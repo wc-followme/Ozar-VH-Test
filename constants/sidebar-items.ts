@@ -1,0 +1,75 @@
+import { ReactNode } from 'react';
+import { JobIcon } from "./../components/icons/JobIcon"
+import { Users } from "./../components/icons/User"
+import { Category } from "./../components/icons/Category"
+import { Company } from "./../components/icons/Company"
+import { Material } from "./../components/icons/Material"
+import { Service } from "./../components/icons/Service"
+import { Tool } from "./../components/icons/Tool"
+import { Trade } from "./../components/icons/Trade"
+import { RoleIcon } from "./../components/icons/RoleIcon"
+import {
+  Home,
+  Briefcase,
+  Bag,
+  Box,
+} from 'iconsax-react';
+
+type SidebarItem = {
+  title: string;
+  href: string;
+  icon: any;
+};
+
+export const sidebarItems: SidebarItem[] = [
+  {
+    title: "Home",
+    href: "/",
+    icon: Home,
+  },
+  {
+    title: "Jobs",
+    href: "/analytics",
+    icon: JobIcon,
+  },
+  {
+    title: "Role Manag.",
+    href: "/role-management",
+    icon: RoleIcon,
+  },
+  {
+    title: "User Manag.",
+    href: "/settings",
+    icon: Users,
+  },
+  {
+    title: "Company Manag.",
+    href: "/trade",
+    icon: Category,
+  },
+  {
+    title: "Category Manag.",
+    href: "/service",
+    icon: Company,
+  },
+  {
+    title: "Trade Manag.",
+    href: "/material",
+    icon: Material,
+  },
+  {
+    title: "Service Manag.",
+    href: "/tools",
+    icon: Service,
+  },
+  {
+    title: "Material Manag.",
+    href: "/tools",
+    icon: Tool,
+  },
+  {
+    title: "Tools Manag.",
+    href: "/tools",
+    icon: Trade,
+  },
+];

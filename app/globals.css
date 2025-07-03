@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+  --primary: #24338C;
+  --secondary: #34AD44;
+  --success: #90C91D;
+  --info: #00A8BF;
+  --error: #EBB402;
+  --warning: #D43232;
+  --text: #2D2D2D;
+   --text-dark: #2D2D2D;
+  --text-secondary: #818181;
+  --text-placeholder: #C0C6CD;
+  --border-dark: #E8EAED;
+  --border-light: #F4F5F6;
+  --background: #F5F7FA;
+  --card-background: #FFFFFF;
+  --white-background: #FFFFFF;
+  --icon-dark: #FFFFFF;
+  --icon-light: #FFFFFF;
+  --dark-background: #E8EAED;
+}
+
+.dark {
+  --primary: #4C5CBA;
+  --secondary: #4C9A5D;
+  --success: #7CA63E;
+  --info: #2CAAC1;
+  --error: #D79C36;
+  --warning: #B55353;
+  --text: #E0E0E0;
+   --text-dark: #fff;
+  --text-secondary: #A2A2A2;
+  --text-placeholder: #7A828B;
+  --border-dark: #222433;
+  --border-light: #33364C;
+  --background: #10121D;
+  --card-background: #161824;
+  --white-background: #040612;
+  --icon-dark: #FFFFFF;
+  --icon-light: #FFFFFF;
+  --dark-background: #040612;
+}
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
