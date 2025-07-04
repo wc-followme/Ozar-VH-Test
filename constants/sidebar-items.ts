@@ -14,6 +14,7 @@ import {
   Bag,
   Box,
 } from 'iconsax-react';
+import { CircleUserIcon } from 'lucide-react';
 
 type SidebarItem = {
   title: string;
@@ -40,22 +41,22 @@ export const sidebarItems: SidebarItem[] = [
   {
     title: "User Manag.",
     href: "/settings",
-    icon: Users,
+    icon: CircleUserIcon,
   },
   {
     title: "Company Manag.",
     href: "/trade",
-    icon: Category,
+    icon: Company,
   },
   {
     title: "Category Manag.",
     href: "/service",
-    icon: Company,
+    icon: Category,
   },
   {
     title: "Trade Manag.",
     href: "/material",
-    icon: Material,
+    icon: Trade,
   },
   {
     title: "Service Manag.",
@@ -65,11 +66,11 @@ export const sidebarItems: SidebarItem[] = [
   {
     title: "Material Manag.",
     href: "/tools",
-    icon: Tool,
+    icon: Material,
   },
   {
     title: "Tools Manag.",
     href: "/tools",
-    icon: Trade,
+    icon: Tool,
   },
 ];
