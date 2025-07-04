@@ -40,7 +40,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: "User Manag.",
-    href: "/settings",
+    href: "/user-management",
     icon: CircleUserIcon,
   },
   {

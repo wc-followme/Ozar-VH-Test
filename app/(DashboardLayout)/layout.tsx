@@ -13,7 +13,7 @@ export default function DashboardLayout({
       <Sidebar />
       <div className="flex flex-col flex-1">
         <Header />
-        <main className="rounded-t-[30px] p-5 bg-[var(--background)] h-full">{children}</main>
+        <main className="rounded-t-[30px] p-6 bg-[var(--background)] h-full">{children}</main>
       </div>
     </div>
   )

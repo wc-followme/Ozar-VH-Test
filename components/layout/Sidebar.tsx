@@ -11,7 +11,7 @@ export function Sidebar() {
 
   return (
     <div className={cn("pb-12 transition-all duration-700 ease-in-out h-screen bg-[var(--white-background)]")}>
-      <div className="space-y-4 py-4">
+      <div className="space-y-4 py-3">
         <div className="px-3">
 
           {/* Burger Menu */}
@@ -42,17 +42,17 @@ export function Sidebar() {
           </div>
 
           {/* Sidebar Links */}
-          <ul>
+          <ul className="py-2">
             {sidebarItems.map((item, index) => (
               <li key={index}>
                 <Link
                   href={item.href}
                   className={cn(
-                    "flex items-center flex-nowrap w-full px-[18px] rounded-2xl h-[60px] text-black dark:text-white  transition-colors",
+                    "flex items-center flex-nowrap w-full px-[18px] rounded-[16px] h-[60px] text-[var( --text-dark)] transition-colors",
                     pathname === item.href && "bg-[var(--primary)] text-white"
                   )}
                 >
-            <div className="stroke-[var(--text)]"><item.icon size="24"/></div>
+            <div className="stroke-[var(--text)]"><item.icon size="24" color="currentcolor"/></div>
                   <span
                     className={cn(
                       "overflow-hidden text-nowrap transition-all duration-700",

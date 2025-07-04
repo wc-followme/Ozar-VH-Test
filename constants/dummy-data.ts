@@ -7,7 +7,7 @@ import { HomeIcon } from "lucide-react";
     {
       title: "Admin",
       iconSrc: UserCardIcon,
-      iconBgColor: "bg-[#34AD4426]",
+      iconBgColor: "#34AD4426",
       description:"Enhance outdoor spaces including roofing, siding, painting, landscaping, or fencing work.",
       permissionCount:30,
       color:'',
@@ -15,7 +15,7 @@ import { HomeIcon } from "lucide-react";
     {
       title: "Contractor",
       iconSrc: HelmetIcon,
-      iconBgColor: "bg-[#1A57BF1A]",
+      iconBgColor: "#1A57BF1A",
       description:"Enhance outdoor spaces including roofing, siding, painting, landscaping, or fencing work.",
       permissionCount:30,
       color:'',
@@ -23,7 +23,7 @@ import { HomeIcon } from "lucide-react";
     {
       title: "Project Manager",
       iconSrc: PeopleGroupIcon,
-      iconBgColor: "bg-[#D4323226]",
+      iconBgColor: "#D4323226",
       description:"Enhance outdoor spaces including roofing, siding, painting, landscaping, or fencing work.",
       permissionCount:30,
       color:'#D43232',
@@ -31,7 +31,7 @@ import { HomeIcon } from "lucide-react";
     {
       title: "Estimator",
       iconSrc:PeopleGroupIcon,
-      iconBgColor: "bg-[#90C91D26]",
+      iconBgColor: "#90C91D26",
       description:"Enhance outdoor spaces including roofing, siding, painting, landscaping, or fencing work.",
       permissionCount:30,
       color:'#90C91D',
@@ -39,7 +39,7 @@ import { HomeIcon } from "lucide-react";
     {
       title: "Employee",
       iconSrc:PeopleGroupIcon,
-      iconBgColor: "bg-[#EBB40226]",
+      iconBgColor: "#EBB40226",
       description:"Enhance outdoor spaces including roofing, siding, painting, landscaping, or fencing work.",
       permissionCount:30,
       color:'#90C91D',
@@ -47,7 +47,7 @@ import { HomeIcon } from "lucide-react";
     {
       title: "Home Owner",
       iconSrc: HomeIcon,
-      iconBgColor: "bg-[#00A8BF26]",
+      iconBgColor: "#00A8BF26",
       description:"Enhance outdoor spaces including roofing, siding, painting, landscaping, or fencing work.",
       permissionCount:30,
       color:'#00A8BF',
