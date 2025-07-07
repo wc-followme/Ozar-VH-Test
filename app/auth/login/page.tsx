@@ -173,14 +173,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   >
                     Login
                   </Button>
-
-                  {/* Additional Help Text */}
-                  <div className='text-center text-sm text-gray-600'>
-                    <p>
-                      ✅ Pure server-side authentication - Zero client
-                      JavaScript
-                    </p>
-                  </div>
                 </form>
               </div>
             </div>
