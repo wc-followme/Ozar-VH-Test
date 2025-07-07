@@ -17,19 +17,26 @@ interface LoginRequest {
 }
 
 interface LoginResponse {
-  success: boolean;
+  statusCode: number;
   message: string;
   data?: {
+    access_token: string;
     user: {
-      id: string;
+      id: number;
+      first_name: string;
+      last_name: string;
       email: string;
-      name: string;
-      role: string;
+      phone_number: string;
+      profile_image: string;
+      status: string;
+      created_at: string;
+      updated_at: string;
+      created_by: number | null;
+      updated_by: number | null;
+      role_id: number;
+      device_token: string;
     };
-    token: string;
-    refresh_token: string;
   };
-  error?: string;
 }
 
 interface ApiError {

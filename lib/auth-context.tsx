@@ -5,10 +5,15 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { apiService, type ApiError, type LoginResponse } from './api';
 
 interface User {
-  id: string;
+  id: number;
+  first_name: string;
+  last_name: string;
   email: string;
-  name: string;
-  role: string;
+  phone_number: string;
+  profile_image: string;
+  status: string;
+  role_id: number;
+  device_token: string;
 }
 
 interface AuthContextType {
@@ -53,16 +58,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response: LoginResponse = await apiService.login(email, password);
 
-      if (response.success && response.data) {
-        const { user: userData, token, refresh_token } = response.data;
+      // Check for successful response using statusCode
+      if (response.statusCode === 200 && response.data) {
+        const { user: userData, access_token } = response.data;
 
         // Store authentication data
         setIsAuthenticated(true);
         setUser(userData);
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('auth_token', token);
-        localStorage.setItem('refresh_token', refresh_token);
+        localStorage.setItem('auth_token', access_token);
 
         return { success: true };
       } else {
@@ -113,7 +118,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
     localStorage.removeItem('auth_token');
-    localStorage.removeItem('refresh_token');
     localStorage.removeItem('device_id');
   };
 
