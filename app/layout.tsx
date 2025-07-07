@@ -8,8 +8,11 @@ import { AuthProvider } from "@/lib/auth-context"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Dashboard App",
-  description: "A modern dashboard application with authentication",
+  title: "Virtual Homes",
+  description: "Join us to start turning your vision into reality!",
+  icons: {
+    icon: "/favicon.ico",
+  },
 }
 
 export default function RootLayout({
