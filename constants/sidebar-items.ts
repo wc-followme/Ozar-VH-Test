@@ -1,20 +1,15 @@
-import { ReactNode } from 'react';
-import { JobIcon } from "./../components/icons/JobIcon"
-import { Users } from "./../components/icons/User"
-import { Category } from "./../components/icons/Category"
-import { Company } from "./../components/icons/Company"
-import { Material } from "./../components/icons/Material"
-import { Service } from "./../components/icons/Service"
-import { Tool } from "./../components/icons/Tool"
-import { Trade } from "./../components/icons/Trade"
-import { RoleIcon } from "./../components/icons/RoleIcon"
 import {
-  Home,
-  Briefcase,
-  Bag,
-  Box,
+  Home
 } from 'iconsax-react';
 import { CircleUserIcon } from 'lucide-react';
+import { Category } from "./../components/icons/Category";
+import { Company } from "./../components/icons/Company";
+import { JobIcon } from "./../components/icons/JobIcon";
+import { Material } from "./../components/icons/Material";
+import { RoleIcon } from "./../components/icons/RoleIcon";
+import { Service } from "./../components/icons/Service";
+import { Tool } from "./../components/icons/Tool";
+import { Trade } from "./../components/icons/Trade";
 
 type SidebarItem = {
   title: string;
@@ -30,7 +25,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: "Jobs",
-    href: "/analytics",
+    href: "/job-management",
     icon: JobIcon,
   },
   {

@@ -1,30 +1,28 @@
-const LockIcon = ({ className }:any) => {
+const LockIcon = ({ className }: any) => {
   return (
     <svg
-  xmlns="http://www.w3.org/2000/svg"
-  width={24}
-  height={24}
-  viewBox="0 0 24 24"
-  fill="none"
-  className={className}
->
-  <path
-    d="M6 10V8C6 4.69 7 2 12 2C17 2 18 4.69 18 8V10M17 22H7C3 22 2 21 2 17V15C2 11 3 10 7 10H17C21 10 22 11 22 15V17C22 21 21 22 17 22Z"
-    stroke="#818181"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
-  <path
-    d="M15.9951 16H16.0051M11.9941 16H12.0041M7.99414 16H8.00214"
-    stroke="#818181"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
-</svg>
-
-
+      xmlns='http://www.w3.org/2000/svg'
+      width={24}
+      height={24}
+      viewBox='0 0 24 24'
+      fill='none'
+      className={className}
+    >
+      <path
+        d='M6 10V8C6 4.69 7 2 12 2C17 2 18 4.69 18 8V10M17 22H7C3 22 2 21 2 17V15C2 11 3 10 7 10H17C21 10 22 11 22 15V17C22 21 21 22 17 22Z'
+        stroke='#818181'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M15.9951 16H16.0051M11.9941 16H12.0041M7.99414 16H8.00214'
+        stroke='#818181'
+        strokeWidth={2}
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </svg>
   );
 };
 

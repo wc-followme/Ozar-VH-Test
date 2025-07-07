@@ -1,0 +1,167 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useState } from 'react';
+import { SelectBoxCard } from '../cards/SelectBoxCard';
+import { RadioGroupStripe } from '../common/RadioStripe';
+
+interface CreateJobFormProps {
+  onClose?: () => void;
+}
+const selectBoxOptions = [
+  {
+    id: 'homeowner-info',
+    title: 'Homeowner Info',
+    description:
+      'Includes name, email, phone number, and basic contact details.',
+  },
+  {
+    id: 'property-details',
+    title: 'Property Details',
+    description:
+      'Covers home size, number of BHKs, and type of work (interior, exterior, etc.).',
+  },
+  {
+    id: 'project-estimate',
+    title: 'Project Estimate',
+    description:
+      'Provides a detailed cost estimate based on selected services and property info.',
+  },
+];
+export function CreateJobForm({ onClose }: CreateJobFormProps) {
+  const [jobType, setJobType] = useState('public');
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phoneNumber: '',
+    jobType: 'public',
+    link: '',
+  });
+
+  const [selectedBoxes, setSelectedBoxes] = useState<string[]>([
+    'homeowner-info',
+    'property-details',
+  ]);
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSelectionChange = (boxId: string, checked: boolean) => {
+    setSelectedBoxes(prev =>
+      checked ? [...prev, boxId] : prev.filter(id => id !== boxId)
+    );
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Form submitted:', { ...formData, selectedBoxes });
+  };
+
+  return (
+    <Card className='w-full max-w-4xl mx-auto bg-white shadow-none border-0'>
+      <CardContent className='space-y-6'>
+        <form onSubmit={handleSubmit} className='space-y-6'>
+          {/* Full Name Input */}
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className='space-y-2 col-span-2'>
+              <Label
+                htmlFor='full-name'
+                className='text-[14px] font-semibold text-[var(--text-dark)]'
+              >
+                New to Us / Already with Us
+              </Label>
+              <Input
+                id='full-name'
+                placeholder='Enter client full name'
+                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              />
+            </div>
+            <div className='space-y-2'>
+              <Label
+                htmlFor='full-name'
+                className='text-[14px] font-semibold text-[var(--text-dark)]'
+              >
+                Email
+              </Label>
+              <Input
+                id='full-name'
+                placeholder='Enter your email'
+                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              />
+            </div>
+            <div className='space-y-2'>
+              <Label
+                htmlFor='full-name'
+                className='text-[14px] font-semibold text-[var(--text-dark)]'
+              >
+                Phone Number
+              </Label>
+              <Input
+                id='full-name'
+                placeholder='Enter your number'
+                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              />
+            </div>
+          </div>
+
+          {/* Job Type Radio Group */}
+          <div className='space-y-3'>
+            <RadioGroupStripe value={jobType} onChange={setJobType} />
+          </div>
+
+          {/* Select Boxes Section */}
+          <div className='space-y-4'>
+            <Label
+              htmlFor='full-name'
+              className='text-[14px] font-semibold text-[var(--text-dark)]'
+            >
+              Select Boxes
+            </Label>
+            <div className='grid gap-4 md:grid-cols-1 lg:grid-cols-3'>
+              {selectBoxOptions.map(option => (
+                <SelectBoxCard
+                  key={option.id}
+                  id={option.id}
+                  title={option.title}
+                  description={option.description}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Link Input */}
+          <div className='space-y-2'>
+            <Label
+              htmlFor='full-name'
+              className='text-[14px] font-semibold text-[var(--text-dark)]'
+            >
+              Link
+            </Label>
+            <Input
+              id='full-name'
+              placeholder=''
+              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div className='pt-4 flex items-center gap-3'>
+            <Button className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'>
+              Continue Estimate
+            </Button>
+            <Button
+              type='submit'
+              className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
+            >
+              Create Job
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}

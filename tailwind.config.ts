@@ -71,6 +71,9 @@ const config: Config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+     clipPath: {
+    'concave-top-right': 'path("M0,0 H0.85 A0.15,0.15 0 0 1 1,0.15 V1 H0 Z")',
+  },
     },
   },
   plugins: [
