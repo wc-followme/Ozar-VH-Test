@@ -1,53 +1,34 @@
-'use client';
 import { CustomerSection } from '@/components/layout/CustomerSection';
 import { ImageSlider } from '@/components/layout/ImageSlider';
-import { LoginForm } from '@/components/shared/forms/LoginForm';
+import { htmlLoginAction } from '@/app/actions/auth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/lib/auth-context';
-import { CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cookies } from 'next/headers';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { redirect } from 'next/navigation';
+import { AlertCircle, CheckCircle, Lock, Mail } from 'lucide-react';
 
-export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const { login, isAuthenticated } = useAuth();
-  const router = useRouter();
+interface LoginPageProps {
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+// Server component - checks authentication on server
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  // Check if user is already authenticated
+  const cookieStore = await cookies();
+  const isAuthenticated = cookieStore.get('is_authenticated')?.value === 'true';
 
   // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/');
-    }
-  }, [isAuthenticated, router]);
+  if (isAuthenticated) {
+    redirect('/');
+  }
 
-  const handleLogin = async (email: string, password: string) => {
-    setIsLoading(true);
-    setSuccessMessage(null);
-
-    try {
-      const result = await login(email, password);
-      console.log('Login result:', result);
-      if (result.success) {
-        setSuccessMessage('Login successful! Redirecting to dashboard...');
-        console.log('Login successful! Redirecting to dashboard...');
-        // Immediate redirect to dashboard
-        router.push('/dashboard');
-        return result;
-      }
-
-      return result;
-    } catch (error) {
-      console.error('Login error:', error);
-      return {
-        success: false,
-        error: 'An unexpected error occurred. Please try again.',
-      };
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Get error message from URL parameters
+  const errorMessage = searchParams.error as string;
+  const emailError = searchParams.error_email as string;
+  const passwordError = searchParams.error_password as string;
 
   return (
     <section className='min-h-screen'>
@@ -70,22 +51,112 @@ export default function LoginPage() {
                   Join us to start turning your vision into reality!
                 </h1>
                 <p className='text-[var(--text-secondary)] text-[18px]'>
-                  Login now to get started!
+                  Login now to get started! (Pure Server-Side)
                 </p>
               </div>
 
-              {/* Success Message */}
-              {successMessage && (
-                <Alert className='mb-6 border-green-200 bg-green-50'>
-                  <CheckCircle className='h-4 w-4 text-green-600' />
-                  <AlertDescription className='text-green-800'>
-                    {successMessage}
+              {/* Error Message */}
+              {errorMessage && (
+                <Alert variant='destructive' className='mb-6 border-red-200 bg-red-50'>
+                  <AlertCircle className='h-4 w-4' />
+                  <AlertDescription className='text-red-800'>
+                    {decodeURIComponent(errorMessage)}
                   </AlertDescription>
                 </Alert>
               )}
 
-              {/* Login Form */}
-              <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
+              {/* Pure Server-Side Login Form */}
+              <div className='space-y-6'>
+                <form action={htmlLoginAction} className='space-y-6'>
+                  <div className='space-y-4'>
+                    {/* Email Field */}
+                    <div className='space-y-2'>
+                      <Label
+                        htmlFor='email'
+                        className='text-[14px] font-[600] text-[var(--text)]'
+                      >
+                        Email *
+                      </Label>
+                      <div className='relative'>
+                        <Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5' />
+                        <Input
+                          id='email'
+                          name='email'
+                          type='email'
+                          placeholder='Enter your email'
+                          className={`pl-10 h-12 border-2 focus:ring-green-500 bg-white rounded-[10px] ${
+                            emailError
+                              ? 'border-red-500 focus:border-red-500'
+                              : 'border-[var(--border-dark)] focus:border-green-500'
+                          }`}
+                          autoComplete='email'
+                          required
+                        />
+                      </div>
+                      {emailError && (
+                        <p className='text-sm text-red-600 mt-1'>
+                          {decodeURIComponent(emailError)}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Password Field */}
+                    <div className='space-y-2'>
+                      <Label
+                        htmlFor='password'
+                        className='text-[14px] font-[600] text-[var(--text)]'
+                      >
+                        Password *
+                      </Label>
+                      <div className='relative'>
+                        <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5' />
+                        <Input
+                          id='password'
+                          name='password'
+                          type='password'
+                          placeholder='Enter your password'
+                          className={`pl-10 pr-10 h-12 border-2 focus:ring-green-500 bg-white rounded-[10px] ${
+                            passwordError
+                              ? 'border-red-500 focus:border-red-500'
+                              : 'border-[var(--border-dark)] focus:border-green-500'
+                          }`}
+                          autoComplete='current-password'
+                          required
+                          minLength={6}
+                        />
+                      </div>
+                      {passwordError && (
+                        <p className='text-sm text-red-600 mt-1'>
+                          {decodeURIComponent(passwordError)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Forgot Password Link */}
+                  <div className='text-right'>
+                    <a
+                      href='#'
+                      className='text-[16px] text-[var(--text)] hover:text-green-600 transition-colors'
+                    >
+                      Forgot Password?
+                    </a>
+                  </div>
+
+                  {/* Login Button */}
+                  <Button
+                    type='submit'
+                    className='w-full h-12 bg-[var(--secondary)] hover:bg-green-700 text-white font-semibold rounded-full transition-all duration-200'
+                  >
+                    Login
+                  </Button>
+
+                  {/* Additional Help Text */}
+                  <div className='text-center text-sm text-gray-600'>
+                    <p>✅ Pure server-side authentication - Zero client JavaScript</p>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
 
