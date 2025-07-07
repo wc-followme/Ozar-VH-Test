@@ -1,14 +1,14 @@
+import { htmlLoginAction } from '@/app/actions/auth';
 import { CustomerSection } from '@/components/layout/CustomerSection';
 import { ImageSlider } from '@/components/layout/ImageSlider';
-import { htmlLoginAction } from '@/app/actions/auth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AlertCircle, Lock, Mail } from 'lucide-react';
 import { cookies } from 'next/headers';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import { AlertCircle, CheckCircle, Lock, Mail } from 'lucide-react';
 
 interface LoginPageProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -22,13 +22,23 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   // Redirect if already authenticated
   if (isAuthenticated) {
+    // Check if there's a redirect URL to go back to
+    const redirectTo = searchParams.redirect as string;
+    if (
+      redirectTo &&
+      redirectTo.startsWith('/') &&
+      !redirectTo.startsWith('/auth/')
+    ) {
+      redirect(redirectTo);
+    }
     redirect('/');
   }
 
-  // Get error message from URL parameters
+  // Get error message and redirect info from URL parameters
   const errorMessage = searchParams.error as string;
   const emailError = searchParams.error_email as string;
   const passwordError = searchParams.error_password as string;
+  const redirectTo = searchParams.redirect as string;
 
   return (
     <section className='min-h-screen'>
@@ -53,11 +63,19 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 <p className='text-[var(--text-secondary)] text-[18px]'>
                   Login now to get started! (Pure Server-Side)
                 </p>
+                {redirectTo && (
+                  <p className='text-sm text-blue-600'>
+                    You need to login to access {redirectTo}
+                  </p>
+                )}
               </div>
 
               {/* Error Message */}
               {errorMessage && (
-                <Alert variant='destructive' className='mb-6 border-red-200 bg-red-50'>
+                <Alert
+                  variant='destructive'
+                  className='mb-6 border-red-200 bg-red-50'
+                >
                   <AlertCircle className='h-4 w-4' />
                   <AlertDescription className='text-red-800'>
                     {decodeURIComponent(errorMessage)}
@@ -68,6 +86,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               {/* Pure Server-Side Login Form */}
               <div className='space-y-6'>
                 <form action={htmlLoginAction} className='space-y-6'>
+                  {/* Hidden field to preserve redirect URL */}
+                  {redirectTo && (
+                    <input type='hidden' name='redirect' value={redirectTo} />
+                  )}
+
                   <div className='space-y-4'>
                     {/* Email Field */}
                     <div className='space-y-2'>
@@ -153,7 +176,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
                   {/* Additional Help Text */}
                   <div className='text-center text-sm text-gray-600'>
-                    <p>✅ Pure server-side authentication - Zero client JavaScript</p>
+                    <p>
+                      ✅ Pure server-side authentication - Zero client
+                      JavaScript
+                    </p>
                   </div>
                 </form>
               </div>

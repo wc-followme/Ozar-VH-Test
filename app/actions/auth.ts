@@ -207,7 +207,8 @@ export async function serverLoginAction(_prevState: any, formData: FormData) {
     if (error.status === 0) {
       return {
         success: false,
-        message: 'Cannot connect to server. Please check if the backend is running.',
+        message:
+          'Cannot connect to server. Please check if the backend is running.',
       };
     }
 
@@ -221,6 +222,9 @@ export async function serverLoginAction(_prevState: any, formData: FormData) {
 // Pure HTML form action (single parameter)
 export async function htmlLoginAction(formData: FormData) {
   try {
+    // Get redirect URL if provided
+    const redirectTo = formData.get('redirect') as string;
+
     // First validate the form data
     const validation = await validateLoginData({
       email: formData.get('email'),
@@ -235,12 +239,29 @@ export async function htmlLoginAction(formData: FormData) {
           errorParams.append(`error_${key}`, value);
         });
       }
+      // Preserve redirect parameter if it exists
+      if (
+        redirectTo &&
+        redirectTo.startsWith('/') &&
+        !redirectTo.startsWith('/auth/')
+      ) {
+        errorParams.append('redirect', redirectTo);
+      }
       redirect(`/auth/login?${errorParams.toString()}`);
     }
 
     // Make server-side API call
     if (!validation.data) {
-      redirect('/auth/login?error=Invalid form data');
+      const errorParams = new URLSearchParams();
+      errorParams.append('error', 'Invalid form data');
+      if (
+        redirectTo &&
+        redirectTo.startsWith('/') &&
+        !redirectTo.startsWith('/auth/')
+      ) {
+        errorParams.append('redirect', redirectTo);
+      }
+      redirect(`/auth/login?${errorParams.toString()}`);
     }
 
     const response = await makeServerLoginRequest(
@@ -276,28 +297,74 @@ export async function htmlLoginAction(formData: FormData) {
         maxAge: 60 * 60 * 24 * 7, // 7 days
       });
 
-      // Redirect to dashboard
-      redirect('/');
+      // Redirect to intended destination or dashboard
+      if (
+        redirectTo &&
+        redirectTo.startsWith('/') &&
+        !redirectTo.startsWith('/auth/')
+      ) {
+        redirect(redirectTo);
+      } else {
+        redirect('/');
+      }
     } else {
       // Redirect back with error message
-      const errorMessage = encodeURIComponent(response.message || 'Login failed');
-      redirect(`/auth/login?error=${errorMessage}`);
+      const errorParams = new URLSearchParams();
+      const errorMessage = encodeURIComponent(
+        response.message || 'Login failed'
+      );
+      errorParams.append('error', errorMessage);
+      if (
+        redirectTo &&
+        redirectTo.startsWith('/') &&
+        !redirectTo.startsWith('/auth/')
+      ) {
+        errorParams.append('redirect', redirectTo);
+      }
+      redirect(`/auth/login?${errorParams.toString()}`);
     }
   } catch (error: any) {
     console.error('HTML login error:', error);
 
     // Handle specific error cases and redirect with error
     let errorMessage = 'An unexpected error occurred';
-    
+
     if (error.status === 401) {
       errorMessage = error.message || 'Invalid email or password';
     } else if (error.status === 0) {
-      errorMessage = 'Cannot connect to server. Please check if the backend is running.';
+      errorMessage =
+        'Cannot connect to server. Please check if the backend is running.';
     } else if (error.message) {
       errorMessage = error.message;
     }
 
+    const errorParams = new URLSearchParams();
     const encodedError = encodeURIComponent(errorMessage);
-    redirect(`/auth/login?error=${encodedError}`);
+    errorParams.append('error', encodedError);
+
+    // Preserve redirect parameter if it exists
+    const redirectTo = formData.get('redirect') as string;
+    if (
+      redirectTo &&
+      redirectTo.startsWith('/') &&
+      !redirectTo.startsWith('/auth/')
+    ) {
+      errorParams.append('redirect', redirectTo);
+    }
+
+    redirect(`/auth/login?${errorParams.toString()}`);
   }
+}
+
+// Logout action
+export async function logoutAction() {
+  const cookieStore = await cookies();
+
+  // Clear all authentication cookies
+  cookieStore.delete('auth_token');
+  cookieStore.delete('user_data');
+  cookieStore.delete('is_authenticated');
+
+  // Redirect to login page
+  redirect('/auth/login');
 }
