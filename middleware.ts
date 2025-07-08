@@ -4,8 +4,6 @@ import { NextResponse } from 'next/server';
 // Define public routes that don't require authentication
 const publicRoutes = [
   '/auth/login',
-  '/auth/login-optimized',
-  '/auth/login-ssr',
   '/_next',
   '/api',
   '/favicon.ico',
