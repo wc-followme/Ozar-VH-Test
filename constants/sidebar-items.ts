@@ -1,4 +1,4 @@
-import { Home } from 'iconsax-react';
+import { Home, Icon } from 'iconsax-react';
 import { CircleUserIcon } from 'lucide-react';
 import { Category } from './../components/icons/Category';
 import { Company } from './../components/icons/Company';
@@ -12,7 +12,7 @@ import { Trade } from './../components/icons/Trade';
 type SidebarItem = {
   title: string;
   href: string;
-  icon: any;
+  icon: Icon;
 };
 
 export const sidebarItems: SidebarItem[] = [
@@ -23,7 +23,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: 'Jobs',
-    href: '/analytics',
+    href: '/job-management',
     icon: JobIcon,
   },
   {
