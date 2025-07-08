@@ -12,7 +12,7 @@ interface SelectBoxCardProps {
 export function SelectBoxCard({ id, title, description }: SelectBoxCardProps) {
   return (
     <div
-      className={`relative p-4 rounded-[20px] bg-white border-2 transition-all duration-200 cursor-pointer hover:shadow-md [&:has(input:checked)]:border-[#24338C]`}
+      className={`relative p-4 rounded-[20px] bg-white border-2 border-[var(--border-dark)] transition-all duration-200 cursor-pointer hover:shadow-md [&:has(input:checked)]:border-[#24338C]`}
     >
       <div className='flex items-start flex-col'>
         <div className='flex items-center pt-0.5 gap-2 mb-3'>

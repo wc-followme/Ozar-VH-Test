@@ -239,7 +239,7 @@ export default function JobManagement() {
           </Tabs>
         </div>
       </div>
-      <SideSheet open={isOpen} onOpenChange={setIsOpen}>
+      <SideSheet open={isOpen} onOpenChange={setIsOpen} title='Create Job'>
         <CreateJobForm />
       </SideSheet>
     </div>
