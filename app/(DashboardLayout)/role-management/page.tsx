@@ -1,9 +1,9 @@
 'use client';
 
 import { RoleCard } from '@/components/shared/cards/RoleCard';
-import { Button } from '@/components/ui/button';
 import { roles } from '@/constants/dummy-data';
 import { Edit2, Trash } from 'iconsax-react';
+import Link from 'next/link';
 import React from 'react';
 const menuOptions = [
   { label: 'Edit', action: 'edit', icon: Edit2 },
@@ -17,9 +17,12 @@ const RoleManagement = () => {
           Role and Permissions Management
         </h2>
 
-        <Button className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'>
+        <Link
+          href={'/role-management/create-role'}
+          className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
+        >
           Create Role
-        </Button>
+        </Link>
       </header>
 
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full'>
