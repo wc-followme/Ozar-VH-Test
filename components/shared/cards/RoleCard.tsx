@@ -1,12 +1,11 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { IconDotsVertical } from '@tabler/icons-react';
-import React, { ReactNode, useState } from "react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
-import { Edit2 } from "iconsax-react";
+import React, { ReactNode, useState } from "react";
 interface MenuOption {
   label: string;
   action: string;
@@ -22,6 +21,7 @@ export interface RoleCardProps {
   iconColor?:string
   onToggle: () => void;
   menuOptions: MenuOption[];
+  onMenuAction?: (action: string) => void;
 }
 
 export const RoleCard: React.FC<RoleCardProps> = ({
@@ -33,6 +33,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
   iconColor,
   onToggle,
   menuOptions,
+  onMenuAction,
 }) => {
   const [isToggling, setIsToggling] = useState(false);
   const handleToggle = async () => {
@@ -41,8 +42,14 @@ export const RoleCard: React.FC<RoleCardProps> = ({
     setTimeout(() => setIsToggling(false), 300);
   };
 
-  const handleMenuAction = (action: string) => {
-    console.log(`Action ${action} triggered for user ${name}`);
+  const handleMenuAction = (action: string, onClick?: () => void) => {
+    if (onClick) {
+      onClick();
+    } else if (onMenuAction) {
+      onMenuAction(action);
+    } else {
+      console.log(`Action ${action} triggered for user ${name}`);
+    }
   };
 
   const getInitials = (name: string) => {
@@ -89,7 +96,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
   return (
     <DropdownMenuItem
       key={index}
-      onClick={() => handleMenuAction(option.action)}
+      onClick={() => handleMenuAction(option.action, (option as any).onClick)}
       className={cn(
         "text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2",
         option.variant === "destructive"
@@ -97,7 +104,9 @@ export const RoleCard: React.FC<RoleCardProps> = ({
           : "hover:bg-gray-100"
       )}
     >
-      <Icon size="18" color="#2D2D2D" variant="Outline" />
+      {typeof option.icon === 'function'
+  ? React.createElement(option.icon, { size: 18, color: '#2D2D2D', variant: 'Outline' })
+  : option.icon}
       <span>{option.label}</span>
     </DropdownMenuItem>
   );
