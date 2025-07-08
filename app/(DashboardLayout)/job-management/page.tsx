@@ -118,7 +118,6 @@ const mockJobs = [
 ];
 
 export default function JobManagement() {
-  const [activeFilter, setActiveFilter] = useState('need-attention');
   const [selectedTab, setSelectedTab] = useState('info');
   const [isOpen, setIsOpen] = useState(false);
   const stats = [

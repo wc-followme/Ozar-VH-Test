@@ -159,7 +159,7 @@ export default function UserManagement() {
     return true;
   });
 
-  const menuOptions: any = [
+  const menuOptions = [
     { label: 'Edit', action: 'edit', icon: Edit2 },
     { label: 'Delete', action: 'delete', icon: Trash },
   ];

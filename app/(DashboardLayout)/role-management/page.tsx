@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { roles } from '@/constants/dummy-data';
 import { Edit2, Trash } from 'iconsax-react';
 import React from 'react';
-const menuOptions: any = [
+const menuOptions = [
   { label: 'Edit', action: 'edit', icon: Edit2 },
   { label: 'Delete', action: 'delete', icon: Trash },
 ];
@@ -26,7 +26,6 @@ const RoleManagement = () => {
         {roles.map((role, index) => (
           <React.Fragment key={index}>
             <RoleCard
-              onToggle={() => {}}
               menuOptions={menuOptions}
               iconSrc={role.iconSrc}
               iconBgColor={role.iconBgColor}

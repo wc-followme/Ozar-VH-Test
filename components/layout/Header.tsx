@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
 import { cn } from '../../lib/utils';
 import { Notification } from '../icons/Notification';
 import { Search } from '../icons/Search';
@@ -19,7 +18,7 @@ import { Input } from '../ui/input';
 type MenuOption = {
   label: string;
   action: string;
-  icon: React.ElementType; // ✅ Must be a component
+  icon: React.ElementType;
   variant?: 'default' | 'destructive';
 };
 const menuOptions = [
@@ -27,9 +26,8 @@ const menuOptions = [
   { label: 'Logout', action: 'delete', icon: SignoutIcon },
 ];
 export function Header() {
-  const [type, setType] = useState('Contractor');
   const handleMenuAction = (action: string) => {
-    console.log(`Action ${action} triggered for user ${name}`);
+    return action;
   };
   return (
     <header className='bg-[var(--white-background)] px-6 py-3'>
@@ -84,7 +82,7 @@ export function Header() {
               className='bg-[var(--card-background)] border border-[var(--border-dark)] min-w-[185px] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px] p-[10px]'
             >
               {menuOptions.map((option: MenuOption, index: number) => {
-                const Icon: any = option.icon; // ensure Icon is a capitalized component
+                const Icon = option.icon; // ensure Icon is a capitalized component
                 return (
                   <DropdownMenuItem
                     key={index}

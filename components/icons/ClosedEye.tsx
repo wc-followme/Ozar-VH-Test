@@ -1,4 +1,4 @@
-const ClosedEyeIcon = ({ className }: any) => {
+const ClosedEyeIcon = ({ className }: { className: string }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -6,6 +6,7 @@ const ClosedEyeIcon = ({ className }: any) => {
       height={24}
       viewBox='0 0 24 24'
       fill='none'
+      className={className}
     >
       <path
         d='M14.5298 9.46984L9.46984 14.5298C8.79884 13.8588 8.42188 12.9488 8.42188 11.9998C8.42188 11.53 8.51442 11.0647 8.69423 10.6306C8.87404 10.1965 9.13759 9.80208 9.46984 9.46984C9.80208 9.13759 10.1965 8.87404 10.6306 8.69423C11.0647 8.51442 11.53 8.42188 11.9998 8.42188C12.9488 8.42188 13.8588 8.79884 14.5298 9.46984Z'

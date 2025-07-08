@@ -1,7 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { Icon } from 'iconsax-react';
 
 interface StatsCardProps {
-  icon: any;
+  icon: Icon | any;
   value: string;
   label: string;
   iconColor: string;

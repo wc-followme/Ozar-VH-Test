@@ -11,14 +11,14 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { Call, Sms } from 'iconsax-react';
-import { ReactNode, useState } from 'react';
+import { Call, Icon, Sms } from 'iconsax-react';
+import { useState } from 'react';
 
 interface MenuOption {
   label: string;
   action: string;
   variant?: 'default' | 'destructive';
-  icon: ReactNode;
+  icon: Icon;
 }
 
 interface UserCardProps {
@@ -51,7 +51,7 @@ export function UserCard({
   };
 
   const handleMenuAction = (action: string) => {
-    console.log(`Action ${action} triggered for user ${name}`);
+    return action;
   };
 
   const getInitials = (name: string) => {
@@ -120,7 +120,7 @@ export function UserCard({
             className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
           >
             {menuOptions.map((option, index) => {
-              const Icon: any = option.icon; // ensure Icon is a capitalized component
+              const Icon = option.icon; // ensure Icon is a capitalized component
               return (
                 <DropdownMenuItem
                   key={index}

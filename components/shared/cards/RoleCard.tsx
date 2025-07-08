@@ -10,12 +10,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
-import React, { ReactNode, useState } from 'react';
+import { Icon } from 'iconsax-react';
+import React from 'react';
 interface MenuOption {
   label: string;
   action: string;
   variant?: 'default' | 'destructive';
-  icon: ReactNode;
+  icon: Icon | any;
 }
 export interface RoleCardProps {
   iconSrc: any;
@@ -24,7 +25,6 @@ export interface RoleCardProps {
   description?: string;
   permissionCount?: number;
   iconColor?: string;
-  onToggle: () => void;
   menuOptions: MenuOption[];
 }
 
@@ -35,27 +35,12 @@ export const RoleCard: React.FC<RoleCardProps> = ({
   description = 'Enhance outdoor spaces including roofing, siding, painting, landscaping, or fencing work.',
   permissionCount = 0,
   iconColor,
-  onToggle,
   menuOptions,
 }) => {
-  const [isToggling, setIsToggling] = useState(false);
-  const handleToggle = async () => {
-    setIsToggling(true);
-    onToggle();
-    setTimeout(() => setIsToggling(false), 300);
-  };
-
   const handleMenuAction = (action: string) => {
-    console.log(`Action ${action} triggered for user ${name}`);
+    return action;
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase();
-  };
   return (
     <Card className='flex flex-col items-start gap-4 p-6 bg-[var(--card-background)] rounded-[24px] border border-[var(--border-dark)] hover:shadow-lg transition-shadow duration-200'>
       <div className='flex items-start justify-between w-full'>
@@ -89,7 +74,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
             className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
           >
             {menuOptions.map((option, index) => {
-              const Icon: any = option.icon; // ensure Icon is a capitalized component
+              const Icon = option.icon; // ensure Icon is a capitalized component
               return (
                 <DropdownMenuItem
                   key={index}

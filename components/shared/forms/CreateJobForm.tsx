@@ -8,9 +8,6 @@ import { useState } from 'react';
 import { SelectBoxCard } from '../cards/SelectBoxCard';
 import { RadioGroupStripe } from '../common/RadioStripe';
 
-interface CreateJobFormProps {
-  onClose?: () => void;
-}
 const selectBoxOptions = [
   {
     id: 'homeowner-info',
@@ -31,34 +28,11 @@ const selectBoxOptions = [
       'Provides a detailed cost estimate based on selected services and property info.',
   },
 ];
-export function CreateJobForm({ onClose }: CreateJobFormProps) {
+export function CreateJobForm() {
   const [jobType, setJobType] = useState('public');
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phoneNumber: '',
-    jobType: 'public',
-    link: '',
-  });
-
-  const [selectedBoxes, setSelectedBoxes] = useState<string[]>([
-    'homeowner-info',
-    'property-details',
-  ]);
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSelectionChange = (boxId: string, checked: boolean) => {
-    setSelectedBoxes(prev =>
-      checked ? [...prev, boxId] : prev.filter(id => id !== boxId)
-    );
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', { ...formData, selectedBoxes });
   };
 
   return (
