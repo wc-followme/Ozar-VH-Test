@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { UserInfoForm } from '@/components/shared/forms/UsrinfoForm';
 import { ImageUpload } from '@/components/shared/ImageUpload';
@@ -7,8 +8,12 @@ import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 
 const CreateCompany = () => {
+  const router = useRouter();
   const handleUploadClick = () => {
     console.log('Upload clicked');
+  };
+  const handleCreateClick = () => {
+    router.push('/company-management/company-details');
   };
   return (
     <div className=''>
@@ -53,7 +58,10 @@ const CreateCompany = () => {
               >
                 Cancel
               </Link>
-              <Button className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'>
+              <Button
+                className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
+                onClick={handleCreateClick}
+              >
                 Create
               </Button>
             </div>
