@@ -68,7 +68,6 @@ const RoleManagement = () => {
 
   // Handler for deleting a role
   const handleDeleteRole = async (uuid: string) => {
-    if (!window.confirm('Are you sure you want to delete this role?')) return;
     try {
       await apiService.deleteRole(uuid);
       setRoles(prev => prev.filter(role => role.uuid !== uuid));

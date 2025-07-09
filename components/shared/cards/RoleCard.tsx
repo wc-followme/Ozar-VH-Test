@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ROLE_MESSAGES } from '@/constants/role-messages';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Icon } from 'iconsax-react';
@@ -46,7 +47,12 @@ export const RoleCard: React.FC<RoleCardProps> = ({
 
   const handleMenuAction = (action: string) => {
     if (action === 'edit' && onEdit) onEdit();
-    if (action === 'delete' && onDelete) onDelete();
+    if (action === 'delete') setShowDelete(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowDelete(false);
+    if (onDelete) onDelete();
   };
 
   return (
@@ -123,14 +129,10 @@ export const RoleCard: React.FC<RoleCardProps> = ({
       </CardContent>
       <ConfirmDeleteModal
         open={showDelete}
-        title={`Are you sure you want to delete?`}
-        subtitle={`This action cannot be undone.`}
+        title={ROLE_MESSAGES.DELETE_CONFIRM_TITLE}
+        subtitle={ROLE_MESSAGES.DELETE_CONFIRM_SUBTITLE}
         onCancel={() => setShowDelete(false)}
-        onDelete={() => {
-          setShowDelete(false);
-          // TODO: Call delete logic here
-          console.log('Role deleted');
-        }}
+        onDelete={handleConfirmDelete}
       />
     </Card>
   );
