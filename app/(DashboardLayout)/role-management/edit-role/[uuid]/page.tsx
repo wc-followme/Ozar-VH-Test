@@ -1,12 +1,12 @@
 'use client';
 import { RoleForm } from '@/components/shared/forms/RoleForm';
 import { useToast } from '@/components/ui/use-toast';
-import { ROLE_MESSAGES } from '@/constants/role-messages';
 import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
 import type { CreateRoleFormData } from '@/lib/validations/role';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ROLE_MESSAGES } from '../../role-messages';
 
 const EditRolePage = () => {
   const router = useRouter();
@@ -45,7 +45,10 @@ const EditRolePage = () => {
   const onSubmit = async (data: CreateRoleFormData) => {
     setIsSubmitting(true);
     try {
-      const response = await apiService.updateRoleDetails(uuid, data);
+      const response = (await apiService.updateRoleDetails(uuid, data)) as {
+        statusCode: number;
+        message?: string;
+      };
       if (
         response.statusCode === STATUS_CODES.OK ||
         response.statusCode === STATUS_CODES.CREATED
