@@ -45,13 +45,13 @@ const CreateRole = () => {
         message?: string;
         errors?: any;
       };
-      let errorMessage = 'An unexpected error occurred';
+      let errorMessage = ROLE_MESSAGES.UNEXPECTED_ERROR;
       if (apiError.status === STATUS_CODES.BAD_REQUEST) {
-        errorMessage = 'Invalid role data. Please check your input.';
+        errorMessage = ROLE_MESSAGES.INVALID_DATA;
       } else if (apiError.status === STATUS_CODES.UNAUTHORIZED) {
-        errorMessage = 'You are not authorized to create roles.';
+        errorMessage = ROLE_MESSAGES.UNAUTHORIZED;
       } else if (apiError.status === STATUS_CODES.CONFLICT) {
-        errorMessage = 'A role with this name already exists.';
+        errorMessage = ROLE_MESSAGES.DUPLICATE_ROLE;
       } else if (apiError.status === STATUS_CODES.UNPROCESSABLE_ENTITY) {
         if (apiError.errors) {
           const errorMessages = Object.values(apiError.errors).flat();
