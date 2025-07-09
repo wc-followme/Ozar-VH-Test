@@ -1,44 +1,41 @@
-import { htmlLoginAction } from '@/app/actions/auth';
+'use client';
+
 import { CustomerSection } from '@/components/layout/CustomerSection';
 import { ImageSlider } from '@/components/layout/ImageSlider';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { AlertCircle, Lock, Mail } from 'lucide-react';
-import { cookies } from 'next/headers';
+import { LoginForm } from '@/components/shared/forms/LoginForm';
+import { useAuth } from '@/lib/auth-context';
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
-interface LoginPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
-}
+export default function LoginPage() {
+  const { login, isLoading } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [error, setError] = useState<string | null>(null);
 
-// Server component - checks authentication on server
-export default async function LoginPage({ searchParams }: LoginPageProps) {
-  // Check if user is already authenticated
-  const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get('is_authenticated')?.value === 'true';
+  // Get redirect param if present
+  const redirectTo = searchParams.get('redirect');
 
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    // Check if there's a redirect URL to go back to
-    const redirectTo = searchParams.redirect as string;
-    if (
-      redirectTo &&
-      redirectTo.startsWith('/') &&
-      !redirectTo.startsWith('/auth/')
-    ) {
-      redirect(redirectTo);
+  const handleLogin = async (email: string, password: string) => {
+    setError(null);
+    const result = await login(email, password);
+    if (result.success) {
+      // Redirect after login
+      if (
+        redirectTo &&
+        redirectTo.startsWith('/') &&
+        !redirectTo.startsWith('/auth/')
+      ) {
+        router.push(redirectTo);
+      } else {
+        router.push('/');
+      }
+    } else {
+      setError(result.error || 'Login failed');
     }
-    redirect('/');
-  }
-
-  // Get error message and redirect info from URL parameters
-  const errorMessage = searchParams.error as string;
-  const emailError = searchParams.error_email as string;
-  const passwordError = searchParams.error_password as string;
-  const redirectTo = searchParams.redirect as string;
+    return result;
+  };
 
   return (
     <section className='min-h-screen'>
@@ -61,7 +58,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   Join us to start turning your vision into reality!
                 </h1>
                 <p className='text-[var(--text-secondary)] text-[18px]'>
-                  Login now to get started! (Pure Server-Side)
+                  Login now to get started!
                 </p>
                 {redirectTo && (
                   <p className='text-sm text-blue-600'>
@@ -71,109 +68,15 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </div>
 
               {/* Error Message */}
-              {errorMessage && (
-                <Alert
-                  variant='destructive'
-                  className='mb-6 border-red-200 bg-red-50'
-                >
-                  <AlertCircle className='h-4 w-4' />
-                  <AlertDescription className='text-red-800'>
-                    {decodeURIComponent(errorMessage)}
-                  </AlertDescription>
-                </Alert>
+              {error && (
+                <div className='mb-6 border-red-200 bg-red-50 text-red-800 rounded p-2'>
+                  {error}
+                </div>
               )}
 
-              {/* Pure Server-Side Login Form */}
+              {/* Client-side Login Form */}
               <div className='space-y-6'>
-                <form action={htmlLoginAction} className='space-y-6'>
-                  {/* Hidden field to preserve redirect URL */}
-                  {redirectTo && (
-                    <input type='hidden' name='redirect' value={redirectTo} />
-                  )}
-
-                  <div className='space-y-4'>
-                    {/* Email Field */}
-                    <div className='space-y-2'>
-                      <Label
-                        htmlFor='email'
-                        className='text-[14px] font-[600] text-[var(--text)]'
-                      >
-                        Email *
-                      </Label>
-                      <div className='relative'>
-                        <Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5' />
-                        <Input
-                          id='email'
-                          name='email'
-                          type='email'
-                          placeholder='Enter your email'
-                          className={`pl-10 h-12 border-2 focus:ring-green-500 bg-white rounded-[10px] ${
-                            emailError
-                              ? 'border-red-500 focus:border-red-500'
-                              : 'border-[var(--border-dark)] focus:border-green-500'
-                          }`}
-                          autoComplete='email'
-                          required
-                        />
-                      </div>
-                      {emailError && (
-                        <p className='text-sm text-red-600 mt-1'>
-                          {decodeURIComponent(emailError)}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Password Field */}
-                    <div className='space-y-2'>
-                      <Label
-                        htmlFor='password'
-                        className='text-[14px] font-[600] text-[var(--text)]'
-                      >
-                        Password *
-                      </Label>
-                      <div className='relative'>
-                        <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5' />
-                        <Input
-                          id='password'
-                          name='password'
-                          type='password'
-                          placeholder='Enter your password'
-                          className={`pl-10 pr-10 h-12 border-2 focus:ring-green-500 bg-white rounded-[10px] ${
-                            passwordError
-                              ? 'border-red-500 focus:border-red-500'
-                              : 'border-[var(--border-dark)] focus:border-green-500'
-                          }`}
-                          autoComplete='current-password'
-                          required
-                          minLength={6}
-                        />
-                      </div>
-                      {passwordError && (
-                        <p className='text-sm text-red-600 mt-1'>
-                          {decodeURIComponent(passwordError)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Forgot Password Link */}
-                  <div className='text-right'>
-                    <a
-                      href='#'
-                      className='text-[16px] text-[var(--text)] hover:text-green-600 transition-colors'
-                    >
-                      Forgot Password?
-                    </a>
-                  </div>
-
-                  {/* Login Button */}
-                  <Button
-                    type='submit'
-                    className='w-full h-12 bg-[var(--secondary)] hover:bg-green-700 text-white font-semibold rounded-full transition-all duration-200'
-                  >
-                    Login
-                  </Button>
-                </form>
+                <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
               </div>
             </div>
           </div>

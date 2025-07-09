@@ -8,6 +8,7 @@ import { cn } from '../../lib/utils';
 import { Notification } from '../icons/Notification';
 import { Search } from '../icons/Search';
 import { SignoutIcon } from '../icons/SignoutIcon';
+import { useAuth } from '@/lib/auth-context';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +27,11 @@ const menuOptions = [
   { label: 'Logout', action: 'delete', icon: SignoutIcon },
 ];
 export function Header() {
+  const { logout } = useAuth();
   const handleMenuAction = (action: string) => {
+    if (action === 'delete') {
+      logout();
+    }
     return action;
   };
   return (

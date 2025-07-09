@@ -45,6 +45,28 @@ interface ApiError {
   errors?: Record<string, string[]>;
 }
 
+// Role management interfaces
+interface CreateRoleRequest {
+  name: string;
+  description: string;
+  icon: string;
+  status: 'ACTIVE' | 'INACTIVE';
+}
+
+interface CreateRoleResponse {
+  statusCode: number;
+  message: string;
+  data?: {
+    id: number;
+    name: string;
+    description: string;
+    icon: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+  };
+}
+
 // Get device information for login
 const getDeviceInfo = (): DeviceInfo => {
   const navigator = typeof window !== 'undefined' ? window.navigator : null;
@@ -90,9 +112,9 @@ class ApiService {
       headers: {
         'Content-Type': 'application/json',
         accept: 'application/json',
-        'app-type': 'web',
+        'app-type': 'mobile', // Changed from 'web' to 'mobile' to match your curl command
         'Accept-Language': 'en',
-        ...options.headers,
+        ...options.headers, // This will include Authorization when passed from getRoleHeaders()
       },
       ...options,
     };
@@ -137,10 +159,32 @@ class ApiService {
 
   // Add authorization header for authenticated requests
   private getAuthHeaders(): Record<string, string> {
+    if (typeof window === 'undefined') {
+      return {};
+    }
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      return {};
+    }
+    return {
+      Authorization: `Bearer ${token}`,
+    };
+  }
+
+  // Get complete headers for role operations
+  private getRoleHeaders(): Record<string, string> {
     const token =
       typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    const baseHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      accept: 'application/json',
+      'app-type': 'mobile',
+      'Accept-Language': 'en',
+    };
+    if (token) {
+      baseHeaders['Authorization'] = `Bearer ${token}`;
+    }
+    return baseHeaders;
   }
 
   // Example of authenticated request
@@ -149,7 +193,79 @@ class ApiService {
       headers: this.getAuthHeaders(),
     });
   }
+
+  // Role management APIs
+  async createRole(roleData: CreateRoleRequest): Promise<CreateRoleResponse> {
+    return this.makeRequest<CreateRoleResponse>('/roles', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(roleData),
+    });
+  }
+
+  async getRoles(): Promise<any> {
+    return this.makeRequest('/roles', {
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Fetch roles with pagination, search, and name filter
+  async fetchRoles({
+    page = 1,
+    limit = 10,
+    search = '',
+    name = '',
+  }: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    name?: string;
+  }) {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (search) params.append('search', search);
+    if (name) params.append('name', name);
+    return this.makeRequest(`/roles?${params.toString()}`, {
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Get role details by UUID
+  async getRoleDetails(uuid: string) {
+    return this.makeRequest(`/roles/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update role details by UUID
+  async updateRoleDetails(uuid: string, data: Partial<CreateRoleRequest>) {
+    return this.makeRequest(`/roles/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Delete role by UUID
+  async deleteRole(uuid: string) {
+    return this.makeRequest(`/roles/${uuid}`, {
+      method: 'DELETE',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Logout API
+  async logout() {
+    return this.makeRequest('/auth/logout', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Removed testConnection and all debug code
 }
 
 export const apiService = new ApiService();
-export type { ApiError, LoginResponse };
+export type { ApiError, CreateRoleRequest, CreateRoleResponse, LoginResponse };
