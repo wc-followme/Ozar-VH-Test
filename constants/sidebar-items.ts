@@ -11,12 +11,12 @@ import { Trade } from './../components/icons/Trade';
 // Common icon options for roles and other modules
 import {
   BarChart,
+  CircleUserIcon,
   Database,
   FileText,
   Settings,
   Shield,
   Users,
-  CircleUserIcon
 } from 'lucide-react';
 
 type SidebarItem = {
@@ -48,7 +48,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: 'Company Manag.',
-    href: '/trade',
+    href: '/company-management',
     icon: Company,
   },
   {
