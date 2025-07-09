@@ -1,5 +1,4 @@
-import { Home } from 'iconsax-react';
-import { CircleUserIcon } from 'lucide-react';
+import { Home, Icon } from 'iconsax-react';
 import { Category } from './../components/icons/Category';
 import { Company } from './../components/icons/Company';
 import { JobIcon } from './../components/icons/JobIcon';
@@ -9,10 +8,21 @@ import { Service } from './../components/icons/Service';
 import { Tool } from './../components/icons/Tool';
 import { Trade } from './../components/icons/Trade';
 
+// Common icon options for roles and other modules
+import {
+  BarChart,
+  CircleUserIcon,
+  Database,
+  FileText,
+  Settings,
+  Shield,
+  Users,
+} from 'lucide-react';
+
 type SidebarItem = {
   title: string;
   href: string;
-  icon: any;
+  icon: Icon;
 };
 
 export const sidebarItems: SidebarItem[] = [
@@ -23,7 +33,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: 'Jobs',
-    href: '/analytics',
+    href: '/job-management',
     icon: JobIcon,
   },
   {
@@ -38,7 +48,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: 'Company Manag.',
-    href: '/company-management',
+    href: '/trade',
     icon: Company,
   },
   {
@@ -65,5 +75,39 @@ export const sidebarItems: SidebarItem[] = [
     title: 'Tools Manag.',
     href: '/tools',
     icon: Tool,
+  },
+];
+
+export const iconOptions = [
+  {
+    value: 'fas fa-cog',
+    label: 'Settings',
+    icon: Settings,
+    color: '#00a8bf',
+  },
+  { value: 'fas fa-users', label: 'Users', icon: Users, color: '#34ad44' },
+  {
+    value: 'fas fa-user-shield',
+    label: 'Shield',
+    icon: Shield,
+    color: '#ff6b6b',
+  },
+  {
+    value: 'fas fa-database',
+    label: 'Database',
+    icon: Database,
+    color: '#4c6ef5',
+  },
+  {
+    value: 'fas fa-file-text',
+    label: 'Documents',
+    icon: FileText,
+    color: '#fd7e14',
+  },
+  {
+    value: 'fas fa-chart-bar',
+    label: 'Analytics',
+    icon: BarChart,
+    color: '#9c88ff',
   },
 ];

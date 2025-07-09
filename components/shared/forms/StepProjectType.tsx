@@ -1,0 +1,115 @@
+import { FlagHookIcon } from '../../icons/FalgHookIcon';
+
+const PROJECT_TYPES = [
+  {
+    key: 'full_home',
+    icon: FlagHookIcon,
+    title: 'Full Home Build/Addition',
+    desc: 'Start a new home from scratch or add a room, floor, or extension to your existing space.',
+    iconColor: 'text-[#EBB402]',
+    bgColor: 'bg-[#EBB4021A]',
+  },
+  {
+    key: 'interior',
+    icon: FlagHookIcon,
+    title: 'Interior',
+    desc: 'Renovate or upgrade interiors like kitchen, bathroom, living room, or complete home redesign.',
+    iconColor: 'text-[#EBB402]',
+    bgColor: 'bg-[#EBB4021A]',
+  },
+  {
+    key: 'exterior',
+    icon: FlagHookIcon,
+    title: 'Exterior',
+    desc: 'Enhance outdoor spaces including roofing, siding, painting, landscaping, or fencing work.',
+    iconColor: 'text-[#EBB402]',
+    bgColor: 'bg-[#EBB4021A]',
+  },
+  {
+    key: 'multi_trade',
+    icon: FlagHookIcon,
+    title: 'Single/Multi Trade',
+    desc: 'Get help with one or more specific trades like plumbing, electrical, flooring, or carpentry.',
+    iconColor: 'text-[#EBB402]',
+    bgColor: 'bg-[#EBB4021A]',
+  },
+  {
+    key: 'repair',
+    icon: FlagHookIcon,
+    title: 'Repair',
+    desc: 'Fix issues like leaks, cracks, broken fixtures, or any small-scale home damage.',
+    iconColor: 'text-[#EBB402]',
+    bgColor: 'bg-[#EBB4021A]',
+  },
+];
+
+interface StepProjectTypeProps {
+  selectedType: string;
+  setSelectedType: (type: string) => void;
+  onPrev: () => void;
+  onSubmit: () => void;
+  cancelButtonClass?: string;
+}
+
+export function StepProjectType({
+  selectedType,
+  setSelectedType,
+  onPrev,
+  onSubmit,
+  cancelButtonClass,
+}: StepProjectTypeProps) {
+  return (
+    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-10 flex flex-col items-center'>
+      <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
+        Which type of project do you need for your home?
+      </h2>
+      <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
+        Choose the project category to help us provide accurate planning and
+        estimates.
+      </p>
+      <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
+        {PROJECT_TYPES.map(type => {
+          const Icon = type.icon;
+          return (
+            <div
+              key={type.key}
+              className={`flex flex-col items-start border border-[var(--border-dark)] rounded-2xl bg-[var(--card-background)]  p-6 cursor-pointer transition-all duration-150 hover:shadow-md ${selectedType === type.key ? 'border-green-500 shadow-green-100' : ''}`}
+              onClick={() => setSelectedType(type.key)}
+            >
+              <div
+                className={`w-10 h-10 rounded-[16px] ${type.bgColor} ${type.iconColor} flex items-center justify-center mb-4`}
+              >
+                <Icon className={`w-5 h-5 `} color='currentcolor' />
+              </div>
+              <div className='font-bold text-base mb-1 text-[var(--text-dark)]'>
+                {type.title}
+              </div>
+              <div className='text-[var(--text-secondary)] text-base'>
+                {type.desc}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className='flex w-full justify-between mt-6'>
+        <button
+          type='button'
+          className={
+            cancelButtonClass ||
+            'h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
+          }
+          onClick={onPrev}
+        >
+          Previous
+        </button>
+        <button
+          type='button'
+          className='bg-[var(--secondary)] hover:bg-green-600 text-white px-10 py-3 rounded-full font-semibold'
+          onClick={onSubmit}
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  );
+}
