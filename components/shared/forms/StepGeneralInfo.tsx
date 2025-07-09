@@ -50,11 +50,11 @@ export function StepGeneralInfo({
   onNext,
 }: StepGeneralInfoProps) {
   return (
-    <div className='w-full max-w-[846px] bg-white rounded-2xl shadow p-10 flex flex-col items-center'>
-      <h2 className='text-2xl font-bold text-center mb-2'>
+    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-10 flex flex-col items-center'>
+      <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
         General information
       </h2>
-      <p className='text-gray-500 text-center mb-8 max-w-lg'>
+      <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
         Please answer the required questions to start your project. This helps
         us generate a personalized quote for you.
       </p>
@@ -230,7 +230,7 @@ export function StepGeneralInfo({
         <div className='flex justify-end mt-4'>
           <Button
             type='submit'
-            className='bg-green-500 hover:bg-green-600 text-white px-10 py-6 rounded-full font-semibold'
+            className='bg-[var(--secondary)] hover:bg-green-600 text-white px-10 py-6 rounded-full font-semibold'
           >
             Next Step
           </Button>

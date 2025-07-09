@@ -3,8 +3,8 @@
 import { StepGeneralInfo } from '@/components/shared/forms/StepGeneralInfo';
 import { StepOptionalDetails } from '@/components/shared/forms/StepOptionalDetails';
 import { StepProjectType } from '@/components/shared/forms/StepProjectType';
-import { Headphones, Moon, UserCircle2 } from 'lucide-react';
 import { useState } from 'react';
+import { HomeOwnerHeader } from '../../components/layout/HomeOwnerHeader';
 
 export default function HomeOwnerWizardPage() {
   // Wizard step state
@@ -59,24 +59,14 @@ export default function HomeOwnerWizardPage() {
     'h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center';
 
   return (
-    <div className='min-h-screen bg-white flex flex-col items-center'>
-      {/* Top Navbar */}
-      <nav className='w-full flex items-center justify-between px-12 py-6'>
-        <div className='text-2xl font-bold text-[var(--text-dark)]'>
-          Virtual Homes
-        </div>
-        <div className='flex items-center gap-6'>
-          <Headphones className='w-6 h-6 text-gray-500' />
-          <Moon className='w-6 h-6 text-gray-500' />
-          <UserCircle2 className='w-8 h-8 text-blue-400' />
-        </div>
-      </nav>
+    <div className='min-h-screen bg-[var(--white-background)] flex flex-col items-center'>
+      <HomeOwnerHeader />
       {/* Centered content with background */}
-      <div className=''>
+      <div className='mt-auto'>
         <div className=''>
-          <div className='w-[90vw] mx-auto flex flex-col items-center bg-[#F5F7FA] min-h-[calc(100vh-100px)] rounded-tl-[32px] rounded-tr-[32px] px-4 md:px-12 py-8 md:py-16 shadow-none'>
+          <div className='w-[90vw] mx-auto flex flex-col items-center bg-[var(--background)] min-h-[calc(100vh-100px)] rounded-tl-[32px] rounded-tr-[32px] px-4 md:px-12 py-8 md:py-16 shadow-none'>
             {/* Custom Progress Bar */}
-            <div className='w-full flex justify-center mb-8'>
+            <div className='w-full flex justify-center mb-12'>
               <div className='flex items-center justify-center w-full max-w-2xl'>
                 {steps.map((s, idx) => (
                   <>
@@ -86,12 +76,12 @@ export default function HomeOwnerWizardPage() {
                     >
                       {/* Circle */}
                       <div
-                        className={`w-7 h-7 rounded-full flex items-center justify-center z-10 ${stepIndex >= idx ? 'bg-green-600' : 'bg-gray-300'}`}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center z-10 ${stepIndex >= idx ? 'bg-green-600' : 'bg-gray-300'}`}
                       />
                       {/* Line (except after last circle) */}
                       {idx < totalSteps - 1 && (
                         <div
-                          className={`h-3 w-[120px] -mx-[1px] md:w-[180px] ${stepIndex > idx ? 'bg-green-600' : 'bg-gray-300'}`}
+                          className={`h-2 w-[120px] -mx-[1px] md:w-[180px] ${stepIndex > idx ? 'bg-green-600' : 'bg-gray-300'}`}
                         />
                       )}
                     </div>

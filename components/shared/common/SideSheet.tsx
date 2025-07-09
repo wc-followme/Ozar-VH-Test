@@ -26,8 +26,11 @@ export default function SideSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       {' '}
       {/* ✅ Pass it here */}
-      <SheetContent side='right' className='w-[846px] !max-w-[846px] bg-white'>
-        <SheetHeader className='text-[#2D2D2D] text-[24px] font-medium p-6 flex items-center flex-row'>
+      <SheetContent
+        side='right'
+        className='w-[846px] !max-w-[846px] bg-[var(--card-background)] border-0 overflow-auto'
+      >
+        <SheetHeader className='text-[var(--text-dark)] text-[24px] font-medium flex items-center flex-row pb-8'>
           <SheetTitle>{title}</SheetTitle>
           <Button
             variant='ghost'

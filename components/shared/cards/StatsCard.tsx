@@ -17,7 +17,7 @@ export function StatsCard({
   bgColor,
 }: StatsCardProps) {
   return (
-    <Card className='border-1 border-[var(--border-dark)] bg-[var(--card-background)] shadow-0 rounded-[20px]'>
+    <Card className='border-[1px] border-[var(--border-dark)] bg-[var(--card-background)] shadow-0 rounded-[20px]'>
       <CardContent className='p-6'>
         <div className='flex items-center justify-between'>
           <div>

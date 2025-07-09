@@ -27,10 +27,10 @@ export function RadioGroupStripe({
           key={option.value}
           htmlFor={option.value}
           className={cn(
-            'flex items-center gap-2 px-[12px] py-[10px] w-full max-w-[250px] rounded-full border-2 text-base text-[#2D2D2D] font-medium cursor-pointer transition-all',
+            'flex items-center gap-2 px-[12px] py-[10px] w-full max-w-[250px] rounded-full border-2 text-base text-[var(--text-dark)] font-medium cursor-pointer transition-all',
             value === option.value
-              ? 'border-[#2E3FC8]'
-              : 'border-[#E8EAED] bg-transparent'
+              ? 'border-[var(--primary)]'
+              : 'border-[var(--border-dark)] bg-transparent'
           )}
         >
           <RadioGroupItem
@@ -42,8 +42,8 @@ export function RadioGroupStripe({
             className={cn(
               'w-6 h-6 rounded-full border-2 flex items-center justify-center',
               value === option.value
-                ? 'bg-[#24338C] border-[#24338C]'
-                : 'border-[#E8EAED]'
+                ? 'bg-[var(--primary)] border-[var(--primary)]'
+                : 'border-[var(--border-dark)]'
             )}
           >
             {value === option.value && <Check className='w-3 h-3 text-white' />}

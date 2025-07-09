@@ -7,12 +7,18 @@ interface SelectBoxCardProps {
   id: string;
   title: string;
   description: string;
+  status: boolean;
 }
 
-export function SelectBoxCard({ id, title, description }: SelectBoxCardProps) {
+export function SelectBoxCard({
+  id,
+  title,
+  description,
+  status,
+}: SelectBoxCardProps) {
   return (
     <div
-      className={`relative p-4 rounded-[20px] bg-white border-2 border-[var(--border-dark)] transition-all duration-200 cursor-pointer hover:shadow-md [&:has(input:checked)]:border-[#24338C]`}
+      className={`relative p-4 rounded-[20px] bg-transparent border-2 border-[var(--border-dark)] transition-all duration-200 cursor-pointer hover:shadow-md [&:has(input:checked)]:border-[var(--primary)]`}
     >
       <div className='flex items-start flex-col'>
         <div className='flex items-center pt-0.5 gap-2 mb-3'>
@@ -22,23 +28,26 @@ export function SelectBoxCard({ id, title, description }: SelectBoxCardProps) {
           rounded-[6px] 
           border-2 
           border-[#BFBFBF]
-          data-[state=checked]:bg-[#24338C]
-          data-[state=checked]:border-[#24338C]
+          data-[state=checked]:bg-[--primary]
+          data-[state=checked]:border-[--primary]
           data-[state=checked]:text-white
           text-white 
           w-6 h-6
           flex items-center justify-center
         '
+            disabled={status}
           />
           <Label
             htmlFor={id}
-            className={`text-[18px] font-bold cursor-pointer block text-[#2D2D2D] `}
+            className={`text-[18px] font-bold cursor-pointer block text-[var(--text-dark)] `}
           >
             {title}
           </Label>
         </div>
         <div className=''>
-          <p className={`text-sm font-normal leading-relaxed text-[#818181]`}>
+          <p
+            className={`text-sm font-normal leading-relaxed text-[var(--text-secondary)]`}
+          >
             {description}
           </p>
         </div>
