@@ -1,8 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Icon } from 'iconsax-react';
+import React from 'react';
 
 interface StatsCardProps {
-  icon: Icon | React.ReactElement;
+  icon: React.ElementType;
   value: string;
   label: string;
   iconColor: string;
@@ -10,7 +10,7 @@ interface StatsCardProps {
 }
 
 export function StatsCard({
-  icon: Icon,
+  icon: IconComp,
   value,
   label,
   iconColor,
@@ -29,7 +29,7 @@ export function StatsCard({
           <div
             className={`w-10 h-10 rounded-[16px] ${bgColor} ${iconColor} flex items-center justify-center`}
           >
-            <Icon className={`w-5 h-5 `} color='currentcolor' />
+            <IconComp className='w-5 h-5' color='currentcolor' />
           </div>
         </div>
       </CardContent>
