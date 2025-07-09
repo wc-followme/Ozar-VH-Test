@@ -12,21 +12,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
+import { iconOptions } from '@/constants/sidebar-items';
 import { apiService, type ApiError, type CreateRoleRequest } from '@/lib/api';
 import {
   createRoleSchema,
   type CreateRoleFormData,
 } from '@/lib/validations/role';
 import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  BarChart,
-  Database,
-  FileText,
-  Loader2,
-  Settings,
-  Shield,
-  Users,
-} from 'lucide-react';
+import { Loader2, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -36,41 +29,6 @@ const CreateRole = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Icon options for the selector
-  const iconOptions = [
-    {
-      value: 'fas fa-cog',
-      label: 'Settings',
-      icon: Settings,
-      color: '#00a8bf',
-    },
-    { value: 'fas fa-users', label: 'Users', icon: Users, color: '#34ad44' },
-    {
-      value: 'fas fa-user-shield',
-      label: 'Shield',
-      icon: Shield,
-      color: '#ff6b6b',
-    },
-    {
-      value: 'fas fa-database',
-      label: 'Database',
-      icon: Database,
-      color: '#4c6ef5',
-    },
-    {
-      value: 'fas fa-file-text',
-      label: 'Documents',
-      icon: FileText,
-      color: '#fd7e14',
-    },
-    {
-      value: 'fas fa-chart-bar',
-      label: 'Analytics',
-      icon: BarChart,
-      color: '#9c88ff',
-    },
-  ];
 
   // Default icon option
   const defaultIconOption = {
