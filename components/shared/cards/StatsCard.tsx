@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Icon } from 'iconsax-react';
 
 interface StatsCardProps {
-  icon: Icon | any;
+  icon: Icon | React.ReactElement;
   value: string;
   label: string;
   iconColor: string;

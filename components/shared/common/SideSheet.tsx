@@ -25,7 +25,7 @@ const CustomSheetContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & {
     side?: 'left' | 'right' | 'top' | 'bottom';
   }
->(({ side = 'right', className, children, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content
