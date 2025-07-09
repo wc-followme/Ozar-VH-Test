@@ -1,28 +1,11 @@
 'use client';
 
-import { Material } from '@/components/icons/Material';
-import { RoleIcon } from '@/components/icons/RoleIcon';
 import { RoleCard } from '@/components/shared/cards/RoleCard';
+import { iconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
 import { Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
-
-const iconMap: Record<string, any> = {
-  'fas fa-cog': Material,
-  'fas fa-user-shield': RoleIcon,
-  // Add more mappings as needed
-};
-const iconBgMap: Record<string, string> = {
-  'fas fa-cog': '#E0F7FA',
-  'fas fa-user-shield': '#E3F2FD',
-  // Add more mappings as needed
-};
-const iconColorMap: Record<string, string> = {
-  'fas fa-cog': '#00a8bf',
-  'fas fa-user-shield': '#4c6ef5',
-  // Add more mappings as needed
-};
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const menuOptions = [
   { label: 'Edit', action: 'edit', icon: Edit2 },
@@ -31,33 +14,55 @@ const menuOptions = [
 
 const RoleManagement = () => {
   const [roles, setRoles] = useState<any[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [search, setSearch] = useState('');
+  const [limit] = useState(10);
+  const [search] = useState('');
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState('');
+  const [name] = useState('');
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
 
-  const fetchRoles = async () => {
+  const fetchRoles = async (append = false) => {
     setLoading(true);
     try {
-      const res = await apiService.fetchRoles({ page, limit, search, name });
-      setRoles(res.data.data || []);
-      setTotal(res.data.total || 0);
-    } catch (e) {
-      setRoles([]);
-      setTotal(0);
+      const res: any = await apiService.fetchRoles({
+        page,
+        limit,
+        search,
+        name,
+      });
+      const data = res.data || { data: [], total: 0 };
+      const newRoles = data.data;
+      setRoles(prev => (append ? [...prev, ...newRoles] : newRoles));
+      const total = data.total;
+      setHasMore(page * limit < total);
+    } catch {
+      if (!append) setRoles([]);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchRoles();
+    fetchRoles(page > 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, limit, search, name]);
 
-  const totalPages = Math.ceil(total / limit);
+  // Infinite scroll logic
+  const lastRoleRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new window.IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage(prev => prev + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
 
   return (
     <section className='flex flex-col w-full items-start gap-8 p-6 overflow-y-auto'>
@@ -97,52 +102,41 @@ const RoleManagement = () => {
       </div> */}
       {/* Roles Grid */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full'>
-        {loading ? (
-          <div className='col-span-4 text-center py-8'>Loading...</div>
-        ) : roles.length === 0 ? (
+        {roles.length === 0 && !loading ? (
           <div className='col-span-4 text-center py-8'>No roles found.</div>
         ) : (
           roles.map((role, index) => {
-            const iconKey = role.icon || 'fas fa-cog';
-            const IconComponent = iconMap[iconKey] || Material;
-            const iconBgColor = iconBgMap[iconKey] || '#E0F7FA';
-            const iconColor = iconColorMap[iconKey] || '#00a8bf';
+            const iconOption = iconOptions.find(
+              opt => opt.value === role.icon
+            ) || {
+              icon: () => null,
+              color: '#00a8bf',
+            };
+            // Attach ref to last item for infinite scroll
+            const isLast = index === roles.length - 1;
             return (
-              <React.Fragment key={role.id || index}>
+              <div
+                key={role.id || index}
+                ref={isLast ? lastRoleRef : undefined}
+              >
                 <RoleCard
                   menuOptions={menuOptions}
-                  iconSrc={IconComponent}
-                  iconBgColor={iconBgColor}
+                  iconSrc={iconOption.icon}
+                  iconBgColor={iconOption.color + '26'}
                   title={role.name}
                   description={role.description}
                   permissionCount={role.total_permissions}
-                  iconColor={iconColor}
+                  iconColor={iconOption.color}
                 />
-              </React.Fragment>
+              </div>
             );
           })
         )}
       </div>
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className='flex gap-2 mt-6'>
-          <button
-            onClick={() => setPage(page - 1)}
-            disabled={page === 1}
-            className='px-3 py-1 rounded border bg-gray-100 disabled:opacity-50'
-          >
-            Prev
-          </button>
-          <span className='px-2 py-1'>
-            Page {page} of {totalPages}
-          </span>
-          <button
-            onClick={() => setPage(page + 1)}
-            disabled={page === totalPages}
-            className='px-3 py-1 rounded border bg-gray-100 disabled:opacity-50'
-          >
-            Next
-          </button>
+      {loading && <div className='w-full text-center py-4'>Loading...</div>}
+      {!hasMore && roles.length > 0 && (
+        <div className='w-full text-center py-4 text-gray-400'>
+          No more roles to load.
         </div>
       )}
     </section>
