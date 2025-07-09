@@ -119,18 +119,9 @@ class ApiService {
       ...options,
     };
 
-    // Debug logging for headers (remove in production)
-    console.log('🔍 API Request Debug:');
-    console.log('URL:', url);
-    console.log('Headers:', config.headers);
-    console.log('Method:', options.method || 'GET');
-    console.log('Body:', options.body);
-
     try {
       const response = await fetch(url, config);
       const data = await response.json();
-
-      console.log('📥 API Response:', response.status, data);
 
       if (!response.ok) {
         throw {
@@ -142,8 +133,6 @@ class ApiService {
 
       return data;
     } catch (error) {
-      console.error('❌ API Error:', error);
-
       if (error instanceof TypeError) {
         // Network error
         throw {
@@ -168,46 +157,22 @@ class ApiService {
     });
   }
 
-  // Remove getCookie entirely
-
   // Add authorization header for authenticated requests
   private getAuthHeaders(): Record<string, string> {
     if (typeof window === 'undefined') {
-      console.log('🔑 Auth Debug: Server-side, no token available');
       return {};
     }
-
-    // Get token from localStorage only
     const token = localStorage.getItem('auth_token');
-
-    console.log('🔑 Auth Debug:');
-    console.log('Reading from localStorage...');
-    console.log('Token exists:', !!token);
-    console.log('Token length:', token ? token.length : 0);
-    console.log(
-      'Token preview:',
-      token ? `${token.substring(0, 20)}...` : 'No token'
-    );
-
     if (!token) {
-      console.error('❌ No auth token found in localStorage');
       return {};
     }
-
-    const authHeader = `Bearer ${token}`;
-    console.log(
-      '🔑 Authorization header:',
-      authHeader.substring(0, 30) + '...'
-    );
-
     return {
-      Authorization: authHeader,
+      Authorization: `Bearer ${token}`,
     };
   }
 
   // Get complete headers for role operations
   private getRoleHeaders(): Record<string, string> {
-    // Always get token from localStorage
     const token =
       typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     const baseHeaders: Record<string, string> = {
@@ -218,16 +183,7 @@ class ApiService {
     };
     if (token) {
       baseHeaders['Authorization'] = `Bearer ${token}`;
-      console.log(
-        `🎭 Using token from localStorage:`,
-        token.substring(0, 20) + '...'
-      );
-    } else {
-      console.warn('❌ No auth token found in localStorage');
     }
-    console.log('🎭 Complete Role Headers:', baseHeaders);
-    console.log('🎭 Authorization included:', !!baseHeaders['Authorization']);
-    console.log('🎭 Number of headers:', Object.keys(baseHeaders).length);
     return baseHeaders;
   }
 
@@ -240,8 +196,6 @@ class ApiService {
 
   // Role management APIs
   async createRole(roleData: CreateRoleRequest): Promise<CreateRoleResponse> {
-    console.log('🏗️ Creating role with data:', roleData);
-
     return this.makeRequest<CreateRoleResponse>('/roles', {
       method: 'POST',
       headers: this.getRoleHeaders(),
@@ -273,43 +227,7 @@ class ApiService {
     });
   }
 
-  // Debug method to test API connection and headers
-  async testConnection(): Promise<any> {
-    console.log('🧪 Testing API connection...');
-
-    // First, let's debug the cookie situation
-    console.log('🍪 Debug Cookie Situation:');
-    console.log(
-      'Document.cookie:',
-      typeof window !== 'undefined' ? document.cookie : 'Server-side'
-    );
-
-    if (typeof window !== 'undefined') {
-      const allCookies = document.cookie.split(';').map(c => {
-        const [name, value] = c.trim().split('=');
-        return {
-          name,
-          value: value ? value.substring(0, 20) + '...' : 'empty',
-        };
-      });
-      console.log('Parsed cookies:', allCookies);
-
-      const authToken = localStorage.getItem('auth_token');
-      console.log(
-        'Auth token from localStorage:',
-        authToken ? `${authToken.substring(0, 20)}...` : 'null'
-      );
-    }
-
-    try {
-      return this.makeRequest('/roles', {
-        headers: this.getRoleHeaders(),
-      });
-    } catch (error) {
-      console.error('❌ Connection test failed:', error);
-      throw error;
-    }
-  }
+  // Removed testConnection and all debug code
 }
 
 export const apiService = new ApiService();

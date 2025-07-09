@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, type ApiError, type CreateRoleRequest } from '@/lib/api';
-import { useAuth } from '@/lib/auth-context';
 import {
   createRoleSchema,
   type CreateRoleFormData,
@@ -36,24 +35,7 @@ import { Controller, useForm } from 'react-hook-form';
 const CreateRole = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const { isAuthenticated, user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Helper function to get cookie value
-  const getCookie = (name: string): string | null => {
-    if (typeof window === 'undefined') return null;
-
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      return parts.pop()?.split(';').shift() || null;
-    }
-    return null;
-  };
-
-  // Check token availability in cookies for debugging
-  const hasToken =
-    typeof window !== 'undefined' ? !!getCookie('auth_token') : false;
 
   // Icon options for the selector
   const iconOptions = [
@@ -183,66 +165,6 @@ const CreateRole = () => {
     );
   };
 
-  // Debug function to test API connection
-  const testApiConnection = async () => {
-    try {
-      console.log('🧪 Testing API connection...');
-      const result = await apiService.testConnection();
-      toast({
-        title: 'API Test Successful!',
-        description: 'Headers and authentication are working correctly.',
-        variant: 'default',
-      });
-      console.log('✅ API test successful:', result);
-    } catch (error) {
-      const apiError = error as ApiError;
-      toast({
-        title: 'API Test Failed',
-        description: `Error: ${apiError.message} (Status: ${apiError.status})`,
-        variant: 'destructive',
-      });
-      console.error('❌ API test failed:', error);
-    }
-  };
-
-  // Debug function to manually set token in cookies (for testing)
-  const setTokenManually = () => {
-    if (typeof window === 'undefined') {
-      toast({
-        title: 'Error',
-        description: 'This function can only be used in the browser.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const tokenFromLocalStorage = localStorage.getItem('auth_token');
-
-    if (tokenFromLocalStorage) {
-      // Set cookie manually using the token from localStorage
-      const expires = new Date();
-      expires.setTime(expires.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
-      document.cookie = `auth_token=${tokenFromLocalStorage};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
-
-      toast({
-        title: 'Token Set!',
-        description: 'Auth token copied from localStorage to cookies.',
-        variant: 'default',
-      });
-
-      console.log('✅ Token manually set in cookies');
-
-      // Refresh the page to update the debug indicators
-      window.location.reload();
-    } else {
-      toast({
-        title: 'No Token Found',
-        description: 'No token found in localStorage. Please login again.',
-        variant: 'destructive',
-      });
-    }
-  };
-
   return (
     <div className='flex flex-col gap-8 p-6 flex-1 w-full'>
       {/* Header */}
@@ -258,83 +180,10 @@ const CreateRole = () => {
             Create Role
           </span>
         </div>
-
-        {/* Debug button - remove in production */}
-        <div className='flex items-center gap-2'>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={testApiConnection}
-            className='h-[32px] px-4 text-xs'
-          >
-            🧪 Test API
-          </Button>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={setTokenManually}
-            className='h-[32px] px-4 text-xs'
-          >
-            🔧 Fix Token
-          </Button>
-        </div>
       </div>
 
       {/* Main Content */}
       <Card className='flex flex-col gap-8 p-6 flex-1 w-full border-1 border-[#E8EAED] rounded-[20px] bg-white'>
-        {/* Debug info - remove in production */}
-        <div className='bg-gray-50 p-4 rounded-lg border text-sm'>
-          <div className='flex items-center gap-4 flex-wrap'>
-            <span
-              className={`px-2 py-1 rounded text-xs ${isAuthenticated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
-            >
-              {isAuthenticated
-                ? '✅ Auth Context: Authenticated'
-                : '❌ Auth Context: Not Authenticated'}
-            </span>
-            <span
-              className={`px-2 py-1 rounded text-xs ${hasToken ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
-            >
-              {hasToken
-                ? '✅ Token: Available (Cookies)'
-                : '❌ Token: Missing (Cookies)'}
-            </span>
-            {typeof window !== 'undefined' &&
-              localStorage.getItem('auth_token') && (
-                <span className='px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800'>
-                  📱 Token: Available (localStorage)
-                </span>
-              )}
-            {user && (
-              <span className='px-2 py-1 rounded text-xs bg-blue-100 text-blue-800'>
-                👤 User: {user.first_name} {user.last_name}
-              </span>
-            )}
-            <span className='text-gray-600'>
-              Check browser console for detailed header logs when testing API
-            </span>
-          </div>
-          {typeof window !== 'undefined' && (
-            <div className='mt-2 text-xs text-gray-500'>
-              🍪 Available cookies:{' '}
-              {document.cookie
-                ? document.cookie
-                    .split(';')
-                    .map(c => c.split('=')[0].trim())
-                    .join(', ')
-                : 'None'}
-            </div>
-          )}
-          {typeof window !== 'undefined' &&
-            !hasToken &&
-            localStorage.getItem('auth_token') && (
-              <div className='mt-2 text-xs text-orange-600'>
-                ⚠️ Token exists in localStorage but not in cookies. Click "🔧
-                Fix Token" to copy it to cookies.
-              </div>
-            )}
-        </div>
-
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-8'>
           {/* Top row with input fields */}
           <div className='flex items-start gap-6 w-full'>
