@@ -11,7 +11,8 @@ import {
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Icon } from 'iconsax-react';
-import React from 'react';
+import React, { useState } from 'react';
+import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 interface MenuOption {
   label: string;
   action: string;
@@ -37,7 +38,12 @@ export const RoleCard: React.FC<RoleCardProps> = ({
   iconColor,
   menuOptions,
 }) => {
+  const [showDelete, setShowDelete] = useState(false);
+
   const handleMenuAction = (action: string) => {
+    if (action === 'delete') {
+      setShowDelete(true);
+    }
     return action;
   };
 
@@ -113,6 +119,17 @@ export const RoleCard: React.FC<RoleCardProps> = ({
           </span>
         </div>
       </CardContent>
+      <ConfirmDeleteModal
+        open={showDelete}
+        title={`Are you sure you want to delete?`}
+        subtitle={`This action cannot be undone.`}
+        onCancel={() => setShowDelete(false)}
+        onDelete={() => {
+          setShowDelete(false);
+          // TODO: Call delete logic here
+          console.log('Role deleted');
+        }}
+      />
     </Card>
   );
 };

@@ -20,8 +20,8 @@ export function SelectBoxCard({
     <div
       className={`relative p-4 rounded-[20px] bg-transparent border-2 border-[var(--border-dark)] transition-all duration-200 cursor-pointer hover:shadow-md [&:has(input:checked)]:border-[var(--primary)]`}
     >
-      <div className='flex items-start flex-col'>
-        <div className='flex items-center pt-0.5 gap-2 mb-3'>
+      <div className='flex items-base flex-col'>
+        <div className='flex items-base pt-0.5 gap-2 mb-3'>
           <Checkbox
             id={id}
             className='
@@ -33,7 +33,8 @@ export function SelectBoxCard({
           data-[state=checked]:text-white
           text-white 
           w-6 h-6
-          flex items-center justify-center
+          flex items-base justify-center
+          mt-0.5
         '
             disabled={status}
           />
