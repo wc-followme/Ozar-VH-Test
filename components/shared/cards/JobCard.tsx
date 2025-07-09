@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Gallery, Location, MessageNotif, Sms } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { CurvedBgIcon } from '../../icons/CurvedBgIcon';
 
 interface JobCardProps {
@@ -27,8 +28,26 @@ export function JobCard({ job }: JobCardProps) {
     return 'bg-orange-500';
   };
 
+  const router = useRouter();
+
+  // Handler for card click
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Prevent navigation if clicking on Gallery or MessageNotif icons
+    const target = e.target as HTMLElement;
+    if (
+      target.closest('.jobcard-gallery') ||
+      target.closest('.jobcard-message')
+    ) {
+      return;
+    }
+    router.push('/job-management/job-details');
+  };
+
   return (
-    <Card className='border-1 border-[#E8EAED] shadow-sm hover:shadow-md bg-[var(--card-background)] transition-shadow duration-200 rounded-[16px] overflow-hidden'>
+    <Card
+      className='border-1 border-[#E8EAED] shadow-sm hover:shadow-md bg-[var(--card-background)] transition-shadow duration-200 rounded-[16px] overflow-hidden cursor-pointer'
+      onClick={handleCardClick}
+    >
       <CardContent className='p-0'>
         <div className='relative'>
           <Image
@@ -48,15 +67,24 @@ export function JobCard({ job }: JobCardProps) {
           </Badge>
           <div className='absolute right-0 bottom-0 h-[2.5rem] w-[6rem] flex justify-center items-center gap-3'>
             <CurvedBgIcon className='absolute -bottom-[2px] right-0 h-[44px] w-[110px] text-[var(--card-background)]' />
-            <Link href={''} className='relative'>
+            <Link
+              href={''}
+              className='relative jobcard-gallery'
+              tabIndex={-1}
+              onClick={e => e.stopPropagation()}
+            >
               <Gallery size='20' color='var(--text-dark)' />
             </Link>
-            <Link href={''} className='relative'>
+            <Link
+              href={''}
+              className='relative jobcard-message'
+              tabIndex={-1}
+              onClick={e => e.stopPropagation()}
+            >
               <MessageNotif size='20' color='var(--text-dark)' />
             </Link>
           </div>
         </div>
-
         <div className='p-5'>
           <div className='mb-3'>
             <h3 className='font-semibold text-base text-[var(--text-dark)] mb-1'>

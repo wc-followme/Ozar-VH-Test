@@ -57,7 +57,7 @@ const RoleManagement = () => {
       if (loading) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new window.IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && hasMore) {
+        if (entries[0] && entries[0].isIntersecting && hasMore) {
           setPage(prev => prev + 1);
         }
       });

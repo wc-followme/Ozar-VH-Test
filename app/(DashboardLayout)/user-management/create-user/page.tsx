@@ -2,10 +2,8 @@
 
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { PhotoUpload } from '@/components/shared/PhotoUpload';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronRight } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
 
 export default function AddUserPage() {
@@ -58,19 +56,6 @@ export default function AddUserPage() {
                 <div className='flex-1'>
                   <UserInfoForm />
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className='flex justify-end gap-2 mt-8'>
-                <Link
-                  className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
-                  href={'/user-management'}
-                >
-                  Cancel
-                </Link>
-                <Button className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'>
-                  Create
-                </Button>
               </div>
             </TabsContent>
 

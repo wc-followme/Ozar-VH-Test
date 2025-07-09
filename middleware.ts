@@ -1,5 +1,4 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 
 // Define public routes that don't require authentication
 const publicRoutes = [
@@ -11,15 +10,6 @@ const publicRoutes = [
   '/public',
 ];
 
-// Define protected routes that require authentication
-const protectedRoutes = [
-  '/',
-  '/analytics',
-  '/role-management',
-  '/settings',
-  '/user-management',
-  '/users',
-];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -41,7 +31,6 @@ export function middleware(request: NextRequest) {
   );
 
   // Get authentication token from cookies
-  const authToken = request.cookies.get('auth_token');
   const isAuthenticated =
     request.cookies.get('is_authenticated')?.value === 'true';
 
