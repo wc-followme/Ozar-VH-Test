@@ -62,12 +62,12 @@ export const RoleForm: React.FC<RoleFormProps> = ({
     }
   }, [initialValues, reset]);
 
-  const selectedIcon = watch('icon');
-  const getSelectedIconOption = () => {
-    return (
-      iconOptions.find(opt => opt.value === selectedIcon) ?? defaultIconOption
-    );
-  };
+  // const selectedIcon = watch('icon');
+  // const getSelectedIconOption = () => {
+  //   return (
+  //     iconOptions.find(opt => opt.value === selectedIcon) ?? defaultIconOption
+  //   );
+  // };
 
   return (
     <Card className='flex flex-col gap-8 p-6 flex-1 w-full border-1 border-[#E8EAED] rounded-[20px] bg-[var(--card-background)]'>
