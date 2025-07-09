@@ -227,6 +227,28 @@ class ApiService {
     });
   }
 
+  // Fetch roles with pagination, search, and name filter
+  async fetchRoles({
+    page = 1,
+    limit = 10,
+    search = '',
+    name = '',
+  }: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    name?: string;
+  }) {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (search) params.append('search', search);
+    if (name) params.append('name', name);
+    return this.makeRequest(`/roles?${params.toString()}`, {
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   // Removed testConnection and all debug code
 }
 
