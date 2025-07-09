@@ -40,7 +40,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
     defaultValues: {
       name: '',
       description: '',
-      icon: defaultIconOption.value,
+      icon: defaultIconOption?.value ?? '',
       status: 'ACTIVE',
       ...initialValues,
     },
@@ -52,7 +52,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
       reset({
         name: initialValues.name || '',
         description: initialValues.description || '',
-        icon: initialValues.icon || defaultIconOption.value,
+        icon: (initialValues.icon || defaultIconOption?.value) ?? '',
         status: initialValues.status || 'ACTIVE',
       });
     }
@@ -85,17 +85,19 @@ export const RoleForm: React.FC<RoleFormProps> = ({
                       <div
                         className='flex w-8 h-8 items-center justify-center rounded-lg'
                         style={{
-                          backgroundColor: `${getSelectedIconOption().color}26`,
+                          backgroundColor: `${getSelectedIconOption()?.color ?? ''}26`,
                         }}
                       >
                         {(() => {
-                          const IconComponent = getSelectedIconOption().icon;
-                          return (
+                          const IconComponent = getSelectedIconOption()?.icon;
+                          return IconComponent ? (
                             <IconComponent
                               className='w-4 h-4'
-                              style={{ color: getSelectedIconOption().color }}
+                              style={{
+                                color: getSelectedIconOption()?.color ?? '',
+                              }}
                             />
-                          );
+                          ) : null;
                         })()}
                       </div>
                     </SelectValue>

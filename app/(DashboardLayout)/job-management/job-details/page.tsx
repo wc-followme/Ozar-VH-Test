@@ -27,16 +27,6 @@ const job = {
   mapImage: '/public/images/map-placeholder.png',
 };
 
-const menuOptions = [
-  { label: 'Edit', action: 'edit', variant: 'default', icon: IconDotsVertical },
-  {
-    label: 'Delete',
-    action: 'delete',
-    variant: 'destructive',
-    icon: IconDotsVertical,
-  },
-];
-
 export default function JobDetailsPage() {
   return (
     <div className=''>

@@ -12,7 +12,7 @@ const CreateRole = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle form submission
-  const onSubmit = async data => {
+  const onSubmit = async (data: any) => {
     setIsSubmitting(true);
     try {
       const roleData = {
@@ -33,7 +33,11 @@ const CreateRole = () => {
         throw new Error(response.message || 'Failed to create role');
       }
     } catch (error) {
-      const apiError = error;
+      const apiError = error as {
+        status?: number;
+        message?: string;
+        errors?: any;
+      };
       let errorMessage = 'An unexpected error occurred';
       if (apiError.status === 400) {
         errorMessage = 'Invalid role data. Please check your input.';

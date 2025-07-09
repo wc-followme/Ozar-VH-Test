@@ -1,5 +1,4 @@
 import { Home, Icon } from 'iconsax-react';
-import { CircleUserIcon } from 'lucide-react';
 import { Category } from './../components/icons/Category';
 import { Company } from './../components/icons/Company';
 import { JobIcon } from './../components/icons/JobIcon';
@@ -17,6 +16,7 @@ import {
   Settings,
   Shield,
   Users,
+  CircleUserIcon
 } from 'lucide-react';
 
 type SidebarItem = {

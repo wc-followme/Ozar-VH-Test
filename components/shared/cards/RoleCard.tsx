@@ -45,10 +45,8 @@ export const RoleCard: React.FC<RoleCardProps> = ({
   const [showDelete, setShowDelete] = useState(false);
 
   const handleMenuAction = (action: string) => {
-    if (action === 'delete') {
-      setShowDelete(true);
-    }
-    return action;
+    if (action === 'edit' && onEdit) onEdit();
+    if (action === 'delete' && onDelete) onDelete();
   };
 
   return (
