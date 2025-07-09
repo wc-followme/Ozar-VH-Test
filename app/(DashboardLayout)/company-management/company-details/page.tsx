@@ -1,5 +1,6 @@
 'use client';
 import { Search } from '@/components/icons/Search';
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -12,11 +13,15 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
 import { Add, Edit2, Trash } from 'iconsax-react';
-import { ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { UserCard } from '../../../../components/shared/cards/UserCard';
+
+const breadcrumbData: BreadcrumbItem[] = [
+  { name: 'Company Management', href: '/company-management' },
+  { name: 'Company Details' }, // current page
+];
 
 // Dummy user data
 const dummyUsers = [
@@ -170,7 +175,7 @@ const CompanyDetails = () => {
     { label: 'Delete', action: 'delete', icon: Trash },
   ];
 
-  const switchStyle =
+  const switchStyleSm =
     'h-4 w-9 data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300 [&>span]:h-3 [&>span]:w-3  [&>span]:bg-white data-[state=checked]:[&>span]:border-green-400 [&>span]:transition-all [&>span]:duration-200';
   const selectContentStyle =
     'bg-[var(--white-background)] border border-[var(--secondary)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]';
@@ -184,24 +189,14 @@ const CompanyDetails = () => {
     setTimeout(() => setIsToggling(false), 300);
   };
   return (
-    <div className=''>
+    <div>
       {/* Breadcrumb */}
-      <div className='flex items-center text-sm text-gray-500 mb-6 mt-2'>
-        <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-          Company Management
-        </span>
-        <ChevronRight className='h-4 w-4 mx-2' />
-        <span className='text-[var(--primary)] text-[14px] font-normal'>
-          Add Company
-        </span>
-      </div>
+      <Breadcrumb items={breadcrumbData} className='mb-5' />
       <div className='p-6 bg-[var(--white-background)] rounded-[24px]'>
         {/* Header */}
         <div className='flex gap-6'>
           <div className='flex-0 w-[120px]'>
             <div className='w-[120px] h-[120px] p-3 rounded-[16px] border border-[var(--border-dark)] flex items-center justify-center'>
-              {/* Placeholder for logo */}
-              {/* <span className="block w-[100px] h-[100px] bg-[url('/company-logo.svg')] bg-cover rounded-[12px]" /> */}
               <Image
                 src='/images/company-management/company-img-1.png'
                 height={90}
@@ -232,7 +227,7 @@ const CompanyDetails = () => {
                 </Button>
                 <Link
                   className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-1'
-                  href={'/company-management/add-company'}
+                  href={'/company-management/add-user'}
                 >
                   <Add
                     size='28'
@@ -279,7 +274,7 @@ const CompanyDetails = () => {
                     handleToggle();
                   }}
                   disabled={isToggling}
-                  className={switchStyle}
+                  className={switchStyleSm}
                 />
               </div>
             </div>

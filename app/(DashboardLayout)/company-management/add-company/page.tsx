@@ -1,8 +1,14 @@
 'use client';
 
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
+import { CompanyInfoForm } from '@/components/shared/forms/CompanyinfoForm';
 import { ImageUpload } from '@/components/shared/ImageUpload';
-import { ChevronRight } from 'lucide-react';
-import { CompanyInfoForm } from '../../../../components/shared/forms/CompanyinfoForm';
+
+const breadcrumbData: BreadcrumbItem[] = [
+  { name: 'Company Management', href: '/company-management' },
+
+  { name: 'Add Company' }, // current page
+];
 
 const CreateCompany = () => {
   const handleUploadClick = () => {
@@ -11,15 +17,7 @@ const CreateCompany = () => {
   return (
     <div className=''>
       {/* Breadcrumb */}
-      <div className='flex items-center text-sm text-gray-500 mb-6 mt-2'>
-        <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-          Company Management
-        </span>
-        <ChevronRight className='h-4 w-4 mx-2' />
-        <span className='text-[var(--primary)] text-[14px] font-normal'>
-          Add Company
-        </span>
-      </div>
+      <Breadcrumb items={breadcrumbData} className='mb-5' />
 
       {/* Main Content */}
       <div className=''>

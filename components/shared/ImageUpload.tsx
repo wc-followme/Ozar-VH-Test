@@ -6,7 +6,7 @@ import React from 'react';
 
 export interface ImageUploadProps {
   label?: React.ReactNode | string;
-  text: React.ReactNode | string;
+  text?: React.ReactNode | string;
   acceptedTypes?: string;
   onClick?: () => void;
   className?: string;
@@ -46,3 +46,16 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     </div>
   );
 };
+
+{
+  // example of usage
+  /*   
+  <ImageUpload
+              onClick={handleUploadClick}
+              icon={<ChevronRight className='h-4 w-4 mx-2' />}
+              label='Upload Photo'
+              text={'PNG and JPG files are allowed'}
+              className='h-[180px]'
+            /> 
+            */
+}

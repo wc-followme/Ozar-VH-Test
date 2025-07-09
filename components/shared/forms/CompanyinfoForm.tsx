@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -20,7 +19,7 @@ export function CompanyInfoForm() {
 
   const router = useRouter();
   const handleCreateClick = () => {
-    router.push('/company-management/company-details');
+    router.push('/company-management/add-user');
   };
   const handleUploadClick = () => {
     console.log('Upload clicked');
@@ -41,7 +40,7 @@ export function CompanyInfoForm() {
             <Input
               id='company-name'
               placeholder='Enter company name'
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
           </div>
           <div className='space-y-2'>
@@ -54,7 +53,7 @@ export function CompanyInfoForm() {
             <Input
               id='tagline'
               placeholder='Enter tagline'
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
           </div>
         </div>
@@ -68,7 +67,7 @@ export function CompanyInfoForm() {
           <Textarea
             id='about'
             placeholder='Type a description of your company'
-            className='rounded-[10px] min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)]'
+            className='rounded-[10px] min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] !placeholder-[var(--text-placeholder)]'
           />
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
@@ -83,7 +82,7 @@ export function CompanyInfoForm() {
               id='email'
               type='email'
               placeholder='Enter company email'
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
           </div>
           <div className='space-y-2'>
@@ -122,7 +121,7 @@ export function CompanyInfoForm() {
               <Input
                 id='phone'
                 placeholder='Enter Number'
-                className='h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)]'
+                className='h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] !placeholder-[var(--text-placeholder)]'
               />
             </div>
           </div>
@@ -137,7 +136,7 @@ export function CompanyInfoForm() {
           <Input
             id='address'
             placeholder='Enter Company Address'
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
@@ -151,7 +150,7 @@ export function CompanyInfoForm() {
             <Input
               id='city'
               placeholder='Enter City'
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
           </div>
           <div className='space-y-2'>
@@ -164,7 +163,7 @@ export function CompanyInfoForm() {
             <Input
               id='pin-code'
               placeholder='Enter Pin Code'
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
           </div>
         </div>
@@ -199,7 +198,7 @@ export function CompanyInfoForm() {
             <Input
               id='website'
               placeholder='eg: yourwebsite.com'
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
           </div>
         </div>
@@ -218,7 +217,7 @@ export function CompanyInfoForm() {
               label='Upload Photo'
               // icon={<ChevronRight className='h-4 w-4 mx-2' />}
               className='h-[180px]'
-              text={''}
+              // text={''}
             />
           </div>
           <div className='md:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -232,7 +231,7 @@ export function CompanyInfoForm() {
               <Input
                 id='contractor-name'
                 placeholder='Enter Full name'
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
               />
             </div>
             <div className='space-y-2 md:col-span-1'>
@@ -246,7 +245,7 @@ export function CompanyInfoForm() {
                 id='contractor-email'
                 type='email'
                 placeholder='Enter email'
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
               />
             </div>
             <div className='space-y-2 md:col-span-1'>
@@ -288,7 +287,7 @@ export function CompanyInfoForm() {
                 <Input
                   id='contractor-phone'
                   placeholder='Enter Number'
-                  className='h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)]'
+                  className='h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] !placeholder-[var(--text-placeholder)]'
                 />
               </div>
             </div>
@@ -303,29 +302,19 @@ export function CompanyInfoForm() {
         >
           Cancel
         </Link>
-        <Button
+        <Link
+          href={'/company-management/add-user'}
+          className='inline-flex items-center h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
+        >
+          Create
+        </Link>
+        {/* <Button
           className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
           onClick={handleCreateClick}
         >
           Create
-        </Button>
+        </Button> */}
       </div>
-      {/* Actions */}
-      {/* <div className='flex justify-end gap-2 pt-8'>
-        <Button
-          type='button'
-          variant='outline'
-          className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)]'
-        >
-          Cancel
-        </Button>
-        <Button
-          type='submit'
-          className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
-        >
-          Save
-        </Button>
-      </div> */}
     </form>
   );
 }
