@@ -63,15 +63,15 @@ const EditRolePage = () => {
         throw new Error(response.message || ROLE_MESSAGES.UPDATE_ERROR);
       }
     } catch (err: any) {
-      let errorMessage = 'Failed to update role.';
+      let errorMessage = ROLE_MESSAGES.UPDATE_ERROR;
       if (err.response) {
         const apiError = err.response.data;
         if (apiError.status === STATUS_CODES.BAD_REQUEST) {
-          errorMessage = 'Invalid role data. Please check your input.';
+          errorMessage = ROLE_MESSAGES.INVALID_DATA;
         } else if (apiError.status === STATUS_CODES.UNAUTHORIZED) {
-          errorMessage = 'You are not authorized to update roles.';
+          errorMessage = ROLE_MESSAGES.UNAUTHORIZED;
         } else if (apiError.status === STATUS_CODES.CONFLICT) {
-          errorMessage = 'A role with this name already exists.';
+          errorMessage = ROLE_MESSAGES.DUPLICATE_ROLE;
         } else if (apiError.status === STATUS_CODES.UNPROCESSABLE_ENTITY) {
           if (apiError.errors) {
             const errorMessages = Object.values(apiError.errors).flat();
