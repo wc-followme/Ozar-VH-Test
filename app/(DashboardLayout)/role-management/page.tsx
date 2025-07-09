@@ -15,7 +15,7 @@ const menuOptions = [
 const RoleManagement = () => {
   const [roles, setRoles] = useState<any[]>([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(10); // Show 9 records by default
   const [search] = useState('');
   const [loading, setLoading] = useState(false);
   const [name] = useState('');
