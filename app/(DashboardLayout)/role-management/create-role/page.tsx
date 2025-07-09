@@ -32,61 +32,7 @@ const CreateRole = () => {
     { value: 'barchart', label: 'Analytics', icon: BarChart, color: '#9c88ff' },
   ];
 
-  // Module data for the sidebar
-  const modules = [
-    { id: 1, name: 'Module 1', selected: true },
-    { id: 2, name: 'Module 2', selected: false },
-    { id: 3, name: 'Module 3', selected: false },
-    { id: 4, name: 'Module 4', selected: false },
-    { id: 5, name: 'Module 5', selected: false },
-    { id: 6, name: 'Module 6', selected: false },
-  ];
 
-  // Sub-module data for the content area
-  const subModules = [
-    {
-      id: 1,
-      name: 'Sub Module 1',
-      description:
-        'Lorem ipsum dolor sit amet consecte tur adipiscing elit semper.',
-      permission: 'edit',
-    },
-    {
-      id: 2,
-      name: 'Sub Module 2',
-      description:
-        'Lorem ipsum dolor sit amet consecte tur adipiscing elit semper.',
-      permission: 'view',
-    },
-    {
-      id: 3,
-      name: 'Sub Module 3',
-      description:
-        'Lorem ipsum dolor sit amet consecte tur adipiscing elit semper.',
-      permission: 'none',
-    },
-    {
-      id: 4,
-      name: 'Sub Module 4',
-      description:
-        'Lorem ipsum dolor sit amet consecte tur adipiscing elit semper.',
-      permission: 'view',
-    },
-    {
-      id: 5,
-      name: 'Sub Module 5',
-      description:
-        'Lorem ipsum dolor sit amet consecte tur adipiscing elit semper.',
-      permission: 'view',
-    },
-    {
-      id: 6,
-      name: 'Sub Module 6',
-      description:
-        'Lorem ipsum dolor sit amet consecte tur adipiscing elit semper.',
-      permission: 'edit',
-    },
-  ];
 
   return (
     <Card className='flex flex-col gap-8 p-6 flex-1 w-full border-1 border-[#E8EAED] rounded-[20px] bg-white'>

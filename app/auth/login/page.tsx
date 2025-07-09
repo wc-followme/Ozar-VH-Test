@@ -23,7 +23,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   // Redirect if already authenticated
   if (isAuthenticated) {
     // Check if there's a redirect URL to go back to
-    const redirectTo = searchParams.redirect as string;
+    const redirectTo = searchParams['redirect'] as string;
     if (
       redirectTo &&
       redirectTo.startsWith('/') &&
@@ -35,10 +35,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   }
 
   // Get error message and redirect info from URL parameters
-  const errorMessage = searchParams.error as string;
-  const emailError = searchParams.error_email as string;
-  const passwordError = searchParams.error_password as string;
-  const redirectTo = searchParams.redirect as string;
+  const errorMessage = searchParams['error'] as string;
+  const emailError = searchParams['error_email'] as string;
+  const passwordError = searchParams['error_password'] as string;
+  const redirectTo = searchParams['redirect'] as string;
 
   return (
     <section className='min-h-screen'>
