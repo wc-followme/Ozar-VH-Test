@@ -60,7 +60,7 @@ const CompanyManagementAddUser = () => {
                     <div className='text-sm text-[var(--text-secondary)]'>
                       Modify or set up new roles with custom names,
                       descriptions, and permission assignments tailored to your
-                      organization's needs.
+                      organization&apos;s needs.
                     </div>
                   </div>
                   <Switch defaultChecked className={switchStyleMd} />

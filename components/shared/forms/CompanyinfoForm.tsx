@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ImageUpload } from '../ImageUpload';
 
@@ -17,10 +17,10 @@ export function CompanyInfoForm() {
   const [contractorCountry, setContractorCountry] = useState('us');
   const [companyCountry, setCompanyCountry] = useState('us');
 
-  const router = useRouter();
-  const handleCreateClick = () => {
-    router.push('/company-management/add-user');
-  };
+  // const router = useRouter();
+  // const handleCreateClick = () => {
+  //   router.push('/company-management/add-user');
+  // };
   const handleUploadClick = () => {
     console.log('Upload clicked');
   };
