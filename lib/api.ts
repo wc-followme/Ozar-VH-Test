@@ -256,6 +256,14 @@ class ApiService {
     });
   }
 
+  // Logout API
+  async logout() {
+    return this.makeRequest('/auth/logout', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   // Removed testConnection and all debug code
 }
 

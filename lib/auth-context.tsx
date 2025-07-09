@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { apiService, type ApiError, type LoginResponse } from './api';
 
@@ -32,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   // Helper function to set cookie
   const setCookie = (name: string, value: string, days = 7) => {
@@ -153,24 +155,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await apiService.logout();
+    } catch (e) {
+      // Ignore API errors, always clear local state
+    }
     setIsAuthenticated(false);
     setUser(null);
-
     // Clear localStorage
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
     localStorage.removeItem('auth_token');
     localStorage.removeItem('device_id');
-
     // Clear cookies
     deleteCookie('is_authenticated');
     deleteCookie('user_data');
     deleteCookie('auth_token');
-
-    console.log(
-      '✅ Authentication data cleared from both localStorage and cookies'
-    );
+    // Redirect to login
+    router.push('/auth/login');
   };
 
   return (
