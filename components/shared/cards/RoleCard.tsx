@@ -26,6 +26,8 @@ export interface RoleCardProps {
   permissionCount?: number;
   iconColor?: string;
   menuOptions: MenuOption[];
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export const RoleCard: React.FC<RoleCardProps> = ({
@@ -36,9 +38,12 @@ export const RoleCard: React.FC<RoleCardProps> = ({
   permissionCount = 0,
   iconColor,
   menuOptions,
+  onEdit,
+  onDelete,
 }) => {
   const handleMenuAction = (action: string) => {
-    return action;
+    if (action === 'edit' && onEdit) onEdit();
+    if (action === 'delete' && onDelete) onDelete();
   };
 
   return (

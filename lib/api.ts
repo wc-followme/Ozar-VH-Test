@@ -209,24 +209,6 @@ class ApiService {
     });
   }
 
-  async updateRole(
-    id: number,
-    roleData: Partial<CreateRoleRequest>
-  ): Promise<any> {
-    return this.makeRequest(`/roles/${id}`, {
-      method: 'PUT',
-      headers: this.getRoleHeaders(),
-      body: JSON.stringify(roleData),
-    });
-  }
-
-  async deleteRole(id: number): Promise<any> {
-    return this.makeRequest(`/roles/${id}`, {
-      method: 'DELETE',
-      headers: this.getRoleHeaders(),
-    });
-  }
-
   // Fetch roles with pagination, search, and name filter
   async fetchRoles({
     page = 1,
@@ -245,6 +227,31 @@ class ApiService {
     if (search) params.append('search', search);
     if (name) params.append('name', name);
     return this.makeRequest(`/roles?${params.toString()}`, {
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Get role details by UUID
+  async getRoleDetails(uuid: string) {
+    return this.makeRequest(`/roles/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update role details by UUID
+  async updateRoleDetails(uuid: string, data: Partial<CreateRoleRequest>) {
+    return this.makeRequest(`/roles/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Delete role by UUID
+  async deleteRole(uuid: string) {
+    return this.makeRequest(`/roles/${uuid}`, {
+      method: 'DELETE',
       headers: this.getRoleHeaders(),
     });
   }

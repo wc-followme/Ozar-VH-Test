@@ -5,6 +5,7 @@ import { iconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
 import { Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const menuOptions = [
@@ -21,6 +22,7 @@ const RoleManagement = () => {
   const [name] = useState('');
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef<IntersectionObserver | null>(null);
+  const router = useRouter();
 
   const fetchRoles = async (append = false) => {
     setLoading(true);
@@ -63,6 +65,22 @@ const RoleManagement = () => {
     },
     [loading, hasMore]
   );
+
+  // Handler for deleting a role
+  const handleDeleteRole = async (uuid: string) => {
+    if (!window.confirm('Are you sure you want to delete this role?')) return;
+    try {
+      await apiService.deleteRole(uuid);
+      setRoles(prev => prev.filter(role => role.uuid !== uuid));
+    } catch (err) {
+      alert('Failed to delete role.');
+    }
+  };
+
+  // Handler for editing a role
+  const handleEditRole = (uuid: string) => {
+    router.push(`/role-management/edit-role/${uuid}`);
+  };
 
   return (
     <section className='flex flex-col w-full items-start gap-8 p-6 overflow-y-auto'>
@@ -127,6 +145,8 @@ const RoleManagement = () => {
                   description={role.description}
                   permissionCount={role.total_permissions}
                   iconColor={iconOption.color}
+                  onEdit={() => handleEditRole(role.uuid)}
+                  onDelete={() => handleDeleteRole(role.uuid)}
                 />
               </div>
             );
