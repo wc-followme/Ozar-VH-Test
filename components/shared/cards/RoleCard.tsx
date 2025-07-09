@@ -1,5 +1,6 @@
 'use client';
 
+import { ROLE_MESSAGES } from '@/app/(DashboardLayout)/role-management/role-messages';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -8,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ROLE_MESSAGES } from '@/constants/role-messages';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Icon } from 'iconsax-react';

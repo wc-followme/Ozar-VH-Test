@@ -2,11 +2,12 @@
 
 import { RoleForm } from '@/components/shared/forms/RoleForm';
 import { useToast } from '@/components/ui/use-toast';
-import { ROLE_MESSAGES } from '@/constants/role-messages';
+import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
 import { showToast } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { ROLE_MESSAGES } from '../role-messages';
 
 const CreateRole = () => {
   const router = useRouter();
@@ -24,7 +25,10 @@ const CreateRole = () => {
         status: data.status,
       };
       const response = await apiService.createRole(roleData);
-      if (response.statusCode === 200 || response.statusCode === 201) {
+      if (
+        response.statusCode === STATUS_CODES.OK ||
+        response.statusCode === STATUS_CODES.CREATED
+      ) {
         showToast({
           toast,
           type: 'success',
@@ -42,20 +46,20 @@ const CreateRole = () => {
         errors?: any;
       };
       let errorMessage = 'An unexpected error occurred';
-      if (apiError.status === 400) {
+      if (apiError.status === STATUS_CODES.BAD_REQUEST) {
         errorMessage = 'Invalid role data. Please check your input.';
-      } else if (apiError.status === 401) {
+      } else if (apiError.status === STATUS_CODES.UNAUTHORIZED) {
         errorMessage = 'You are not authorized to create roles.';
-      } else if (apiError.status === 409) {
+      } else if (apiError.status === STATUS_CODES.CONFLICT) {
         errorMessage = 'A role with this name already exists.';
-      } else if (apiError.status === 422) {
+      } else if (apiError.status === STATUS_CODES.UNPROCESSABLE_ENTITY) {
         if (apiError.errors) {
           const errorMessages = Object.values(apiError.errors).flat();
           errorMessage = errorMessages.join(', ');
         } else {
           errorMessage = apiError.message || ROLE_MESSAGES.VALIDATION_ERROR;
         }
-      } else if (apiError.status === 0) {
+      } else if (apiError.status === STATUS_CODES.NETWORK_ERROR) {
         errorMessage = ROLE_MESSAGES.NETWORK_ERROR;
       } else if (apiError.message) {
         errorMessage = apiError.message;
