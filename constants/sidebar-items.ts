@@ -1,5 +1,4 @@
 import { Home, Icon } from 'iconsax-react';
-import { CircleUserIcon } from 'lucide-react';
 import { Category } from './../components/icons/Category';
 import { Company } from './../components/icons/Company';
 import { JobIcon } from './../components/icons/JobIcon';
@@ -12,6 +11,7 @@ import { Trade } from './../components/icons/Trade';
 // Common icon options for roles and other modules
 import {
   BarChart,
+  CircleUserIcon,
   Database,
   FileText,
   Settings,
@@ -48,7 +48,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: 'Company Manag.',
-    href: '/trade',
+    href: '/company-management',
     icon: Company,
   },
   {

@@ -20,12 +20,66 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
 import { useState } from 'react';
+import FormErrorMessage from '../common/FormErrorMessage';
 
 export function UserInfoForm() {
   const [date, setDate] = useState<Date>();
+  const [roleCategory, setRoleCategory] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [designation, setDesignation] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [country, setCountry] = useState('us');
+  const [communication, setCommunication] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [pinCode, setPinCode] = useState('');
+  const [errors, setErrors] = useState<any>({});
+
+  const validate = () => {
+    const newErrors: any = {};
+    if (!roleCategory) newErrors.roleCategory = 'Role category is required.';
+    if (!fullName) newErrors.fullName = 'Full name is required.';
+    if (!designation) newErrors.designation = 'Designation is required.';
+    if (!date) newErrors.date = 'Date of joining is required.';
+    if (!email) newErrors.email = 'Email is required.';
+    if (!phone) newErrors.phone = 'Phone number is required.';
+    if (!communication)
+      newErrors.communication = 'Preferred communication is required.';
+    if (!address) newErrors.address = 'Address is required.';
+    if (!city) newErrors.city = 'City is required.';
+    if (!pinCode) newErrors.pinCode = 'Pin code is required.';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validate()) {
+      // Submit logic here
+      alert('Form submitted!');
+    }
+  };
+
+  const handleCancel = () => {
+    // TODO: Implement cancel logic, e.g., close modal or reset form
+    // For now, just reset all fields
+    setRoleCategory('');
+    setFullName('');
+    setDesignation('');
+    setDate(undefined);
+    setEmail('');
+    setPhone('');
+    setCountry('us');
+    setCommunication('');
+    setAddress('');
+    setCity('');
+    setPinCode('');
+    setErrors({});
+  };
 
   return (
-    <div className='space-y-6'>
+    <form className='space-y-6' onSubmit={handleSubmit} noValidate>
       {/* Role Category */}
       <div className='space-y-2'>
         <Label
@@ -34,7 +88,7 @@ export function UserInfoForm() {
         >
           Role Category
         </Label>
-        <Select defaultValue='contractors'>
+        <Select value={roleCategory} onValueChange={setRoleCategory}>
           <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
             <SelectValue placeholder='Select role category' />
           </SelectTrigger>
@@ -45,8 +99,8 @@ export function UserInfoForm() {
             <SelectItem value='administrators'>Administrators</SelectItem>
           </SelectContent>
         </Select>
+        <FormErrorMessage message={errors.roleCategory} />
       </div>
-
       {/* First Row - Full Name, Designation, Date of Joining */}
       <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
         <div className='space-y-2'>
@@ -59,8 +113,11 @@ export function UserInfoForm() {
           <Input
             id='full-name'
             placeholder='Enter Full Name'
+            value={fullName}
+            onChange={e => setFullName(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
+          <FormErrorMessage message={errors.fullName} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -72,8 +129,11 @@ export function UserInfoForm() {
           <Input
             id='designation'
             placeholder='Enter Job Title'
+            value={designation}
+            onChange={e => setDesignation(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
+          <FormErrorMessage message={errors.designation} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -111,6 +171,7 @@ export function UserInfoForm() {
               />
             </PopoverContent>
           </Popover>
+          <FormErrorMessage message={errors.date} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -123,8 +184,11 @@ export function UserInfoForm() {
             id='email'
             type='email'
             placeholder='Enter Email'
+            value={email}
+            onChange={e => setEmail(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
+          <FormErrorMessage message={errors.email} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -134,7 +198,7 @@ export function UserInfoForm() {
             Phone Number
           </Label>
           <div className='flex w-full'>
-            <Select defaultValue='us'>
+            <Select value={country} onValueChange={setCountry}>
               <SelectTrigger
                 className={cn(
                   'h-12 w-24 rounded-l-[10px] rounded-r-none border-2 border-[var(--border-dark)]',
@@ -165,10 +229,11 @@ export function UserInfoForm() {
                 </SelectItem>
               </SelectContent>
             </Select>
-
             <Input
               id='phone'
               placeholder='Enter Number'
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
               className={cn(
                 'h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 border-[var(--border-dark)] !placeholder-[var(--text-placeholder)]',
                 'focus:border-green-500 focus:ring-green-500',
@@ -176,6 +241,7 @@ export function UserInfoForm() {
               )}
             />
           </div>
+          <FormErrorMessage message={errors.phone} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -184,7 +250,7 @@ export function UserInfoForm() {
           >
             Preferred Method of Communication
           </Label>
-          <Select>
+          <Select value={communication} onValueChange={setCommunication}>
             <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
               <SelectValue
                 placeholder='eg. email, phone, etc.'
@@ -199,6 +265,7 @@ export function UserInfoForm() {
               <SelectItem value='teams'>Microsoft Teams</SelectItem>
             </SelectContent>
           </Select>
+          <FormErrorMessage message={errors.communication} />
         </div>
       </div>
       {/* Third Row - Address */}
@@ -212,10 +279,12 @@ export function UserInfoForm() {
         <Input
           id='address'
           placeholder='Enter Company Address'
+          value={address}
+          onChange={e => setAddress(e.target.value)}
           className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
         />
+        <FormErrorMessage message={errors.address} />
       </div>
-
       {/* Fourth Row - City, Pin Code */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <div className='space-y-2'>
@@ -228,8 +297,11 @@ export function UserInfoForm() {
           <Input
             id='city'
             placeholder='Enter City'
+            value={city}
+            onChange={e => setCity(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
+          <FormErrorMessage message={errors.city} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -241,10 +313,28 @@ export function UserInfoForm() {
           <Input
             id='pin-code'
             placeholder='Enter Pin Code'
+            value={pinCode}
+            onChange={e => setPinCode(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
+          <FormErrorMessage message={errors.pinCode} />
         </div>
       </div>
-    </div>
+      <div className='pt-4 flex items-center justify-end gap-3'>
+        <Button
+          type='button'
+          className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
+          onClick={handleCancel}
+        >
+          Cancel
+        </Button>
+        <Button
+          type='submit'
+          className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
+        >
+          Create
+        </Button>
+      </div>
+    </form>
   );
 }

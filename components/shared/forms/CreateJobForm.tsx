@@ -5,8 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import { SelectBoxCard } from '../cards/SelectBoxCard';
 import { RadioGroupStripe } from '../common/RadioStripe';
+import { SelectBoxCard } from '../common/SelectBoxCard';
 
 const selectBoxOptions = [
   {
@@ -14,18 +14,34 @@ const selectBoxOptions = [
     title: 'Homeowner Info',
     description:
       'Includes name, email, phone number, and basic contact details.',
+    status: false,
   },
   {
     id: 'property-details',
     title: 'Property Details',
     description:
       'Covers home size, number of BHKs, and type of work (interior, exterior, etc.).',
+    status: false,
   },
   {
     id: 'project-estimate',
     title: 'Project Estimate',
     description:
       'Provides a detailed cost estimate based on selected services and property info.',
+    status: false,
+  },
+  {
+    id: 'adding-more',
+    title: 'Adding more project details',
+    description:
+      'Includes name, email, phone number, and basic contact details.',
+    status: true,
+  },
+  {
+    id: 'complete-estimate',
+    title: 'Complete line items in estimates to create new estimates.',
+    description: 'Covers home size, number of BHKs, and type of work.',
+    status: true,
   },
 ];
 export function CreateJobForm() {
@@ -36,8 +52,8 @@ export function CreateJobForm() {
   };
 
   return (
-    <Card className='w-full max-w-4xl mx-auto bg-white shadow-none border-0'>
-      <CardContent className='space-y-6'>
+    <Card className='w-full max-w-4xl mx-auto bg-transparent shadow-none border-0'>
+      <CardContent className='p-0'>
         <form onSubmit={handleSubmit} className='space-y-6'>
           {/* Full Name Input */}
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -102,6 +118,7 @@ export function CreateJobForm() {
                   id={option.id}
                   title={option.title}
                   description={option.description}
+                  status={option.status}
                 />
               ))}
             </div>

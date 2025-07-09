@@ -35,25 +35,30 @@ const CreateRole = () => {
       } else {
         throw new Error(response.message || ROLE_MESSAGES.CREATE_ERROR);
       }
-    } catch (error: any) {
-      let errorMessage = ROLE_MESSAGES.UNEXPECTED_ERROR;
-      if (error.status === 400) {
-        errorMessage = ROLE_MESSAGES.INVALID_DATA;
-      } else if (error.status === 401) {
-        errorMessage = ROLE_MESSAGES.UNAUTHORIZED;
-      } else if (error.status === 409) {
-        errorMessage = ROLE_MESSAGES.DUPLICATE_ROLE;
-      } else if (error.status === 422) {
-        if (error.errors) {
-          const errorMessages = Object.values(error.errors).flat();
+    } catch (error) {
+      const apiError = error as {
+        status?: number;
+        message?: string;
+        errors?: any;
+      };
+      let errorMessage = 'An unexpected error occurred';
+      if (apiError.status === 400) {
+        errorMessage = 'Invalid role data. Please check your input.';
+      } else if (apiError.status === 401) {
+        errorMessage = 'You are not authorized to create roles.';
+      } else if (apiError.status === 409) {
+        errorMessage = 'A role with this name already exists.';
+      } else if (apiError.status === 422) {
+        if (apiError.errors) {
+          const errorMessages = Object.values(apiError.errors).flat();
           errorMessage = errorMessages.join(', ');
         } else {
-          errorMessage = error.message || ROLE_MESSAGES.VALIDATION_ERROR;
+          errorMessage = apiError.message || ROLE_MESSAGES.VALIDATION_ERROR;
         }
-      } else if (error.status === 0) {
+      } else if (apiError.status === 0) {
         errorMessage = ROLE_MESSAGES.NETWORK_ERROR;
-      } else if (error.message) {
-        errorMessage = error.message;
+      } else if (apiError.message) {
+        errorMessage = apiError.message;
       }
       showToast({
         toast,

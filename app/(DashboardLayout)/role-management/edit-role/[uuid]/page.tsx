@@ -16,14 +16,14 @@ const EditRolePage = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const uuid = params?.uuid as string;
+  const uuid = params['uuid'] as string;
 
   useEffect(() => {
     const fetchRole = async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await apiService.getRoleDetails(uuid);
+        const res = (await apiService.getRoleDetails(uuid)) as { data: any };
         const data = res.data;
         setInitialValues({
           name: data.name || '',
@@ -64,6 +64,8 @@ const EditRolePage = () => {
   if (loading) return <div className='p-8'>Loading...</div>;
   if (error) return <div className='p-8 text-red-500'>{error}</div>;
 
+  if (!initialValues) return null;
+
   return (
     <div className='flex flex-col gap-8 p-6 flex-1 w-full'>
       <div className='flex items-center justify-between'>
@@ -82,7 +84,7 @@ const EditRolePage = () => {
       <RoleForm
         mode='edit'
         isSubmitting={isSubmitting}
-        initialValues={initialValues || undefined}
+        initialValues={initialValues}
         onSubmit={onSubmit}
       />
     </div>

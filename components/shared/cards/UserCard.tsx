@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Call, Icon, Sms } from 'iconsax-react';
 import { useState } from 'react';
+import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 
 interface MenuOption {
   label: string;
@@ -43,6 +44,7 @@ export function UserCard({
   menuOptions,
 }: UserCardProps) {
   const [isToggling, setIsToggling] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
   const handleToggle = async () => {
     setIsToggling(true);
@@ -51,6 +53,9 @@ export function UserCard({
   };
 
   const handleMenuAction = (action: string) => {
+    if (action === 'delete') {
+      setShowDelete(true);
+    }
     return action;
   };
 
@@ -163,6 +168,17 @@ export function UserCard({
             '
         />
       </div>
+      <ConfirmDeleteModal
+        open={showDelete}
+        title={`Are you sure you want to delete?`}
+        subtitle={`This action cannot be undone.`}
+        onCancel={() => setShowDelete(false)}
+        onDelete={() => {
+          setShowDelete(false);
+          // TODO: Call delete logic here
+          console.log('User deleted');
+        }}
+      />
     </div>
   );
 }
