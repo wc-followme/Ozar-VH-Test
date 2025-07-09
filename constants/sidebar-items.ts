@@ -48,7 +48,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: 'Company Manag.',
-    href: '/trade',
+    href: '/company-management',
     icon: Company,
   },
   {
