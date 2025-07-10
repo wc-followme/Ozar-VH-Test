@@ -16,6 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 export default function AddUserPage() {
   const [selectedTab, setSelectedTab] = useState('info');
   const [imageUrl, setImageUrl] = useState<string>('');
+  const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
   const [roles, setRoles] = useState<{ id: number; name: string }[]>([]);
   const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
@@ -72,7 +73,11 @@ export default function AddUserPage() {
         customPath: ``,
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
-      setImageUrl(presigned.data['publicUrl']);
+      setFileKey(presigned.data['fileKey'] || '');
+      const cdnUrl = process.env['NEXT_PUBLIC_CDN_URL'] || '';
+      setImageUrl(
+        presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
+      );
     } catch (err) {
       console.log('err', err);
       alert('Failed to upload image');
@@ -86,7 +91,11 @@ export default function AddUserPage() {
     setFormError(undefined);
     try {
       // You may want to prompt for password or generate one here
-      const payload = { ...data, password: 'password123' };
+      const payload = {
+        ...data,
+        password: 'password123',
+        profile_picture_url: fileKey,
+      };
       await apiService.createUser(payload);
       showToast({
         toast,
@@ -154,9 +163,9 @@ export default function AddUserPage() {
                     <div className='text-xs mt-2'>Uploading...</div>
                   )}
                   {}
-                  {imageUrl && (
+                  {fileKey && (
                     <Image
-                      src={imageUrl}
+                      src={(process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey}
                       alt='Uploaded'
                       className='mt-2 rounded-lg w-full h-auto'
                       width={250}
@@ -170,7 +179,7 @@ export default function AddUserPage() {
                   <UserInfoForm
                     roles={roles}
                     loadingRoles={loadingRoles}
-                    imageUrl={imageUrl}
+                    imageUrl={fileKey}
                     onSubmit={handleCreateUser}
                     loading={formLoading}
                     error={formError}

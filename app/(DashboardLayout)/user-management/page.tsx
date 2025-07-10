@@ -57,7 +57,20 @@ export default function UserManagement() {
       // Fetch roles only on first load
       if (targetPage === 1) {
         const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
-        const roleList = rolesRes?.data?.data || [];
+        function isRoleApiResponse(
+          obj: unknown
+        ): obj is { data: { data: any[] } } {
+          return (
+            typeof obj === 'object' &&
+            obj !== null &&
+            'data' in obj &&
+            typeof (obj as any).data === 'object' &&
+            (obj as any).data !== null &&
+            'data' in (obj as any).data &&
+            Array.isArray((obj as any).data.data)
+          );
+        }
+        const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
           roleList.map((role: any) => ({ id: role.id, name: role.name }))
         );
@@ -140,8 +153,13 @@ export default function UserManagement() {
   };
 
   const menuOptions = [
-    { label: 'Edit', action: 'edit', icon: Edit2 },
-    { label: 'Delete', action: 'delete', icon: Trash, variant: 'destructive' },
+    { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' as const },
+    {
+      label: 'Delete',
+      action: 'delete',
+      icon: Trash,
+      variant: 'destructive' as const,
+    },
   ];
 
   return (
@@ -188,7 +206,12 @@ export default function UserManagement() {
               role={user.role?.name || ''}
               phone={user.phone_number}
               email={user.email}
-              image={user.profile_picture_url}
+              image={
+                user.profile_picture_url
+                  ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+                    user.profile_picture_url
+                  : ''
+              }
               status={user.status === 'ACTIVE'}
               onToggle={() =>
                 handleToggleStatus(user.id, user.status === 'ACTIVE')
