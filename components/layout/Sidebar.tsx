@@ -45,7 +45,7 @@ export function Sidebar() {
           </div>
 
           {/* Sidebar Links */}
-          <ul className='py-2'>
+          <ul className='py-2 [&>li+li]:mt-0.5 '>
             {sidebarItems.map((item, index) => (
               <li key={index}>
                 <Link

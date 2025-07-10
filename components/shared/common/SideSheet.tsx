@@ -14,6 +14,7 @@ import * as React from 'react';
 
 interface SideSheetProps {
   title?: string;
+  size?: string;
   children: React.ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -43,13 +44,15 @@ export default function SideSheet({
   title = 'Sidebar',
   children,
   open,
+  size = '846px',
   onOpenChange, // ✅ Accept it
 }: SideSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <CustomSheetContent
         side='right'
-        className='w-[846px] !max-w-[846px] bg-[var(--card-background)] border-0 overflow-auto'
+        className={`w-full bg-[var(--card-background)] border-0 overflow-auto`}
+        style={{ maxWidth: size }}
       >
         <SheetHeader className='text-[var(--text-dark)] text-[24px] font-medium flex items-center flex-row pb-8'>
           <SheetTitle>{title}</SheetTitle>

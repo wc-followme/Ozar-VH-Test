@@ -53,7 +53,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: 'Category Manag.',
-    href: '/service',
+    href: '/category-management',
     icon: Category,
   },
   {
