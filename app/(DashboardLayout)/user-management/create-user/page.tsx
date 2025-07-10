@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { apiService } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage, showToast } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -159,13 +159,28 @@ export default function AddUserPage() {
                 {/* Left Column - Upload Photo */}
                 <div className='w-[250px] flex-shrink-0 relative'>
                   {fileKey ? (
-                    <Image
-                      src={(process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey}
-                      alt='Uploaded'
-                      className='rounded-lg w-full h-auto'
-                      width={250}
-                      height={250}
-                    />
+                    <div className='relative'>
+                      <Image
+                        src={
+                          (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
+                        }
+                        alt='Uploaded'
+                        className='rounded-lg w-full h-auto'
+                        width={250}
+                        height={250}
+                      />
+                      <button
+                        type='button'
+                        className='absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1 shadow hover:bg-opacity-100 transition'
+                        onClick={() => {
+                          setFileKey('');
+                          setImageUrl('');
+                        }}
+                        aria-label='Remove photo'
+                      >
+                        <X className='w-5 h-5 text-gray-700' />
+                      </button>
+                    </div>
                   ) : (
                     <PhotoUpload onFileUpload={handlePhotoUpload} />
                   )}
