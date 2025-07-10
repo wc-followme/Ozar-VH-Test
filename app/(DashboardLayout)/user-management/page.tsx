@@ -165,7 +165,7 @@ export default function UserManagement() {
   ];
 
   return (
-    <div className='w-full p-6 overflow-y-auto'>
+    <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
         <h1 className='text-2xl font-medium text-[var(--text-dark)]'>

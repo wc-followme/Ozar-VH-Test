@@ -50,7 +50,7 @@ export function ConfirmDeleteModal({
         <DialogTitle className='text-[24px] text-[var(--text-dark)] font-medium mb-1 leading-[1]'>
           {title}
         </DialogTitle>
-        <p className='text-[var(--text-secondary)] mb-8 text-[18px] leading-[1]'>
+        <p className='text-[var(--text-secondary)] mb-8 text-[18px] leading-[1.4]'>
           {subtitle}
         </p>
         <div className='flex gap-4 w-full justify-center'>

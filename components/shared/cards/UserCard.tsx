@@ -68,7 +68,7 @@ export function UserCard({
   };
 
   return (
-    <div className='bg-[var(--white-background)] rounded-[12px] border border-[var(--border-dark)] p-[10px] hover:shadow-lg transition-shadow duration-200'>
+    <div className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[10px] hover:shadow-lg transition-shadow duration-200'>
       {/* Header with Avatar, User Info and Menu */}
       <div className='flex items-start gap-4 mb-2'>
         <Avatar className='w-20 h-20 rounded-[10px]'>

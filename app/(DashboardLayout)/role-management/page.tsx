@@ -82,7 +82,7 @@ const RoleManagement = () => {
   };
 
   return (
-    <section className='flex flex-col w-full items-start gap-8 p-6 overflow-y-auto'>
+    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
         <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
           Role and Permissions Management

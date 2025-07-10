@@ -4,7 +4,6 @@ import { Company } from './../components/icons/Company';
 import { JobIcon } from './../components/icons/JobIcon';
 import { Material } from './../components/icons/Material';
 import { RoleIcon } from './../components/icons/RoleIcon';
-import { Service } from './../components/icons/Service';
 import { Tool } from './../components/icons/Tool';
 import { Trade } from './../components/icons/Trade';
 
@@ -18,6 +17,7 @@ import {
   Shield,
   Users,
 } from 'lucide-react';
+import { Service } from '../components/icons/Service';
 
 type SidebarItem = {
   title: string;
@@ -58,17 +58,17 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: 'Trade Manag.',
-    href: '/material',
+    href: '/trade-management',
     icon: Trade,
   },
   {
     title: 'Service Manag.',
-    href: '/tools',
+    href: '/service-management',
     icon: Service,
   },
   {
     title: 'Material Manag.',
-    href: '/tools',
+    href: '/material-management',
     icon: Material,
   },
   {
