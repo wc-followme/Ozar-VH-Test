@@ -98,6 +98,16 @@ const iconOptions = [
     color: '#00A8BF', // Blue color
   },
 ];
+const menuOptions = [
+  { id: 1, label: 'Edit', action: 'edit', icon: Edit2 },
+  {
+    id: 2,
+    label: 'Delete',
+    action: 'delete',
+    icon: Trash,
+    variant: 'destructive',
+  },
+];
 
 const CategoryManagement = () => {
   const [open, setOpen] = useState(false);
@@ -125,7 +135,7 @@ const CategoryManagement = () => {
         <div className='bg-[var(--white-background)] p-[0px] w-full'>
           <form className='space-y-6' onSubmit={e => e.preventDefault()}>
             {/* Icon & Category Name Row */}
-            <div className='grid grid-cols-1 md:grid-cols-4 gap-4 w-full'>
+            <div className='grid grid-cols-1 md:grid-cols-5 gap-4 w-full'>
               {/* Icon Selector */}
               <div className='space-y-2 pt-1 md:col-span-1'>
                 <IconFieldWrapper
@@ -140,7 +150,7 @@ const CategoryManagement = () => {
                 {/* <FormErrorMessage message={errors.icon} /> */}
               </div>
               {/* Category Name */}
-              <div className='space-y-2 md:col-span-3'>
+              <div className='space-y-2 md:col-span-4'>
                 <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
                   Category Name
                 </Label>
@@ -187,15 +197,7 @@ const CategoryManagement = () => {
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full'>
         {categories.map((cat, idx) => {
           const Icon = cat.icon;
-          const menuOptions = [
-            { label: 'Edit', action: 'edit', icon: Edit2 },
-            {
-              label: 'Delete',
-              action: 'delete',
-              icon: Trash,
-              variant: 'destructive',
-            },
-          ];
+
           return (
             <div
               key={cat.title}
@@ -232,11 +234,11 @@ const CategoryManagement = () => {
                     align='end'
                     className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
                   >
-                    {menuOptions.map((option, index) => {
+                    {menuOptions.map(option => {
                       const MenuIcon = option.icon;
                       return (
                         <DropdownMenuItem
-                          key={index}
+                          key={option.id}
                           onClick={() => {
                             if (option.action === 'edit') {
                               alert(`Edit ${cat.title}`);
