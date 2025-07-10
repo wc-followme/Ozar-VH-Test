@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { CreateUserRequest } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
@@ -25,9 +26,24 @@ import FormErrorMessage from '../common/FormErrorMessage';
 interface UserInfoFormProps {
   roles: { id: number; name: string }[];
   loadingRoles?: boolean;
+  imageUrl?: string;
+  onSubmit: (
+    data: Omit<CreateUserRequest, 'profile_picture_url'> & {
+      profile_picture_url?: string;
+    }
+  ) => void;
+  loading?: boolean;
+  error?: string | undefined;
 }
 
-export function UserInfoForm({ roles, loadingRoles }: UserInfoFormProps) {
+export function UserInfoForm({
+  roles,
+  loadingRoles,
+  imageUrl,
+  onSubmit,
+  loading,
+  error,
+}: UserInfoFormProps) {
   const [date, setDate] = useState<Date>();
   const [roleId, setRoleId] = useState('');
   const [fullName, setFullName] = useState('');
@@ -61,8 +77,20 @@ export function UserInfoForm({ roles, loadingRoles }: UserInfoFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      // Submit logic here
-      alert('Form submitted!');
+      onSubmit({
+        role_id: Number(roleId),
+        name: fullName,
+        email,
+        password: '', // You may want to add a password field to the form
+        phone_number: phone,
+        profile_picture_url: imageUrl,
+        date_of_joining: date ? date.toISOString().split('T')[0] : '',
+        designation,
+        preferred_communication_method: communication,
+        address,
+        city,
+        pincode: pinCode,
+      });
     }
   };
 
@@ -332,6 +360,7 @@ export function UserInfoForm({ roles, loadingRoles }: UserInfoFormProps) {
           <FormErrorMessage message={errors.pinCode} />
         </div>
       </div>
+      {error && <FormErrorMessage message={error} />}
       <div className='pt-4 flex items-center justify-end gap-3'>
         <Button
           type='button'

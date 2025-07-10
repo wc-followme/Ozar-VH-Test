@@ -115,6 +115,28 @@ export interface DeleteUserResponse {
   message: string;
 }
 
+// User creation types
+export interface CreateUserRequest {
+  role_id: number;
+  name: string;
+  email: string;
+  password: string;
+  phone_number: string;
+  profile_picture_url?: string;
+  date_of_joining: string;
+  designation: string;
+  preferred_communication_method: string;
+  address: string;
+  city: string;
+  pincode: string;
+}
+
+export interface CreateUserResponse {
+  statusCode: number;
+  message: string;
+  data: any;
+}
+
 // Get device information for login
 const getDeviceInfo = (): DeviceInfo => {
   const navigator = typeof window !== 'undefined' ? window.navigator : null;
@@ -332,6 +354,15 @@ class ApiService {
     return this.makeRequest(`/users?${params.toString()}`, {
       method: 'GET',
       headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Create user
+  async createUser(payload: CreateUserRequest): Promise<CreateUserResponse> {
+    return this.makeRequest('/users', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
     });
   }
 

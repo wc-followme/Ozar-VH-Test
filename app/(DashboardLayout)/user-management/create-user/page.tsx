@@ -3,10 +3,13 @@
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { PhotoUpload } from '@/components/shared/PhotoUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/components/ui/use-toast';
 import { apiService } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
+import { extractApiErrorMessage, showToast } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -16,6 +19,10 @@ export default function AddUserPage() {
   const [uploading, setUploading] = useState<boolean>(false);
   const [roles, setRoles] = useState<{ id: number; name: string }[]>([]);
   const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState<string | undefined>(undefined);
+  const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -71,6 +78,34 @@ export default function AddUserPage() {
       alert('Failed to upload image');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleCreateUser = async (data: any) => {
+    setFormLoading(true);
+    setFormError(undefined);
+    try {
+      // You may want to prompt for password or generate one here
+      const payload = { ...data, password: 'password123' };
+      await apiService.createUser(payload);
+      showToast({
+        toast,
+        type: 'success',
+        title: 'Success',
+        description: 'User created successfully.',
+      });
+      router.push('/user-management');
+    } catch (err: any) {
+      const message = extractApiErrorMessage(err, 'Failed to create user.');
+      setFormError(message);
+      showToast({
+        toast,
+        type: 'error',
+        title: 'Error',
+        description: message,
+      });
+    } finally {
+      setFormLoading(false);
     }
   };
 
@@ -132,7 +167,14 @@ export default function AddUserPage() {
 
                 {/* Right Column - Form Fields */}
                 <div className='flex-1'>
-                  <UserInfoForm roles={roles} loadingRoles={loadingRoles} />
+                  <UserInfoForm
+                    roles={roles}
+                    loadingRoles={loadingRoles}
+                    imageUrl={imageUrl}
+                    onSubmit={handleCreateUser}
+                    loading={formLoading}
+                    error={formError}
+                  />
                 </div>
               </div>
             </TabsContent>

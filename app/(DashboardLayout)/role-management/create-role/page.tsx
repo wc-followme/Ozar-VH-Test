@@ -4,7 +4,7 @@ import { RoleForm } from '@/components/shared/forms/RoleForm';
 import { useToast } from '@/components/ui/use-toast';
 import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
-import { showToast } from '@/lib/utils';
+import { extractApiErrorMessage, showToast } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ROLE_MESSAGES } from '../role-messages';
@@ -39,36 +39,14 @@ const CreateRole = () => {
       } else {
         throw new Error(response.message || ROLE_MESSAGES.CREATE_ERROR);
       }
-    } catch (error) {
-      const apiError = error as {
-        status?: number;
-        message?: string;
-        errors?: any;
-      };
-      let errorMessage = ROLE_MESSAGES.UNEXPECTED_ERROR;
-      if (apiError.status === STATUS_CODES.BAD_REQUEST) {
-        errorMessage = ROLE_MESSAGES.INVALID_DATA;
-      } else if (apiError.status === STATUS_CODES.UNAUTHORIZED) {
-        errorMessage = ROLE_MESSAGES.UNAUTHORIZED;
-      } else if (apiError.status === STATUS_CODES.CONFLICT) {
-        errorMessage = ROLE_MESSAGES.DUPLICATE_ROLE;
-      } else if (apiError.status === STATUS_CODES.UNPROCESSABLE_ENTITY) {
-        if (apiError.errors) {
-          const errorMessages = Object.values(apiError.errors).flat();
-          errorMessage = errorMessages.join(', ');
-        } else {
-          errorMessage = apiError.message || ROLE_MESSAGES.VALIDATION_ERROR;
-        }
-      } else if (apiError.status === STATUS_CODES.NETWORK_ERROR) {
-        errorMessage = ROLE_MESSAGES.NETWORK_ERROR;
-      } else if (apiError.message) {
-        errorMessage = apiError.message;
-      }
+    } catch (err: any) {
+      const message = extractApiErrorMessage(err, 'Failed to create role.');
+      setIsSubmitting(false);
       showToast({
         toast,
         type: 'error',
         title: 'Error',
-        description: errorMessage,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);

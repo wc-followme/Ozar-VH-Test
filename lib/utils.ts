@@ -22,3 +22,13 @@ export function showToast({
     variant: type === 'error' ? 'destructive' : 'default',
   });
 }
+
+// Extracts a user-friendly error message from API error responses
+export function extractApiErrorMessage(
+  err: any,
+  fallback = 'An error occurred.'
+) {
+  if (err?.details?.message) return err.details.message;
+  if (err?.message) return err.message;
+  return fallback;
+}
