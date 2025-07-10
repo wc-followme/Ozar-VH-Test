@@ -1,10 +1,12 @@
 'use client';
 import { RoleForm } from '@/components/shared/forms/RoleForm';
 import { useToast } from '@/components/ui/use-toast';
+import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
 import type { CreateRoleFormData } from '@/lib/validations/role';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ROLE_MESSAGES } from '../../role-messages';
 
 const EditRolePage = () => {
   const router = useRouter();
@@ -43,17 +45,51 @@ const EditRolePage = () => {
   const onSubmit = async (data: CreateRoleFormData) => {
     setIsSubmitting(true);
     try {
-      await apiService.updateRoleDetails(uuid, data);
-      toast({
-        title: 'Success!',
-        description: 'Role updated successfully.',
-        variant: 'default',
-      });
-      router.push('/role-management');
+      const response = (await apiService.updateRoleDetails(uuid, data)) as {
+        statusCode: number;
+        message?: string;
+      };
+      if (
+        response.statusCode === STATUS_CODES.OK ||
+        response.statusCode === STATUS_CODES.CREATED
+      ) {
+        toast({
+          title: 'Success!',
+          description: ROLE_MESSAGES.UPDATE_SUCCESS,
+          variant: 'default',
+        });
+        router.push('/role-management');
+      } else {
+        throw new Error(response.message || ROLE_MESSAGES.UPDATE_ERROR);
+      }
     } catch (err: any) {
+      let errorMessage = ROLE_MESSAGES.UPDATE_ERROR;
+      if (err.response) {
+        const apiError = err.response.data;
+        if (apiError.status === STATUS_CODES.BAD_REQUEST) {
+          errorMessage = ROLE_MESSAGES.INVALID_DATA;
+        } else if (apiError.status === STATUS_CODES.UNAUTHORIZED) {
+          errorMessage = ROLE_MESSAGES.UNAUTHORIZED;
+        } else if (apiError.status === STATUS_CODES.CONFLICT) {
+          errorMessage = ROLE_MESSAGES.DUPLICATE_ROLE;
+        } else if (apiError.status === STATUS_CODES.UNPROCESSABLE_ENTITY) {
+          if (apiError.errors) {
+            const errorMessages = Object.values(apiError.errors).flat();
+            errorMessage = errorMessages.join(', ');
+          } else {
+            errorMessage = apiError.message || ROLE_MESSAGES.VALIDATION_ERROR;
+          }
+        } else if (apiError.status === STATUS_CODES.NETWORK_ERROR) {
+          errorMessage = ROLE_MESSAGES.NETWORK_ERROR;
+        } else if (apiError.message) {
+          errorMessage = apiError.message;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
       toast({
         title: 'Error',
-        description: err?.message || 'Failed to update role.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
