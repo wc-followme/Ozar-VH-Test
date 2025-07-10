@@ -505,8 +505,8 @@ class ApiService {
   }
 
   // Delete user
-  async deleteUser(id: number): Promise<DeleteUserResponse> {
-    return this.makeRequest(`/users/${id}`, {
+  async deleteUser(uuid: string): Promise<DeleteUserResponse> {
+    return this.makeRequest(`/users/${uuid}`, {
       method: 'DELETE',
       headers: this.getRoleHeaders(),
     });

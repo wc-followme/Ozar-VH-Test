@@ -130,10 +130,10 @@ export default function UserManagement() {
   };
 
   // Delete handler
-  const handleDeleteUser = async (id: number) => {
+  const handleDeleteUser = async (uuid: string) => {
     try {
-      await apiService.deleteUser(id);
-      setUsers(users => users.filter(user => user.id !== id));
+      await apiService.deleteUser(uuid);
+      setUsers(users => users.filter(user => user.uuid !== uuid));
       showToast({
         toast,
         type: 'success',
@@ -217,7 +217,7 @@ export default function UserManagement() {
                 handleToggleStatus(user.id, user.status === 'ACTIVE')
               }
               menuOptions={menuOptions}
-              onDelete={() => handleDeleteUser(user.id)}
+              onDelete={() => handleDeleteUser(user.uuid)}
               disableActions={loading}
               userUuid={user.uuid}
             />

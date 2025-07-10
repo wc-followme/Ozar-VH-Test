@@ -1,13 +1,15 @@
 'use client';
 
+import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { PhotoUpload } from '@/components/shared/PhotoUpload';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, User } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage, showToast } from '@/lib/utils';
-import { ChevronRight, X } from 'lucide-react';
+import { ChevronRight, Trash, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -22,7 +24,6 @@ interface EditUserPageProps {
 export default function EditUserPage({ params }: EditUserPageProps) {
   const resolvedParams = React.use(params);
   const [selectedTab, setSelectedTab] = useState('info');
-  const [imageUrl, setImageUrl] = useState<string>('');
   const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
   const [roles, setRoles] = useState<{ id: number; name: string }[]>([]);
@@ -31,6 +32,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -51,8 +53,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           // Set existing image if available
           if (userRes.data.profile_picture_url) {
             setFileKey(userRes.data.profile_picture_url);
-            const cdnUrl = process.env['NEXT_PUBLIC_CDN_URL'] || '';
-            setImageUrl(cdnUrl + userRes.data.profile_picture_url);
+            // setImageUrl(cdnUrl + userRes.data.profile_picture_url); // Removed unused imageUrl
           }
         }
 
@@ -112,10 +113,10 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
-      const cdnUrl = process.env['NEXT_PUBLIC_CDN_URL'] || '';
-      setImageUrl(
-        presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
-      );
+      // const cdnUrl = process.env['NEXT_PUBLIC_CDN_URL'] || '';
+      // setImageUrl( // Removed unused imageUrl
+      //   presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
+      // );
     } catch (err) {
       alert('Failed to upload image');
     } finally {
@@ -153,6 +154,27 @@ export default function EditUserPage({ params }: EditUserPageProps) {
     }
   };
 
+  const handleDeleteUser = async () => {
+    try {
+      await apiService.deleteUser(resolvedParams.uuid);
+      showToast({
+        toast,
+        type: 'success',
+        title: 'Success',
+        description: 'User deleted successfully.',
+      });
+      router.push('/user-management');
+    } catch (err: any) {
+      const message = extractApiErrorMessage(err, 'Failed to delete user.');
+      showToast({
+        toast,
+        type: 'error',
+        title: 'Error',
+        description: message,
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
@@ -181,6 +203,21 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
             Edit User
           </span>
+        </div>
+
+        {/* Header with Delete Button */}
+        <div className='flex items-center justify-between mb-6'>
+          <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
+            Edit User
+          </h1>
+          <Button
+            variant='destructive'
+            onClick={() => setShowDeleteModal(true)}
+            className='h-[42px] px-6 bg-[var(--warning)] hover:bg-red-600 rounded-full font-semibold text-white flex items-center gap-2'
+          >
+            <Trash size={18} />
+            Delete User
+          </Button>
         </div>
 
         {/* Main Content */}
@@ -225,7 +262,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                         className='absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1 shadow hover:bg-opacity-100 transition'
                         onClick={() => {
                           setFileKey('');
-                          setImageUrl('');
+                          // setImageUrl(''); // Removed unused imageUrl
                         }}
                         aria-label='Remove photo'
                       >
@@ -268,6 +305,18 @@ export default function EditUserPage({ params }: EditUserPageProps) {
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmDeleteModal
+          open={showDeleteModal}
+          title='Are you sure you want to delete this user?'
+          subtitle='This action cannot be undone.'
+          onCancel={() => setShowDeleteModal(false)}
+          onDelete={async () => {
+            setShowDeleteModal(false);
+            await handleDeleteUser();
+          }}
+        />
       </div>
     </div>
   );
