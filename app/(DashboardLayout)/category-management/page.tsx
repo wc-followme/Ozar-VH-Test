@@ -1,11 +1,13 @@
 'use client';
 
-import { Category } from '@/components/icons/Category';
-import { Company } from '@/components/icons/Company';
 import { FlagHookIcon } from '@/components/icons/FalgHookIcon';
+import { Home } from '@/components/icons/Home';
+import { HomeIcon2 } from '@/components/icons/HomeIcon2';
 import { Interior } from '@/components/icons/Interior';
-import { RoleIcon } from '@/components/icons/RoleIcon';
+import { ToolsIcon } from '@/components/icons/ToolsIcon';
+import { WrenchIcon } from '@/components/icons/WrenchIcon';
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
+import IconFieldWrapper from '@/components/shared/common/IconFieldWrapper';
 import SideSheet from '@/components/shared/common/SideSheet';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,16 +18,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { Edit2, Hammer, Home, Trash, Wrench } from 'lucide-react';
+import { Edit2, Hammer, Trash, Wrench } from 'lucide-react';
 import { useState } from 'react';
 
 function hexToRgba(hex: string, alpha: number = 0.15): string {
@@ -58,36 +53,56 @@ const categories = [
     title: 'Exterior',
     description:
       'Enhance outdoor spaces including roofing, siding, painting, landscaping, or fencing work.',
-    icon: Home,
+    icon: HomeIcon2,
     iconBg: '#F58B1E',
   },
   {
     title: 'Single/Multi Trade',
     description:
       'Get help with one or more specific trades like plumbing, electrical, flooring, or carpentry.',
-    icon: Hammer,
+    icon: ToolsIcon,
     iconBg: '#EBB402',
   },
   {
     title: 'Repair',
     description:
       'Fix issues like leaks, cracks, broken fixtures, or any small-scale home damage.',
-    icon: Wrench,
+    icon: WrenchIcon,
     iconBg: '#00A8BF',
   },
 ];
 
 const iconOptions = [
-  { value: 'home', label: 'Home', icon: Home, bgColor: '#90C91D' },
-  { value: 'category', label: 'Category', icon: Category, bgColor: '#24338C' },
-  { value: 'company', label: 'Company', icon: Company, bgColor: '#F58B1E' },
-  { value: 'role', label: 'Role', icon: RoleIcon, bgColor: '#00A8BF' },
-  // Add more icons as needed
+  {
+    value: 'star',
+    label: 'Star',
+    icon: Edit2,
+    color: '#FFD700', // Gold color
+  },
+  {
+    value: 'heart',
+    label: 'Heart',
+    icon: Hammer,
+    color: '#FF0000', // Red color
+  },
+  {
+    value: 'bolt',
+    label: 'Bolt',
+    icon: Home,
+    color: '#1E90FF', // Blue color
+  },
+  {
+    value: 'service',
+    label: 'service',
+    icon: Wrench,
+    color: '#00A8BF', // Blue color
+  },
 ];
 
 const CategoryManagement = () => {
   const [open, setOpen] = useState(false);
-
+  const [selectedIcon, setSelectedIcon] = useState('star');
+  const [showDeleteIdx, setShowDeleteIdx] = useState<number | null>(null);
   return (
     <section className='flex flex-col w-full items-start gap-8 p-6 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
@@ -110,42 +125,22 @@ const CategoryManagement = () => {
         <div className='bg-[var(--white-background)] p-[0px] w-full'>
           <form className='space-y-6' onSubmit={e => e.preventDefault()}>
             {/* Icon & Category Name Row */}
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6 w-full'>
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4 w-full'>
               {/* Icon Selector */}
-              <div className='space-y-2'>
-                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                  Icon
-                </Label>
-                <Select>
-                  <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
-                    <SelectValue placeholder='Select icon' />
-                  </SelectTrigger>
-                  <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                    {iconOptions.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        <span className='flex items-center gap-2'>
-                          <span
-                            className='flex items-center justify-center w-10 h-10 rounded-[8px]'
-                            style={{
-                              background: `${hexToRgba(opt.bgColor, 0.15)}`,
-                            }}
-                          >
-                            <opt.icon
-                              className='w-6 h-6'
-                              style={{ color: opt.bgColor }}
-                            />
-                          </span>
-                          {opt.label}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className='space-y-2 pt-1 md:col-span-1'>
+                <IconFieldWrapper
+                  label='Icon'
+                  value={selectedIcon}
+                  onChange={setSelectedIcon}
+                  iconOptions={iconOptions}
+                  error={selectedIcon === '' ? 'Please select an icon' : ''} // Optional error
+                />
+
                 {/* Error message placeholder */}
                 {/* <FormErrorMessage message={errors.icon} /> */}
               </div>
               {/* Category Name */}
-              <div className='space-y-2'>
+              <div className='space-y-2 md:col-span-3'>
                 <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
                   Category Name
                 </Label>
@@ -192,7 +187,6 @@ const CategoryManagement = () => {
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full'>
         {categories.map((cat, idx) => {
           const Icon = cat.icon;
-          const [showDelete, setShowDelete] = useState(false);
           const menuOptions = [
             { label: 'Edit', action: 'edit', icon: Edit2 },
             {
@@ -202,30 +196,19 @@ const CategoryManagement = () => {
               variant: 'destructive',
             },
           ];
-
-          const handleMenuAction = (action: string) => {
-            if (action === 'edit') {
-              // TODO: Implement edit logic
-              alert(`Edit ${cat.title}`);
-            }
-            if (action === 'delete') {
-              setShowDelete(true);
-            }
-          };
-
           return (
             <div
               key={cat.title}
               className='bg-[var(--white-background)] rounded-2xl p-6 flex flex-col shadow-sm min-h-[210px] relative'
             >
               <div
-                className='w-[60px] h-[60px] flex items-center justify-center rounded-[10px] mb-3.5'
+                className='w-[60px] h-[60px] flex items-center justify-center rounded-[16px] mb-3.5'
                 style={{
                   background: hexToRgba(cat.iconBg, 0.15),
                   color: cat.iconBg,
                 }}
               >
-                <Icon className='w-7 h-7' color='CurrentColor' />
+                <Icon className='w-8 h-8' color='CurrentColor' />
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)] mb-1.5'>
                 {cat.title}
@@ -237,7 +220,7 @@ const CategoryManagement = () => {
               <div className='absolute top-4 right-4 cursor-pointer'>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className='h-8 w-8 p-0 flex items-center justify-center rounded-full hover:bg-gray-100'>
+                    <button className='h-8 w-8 p-0 flex items-center justify-center rounded-full '>
                       <IconDotsVertical
                         className='!w-6 !h-6'
                         strokeWidth={2}
@@ -254,7 +237,13 @@ const CategoryManagement = () => {
                       return (
                         <DropdownMenuItem
                           key={index}
-                          onClick={() => handleMenuAction(option.action)}
+                          onClick={() => {
+                            if (option.action === 'edit') {
+                              alert(`Edit ${cat.title}`);
+                            } else if (option.action === 'delete') {
+                              setShowDeleteIdx(idx);
+                            }
+                          }}
                           className={`text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 ${option.variant === 'destructive' ? ' hover:bg-red-50' : 'hover:bg-gray-100'}`}
                         >
                           <MenuIcon size='18' color='var(--text-dark)' />
@@ -265,13 +254,12 @@ const CategoryManagement = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <ConfirmDeleteModal
-                  open={showDelete}
+                  open={showDeleteIdx === idx}
                   title={`Are you sure you want to delete "${cat.title}"?`}
                   subtitle={`This action cannot be undone.`}
-                  onCancel={() => setShowDelete(false)}
+                  onCancel={() => setShowDeleteIdx(null)}
                   onDelete={() => {
-                    setShowDelete(false);
-                    // TODO: Implement delete logic
+                    setShowDeleteIdx(null);
                     alert(`Deleted ${cat.title}`);
                   }}
                 />
