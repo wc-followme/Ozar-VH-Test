@@ -47,10 +47,10 @@ export function ConfirmDeleteModal({
         <div className='flex items-center justify-center w-[100px] h-[100px] rounded-full bg-[#D4323226] mb-8 mx-auto'>
           <Trash size='40' color='var(--warning)' />
         </div>
-        <DialogTitle className='text-[24px] text-[var(--text-dark)] font-medium mb-2 leading-[1.4]'>
+        <DialogTitle className='text-[24px] text-[var(--text-dark)] font-medium mb-1 leading-[1]'>
           {title}
         </DialogTitle>
-        <p className='text-[var(--text-secondary)] mb-8 text-[18px] leading-[1.4]'>
+        <p className='text-[var(--text-secondary)] mb-8 text-[18px] leading-[1]'>
           {subtitle}
         </p>
         <div className='flex gap-4 w-full justify-center'>

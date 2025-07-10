@@ -4,7 +4,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Eye, EyeSlash, Lock, Sms } from 'iconsax-react';
+import { AlertCircle } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface LoginFormProps {
@@ -153,12 +154,17 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
         <div className='space-y-2'>
           <Label
             htmlFor='email'
-            className='text-[14px] font-[600] text-[var(--text)]'
+            className='text-[14px] font-[600] text-[#2D2D2D]'
           >
             Email *
           </Label>
-          <div className='relative'>
-            <Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5' />
+          <div className='relative flex items-center'>
+            <Sms
+              size='32'
+              color='#818181'
+              className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5'
+            />
+            <span className='h-4 w-[1px] bg-[#C0C6CD] absolute left-10'></span>
             <Input
               id='email'
               type='email'
@@ -166,7 +172,7 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
               value={email}
               onChange={handleEmailChange}
               onBlur={() => handleBlur('email')}
-              className={`pl-10 h-12 border-2 focus:ring-green-500 bg-white rounded-[10px] ${
+              className={`pl-12 h-12 border-2 focus:ring-green-500 bg-white rounded-[10px] !placeholder-[#C0C6CD] ${
                 errors.email && touched.email
                   ? 'border-red-500 focus:border-red-500'
                   : 'border-[var(--border-dark)] focus:border-green-500'
@@ -184,12 +190,17 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
         <div className='space-y-2'>
           <Label
             htmlFor='password'
-            className='text-[14px] font-[600] text-[var(--text)]'
+            className='text-[14px] font-[600] text-[#2D2D2D]'
           >
             Password *
           </Label>
-          <div className='relative'>
-            <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5' />
+          <div className='relative flex items-center'>
+            <Lock
+              size='32'
+              color='#818181'
+              className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5'
+            />
+            <span className='h-4 w-[1px] bg-[#C0C6CD] absolute left-10'></span>
             <Input
               id='password'
               type={showPassword ? 'text' : 'password'}
@@ -197,7 +208,7 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
               value={password}
               onChange={handlePasswordChange}
               onBlur={() => handleBlur('password')}
-              className={`pl-10 pr-10 h-12 border-2 focus:ring-green-500 bg-white rounded-[10px] ${
+              className={`pl-12 pr-10 h-12 border-2 focus:ring-green-500 bg-white rounded-[10px] !placeholder-[#C0C6CD] ${
                 errors.password && touched.password
                   ? 'border-red-500 focus:border-red-500'
                   : 'border-[var(--border-dark)] focus:border-green-500'
@@ -213,9 +224,9 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
               className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors disabled:cursor-not-allowed'
             >
               {showPassword ? (
-                <EyeOff className='h-5 w-5' />
+                <EyeSlash size={24} color='#818181' className='h-5 w-5' />
               ) : (
-                <Eye className='h-5 w-5' />
+                <Eye size={24} color='#818181' className='h-5 w-5' />
               )}
             </button>
           </div>
