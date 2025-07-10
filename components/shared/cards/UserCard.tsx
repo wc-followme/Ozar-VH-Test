@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Call, Icon, Sms } from 'iconsax-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 
@@ -33,6 +34,7 @@ interface UserCardProps {
   menuOptions: MenuOption[];
   onDelete?: () => void;
   disableActions?: boolean;
+  userUuid: string;
 }
 
 export function UserCard({
@@ -46,9 +48,11 @@ export function UserCard({
   menuOptions,
   onDelete,
   disableActions,
+  userUuid,
 }: UserCardProps) {
   const [isToggling, setIsToggling] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const router = useRouter();
 
   const handleToggle = async () => {
     if (disableActions) return;
@@ -60,6 +64,8 @@ export function UserCard({
   const handleMenuAction = (action: string) => {
     if (action === 'delete') {
       setShowDelete(true);
+    } else if (action === 'edit') {
+      router.push(`/user-management/edit-user/${userUuid}`);
     }
     return action;
   };
@@ -142,7 +148,7 @@ export function UserCard({
                       ? 'text-red-600 hover:bg-red-50'
                       : 'hover:bg-gray-100'
                   )}
-                  disabled={disableActions}
+                  disabled={!!disableActions}
                 >
                   <Icon size='18' color='var(--text-dark)' variant='Outline' />
                   <span>{option.label}</span>

@@ -20,7 +20,7 @@ import { CreateUserRequest } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
 
 interface UserInfoFormProps {
@@ -34,6 +34,8 @@ interface UserInfoFormProps {
   ) => void;
   loading?: boolean;
   error?: string | undefined;
+  initialData?: any; // User data for edit mode
+  isEditMode?: boolean;
 }
 
 export function UserInfoForm({
@@ -43,6 +45,8 @@ export function UserInfoForm({
   onSubmit,
   loading,
   error,
+  initialData,
+  isEditMode,
 }: UserInfoFormProps) {
   const [date, setDate] = useState<Date>();
   const [roleId, setRoleId] = useState('');
@@ -55,7 +59,26 @@ export function UserInfoForm({
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [pinCode, setPinCode] = useState('');
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<any>({});
+
+  // Prefill form with initial data in edit mode
+  useEffect(() => {
+    if (isEditMode && initialData) {
+      setRoleId(String(initialData.role_id || ''));
+      setFullName(initialData.name || '');
+      setDesignation(initialData.designation || '');
+      setEmail(initialData.email || '');
+      setPhone(initialData.phone_number || '');
+      setCommunication(initialData.preferred_communication_method || '');
+      setAddress(initialData.address || '');
+      setCity(initialData.city || '');
+      setPinCode(initialData.pincode || '');
+      if (initialData.date_of_joining) {
+        setDate(new Date(initialData.date_of_joining));
+      }
+    }
+  }, [isEditMode, initialData]);
 
   const validate = () => {
     const newErrors: any = {};
@@ -65,6 +88,8 @@ export function UserInfoForm({
     if (!date) newErrors.date = 'Date of joining is required.';
     if (!email) newErrors.email = 'Email is required.';
     if (!phone) newErrors.phone = 'Phone number is required.';
+    // Password is only required for create mode
+    if (!isEditMode && !password) newErrors.password = 'Password is required.';
     if (!communication)
       newErrors.communication = 'Preferred communication is required.';
     if (!address) newErrors.address = 'Address is required.';
@@ -77,11 +102,10 @@ export function UserInfoForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit({
+      const payload: any = {
         role_id: Number(roleId),
         name: fullName,
         email,
-        password: '', // You may want to add a password field to the form
         phone_number: phone,
         profile_picture_url: imageUrl,
         date_of_joining: date ? date.toISOString().split('T')[0] : '',
@@ -90,7 +114,14 @@ export function UserInfoForm({
         address,
         city,
         pincode: pinCode,
-      });
+      };
+
+      // Only include password if provided (for edit mode) or always (for create mode)
+      if (!isEditMode || password) {
+        payload.password = password || 'password123'; // Default for create mode
+      }
+
+      onSubmit(payload);
     }
   };
 
@@ -108,6 +139,7 @@ export function UserInfoForm({
     setAddress('');
     setCity('');
     setPinCode('');
+    setPassword('');
     setErrors({});
   };
 
@@ -229,6 +261,30 @@ export function UserInfoForm({
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
           <FormErrorMessage message={errors.email} />
+        </div>
+        <div className='space-y-2'>
+          <Label
+            htmlFor='password'
+            className='text-[14px] font-semibold text-[var(--text-dark)]'
+          >
+            Password{' '}
+            {isEditMode && (
+              <span className='text-sm text-gray-500'>
+                (leave blank to keep current)
+              </span>
+            )}
+          </Label>
+          <Input
+            id='password'
+            type='password'
+            placeholder={
+              isEditMode ? 'Enter new password (optional)' : 'Enter Password'
+            }
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+          />
+          <FormErrorMessage message={errors.password} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -373,7 +429,7 @@ export function UserInfoForm({
           type='submit'
           className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
         >
-          Create
+          {isEditMode ? 'Update' : 'Create'}
         </Button>
       </div>
     </form>

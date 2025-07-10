@@ -219,6 +219,7 @@ export default function UserManagement() {
               menuOptions={menuOptions}
               onDelete={() => handleDeleteUser(user.id)}
               disableActions={loading}
+              userUuid={user.uuid}
             />
           ))}
         </div>

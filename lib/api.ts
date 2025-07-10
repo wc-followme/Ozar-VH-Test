@@ -152,6 +152,37 @@ export interface CreateUserResponse {
   data: any;
 }
 
+// User update types
+export interface UpdateUserRequest {
+  role_id?: number;
+  name?: string;
+  email?: string;
+  password?: string;
+  phone_number?: string;
+  profile_picture_url?: string;
+  date_of_joining?: string;
+  designation?: string;
+  preferred_communication_method?: string;
+  address?: string;
+  city?: string;
+  pincode?: string;
+  status?: 'ACTIVE' | 'INACTIVE';
+  is_profile_completed?: boolean;
+}
+
+export interface UpdateUserResponse {
+  statusCode: number;
+  message: string;
+  data: any;
+}
+
+// User details response
+export interface GetUserResponse {
+  statusCode: number;
+  message: string;
+  data: User;
+}
+
 // Get device information for login
 const getDeviceInfo = (): DeviceInfo => {
   const navigator = typeof window !== 'undefined' ? window.navigator : null;
@@ -436,6 +467,26 @@ class ApiService {
   async createUser(payload: CreateUserRequest): Promise<CreateUserResponse> {
     return this.makeRequest('/users', {
       method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Get user details
+  async getUserDetails(uuid: string): Promise<GetUserResponse> {
+    return this.makeRequest(`/users/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update user
+  async updateUser(
+    uuid: string,
+    payload: UpdateUserRequest
+  ): Promise<UpdateUserResponse> {
+    return this.makeRequest(`/users/${uuid}`, {
+      method: 'PATCH',
       headers: this.getRoleHeaders(),
       body: JSON.stringify(payload),
     });
