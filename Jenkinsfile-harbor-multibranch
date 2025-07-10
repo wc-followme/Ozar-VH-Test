@@ -1,6 +1,6 @@
 @Library('jenkins-shared-library@production') _
 
-def gitUrl = "https://github.com/CodezerosDev/envision-backend-api.git"
+def gitUrl = "https://github.com/CodezerosDev/envision-web.git"
 def componentName = gitUrl.tokenize('/')[-1].replace('.git', '')
 def project = 'envision-development'
 
@@ -23,7 +23,7 @@ def branch_definitions = [
         hostIP        : '43.204.64.131',
         sshCreds      : 'wdcs-eks-bastion',
         sshUser       : 'wdcs-dev',
-        deploy_option : 'no',
+        deploy_option : 'yes',
         website_url   : 'https://envision-web.qa.webcluesstaging.com'
     ]
 ]
@@ -36,14 +36,14 @@ BuildDeploy(
         gitUrl   : gitUrl,
         gitCreds : 'Codezerosdev-git'
     ],
-    // notifications: [
-    //     slack: [
-    //         channel: '#proj-envision'
-    //     ],
-    //     email: [
-    //         recipients: ['yash@webcluesinfotech.com'],
-    //         replyTo: ['harsh.solanki@codezeros.com']
-    //     ]
-    // ],
+    notifications: [
+        slack: [
+            channel: '#proj-envision'
+        ],
+        email: [
+            recipients: ['yash@webcluesinfotech.com'],
+            replyTo: ['harsh.solanki@codezeros.com']
+        ]
+    ],
     kube: [:]
 )
