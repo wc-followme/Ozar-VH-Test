@@ -69,7 +69,7 @@ const CreateRole = () => {
   };
 
   return (
-    <div className='flex flex-col gap-8 p-6 flex-1 w-full'>
+    <div className='flex flex-col gap-8 flex-1 w-full'>
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
