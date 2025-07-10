@@ -1,15 +1,29 @@
 'use client';
 
+import { Category } from '@/components/icons/Category';
+import { Company } from '@/components/icons/Company';
 import { FlagHookIcon } from '@/components/icons/FalgHookIcon';
 import { Interior } from '@/components/icons/Interior';
+import { RoleIcon } from '@/components/icons/RoleIcon';
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import SideSheet from '@/components/shared/common/SideSheet';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Edit2, Hammer, Home, Trash, Wrench } from 'lucide-react';
 import { useState } from 'react';
@@ -63,6 +77,14 @@ const categories = [
   },
 ];
 
+const iconOptions = [
+  { value: 'home', label: 'Home', icon: Home, bgColor: '#90C91D' },
+  { value: 'category', label: 'Category', icon: Category, bgColor: '#24338C' },
+  { value: 'company', label: 'Company', icon: Company, bgColor: '#F58B1E' },
+  { value: 'role', label: 'Role', icon: RoleIcon, bgColor: '#00A8BF' },
+  // Add more icons as needed
+];
+
 const CategoryManagement = () => {
   const [open, setOpen] = useState(false);
 
@@ -79,9 +101,92 @@ const CategoryManagement = () => {
           Create Category
         </button>
       </header>
-      <SideSheet title='Create Category' open={open} onOpenChange={setOpen}>
-        <div className='py-8 text-center text-lg text-gray-500'>
-          Category creation form goes here.
+      <SideSheet
+        title='Create Category'
+        open={open}
+        onOpenChange={setOpen}
+        size='600px'
+      >
+        <div className='bg-[var(--white-background)] p-[0px] w-full'>
+          <form className='space-y-6' onSubmit={e => e.preventDefault()}>
+            {/* Icon & Category Name Row */}
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6 w-full'>
+              {/* Icon Selector */}
+              <div className='space-y-2'>
+                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                  Icon
+                </Label>
+                <Select>
+                  <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
+                    <SelectValue placeholder='Select icon' />
+                  </SelectTrigger>
+                  <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
+                    {iconOptions.map(opt => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        <span className='flex items-center gap-2'>
+                          <span
+                            className='flex items-center justify-center w-10 h-10 rounded-[8px]'
+                            style={{
+                              background: `${hexToRgba(opt.bgColor, 0.15)}`,
+                            }}
+                          >
+                            <opt.icon
+                              className='w-6 h-6'
+                              style={{ color: opt.bgColor }}
+                            />
+                          </span>
+                          {opt.label}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {/* Error message placeholder */}
+                {/* <FormErrorMessage message={errors.icon} /> */}
+              </div>
+              {/* Category Name */}
+              <div className='space-y-2'>
+                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                  Category Name
+                </Label>
+                <Input
+                  placeholder='Enter Category Name'
+                  className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                />
+                {/* Error message placeholder */}
+                {/* <FormErrorMessage message={errors.categoryName} /> */}
+              </div>
+            </div>
+            {/* Description */}
+            <div className='space-y-2'>
+              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                Description
+              </Label>
+              <Textarea
+                placeholder='Enter Description'
+                className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              />
+              {/* Error message placeholder */}
+              {/* <FormErrorMessage message={errors.description} /> */}
+            </div>
+            {/* Actions */}
+            <div className='flex gap-4 pt-2'>
+              <Button
+                type='button'
+                variant='outline'
+                className='h-[48px] px-8 rounded-full font-semibold text-[var(--text-dark)] border-2 border-[var(--border-dark)] bg-transparent'
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type='submit'
+                className='h-[48px] px-12 bg-[#38B24D] hover:bg-[#2e9c41] rounded-full font-semibold text-white'
+              >
+                Create
+              </Button>
+            </div>
+          </form>
         </div>
       </SideSheet>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full'>

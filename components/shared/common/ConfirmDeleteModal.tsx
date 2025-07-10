@@ -43,14 +43,14 @@ export function ConfirmDeleteModal({
 }: ConfirmDeleteModalProps) {
   return (
     <Dialog open={open} onOpenChange={onCancel}>
-      <CustomDialogContent className='max-w-[519px] !rounded-[20px] p-[30px] flex flex-col items-center text-center bg-[var(--card-background)] gap-0 border-[var(--border-dark)]'>
-        <div className='flex items-center justify-center w-[100px] h-[100px] rounded-full bg-[#D4323226] mb-8 mx-auto'>
+      <CustomDialogContent className='max-w-[519px] !rounded-[20px] py-[30px] px-[25px] flex flex-col items-center text-center bg-[var(--card-background)] !gap-0 border-[var(--border-dark)]'>
+        <div className='flex items-center justify-center w-[100px] h-[100px] rounded-full bg-[#D4323226] mb-6 mx-auto'>
           <Trash size='40' color='var(--warning)' />
         </div>
-        <DialogTitle className='text-[24px] text-[var(--text-dark)] font-medium mb-2 leading-[1.4]'>
+        <DialogTitle className='text-[24px] text-[var(--text-dark)] font-medium mb-2 leading-[1.3] tracking-[-0.025em]'>
           {title}
         </DialogTitle>
-        <p className='text-[var(--text-secondary)] mb-8 text-[18px] leading-[1.4]'>
+        <p className='text-[var(--text-secondary)] mb-6 text-[18px] leading-[1.4]'>
           {subtitle}
         </p>
         <div className='flex gap-4 w-full justify-center'>
