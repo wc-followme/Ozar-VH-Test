@@ -3,16 +3,50 @@
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { PhotoUpload } from '@/components/shared/PhotoUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { apiService } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { ChevronRight } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 export default function AddUserPage() {
   const [selectedTab, setSelectedTab] = useState('info');
   const [imageUrl, setImageUrl] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
+  const [roles, setRoles] = useState<{ id: number; name: string }[]>([]);
+  const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      setLoadingRoles(true);
+      try {
+        const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
+        function isRoleApiResponse(
+          obj: unknown
+        ): obj is { data: { data: any[] } } {
+          return (
+            typeof obj === 'object' &&
+            obj !== null &&
+            'data' in obj &&
+            typeof (obj as any).data === 'object' &&
+            (obj as any).data !== null &&
+            'data' in (obj as any).data &&
+            Array.isArray((obj as any).data.data)
+          );
+        }
+        const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
+        setRoles(
+          roleList.map((role: any) => ({ id: role.id, name: role.name }))
+        );
+      } catch {
+        setRoles([]);
+      } finally {
+        setLoadingRoles(false);
+      }
+    };
+    fetchRoles();
+  }, []);
 
   const handlePhotoUpload = async (file: File) => {
     setUploading(true);
@@ -33,7 +67,7 @@ export default function AddUserPage() {
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setImageUrl(presigned.data['publicUrl']);
     } catch (err) {
-      console.log("err",err);
+      console.log('err', err);
       alert('Failed to upload image');
     } finally {
       setUploading(false);
@@ -98,7 +132,7 @@ export default function AddUserPage() {
 
                 {/* Right Column - Form Fields */}
                 <div className='flex-1'>
-                  <UserInfoForm />
+                  <UserInfoForm roles={roles} loadingRoles={loadingRoles} />
                 </div>
               </div>
             </TabsContent>

@@ -22,9 +22,14 @@ import { Calendar1 } from 'iconsax-react';
 import { useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
 
-export function UserInfoForm() {
+interface UserInfoFormProps {
+  roles: { id: number; name: string }[];
+  loadingRoles?: boolean;
+}
+
+export function UserInfoForm({ roles, loadingRoles }: UserInfoFormProps) {
   const [date, setDate] = useState<Date>();
-  const [roleCategory, setRoleCategory] = useState('');
+  const [roleId, setRoleId] = useState('');
   const [fullName, setFullName] = useState('');
   const [designation, setDesignation] = useState('');
   const [email, setEmail] = useState('');
@@ -38,7 +43,7 @@ export function UserInfoForm() {
 
   const validate = () => {
     const newErrors: any = {};
-    if (!roleCategory) newErrors.roleCategory = 'Role category is required.';
+    if (!roleId) newErrors.roleCategory = 'Role is required.';
     if (!fullName) newErrors.fullName = 'Full name is required.';
     if (!designation) newErrors.designation = 'Designation is required.';
     if (!date) newErrors.date = 'Date of joining is required.';
@@ -64,7 +69,7 @@ export function UserInfoForm() {
   const handleCancel = () => {
     // TODO: Implement cancel logic, e.g., close modal or reset form
     // For now, just reset all fields
-    setRoleCategory('');
+    setRoleId('');
     setFullName('');
     setDesignation('');
     setDate(undefined);
@@ -80,23 +85,30 @@ export function UserInfoForm() {
 
   return (
     <form className='space-y-6' onSubmit={handleSubmit} noValidate>
-      {/* Role Category */}
+      {/* Role Dropdown */}
       <div className='space-y-2'>
         <Label
-          htmlFor='role-category'
+          htmlFor='role'
           className='text-[14px] font-semibold text-[var(--text-dark)]'
         >
-          Role Category
+          Role
         </Label>
-        <Select value={roleCategory} onValueChange={setRoleCategory}>
+        <Select
+          value={roleId}
+          onValueChange={setRoleId}
+          disabled={loadingRoles}
+        >
           <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
-            <SelectValue placeholder='Select role category' />
+            <SelectValue
+              placeholder={loadingRoles ? 'Loading roles...' : 'Select role'}
+            />
           </SelectTrigger>
           <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-            <SelectItem value='contractors'>Contractors</SelectItem>
-            <SelectItem value='employees'>Employees</SelectItem>
-            <SelectItem value='managers'>Managers</SelectItem>
-            <SelectItem value='administrators'>Administrators</SelectItem>
+            {roles.map(role => (
+              <SelectItem key={role.id} value={String(role.id)}>
+                {role.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <FormErrorMessage message={errors.roleCategory} />
