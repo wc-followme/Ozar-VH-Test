@@ -93,7 +93,6 @@ export default function AddUserPage() {
       // You may want to prompt for password or generate one here
       const payload = {
         ...data,
-        password: 'password123',
         profile_picture_url: fileKey,
       };
       await apiService.createUser(payload);
