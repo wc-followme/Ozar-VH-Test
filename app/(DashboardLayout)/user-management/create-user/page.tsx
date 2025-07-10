@@ -157,20 +157,20 @@ export default function AddUserPage() {
             <TabsContent value='info' className='pt-8'>
               <div className='flex items-start gap-6'>
                 {/* Left Column - Upload Photo */}
-                <div className='w-[250px] flex-shrink-0'>
-                  <PhotoUpload onFileUpload={handlePhotoUpload} />
-                  {uploading && (
-                    <div className='text-xs mt-2'>Uploading...</div>
-                  )}
-                  {}
-                  {fileKey && (
+                <div className='w-[250px] flex-shrink-0 relative'>
+                  {fileKey ? (
                     <Image
                       src={(process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey}
                       alt='Uploaded'
-                      className='mt-2 rounded-lg w-full h-auto'
+                      className='rounded-lg w-full h-auto'
                       width={250}
                       height={250}
                     />
+                  ) : (
+                    <PhotoUpload onFileUpload={handlePhotoUpload} />
+                  )}
+                  {uploading && (
+                    <div className='text-xs mt-2'>Uploading...</div>
                   )}
                 </div>
 
