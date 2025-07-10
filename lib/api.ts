@@ -67,6 +67,54 @@ interface CreateRoleResponse {
   };
 }
 
+// User management interfaces
+export interface User {
+  id: number;
+  uuid: string;
+  role_id: number;
+  company_id: string;
+  name: string;
+  email: string;
+  phone_number: string;
+  profile_picture_url: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  role: {
+    id: number;
+    name: string;
+  };
+  company: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface FetchUsersResponse {
+  statusCode: number;
+  message: string;
+  data: User[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+// User status update response
+export interface UpdateUserStatusResponse {
+  statusCode: number;
+  message: string;
+  data?: User;
+}
+
+// User delete response
+export interface DeleteUserResponse {
+  statusCode: number;
+  message: string;
+}
+
 // Get device information for login
 const getDeviceInfo = (): DeviceInfo => {
   const navigator = typeof window !== 'undefined' ? window.navigator : null;
@@ -260,6 +308,49 @@ class ApiService {
   async logout() {
     return this.makeRequest('/auth/logout', {
       method: 'POST',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // User management API
+  async fetchUsers({
+    page = 1,
+    limit = 10,
+    role_id = '',
+    company_id = '',
+  }: {
+    page?: number;
+    limit?: number;
+    role_id?: string | number;
+    company_id?: string | number;
+  }): Promise<FetchUsersResponse> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (role_id) params.append('role_id', String(role_id));
+    if (company_id) params.append('company_id', String(company_id));
+    return this.makeRequest(`/users?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update user status
+  async updateUserStatus(
+    uuid: string,
+    status: 'ACTIVE' | 'INACTIVE'
+  ): Promise<UpdateUserStatusResponse> {
+    return this.makeRequest(`/users/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify({ status }),
+    });
+  }
+
+  // Delete user
+  async deleteUser(id: number): Promise<DeleteUserResponse> {
+    return this.makeRequest(`/users/${id}`, {
+      method: 'DELETE',
       headers: this.getRoleHeaders(),
     });
   }

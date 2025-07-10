@@ -31,6 +31,8 @@ interface UserCardProps {
   status: boolean;
   onToggle: () => void;
   menuOptions: MenuOption[];
+  onDelete?: () => void;
+  disableActions?: boolean;
 }
 
 export function UserCard({
@@ -42,13 +44,16 @@ export function UserCard({
   status,
   onToggle,
   menuOptions,
+  onDelete,
+  disableActions,
 }: UserCardProps) {
   const [isToggling, setIsToggling] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
   const handleToggle = async () => {
+    if (disableActions) return;
     setIsToggling(true);
-    onToggle();
+    await onToggle();
     setTimeout(() => setIsToggling(false), 300);
   };
 
@@ -112,6 +117,7 @@ export function UserCard({
               variant='ghost'
               size='sm'
               className='h-8 w-8 p-0 flex-shrink-0'
+              disabled={disableActions}
             >
               <IconDotsVertical
                 className='!w-6 !h-6'
@@ -136,6 +142,7 @@ export function UserCard({
                       ? 'text-red-600 hover:bg-red-50'
                       : 'hover:bg-gray-100'
                   )}
+                  disabled={disableActions}
                 >
                   <Icon size='18' color='var(--text-dark)' variant='Outline' />
                   <span>{option.label}</span>
@@ -154,7 +161,7 @@ export function UserCard({
         <Switch
           checked={status}
           onCheckedChange={handleToggle}
-          disabled={isToggling}
+          disabled={isToggling || disableActions}
           className='
               h-4 w-9 
               data-[state=checked]:bg-green-500 
@@ -173,10 +180,9 @@ export function UserCard({
         title={`Are you sure you want to delete?`}
         subtitle={`This action cannot be undone.`}
         onCancel={() => setShowDelete(false)}
-        onDelete={() => {
+        onDelete={async () => {
           setShowDelete(false);
-          // TODO: Call delete logic here
-          console.log('User deleted');
+          if (onDelete) await onDelete();
         }}
       />
     </div>
