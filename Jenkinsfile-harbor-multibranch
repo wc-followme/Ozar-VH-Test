@@ -1,0 +1,49 @@
+@Library('jenkins-shared-library@production') _
+
+def gitUrl = "https://github.com/CodezerosDev/envision-backend-api.git"
+def componentName = gitUrl.tokenize('/')[-1].replace('.git', '')
+def project = 'envision-development'
+
+// Define file paths - required when configFiles is used
+def filePaths = [
+    dev: "file:///home/ubuntu/env/envision-development/web"
+]
+
+// Branch definitions with mixed configuration approaches and branch-specific website_url where applicable
+def branch_definitions = [
+    'development': [
+        // Simple array of strings for standard files
+        configFiles: [
+            "${filePaths.dev}/.env"
+        ],
+        agent         : 'wdcs-arm64-agent',
+        imageName     : "dev-${componentName}",
+        namespace     : 'dev',
+        deployment    : 'envision-development-web',
+        hostIP        : '43.204.64.131',
+        sshCreds      : 'wdcs-eks-bastion',
+        sshUser       : 'wdcs-dev',
+        deploy_option : 'no',
+        website_url   : 'https://envision-web.qa.webcluesstaging.com'
+    ]
+]
+
+// Call the Combined function with branchDefinitions and other global settings
+BuildDeploy(
+    branchDefinitions: branch_definitions,
+    docker: [
+        project  : project,
+        gitUrl   : gitUrl,
+        gitCreds : 'Codezerosdev-git'
+    ],
+    // notifications: [
+    //     slack: [
+    //         channel: '#proj-envision'
+    //     ],
+    //     email: [
+    //         recipients: ['yash@webcluesinfotech.com'],
+    //         replyTo: ['harsh.solanki@codezeros.com']
+    //     ]
+    // ],
+    kube: [:]
+)
