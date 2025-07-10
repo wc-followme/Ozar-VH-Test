@@ -21,6 +21,7 @@ interface LoginResponse {
   message: string;
   data?: {
     access_token: string;
+    refresh_token: string;
     user: {
       id: number;
       first_name: string;
@@ -36,6 +37,20 @@ interface LoginResponse {
       role_id: number;
       device_token: string;
     };
+  };
+}
+
+// Refresh token interfaces
+interface RefreshTokenRequest {
+  refresh_token: string;
+}
+
+interface RefreshTokenResponse {
+  statusCode: number;
+  message: string;
+  data?: {
+    access_token: string;
+    refresh_token: string;
   };
 }
 
@@ -189,26 +204,75 @@ class ApiService {
       ...options,
     };
 
-    try {
-      const response = await fetch(url, config);
-      const data = await response.json();
+    const makeApiCall = async (): Promise<T> => {
+      try {
+        const response = await fetch(url, config);
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw {
-          message: data.message || 'An error occurred',
-          status: response.status,
-          errors: data.errors,
-        } as ApiError;
+        if (!response.ok) {
+          throw {
+            message: data.message || 'An error occurred',
+            status: response.status,
+            errors: data.errors,
+          } as ApiError;
+        }
+
+        return data;
+      } catch (error) {
+        if (error instanceof TypeError) {
+          // Network error
+          throw {
+            message: 'Network error. Please check your connection.',
+            status: 0,
+          } as ApiError;
+        }
+        throw error;
       }
+    };
 
-      return data;
-    } catch (error) {
-      if (error instanceof TypeError) {
-        // Network error
-        throw {
-          message: 'Network error. Please check your connection.',
-          status: 0,
-        } as ApiError;
+    try {
+      return await makeApiCall();
+    } catch (error: any) {
+      // If 401 error and not a refresh endpoint, try to refresh token and retry
+      if (
+        error.status === 401 &&
+        !endpoint.includes('/auth/refresh') &&
+        !endpoint.includes('/auth/login')
+      ) {
+        try {
+          const refreshToken =
+            typeof window !== 'undefined'
+              ? localStorage.getItem('refresh_token')
+              : null;
+
+          if (refreshToken) {
+            const refreshResponse = await this.refreshToken(refreshToken);
+            if (refreshResponse.statusCode === 200 && refreshResponse.data) {
+              const { access_token, refresh_token: newRefreshToken } =
+                refreshResponse.data;
+
+              // Update stored tokens
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('auth_token', access_token);
+                localStorage.setItem('refresh_token', newRefreshToken);
+              }
+
+              // Update config with new token and retry
+              config.headers = {
+                ...config.headers,
+                Authorization: `Bearer ${access_token}`,
+              };
+
+              return await makeApiCall();
+            }
+          }
+        } catch (refreshError) {
+          // If refresh fails, redirect to login
+          if (typeof window !== 'undefined') {
+            localStorage.clear();
+            window.location.href = '/auth/login';
+          }
+        }
       }
       throw error;
     }
@@ -330,7 +394,18 @@ class ApiService {
   async logout() {
     return this.makeRequest('/auth/logout', {
       method: 'POST',
-      headers: this.getRoleHeaders(),
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
+    const refreshData: RefreshTokenRequest = {
+      refresh_token: refreshToken,
+    };
+
+    return this.makeRequest<RefreshTokenResponse>('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify(refreshData),
     });
   }
 

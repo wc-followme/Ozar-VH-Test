@@ -23,8 +23,9 @@ interface AuthContextType {
     email: string,
     password: string
   ) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isLoading: boolean;
+  refreshAccessToken: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -92,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Check for successful response using statusCode
       if (response.statusCode === 200 && response.data) {
-        const { user: userData, access_token } = response.data;
+        const { user: userData, access_token, refresh_token } = response.data;
 
         // Store authentication data in both localStorage and cookies
         setIsAuthenticated(true);
@@ -102,11 +103,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('auth_token', access_token);
+        localStorage.setItem('refresh_token', refresh_token);
 
         // Store in cookies (for API access)
         setCookie('is_authenticated', 'true');
         setCookie('user_data', JSON.stringify(userData));
         setCookie('auth_token', access_token);
+        setCookie('refresh_token', refresh_token);
 
         console.log(
           '✅ Authentication data stored in both localStorage and cookies'
@@ -167,13 +170,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('device_id');
     // Clear cookies
     deleteCookie('is_authenticated');
     deleteCookie('user_data');
     deleteCookie('auth_token');
+    deleteCookie('refresh_token');
     // Redirect to login
     router.push('/auth/login');
+  };
+
+  // Auto refresh token when needed
+  const refreshAccessToken = async (): Promise<boolean> => {
+    try {
+      const refreshToken =
+        localStorage.getItem('refresh_token') || getCookie('refresh_token');
+      if (!refreshToken) {
+        logout();
+        return false;
+      }
+
+      const response = await apiService.refreshToken(refreshToken);
+      if (response.statusCode === 200 && response.data) {
+        const { access_token, refresh_token: newRefreshToken } = response.data;
+
+        // Update stored tokens
+        localStorage.setItem('auth_token', access_token);
+        localStorage.setItem('refresh_token', newRefreshToken);
+        setCookie('auth_token', access_token);
+        setCookie('refresh_token', newRefreshToken);
+
+        return true;
+      } else {
+        logout();
+        return false;
+      }
+    } catch (err) {
+      logout();
+      return false;
+    }
   };
 
   return (
@@ -184,6 +220,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         isLoading,
+        refreshAccessToken,
       }}
     >
       {children}
