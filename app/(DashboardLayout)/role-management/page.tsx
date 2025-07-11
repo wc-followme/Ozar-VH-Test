@@ -7,16 +7,23 @@ import { Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ROLE_MESSAGES } from './role-messages';
+import type {
+  FetchRolesParams,
+  MenuOption,
+  Role,
+  RoleApiResponse,
+} from './types';
 
-const menuOptions = [
-  { label: 'Edit', action: 'edit', icon: Edit2 },
-  { label: 'Delete', action: 'delete', icon: Trash },
+const menuOptions: MenuOption[] = [
+  { label: ROLE_MESSAGES.EDIT_MENU, action: 'edit', icon: Edit2 },
+  { label: ROLE_MESSAGES.DELETE_MENU, action: 'delete', icon: Trash },
 ];
 
 const RoleManagement = () => {
-  const [roles, setRoles] = useState<any[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10); // Show 9 records by default
+  const [limit] = useState(10); // Show 10 records by default
   const [search] = useState('');
   const [loading, setLoading] = useState(false);
   const [name] = useState('');
@@ -27,18 +34,20 @@ const RoleManagement = () => {
   const fetchRoles = async (append = false) => {
     setLoading(true);
     try {
-      const res: any = await apiService.fetchRoles({
+      const params: FetchRolesParams = {
         page,
         limit,
         search,
         name,
-      });
+      };
+      const res: RoleApiResponse = await apiService.fetchRoles(params);
       const data = res.data || { data: [], total: 0 };
       const newRoles = data.data;
       setRoles(prev => (append ? [...prev, ...newRoles] : newRoles));
       const total = data.total;
       setHasMore(page * limit < total);
-    } catch {
+    } catch (error) {
+      console.error(ROLE_MESSAGES.FETCH_ROLES_ERROR, error);
       if (!append) setRoles([]);
       setHasMore(false);
     } finally {
@@ -71,8 +80,9 @@ const RoleManagement = () => {
     try {
       await apiService.deleteRole(uuid);
       setRoles(prev => prev.filter(role => role.uuid !== uuid));
-    } catch (err) {
-      alert('Failed to delete role.');
+    } catch (error) {
+      console.error(ROLE_MESSAGES.DELETE_ERROR, error);
+      alert(ROLE_MESSAGES.DELETE_ERROR);
     }
   };
 
@@ -85,13 +95,13 @@ const RoleManagement = () => {
     <section className='flex flex-col w-full items-start gap-8 p-6 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
         <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
-          Role and Permissions Management
+          {ROLE_MESSAGES.PAGE_TITLE}
         </h2>
         <Link
           href={'/role-management/create-role'}
           className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
         >
-          Create Role
+          {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
         </Link>
       </header>
       {/* Commented out for now as we are not using it */}
@@ -120,7 +130,9 @@ const RoleManagement = () => {
       {/* Roles Grid */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full'>
         {roles.length === 0 && !loading ? (
-          <div className='col-span-4 text-center py-8'>No roles found.</div>
+          <div className='col-span-4 text-center py-8'>
+            {ROLE_MESSAGES.NO_ROLES_FOUND}
+          </div>
         ) : (
           roles.map((role, index) => {
             const iconOption = iconOptions.find(
@@ -152,10 +164,12 @@ const RoleManagement = () => {
           })
         )}
       </div>
-      {loading && <div className='w-full text-center py-4'>Loading...</div>}
+      {loading && (
+        <div className='w-full text-center py-4'>{ROLE_MESSAGES.LOADING}</div>
+      )}
       {!hasMore && roles.length > 0 && (
         <div className='w-full text-center py-4 text-gray-400'>
-          No more roles to load.
+          {ROLE_MESSAGES.NO_MORE_ROLES}
         </div>
       )}
     </section>

@@ -1,3 +1,4 @@
+import { ROLE_MESSAGES } from '@/app/(DashboardLayout)/role-management/role-messages';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -60,7 +61,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
         status: initialValues.status || 'ACTIVE',
       });
     }
-  }, [initialValues, reset]);
+  }, [initialValues, reset, defaultIconOption?.value]);
 
   // const selectedIcon = watch('icon');
   // const getSelectedIconOption = () => {
@@ -80,7 +81,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
             control={control}
             render={({ field }) => (
               <IconFieldWrapper
-                label='Icon'
+                label={ROLE_MESSAGES.ICON_LABEL}
                 value={field.value}
                 onChange={field.onChange}
                 iconOptions={iconOptions}
@@ -92,7 +93,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
           {/* Role Name input */}
           <div className='flex flex-col w-[300px] items-start gap-2'>
             <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-              Role Name
+              {ROLE_MESSAGES.ROLE_NAME_LABEL}
             </Label>
             <Controller
               name='name'
@@ -101,7 +102,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
                 <Input
                   {...field}
                   className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                  placeholder='Enter role name'
+                  placeholder={ROLE_MESSAGES.ROLE_NAME_PLACEHOLDER}
                   disabled={isSubmitting}
                 />
               )}
@@ -114,7 +115,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
           {/* Description input */}
           <div className='flex flex-col items-start gap-2 flex-1'>
             <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-              Description
+              {ROLE_MESSAGES.DESCRIPTION_LABEL}
             </Label>
             <Controller
               name='description'
@@ -123,7 +124,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
                 <Input
                   {...field}
                   className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                  placeholder='Enter role description'
+                  placeholder={ROLE_MESSAGES.DESCRIPTION_PLACEHOLDER}
                   disabled={isSubmitting}
                 />
               )}
@@ -136,7 +137,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
           {/* Status selector */}
           <div className='flex flex-col items-start gap-1'>
             <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-              Status
+              {ROLE_MESSAGES.STATUS_LABEL}
             </Label>
             <Controller
               name='status'
@@ -147,8 +148,12 @@ export const RoleForm: React.FC<RoleFormProps> = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                    <SelectItem value='ACTIVE'>Active</SelectItem>
-                    <SelectItem value='INACTIVE'>Inactive</SelectItem>
+                    <SelectItem value='ACTIVE'>
+                      {ROLE_MESSAGES.STATUS_ACTIVE}
+                    </SelectItem>
+                    <SelectItem value='INACTIVE'>
+                      {ROLE_MESSAGES.STATUS_INACTIVE}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               )}
@@ -164,7 +169,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
             className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
             onClick={() => router.push('/role-management')}
           >
-            Cancel
+            {ROLE_MESSAGES.CANCEL_BUTTON}
           </button>
           <button
             type='submit'
@@ -174,12 +179,14 @@ export const RoleForm: React.FC<RoleFormProps> = ({
             {isSubmitting ? (
               <>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                {mode === 'edit' ? 'Updating...' : 'Creating...'}
+                {mode === 'edit'
+                  ? ROLE_MESSAGES.UPDATING_BUTTON
+                  : ROLE_MESSAGES.CREATING_BUTTON}
               </>
             ) : mode === 'edit' ? (
-              'Update Role'
+              ROLE_MESSAGES.UPDATE_BUTTON
             ) : (
-              'Create Role'
+              ROLE_MESSAGES.CREATE_BUTTON
             )}
           </button>
         </div>

@@ -426,6 +426,7 @@ const CompanyDetails = () => {
                     status={user.status}
                     onToggle={() => handleToggleStatus(user.id)}
                     menuOptions={menuOptions}
+                    userUuid={String(user.id)}
                   />
                 ))}
               </div>

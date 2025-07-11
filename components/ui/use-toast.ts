@@ -5,8 +5,8 @@ import * as React from 'react';
 
 import type { ToastActionElement, ToastProps } from '@/components/ui/toast';
 
-const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_LIMIT = 3;
+const TOAST_REMOVE_DELAY = 5000;
 
 type ToasterToast = ToastProps & {
   id: string;
@@ -161,11 +161,35 @@ function toast({ ...props }: Toast) {
     },
   });
 
+  // Auto-dismiss after 4 seconds if no duration is specified
+  if (!props.duration) {
+    setTimeout(() => {
+      dismiss();
+    }, 4000);
+  }
+
   return {
     id: id,
     dismiss,
     update,
   };
+}
+
+// Standardized toast functions with consistent duration and variants
+function showSuccessToast(message: string) {
+  return toast({
+    title: 'Success',
+    description: message,
+    variant: 'default', // Green variant for success
+  });
+}
+
+function showErrorToast(message: string) {
+  return toast({
+    title: 'Error',
+    description: message,
+    variant: 'destructive', // Red variant for errors
+  });
 }
 
 function useToast() {
@@ -184,6 +208,8 @@ function useToast() {
   return {
     ...state,
     toast,
+    showSuccessToast,
+    showErrorToast,
     dismiss: (toastId?: string) =>
       dispatch(
         toastId !== undefined
@@ -193,4 +219,4 @@ function useToast() {
   };
 }
 
-export { toast, useToast };
+export { showErrorToast, showSuccessToast, toast, useToast };

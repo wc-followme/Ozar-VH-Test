@@ -21,6 +21,7 @@ interface LoginResponse {
   message: string;
   data?: {
     access_token: string;
+    refresh_token: string;
     user: {
       id: number;
       first_name: string;
@@ -36,6 +37,20 @@ interface LoginResponse {
       role_id: number;
       device_token: string;
     };
+  };
+}
+
+// Refresh token interfaces
+interface RefreshTokenRequest {
+  refresh_token: string;
+}
+
+interface RefreshTokenResponse {
+  statusCode: number;
+  message: string;
+  data?: {
+    access_token: string;
+    refresh_token: string;
   };
 }
 
@@ -65,6 +80,107 @@ interface CreateRoleResponse {
     created_at: string;
     updated_at: string;
   };
+}
+
+// User management interfaces
+export interface User {
+  id: number;
+  uuid: string;
+  role_id: number;
+  company_id: string;
+  name: string;
+  email: string;
+  phone_number: string;
+  profile_picture_url: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  role: {
+    id: number;
+    name: string;
+  };
+  company: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface FetchUsersResponse {
+  statusCode: number;
+  message: string;
+  data: User[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+// User status update response
+export interface UpdateUserStatusResponse {
+  statusCode: number;
+  message: string;
+  data?: User;
+}
+
+// User delete response
+export interface DeleteUserResponse {
+  statusCode: number;
+  message: string;
+}
+
+// User creation types
+export interface CreateUserRequest {
+  role_id: number;
+  name: string;
+  email: string;
+  password: string;
+  phone_number: string;
+  profile_picture_url?: string;
+  date_of_joining: string;
+  designation: string;
+  preferred_communication_method: string;
+  address: string;
+  city: string;
+  pincode: string;
+}
+
+export interface CreateUserResponse {
+  statusCode: number;
+  message: string;
+  data: any;
+}
+
+// User update types
+export interface UpdateUserRequest {
+  role_id?: number;
+  name?: string;
+  email?: string;
+  password?: string;
+  phone_number?: string;
+  profile_picture_url?: string;
+  date_of_joining?: string;
+  designation?: string;
+  preferred_communication_method?: string;
+  address?: string;
+  city?: string;
+  pincode?: string;
+  status?: 'ACTIVE' | 'INACTIVE';
+  is_profile_completed?: boolean;
+}
+
+export interface UpdateUserResponse {
+  statusCode: number;
+  message: string;
+  data: any;
+}
+
+// User details response
+export interface GetUserResponse {
+  statusCode: number;
+  message: string;
+  data: User;
 }
 
 // Get device information for login
@@ -119,26 +235,79 @@ class ApiService {
       ...options,
     };
 
-    try {
-      const response = await fetch(url, config);
-      const data = await response.json();
+    const makeApiCall = async (): Promise<T> => {
+      try {
+        const response = await fetch(url, config);
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw {
-          message: data.message || 'An error occurred',
-          status: response.status,
-          errors: data.errors,
-        } as ApiError;
+        if (!response.ok) {
+          throw {
+            message: data.message || 'An error occurred',
+            status: response.status,
+            errors: data.errors,
+          } as ApiError;
+        }
+
+        return data;
+      } catch (error) {
+        if (error instanceof TypeError) {
+          // Network error
+          throw {
+            message: 'Network error. Please check your connection.',
+            status: 0,
+          } as ApiError;
+        }
+        throw error;
       }
+    };
 
-      return data;
-    } catch (error) {
-      if (error instanceof TypeError) {
-        // Network error
-        throw {
-          message: 'Network error. Please check your connection.',
-          status: 0,
-        } as ApiError;
+    try {
+      return await makeApiCall();
+    } catch (error: any) {
+      // If 401 error and not a refresh endpoint, try to refresh token and retry
+      if (
+        error.status === 401 &&
+        !endpoint.includes('/auth/refresh') &&
+        !endpoint.includes('/auth/login')
+      ) {
+        try {
+          const refreshToken =
+            typeof window !== 'undefined'
+              ? localStorage.getItem('refresh_token')
+              : null;
+
+          if (refreshToken) {
+            const refreshResponse = await this.refreshToken(refreshToken);
+            if (refreshResponse.statusCode === 200 && refreshResponse.data) {
+              const { access_token, refresh_token: newRefreshToken } =
+                refreshResponse.data;
+
+              // Update stored tokens
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('auth_token', access_token);
+                localStorage.setItem('refresh_token', newRefreshToken);
+              }
+
+              // Update config with new token and retry
+              config.headers = {
+                ...config.headers,
+                Authorization: `Bearer ${access_token}`,
+              };
+
+              return await makeApiCall();
+            }
+          }
+        } catch (refreshError) {
+          // If refresh fails, clear tokens and throw 401 error to be handled by auth context
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('user');
+          }
+          // Re-throw the original 401 error so auth context can handle the redirect
+          throw error;
+        }
       }
       throw error;
     }
@@ -260,6 +429,89 @@ class ApiService {
   async logout() {
     return this.makeRequest('/auth/logout', {
       method: 'POST',
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
+    const refreshData: RefreshTokenRequest = {
+      refresh_token: refreshToken,
+    };
+
+    return this.makeRequest<RefreshTokenResponse>('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify(refreshData),
+    });
+  }
+
+  // User management API
+  async fetchUsers({
+    page = 1,
+    limit = 10,
+    role_id = '',
+    company_id = '',
+  }: {
+    page?: number;
+    limit?: number;
+    role_id?: string | number;
+    company_id?: string | number;
+  }): Promise<FetchUsersResponse> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (role_id) params.append('role_id', String(role_id));
+    if (company_id) params.append('company_id', String(company_id));
+    return this.makeRequest(`/users?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Create user
+  async createUser(payload: CreateUserRequest): Promise<CreateUserResponse> {
+    return this.makeRequest('/users', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Get user details
+  async getUserDetails(uuid: string): Promise<GetUserResponse> {
+    return this.makeRequest(`/users/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update user
+  async updateUser(
+    uuid: string,
+    payload: UpdateUserRequest
+  ): Promise<UpdateUserResponse> {
+    return this.makeRequest(`/users/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Update user status
+  async updateUserStatus(
+    uuid: string,
+    status: 'ACTIVE' | 'INACTIVE'
+  ): Promise<UpdateUserStatusResponse> {
+    return this.makeRequest(`/users/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify({ status }),
+    });
+  }
+
+  // Delete user
+  async deleteUser(uuid: string): Promise<DeleteUserResponse> {
+    return this.makeRequest(`/users/${uuid}`, {
+      method: 'DELETE',
       headers: this.getRoleHeaders(),
     });
   }
