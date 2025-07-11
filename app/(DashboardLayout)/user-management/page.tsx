@@ -15,6 +15,7 @@ import { showToast } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { USER_MESSAGES } from './user-messages';
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
@@ -90,7 +91,7 @@ export default function UserManagement() {
         toast,
         type: 'error',
         title: 'Error',
-        description: err?.message || 'Failed to fetch users.',
+        description: err?.message || USER_MESSAGES.FETCH_ERROR,
       });
       if (!append) setUsers([]);
       setHasMore(false);
@@ -103,10 +104,9 @@ export default function UserManagement() {
   const handleToggleStatus = async (id: number, currentStatus: boolean) => {
     try {
       const user = users.find(u => u.id === id);
-      console.log('INNNNN', user);
-      if (!user || !user.uuid) throw new Error('User UUID not found');
+      if (!user || !user.uuid)
+        throw new Error(USER_MESSAGES.USER_NOT_FOUND_ERROR);
       const newStatus = currentStatus ? 'INACTIVE' : 'ACTIVE';
-      console.log(user.uuid, newStatus);
       await apiService.updateUserStatus(user.uuid, newStatus);
       setUsers(users =>
         users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
@@ -115,11 +115,11 @@ export default function UserManagement() {
         toast,
         type: 'success',
         title: 'Success',
-        description: `User status updated to ${newStatus}.`,
+        description: `${USER_MESSAGES.STATUS_UPDATE_SUCCESS} to ${newStatus}.`,
       });
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : 'Failed to update user status.';
+        err instanceof Error ? err.message : USER_MESSAGES.STATUS_UPDATE_ERROR;
       showToast({
         toast,
         type: 'error',
@@ -138,11 +138,11 @@ export default function UserManagement() {
         toast,
         type: 'success',
         title: 'Success',
-        description: 'User deleted successfully.',
+        description: USER_MESSAGES.DELETE_SUCCESS,
       });
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : 'Failed to delete user.';
+        err instanceof Error ? err.message : USER_MESSAGES.DELETE_ERROR;
       showToast({
         toast,
         type: 'error',
@@ -167,15 +167,15 @@ export default function UserManagement() {
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
         <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
-          Admin / User Management
+          {USER_MESSAGES.USER_MANAGEMENT_TITLE}
         </h1>
         <div className='flex items-center gap-4'>
           <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger className='w-40 bg-[var(--white-background)] rounded-[30px] border-2 border-[var(--border-dark)] h-[42px]'>
-              <SelectValue placeholder='All Users' />
+              <SelectValue placeholder={USER_MESSAGES.ALL_USERS} />
             </SelectTrigger>
             <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-              <SelectItem value='all'>All Users</SelectItem>
+              <SelectItem value='all'>{USER_MESSAGES.ALL_USERS}</SelectItem>
               {roles.map(role => (
                 <SelectItem key={role.id} value={String(role.id)}>
                   {role.name}
@@ -188,15 +188,19 @@ export default function UserManagement() {
             className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
             disabled={loading}
           >
-            <Link href='/user-management/create-user'>Add Admin or User</Link>
+            <Link href='/user-management/create-user'>
+              {USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
+            </Link>
           </Button>
         </div>
       </div>
       {/* User Grid */}
       {loading && users.length === 0 ? (
-        <div className='text-center py-10'>Loading...</div>
+        <div className='text-center py-10'>{USER_MESSAGES.LOADING}</div>
       ) : users.length === 0 ? (
-        <div className='text-center py-10 text-gray-500'>No users found.</div>
+        <div className='text-center py-10 text-gray-500'>
+          {USER_MESSAGES.NO_USERS_FOUND}
+        </div>
       ) : (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
           {users.map(user => (
@@ -225,7 +229,7 @@ export default function UserManagement() {
         </div>
       )}
       {loading && users.length > 0 && (
-        <div className='text-center py-4'>Loading more...</div>
+        <div className='text-center py-4'>{USER_MESSAGES.LOADING_MORE}</div>
       )}
     </div>
   );

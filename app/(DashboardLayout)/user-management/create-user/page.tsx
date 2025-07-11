@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { USER_MESSAGES } from '../user-messages';
 
 export default function AddUserPage() {
   const [selectedTab, setSelectedTab] = useState('info');
@@ -47,8 +48,8 @@ export default function AddUserPage() {
         setRoles(
           roleList.map((role: any) => ({ id: role.id, name: role.name }))
         );
-      } catch {
-        setRoles([]);
+      } catch (err) {
+        console.error(USER_MESSAGES.LOAD_ROLES_ERROR, err);
       } finally {
         setLoadingRoles(false);
       }
@@ -80,7 +81,7 @@ export default function AddUserPage() {
       );
     } catch (err) {
       console.log('err', err);
-      alert('Failed to upload image');
+      alert(USER_MESSAGES.UPLOAD_ERROR);
     } finally {
       setUploading(false);
     }
@@ -100,11 +101,11 @@ export default function AddUserPage() {
         toast,
         type: 'success',
         title: 'Success',
-        description: 'User created successfully.',
+        description: USER_MESSAGES.CREATE_SUCCESS,
       });
       router.push('/user-management');
     } catch (err: any) {
-      const message = extractApiErrorMessage(err, 'Failed to create user.');
+      const message = extractApiErrorMessage(err, USER_MESSAGES.CREATE_ERROR);
       setFormError(message);
       showToast({
         toast,
@@ -123,11 +124,11 @@ export default function AddUserPage() {
         {/* Breadcrumb */}
         <div className='flex items-center text-sm text-gray-500 mb-6 mt-2'>
           <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            User Management
+            {USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB}
           </span>
           <ChevronRight className='h-4 w-4 mx-2' />
           <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            Add User
+            {USER_MESSAGES.ADD_USER_BREADCRUMB}
           </span>
         </div>
 
@@ -143,13 +144,13 @@ export default function AddUserPage() {
                 value='info'
                 className='rounded-md px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
-                Info
+                {USER_MESSAGES.INFO_TAB}
               </TabsTrigger>
               <TabsTrigger
                 value='permissions'
                 className='rounded-md px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
-                Permissions
+                {USER_MESSAGES.PERMISSIONS_TAB}
               </TabsTrigger>
             </TabsList>
 
@@ -175,7 +176,7 @@ export default function AddUserPage() {
                           setFileKey('');
                           setImageUrl('');
                         }}
-                        aria-label='Remove photo'
+                        aria-label={USER_MESSAGES.REMOVE_PHOTO_ARIA}
                       >
                         <X className='w-5 h-5 text-gray-700' />
                       </button>
@@ -184,7 +185,9 @@ export default function AddUserPage() {
                     <PhotoUpload onFileUpload={handlePhotoUpload} />
                   )}
                   {uploading && (
-                    <div className='text-xs mt-2'>Uploading...</div>
+                    <div className='text-xs mt-2'>
+                      {USER_MESSAGES.UPLOADING}
+                    </div>
                   )}
                 </div>
 
@@ -202,14 +205,9 @@ export default function AddUserPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value='permissions' className='p-8'>
-              <div className='text-center py-16'>
-                <h3 className='text-lg font-medium text-gray-900 mb-2'>
-                  Permissions Settings
-                </h3>
-                <p className='text-gray-500'>
-                  Configure user permissions and access levels here.
-                </p>
+            <TabsContent value='permissions' className='pt-8'>
+              <div className='text-center py-10 text-gray-500'>
+                Permissions management coming soon...
               </div>
             </TabsContent>
           </Tabs>

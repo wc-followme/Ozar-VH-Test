@@ -1,5 +1,6 @@
 'use client';
 
+import { USER_MESSAGES } from '@/app/(DashboardLayout)/user-management/user-messages';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
@@ -82,19 +83,21 @@ export function UserInfoForm({
 
   const validate = () => {
     const newErrors: any = {};
-    if (!roleId) newErrors.roleCategory = 'Role is required.';
-    if (!fullName) newErrors.fullName = 'Full name is required.';
-    if (!designation) newErrors.designation = 'Designation is required.';
-    if (!date) newErrors.date = 'Date of joining is required.';
-    if (!email) newErrors.email = 'Email is required.';
-    if (!phone) newErrors.phone = 'Phone number is required.';
+    if (!roleId) newErrors.roleCategory = USER_MESSAGES.ROLE_REQUIRED;
+    if (!fullName) newErrors.fullName = USER_MESSAGES.FULL_NAME_REQUIRED;
+    if (!designation)
+      newErrors.designation = USER_MESSAGES.DESIGNATION_REQUIRED;
+    if (!date) newErrors.date = USER_MESSAGES.DATE_REQUIRED;
+    if (!email) newErrors.email = USER_MESSAGES.EMAIL_REQUIRED;
+    if (!phone) newErrors.phone = USER_MESSAGES.PHONE_REQUIRED;
     // Password is only required for create mode
-    if (!isEditMode && !password) newErrors.password = 'Password is required.';
+    if (!isEditMode && !password)
+      newErrors.password = USER_MESSAGES.PASSWORD_REQUIRED;
     if (!communication)
-      newErrors.communication = 'Preferred communication is required.';
-    if (!address) newErrors.address = 'Address is required.';
-    if (!city) newErrors.city = 'City is required.';
-    if (!pinCode) newErrors.pinCode = 'Pin code is required.';
+      newErrors.communication = USER_MESSAGES.COMMUNICATION_REQUIRED;
+    if (!address) newErrors.address = USER_MESSAGES.ADDRESS_REQUIRED;
+    if (!city) newErrors.city = USER_MESSAGES.CITY_REQUIRED;
+    if (!pinCode) newErrors.pinCode = USER_MESSAGES.PIN_CODE_REQUIRED;
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -151,7 +154,7 @@ export function UserInfoForm({
           htmlFor='role'
           className='text-[14px] font-semibold text-[var(--text-dark)]'
         >
-          Role
+          {USER_MESSAGES.ROLE_LABEL}
         </Label>
         <Select
           value={roleId}
@@ -160,7 +163,11 @@ export function UserInfoForm({
         >
           <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
             <SelectValue
-              placeholder={loadingRoles ? 'Loading roles...' : 'Select role'}
+              placeholder={
+                loadingRoles
+                  ? USER_MESSAGES.LOADING_ROLES
+                  : USER_MESSAGES.SELECT_ROLE
+              }
             />
           </SelectTrigger>
           <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
@@ -180,11 +187,11 @@ export function UserInfoForm({
             htmlFor='full-name'
             className='text-[14px] font-semibold text-[var(--text-dark)]'
           >
-            Full Name
+            {USER_MESSAGES.FULL_NAME_LABEL}
           </Label>
           <Input
             id='full-name'
-            placeholder='Enter Full Name'
+            placeholder={USER_MESSAGES.ENTER_FULL_NAME}
             value={fullName}
             onChange={e => setFullName(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
@@ -196,11 +203,11 @@ export function UserInfoForm({
             htmlFor='designation'
             className='text-[14px] font-semibold text-[var(--text-dark)]'
           >
-            Designation
+            {USER_MESSAGES.DESIGNATION_LABEL}
           </Label>
           <Input
             id='designation'
-            placeholder='Enter Job Title'
+            placeholder={USER_MESSAGES.ENTER_JOB_TITLE}
             value={designation}
             onChange={e => setDesignation(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
@@ -209,53 +216,56 @@ export function UserInfoForm({
         </div>
         <div className='space-y-2'>
           <Label
-            htmlFor='date-joining'
+            htmlFor='date'
             className='text-[14px] font-semibold text-[var(--text-dark)]'
           >
-            Date Of Joining
+            {USER_MESSAGES.DATE_OF_JOINING_LABEL}
           </Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant='outline'
                 className={cn(
-                  'w-full h-12 px-4 pr-2 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
-                  'focus:border-green-500 focus:ring-green-500',
-                  'justify-between font-normal',
+                  'h-12 w-full pl-3 text-left font-normal border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
                   !date && 'text-muted-foreground'
                 )}
               >
-                {date ? format(date, 'PPP') : <span>Select Date</span>}
-                <Calendar1
-                  size='60'
-                  color='#24338C'
-                  variant='Outline'
-                  className='!h-8 !w-8'
-                />
+                {date ? (
+                  format(date, 'PPP')
+                ) : (
+                  <span>{USER_MESSAGES.SELECT_DATE}</span>
+                )}
+                <Calendar1 className='ml-auto h-4 w-4 opacity-50' />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
+            <PopoverContent className='w-auto p-0' align='start'>
               <CalendarComponent
                 mode='single'
                 selected={date}
                 onSelect={setDate}
+                disabled={(date: Date) =>
+                  date > new Date() || date < new Date('1900-01-01')
+                }
                 initialFocus
               />
             </PopoverContent>
           </Popover>
           <FormErrorMessage message={errors.date} />
         </div>
+      </div>
+      {/* Second Row - Email, Password, Phone, Communication */}
+      <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
         <div className='space-y-2'>
           <Label
             htmlFor='email'
             className='text-[14px] font-semibold text-[var(--text-dark)]'
           >
-            Email
+            {USER_MESSAGES.EMAIL_LABEL}
           </Label>
           <Input
             id='email'
             type='email'
-            placeholder='Enter Email'
+            placeholder={USER_MESSAGES.ENTER_EMAIL}
             value={email}
             onChange={e => setEmail(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
@@ -267,10 +277,10 @@ export function UserInfoForm({
             htmlFor='password'
             className='text-[14px] font-semibold text-[var(--text-dark)]'
           >
-            Password{' '}
+            {USER_MESSAGES.PASSWORD_LABEL}{' '}
             {isEditMode && (
               <span className='text-sm text-gray-500'>
-                (leave blank to keep current)
+                {USER_MESSAGES.PASSWORD_OPTIONAL_HINT}
               </span>
             )}
           </Label>
@@ -278,7 +288,9 @@ export function UserInfoForm({
             id='password'
             type='password'
             placeholder={
-              isEditMode ? 'Enter new password (optional)' : 'Enter Password'
+              isEditMode
+                ? USER_MESSAGES.ENTER_PASSWORD_OPTIONAL
+                : USER_MESSAGES.ENTER_PASSWORD
             }
             value={password}
             onChange={e => setPassword(e.target.value)}
@@ -291,13 +303,13 @@ export function UserInfoForm({
             htmlFor='phone'
             className='text-[14px] font-semibold text-[var(--text-dark)]'
           >
-            Phone Number
+            {USER_MESSAGES.PHONE_LABEL}
           </Label>
-          <div className='flex w-full'>
+          <div className='flex'>
             <Select value={country} onValueChange={setCountry}>
               <SelectTrigger
                 className={cn(
-                  'h-12 w-24 rounded-l-[10px] rounded-r-none border-2 border-[var(--border-dark)]',
+                  'w-24 h-12 rounded-l-[10px] rounded-r-none border-2 border-r-0 border-[var(--border-dark)]',
                   'focus:border-green-500 focus:ring-green-500',
                   'bg-[var(--white-background)]'
                 )}
@@ -307,19 +319,19 @@ export function UserInfoForm({
               <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
                 <SelectItem value='us'>
                   <div className='flex items-center gap-2'>
-                    <span className='text-xs'>🇺🇸</span>
+                    <span>🇺🇸</span>
                     <span>+1</span>
                   </div>
                 </SelectItem>
                 <SelectItem value='uk'>
                   <div className='flex items-center gap-2'>
-                    <span className='text-xs'>🇬🇧</span>
+                    <span>🇬🇧</span>
                     <span>+44</span>
                   </div>
                 </SelectItem>
                 <SelectItem value='in'>
                   <div className='flex items-center gap-2'>
-                    <span className='text-xs'>🇮🇳</span>
+                    <span>🇮🇳</span>
                     <span>+91</span>
                   </div>
                 </SelectItem>
@@ -327,7 +339,7 @@ export function UserInfoForm({
             </Select>
             <Input
               id='phone'
-              placeholder='Enter Number'
+              placeholder={USER_MESSAGES.ENTER_NUMBER}
               value={phone}
               onChange={e => setPhone(e.target.value)}
               className={cn(
@@ -344,21 +356,29 @@ export function UserInfoForm({
             htmlFor='communication'
             className='text-[14px] font-semibold text-[var(--text-dark)]'
           >
-            Preferred Method of Communication
+            {USER_MESSAGES.COMMUNICATION_LABEL}
           </Label>
           <Select value={communication} onValueChange={setCommunication}>
             <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
               <SelectValue
-                placeholder='eg. email, phone, etc.'
+                placeholder={USER_MESSAGES.SELECT_COMMUNICATION}
                 className='[&>span]:text-[var(--text-placeholder)]'
               />
             </SelectTrigger>
             <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-              <SelectItem value='email'>Email</SelectItem>
-              <SelectItem value='phone'>Phone</SelectItem>
-              <SelectItem value='sms'>SMS</SelectItem>
-              <SelectItem value='slack'>Slack</SelectItem>
-              <SelectItem value='teams'>Microsoft Teams</SelectItem>
+              <SelectItem value='email'>
+                {USER_MESSAGES.EMAIL_OPTION}
+              </SelectItem>
+              <SelectItem value='phone'>
+                {USER_MESSAGES.PHONE_OPTION}
+              </SelectItem>
+              <SelectItem value='sms'>{USER_MESSAGES.SMS_OPTION}</SelectItem>
+              <SelectItem value='slack'>
+                {USER_MESSAGES.SLACK_OPTION}
+              </SelectItem>
+              <SelectItem value='teams'>
+                {USER_MESSAGES.TEAMS_OPTION}
+              </SelectItem>
             </SelectContent>
           </Select>
           <FormErrorMessage message={errors.communication} />
@@ -370,11 +390,11 @@ export function UserInfoForm({
           htmlFor='address'
           className='text-[14px] font-semibold text-[var(--text-dark)]'
         >
-          Address
+          {USER_MESSAGES.ADDRESS_LABEL}
         </Label>
         <Input
           id='address'
-          placeholder='Enter Company Address'
+          placeholder={USER_MESSAGES.ENTER_ADDRESS}
           value={address}
           onChange={e => setAddress(e.target.value)}
           className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
@@ -388,11 +408,11 @@ export function UserInfoForm({
             htmlFor='city'
             className='text-[14px] font-semibold text-[var(--text-dark)]'
           >
-            City
+            {USER_MESSAGES.CITY_LABEL}
           </Label>
           <Input
             id='city'
-            placeholder='Enter City'
+            placeholder={USER_MESSAGES.ENTER_CITY}
             value={city}
             onChange={e => setCity(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
@@ -404,11 +424,11 @@ export function UserInfoForm({
             htmlFor='pin-code'
             className='text-[14px] font-semibold text-[var(--text-dark)]'
           >
-            Pin Code
+            {USER_MESSAGES.PIN_CODE_LABEL}
           </Label>
           <Input
             id='pin-code'
-            placeholder='Enter Pin Code'
+            placeholder={USER_MESSAGES.ENTER_PIN_CODE}
             value={pinCode}
             onChange={e => setPinCode(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
@@ -423,13 +443,15 @@ export function UserInfoForm({
           className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
           onClick={handleCancel}
         >
-          Cancel
+          {USER_MESSAGES.CANCEL_BUTTON}
         </Button>
         <Button
           type='submit'
           className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
         >
-          {isEditMode ? 'Update' : 'Create'}
+          {isEditMode
+            ? USER_MESSAGES.UPDATE_BUTTON
+            : USER_MESSAGES.CREATE_BUTTON}
         </Button>
       </div>
     </form>

@@ -14,6 +14,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { USER_MESSAGES } from '../../user-messages';
 
 interface EditUserPageProps {
   params: Promise<{
@@ -78,7 +79,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       } catch (err: any) {
         const message = extractApiErrorMessage(
           err,
-          'Failed to fetch user details.'
+          USER_MESSAGES.FETCH_DETAILS_ERROR
         );
         showToast({
           toast,
@@ -118,7 +119,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       //   presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
       // );
     } catch (err) {
-      alert('Failed to upload image');
+      alert(USER_MESSAGES.UPLOAD_ERROR);
     } finally {
       setUploading(false);
     }
@@ -137,11 +138,11 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         toast,
         type: 'success',
         title: 'Success',
-        description: 'User updated successfully.',
+        description: USER_MESSAGES.UPDATE_SUCCESS,
       });
       router.push('/user-management');
     } catch (err: any) {
-      const message = extractApiErrorMessage(err, 'Failed to update user.');
+      const message = extractApiErrorMessage(err, USER_MESSAGES.UPDATE_ERROR);
       setFormError(message);
       showToast({
         toast,
@@ -161,11 +162,11 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         toast,
         type: 'success',
         title: 'Success',
-        description: 'User deleted successfully.',
+        description: USER_MESSAGES.DELETE_SUCCESS,
       });
       router.push('/user-management');
     } catch (err: any) {
-      const message = extractApiErrorMessage(err, 'Failed to delete user.');
+      const message = extractApiErrorMessage(err, USER_MESSAGES.DELETE_ERROR);
       showToast({
         toast,
         type: 'error',
@@ -178,7 +179,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   if (loading) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
-        <div className='text-center'>Loading...</div>
+        <div className='text-center'>{USER_MESSAGES.LOADING}</div>
       </div>
     );
   }
@@ -186,7 +187,9 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   if (!user) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
-        <div className='text-center text-red-500'>User not found</div>
+        <div className='text-center text-red-500'>
+          {USER_MESSAGES.USER_NOT_FOUND}
+        </div>
       </div>
     );
   }
@@ -197,18 +200,18 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         {/* Breadcrumb */}
         <div className='flex items-center text-sm text-gray-500 mb-6 mt-2'>
           <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            User Management
+            {USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB}
           </span>
           <ChevronRight className='h-4 w-4 mx-2' />
           <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            Edit User
+            {USER_MESSAGES.EDIT_USER_BREADCRUMB}
           </span>
         </div>
 
         {/* Header with Delete Button */}
         <div className='flex items-center justify-between mb-6'>
           <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
-            Edit User
+            {USER_MESSAGES.EDIT_USER_TITLE}
           </h1>
           <Button
             variant='destructive'
@@ -216,7 +219,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
             className='h-[42px] px-6 bg-[var(--warning)] hover:bg-red-600 rounded-full font-semibold text-white flex items-center gap-2'
           >
             <Trash size={18} />
-            Delete User
+            {USER_MESSAGES.DELETE_USER_BUTTON}
           </Button>
         </div>
 
@@ -232,13 +235,13 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                 value='info'
                 className='rounded-md px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
-                Info
+                {USER_MESSAGES.INFO_TAB}
               </TabsTrigger>
               <TabsTrigger
                 value='permissions'
                 className='rounded-md px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
-                Permissions
+                {USER_MESSAGES.PERMISSIONS_TAB}
               </TabsTrigger>
             </TabsList>
 
@@ -252,7 +255,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                         src={
                           (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
                         }
-                        alt='User Photo'
+                        alt='Uploaded'
                         className='rounded-lg w-full h-auto'
                         width={250}
                         height={250}
@@ -262,9 +265,8 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                         className='absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1 shadow hover:bg-opacity-100 transition'
                         onClick={() => {
                           setFileKey('');
-                          // setImageUrl(''); // Removed unused imageUrl
                         }}
-                        aria-label='Remove photo'
+                        aria-label={USER_MESSAGES.REMOVE_PHOTO_ARIA}
                       >
                         <X className='w-5 h-5 text-gray-700' />
                       </button>
@@ -273,7 +275,9 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                     <PhotoUpload onFileUpload={handlePhotoUpload} />
                   )}
                   {uploading && (
-                    <div className='text-xs mt-2'>Uploading...</div>
+                    <div className='text-xs mt-2'>
+                      {USER_MESSAGES.UPLOADING}
+                    </div>
                   )}
                 </div>
 
@@ -293,31 +297,23 @@ export default function EditUserPage({ params }: EditUserPageProps) {
               </div>
             </TabsContent>
 
-            <TabsContent value='permissions' className='p-8'>
-              <div className='text-center py-16'>
-                <h3 className='text-lg font-medium text-gray-900 mb-2'>
-                  Permissions Settings
-                </h3>
-                <p className='text-gray-500'>
-                  Configure user permissions and access levels here.
-                </p>
+            <TabsContent value='permissions' className='pt-8'>
+              <div className='text-center py-10 text-gray-500'>
+                Permissions management coming soon...
               </div>
             </TabsContent>
           </Tabs>
         </div>
-
-        {/* Delete Confirmation Modal */}
-        <ConfirmDeleteModal
-          open={showDeleteModal}
-          title='Are you sure you want to delete this user?'
-          subtitle='This action cannot be undone.'
-          onCancel={() => setShowDeleteModal(false)}
-          onDelete={async () => {
-            setShowDeleteModal(false);
-            await handleDeleteUser();
-          }}
-        />
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteUser}
+        title={USER_MESSAGES.DELETE_CONFIRM_TITLE}
+        description={USER_MESSAGES.DELETE_CONFIRM_SUBTITLE}
+      />
     </div>
   );
 }
