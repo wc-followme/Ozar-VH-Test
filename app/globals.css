@@ -33,6 +33,7 @@ body {
     --icon-light: #ffffff;
     --dark-background: #e8eaed;
     --hover-bg: #3bc44e;
+    --select-option: #e8eaed;
   }
 
   .dark {
@@ -55,6 +56,7 @@ body {
     --icon-light: #ffffff;
     --dark-background: #040612;
     --hover-bg: #3bc44e;
+    --select-option: #3bc44e;
   }
 }
 
