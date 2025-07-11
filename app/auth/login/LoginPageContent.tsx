@@ -3,36 +3,42 @@
 import { CustomerSection } from '@/components/layout/CustomerSection';
 import { ImageSlider } from '@/components/layout/ImageSlider';
 import { LoginForm } from '@/components/shared/forms/LoginForm';
+import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
 
 export default function LoginPageContent() {
   const { login, isLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [error, setError] = useState<string | null>(null);
+  const { showSuccessToast, showErrorToast } = useToast();
 
   // Get redirect param if present
   const redirectTo = searchParams.get('redirect');
 
   const handleLogin = async (email: string, password: string) => {
-    setError(null);
     const result = await login(email, password);
     if (result.success) {
-      // Redirect after login
-      if (
-        redirectTo &&
-        redirectTo.startsWith('/') &&
-        !redirectTo.startsWith('/auth/')
-      ) {
-        router.push(redirectTo);
-      } else {
-        router.push('/');
-      }
+      showSuccessToast('Welcome back! You have been logged in successfully.');
+
+      // Small delay to show success toast before redirect
+      setTimeout(() => {
+        // Redirect after login
+        if (
+          redirectTo &&
+          redirectTo.startsWith('/') &&
+          !redirectTo.startsWith('/auth/')
+        ) {
+          router.push(redirectTo);
+        } else {
+          router.push('/');
+        }
+      }, 500);
     } else {
-      setError(result.error || 'Login failed');
+      showErrorToast(
+        result.error || 'Invalid email or password. Please try again.'
+      );
     }
     return result;
   };
@@ -66,13 +72,6 @@ export default function LoginPageContent() {
                   </p>
                 )}
               </div>
-
-              {/* Error Message */}
-              {error && (
-                <div className='mb-6 border-red-200 bg-red-50 text-red-800 rounded p-2'>
-                  {error}
-                </div>
-              )}
 
               {/* Client-side Login Form */}
               <div className='space-y-6'>

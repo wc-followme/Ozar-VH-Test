@@ -33,6 +33,13 @@ body {
     --icon-light: #ffffff;
     --dark-background: #e8eaed;
     --hover-bg: #3bc44e;
+
+    /* Shadcn/ui variables needed for toast components */
+    --foreground: 0 0% 10%;
+    --border: 0 0% 90%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -55,6 +62,12 @@ body {
     --icon-light: #ffffff;
     --dark-background: #040612;
     --hover-bg: #3bc44e;
+
+    /* Shadcn/ui variables for dark theme */
+    --foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 86% 97%;
   }
 }
 
@@ -66,6 +79,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
 .loader {
   width: 50px;
   aspect-ratio: 1;
@@ -88,5 +102,142 @@ input:-webkit-autofill:active {
 @keyframes l13 {
   100% {
     transform: rotate(1turn);
+  }
+}
+
+/* Toast component overrides to ensure visibility */
+@layer components {
+  /* Radix toast viewport positioning - override Tailwind classes */
+  [data-radix-toast-viewport] {
+    position: fixed !important;
+    top: 16px !important;
+    right: 16px !important;
+    bottom: auto !important;
+    left: auto !important;
+    z-index: 9999 !important;
+    max-width: 420px !important;
+    width: auto !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    max-height: none !important;
+  }
+
+  /* Override Tailwind responsive classes */
+  @media (min-width: 640px) {
+    [data-radix-toast-viewport] {
+      bottom: auto !important;
+      top: 16px !important;
+      flex-direction: column !important;
+    }
+  }
+
+  /* Success toast styling - target default variant */
+  [data-state='open'][data-radix-toast-root] {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 420px !important;
+    padding: 16px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    animation: slideInFromRight 0.3s ease-out !important;
+    pointer-events: auto !important;
+  }
+
+  /* Success toast - default variant (green) */
+  [data-state='open'][data-radix-toast-root]:not(
+      [data-variant='destructive']
+    ):not(.destructive) {
+    background: #f0fdf4 !important;
+    border: 1px solid #86efac !important;
+    color: #166534 !important;
+  }
+
+  /* Error toast - destructive variant (red) */
+  [data-state='open'][data-radix-toast-root][data-variant='destructive'],
+  [data-state='open'][data-radix-toast-root].destructive {
+    background: #fef2f2 !important;
+    border: 1px solid #fca5a5 !important;
+    color: #b91c1c !important;
+  }
+
+  /* Toast title styling */
+  [data-radix-toast-title] {
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    margin-bottom: 4px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Toast description styling */
+  [data-radix-toast-description] {
+    font-size: 14px !important;
+    opacity: 0.9 !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Toast close button */
+  [data-radix-toast-close] {
+    position: absolute !important;
+    top: 8px !important;
+    right: 8px !important;
+    opacity: 0.7 !important;
+    transition: opacity 0.2s !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    padding: 4px !important;
+    border-radius: 4px !important;
+  }
+
+  [data-radix-toast-close]:hover {
+    opacity: 1 !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* Animation keyframes */
+  @keyframes slideInFromRight {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Legacy sonner toast styles (fallback) */
+  [data-sonner-toaster] {
+    position: fixed !important;
+    top: 16px !important;
+    right: 16px !important;
+    z-index: 9999 !important;
+    pointer-events: none !important;
+    max-width: 420px !important;
+  }
+
+  [data-sonner-toast] {
+    pointer-events: auto !important;
+    background: white !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin-bottom: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    color: #333 !important;
+  }
+
+  [data-sonner-toast][data-type='error'] {
+    background: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+    color: #b91c1c !important;
+  }
+
+  [data-sonner-toast][data-type='success'] {
+    background: #f0fdf4 !important;
+    border-color: #86efac !important;
+    color: #166534 !important;
   }
 }

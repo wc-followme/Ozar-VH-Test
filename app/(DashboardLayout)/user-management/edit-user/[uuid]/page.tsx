@@ -4,25 +4,34 @@ import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { PhotoUpload } from '@/components/shared/PhotoUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { apiService, CreateUserRequest } from '@/lib/api';
+import { apiService, UpdateUserRequest, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
 import { ChevronRight, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Role, RoleApiResponse, UserFormData } from '../types';
-import { USER_MESSAGES } from '../user-messages';
+import { Role, RoleApiResponse, UserFormData } from '../../types';
+import { USER_MESSAGES } from '../../user-messages';
 
-export default function AddUserPage() {
+interface EditUserPageProps {
+  params: Promise<{
+    uuid: string;
+  }>;
+}
+
+export default function EditUserPage({ params }: EditUserPageProps) {
+  const resolvedParams = React.use(params);
   const [selectedTab, setSelectedTab] = useState('info');
   const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
   const [roles, setRoles] = useState<Role[]>([]);
   const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
   const [formLoading, setFormLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
@@ -39,11 +48,27 @@ export default function AddUserPage() {
     );
   };
 
+  // Fetch user details and roles
   useEffect(() => {
-    const fetchRoles = async () => {
-      setLoadingRoles(true);
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
+        // Fetch user details and roles in parallel
+        const [userRes, rolesRes] = await Promise.all([
+          apiService.getUserDetails(resolvedParams.uuid),
+          apiService.fetchRoles({ page: 1, limit: 50 }),
+        ]);
+
+        // Set user data
+        if (userRes.statusCode === 200 && userRes.data) {
+          setUser(userRes.data);
+          // Set existing image if available
+          if (userRes.data.profile_picture_url) {
+            setFileKey(userRes.data.profile_picture_url);
+          }
+        }
+
+        // Set roles data
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
           roleList.map((role: Role) => ({ id: role.id, name: role.name }))
@@ -51,16 +76,23 @@ export default function AddUserPage() {
       } catch (err: unknown) {
         // Handle auth errors first (will redirect to login if 401)
         if (handleAuthError(err)) {
-          return; // Don't log error if it's an auth error
+          return; // Don't show toast or redirect if it's an auth error
         }
 
-        console.error(USER_MESSAGES.LOAD_ROLES_ERROR, err);
+        const message = extractApiErrorMessage(
+          err,
+          USER_MESSAGES.FETCH_DETAILS_ERROR
+        );
+        showErrorToast(message);
+        router.push('/user-management');
       } finally {
+        setLoading(false);
         setLoadingRoles(false);
       }
     };
-    fetchRoles();
-  }, [handleAuthError]);
+
+    fetchData();
+  }, [resolvedParams.uuid, router, showErrorToast, handleAuthError]);
 
   const handlePhotoUpload = async (file: File) => {
     setUploading(true);
@@ -68,7 +100,6 @@ export default function AddUserPage() {
       // Generate a unique file name: user_<uuid>_<timestamp>.<ext>
       const ext = file.name.split('.').pop() || 'png';
       const timestamp = Date.now();
-      // If you have a user UUID, use it. Otherwise, generate a temp one for the upload.
       const userUuid = uuidv4();
       const generatedFileName = `user_${userUuid}_${timestamp}.${ext}`;
       const presigned = await getPresignedUrl({
@@ -80,36 +111,21 @@ export default function AddUserPage() {
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
-      // const cdnUrl = process.env['NEXT_PUBLIC_CDN_URL'] || '';
-      // setImageUrl(
-      //   presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
-      // );
-    } catch (err: unknown) {
-      console.log('err', err);
+    } catch {
       alert(USER_MESSAGES.UPLOAD_ERROR);
     } finally {
       setUploading(false);
     }
   };
 
-  const handleCreateUser = async (data: UserFormData) => {
+  const handleUpdateUser = async (data: UserFormData) => {
     setFormLoading(true);
     try {
-      // Ensure all required fields are provided for create operation
-      if (!data.password) {
-        throw new Error('Password is required for user creation');
-      }
-      if (!data.date_of_joining) {
-        throw new Error('Date of joining is required for user creation');
-      }
-
-      const payload: CreateUserRequest = {
+      const payload: UpdateUserRequest = {
         role_id: data.role_id,
         name: data.name,
         email: data.email,
-        password: data.password,
         phone_number: data.phone_number,
-        date_of_joining: data.date_of_joining,
         designation: data.designation,
         preferred_communication_method: data.preferred_communication_method,
         address: data.address,
@@ -117,8 +133,19 @@ export default function AddUserPage() {
         pincode: data.pincode,
         profile_picture_url: fileKey,
       };
-      await apiService.createUser(payload);
-      showSuccessToast(USER_MESSAGES.CREATE_SUCCESS);
+
+      // Only include password if provided
+      if (data.password) {
+        payload.password = data.password;
+      }
+
+      // Only include date if provided
+      if (data.date_of_joining) {
+        payload.date_of_joining = data.date_of_joining;
+      }
+
+      await apiService.updateUser(resolvedParams.uuid, payload);
+      showSuccessToast(USER_MESSAGES.UPDATE_SUCCESS);
       router.push('/user-management');
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
@@ -126,12 +153,30 @@ export default function AddUserPage() {
         return; // Don't show toast if it's an auth error
       }
 
-      const message = extractApiErrorMessage(err, USER_MESSAGES.CREATE_ERROR);
+      const message = extractApiErrorMessage(err, USER_MESSAGES.UPDATE_ERROR);
       showErrorToast(message);
     } finally {
       setFormLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='text-center'>{USER_MESSAGES.LOADING}</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='text-center text-red-500'>
+          {USER_MESSAGES.USER_NOT_FOUND}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className=''>
@@ -143,8 +188,15 @@ export default function AddUserPage() {
           </span>
           <ChevronRight className='h-4 w-4 mx-2' />
           <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            {USER_MESSAGES.ADD_USER_BREADCRUMB}
+            {USER_MESSAGES.EDIT_USER_BREADCRUMB}
           </span>
+        </div>
+
+        {/* Header */}
+        <div className='flex items-center justify-between mb-6'>
+          <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
+            {USER_MESSAGES.EDIT_USER_TITLE}
+          </h1>
         </div>
 
         {/* Main Content */}
@@ -157,13 +209,13 @@ export default function AddUserPage() {
             <TabsList className='grid w-full max-w-[328px] grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal'>
               <TabsTrigger
                 value='info'
-                className='px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='rounded-md px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
                 {USER_MESSAGES.INFO_TAB}
               </TabsTrigger>
               <TabsTrigger
                 value='permissions'
-                className='px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='rounded-md px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
                 {USER_MESSAGES.PERMISSIONS_TAB}
               </TabsTrigger>
@@ -189,7 +241,6 @@ export default function AddUserPage() {
                         className='absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1 shadow hover:bg-opacity-100 transition'
                         onClick={() => {
                           setFileKey('');
-                          // setImageUrl(''); // This line was removed
                         }}
                         aria-label={USER_MESSAGES.REMOVE_PHOTO_ARIA}
                       >
@@ -212,8 +263,10 @@ export default function AddUserPage() {
                     roles={roles}
                     loadingRoles={loadingRoles}
                     imageUrl={fileKey}
-                    onSubmit={handleCreateUser}
+                    onSubmit={handleUpdateUser}
                     loading={formLoading}
+                    initialData={user}
+                    isEditMode={true}
                   />
                 </div>
               </div>

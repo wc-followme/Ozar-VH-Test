@@ -46,9 +46,6 @@ const selectBoxOptions = [
 ];
 export function CreateJobForm() {
   const [jobType, setJobType] = useState('public');
-  const [checkedCards, setCheckedCards] = useState<{ [id: string]: boolean }>(
-    {}
-  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,10 +119,6 @@ export function CreateJobForm() {
                   title={option.title}
                   description={option.description}
                   status={option.status}
-                  checked={!!checkedCards[option.id]}
-                  onCheckedChange={checked =>
-                    setCheckedCards(prev => ({ ...prev, [option.id]: checked }))
-                  }
                 />
               ))}
             </div>

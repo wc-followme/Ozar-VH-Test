@@ -2,19 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { apiService, type ApiError, type LoginResponse } from './api';
-
-interface User {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  profile_image: string;
-  status: string;
-  role_id: number;
-  device_token: string;
-}
+import { ApiError, apiService, LoginResponse, User } from './api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -23,8 +11,10 @@ interface AuthContextType {
     email: string,
     password: string
   ) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isLoading: boolean;
+  refreshAccessToken: () => Promise<boolean>;
+  handleAuthError: (error: any) => boolean; // Returns true if handled (401), false otherwise
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -55,6 +45,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Helper function to delete cookie
   const deleteCookie = (name: string) => {
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+  };
+
+  // Clear all authentication data
+  const clearAuthData = () => {
+    setIsAuthenticated(false);
+    setUser(null);
+    // Clear localStorage
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('user');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('device_id');
+    // Clear cookies
+    deleteCookie('is_authenticated');
+    deleteCookie('user_data');
+    deleteCookie('auth_token');
+    deleteCookie('refresh_token');
+  };
+
+  // Handle authentication errors (401 Unauthorized)
+  const handleAuthError = (error: any): boolean => {
+    // Check if this is a 401 error
+    if (
+      error?.status === 401 ||
+      (error instanceof Error && error.message?.includes('401'))
+    ) {
+      console.log('🔑 Authentication error detected, logging out user');
+
+      // Clear auth data immediately
+      clearAuthData();
+
+      // Redirect to login page
+      router.push('/auth/login');
+
+      return true; // Indicates this error was handled
+    }
+
+    return false; // Indicates this error was not handled
   };
 
   useEffect(() => {
@@ -92,7 +120,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Check for successful response using statusCode
       if (response.statusCode === 200 && response.data) {
-        const { user: userData, access_token } = response.data;
+        const {
+          user: loginUserData,
+          access_token,
+          refresh_token,
+        } = response.data;
+
+        // Transform login user data to match User interface
+        const userData: User = {
+          id: loginUserData.id,
+          uuid: '', // Login response doesn't include UUID, will be set later if needed
+          role_id: loginUserData.role_id,
+          company_id: '', // Login response doesn't include company_id
+          name: `${loginUserData.first_name} ${loginUserData.last_name}`.trim(),
+          email: loginUserData.email,
+          phone_number: loginUserData.phone_number,
+          profile_picture_url: loginUserData.profile_image || '',
+          status: loginUserData.status,
+          created_at: loginUserData.created_at,
+          updated_at: loginUserData.updated_at,
+          role: {
+            id: loginUserData.role_id,
+            name: '', // Login response doesn't include role name
+          },
+          company: {
+            id: '',
+            name: '',
+          },
+        };
 
         // Store authentication data in both localStorage and cookies
         setIsAuthenticated(true);
@@ -102,11 +157,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('auth_token', access_token);
+        localStorage.setItem('refresh_token', refresh_token);
 
         // Store in cookies (for API access)
         setCookie('is_authenticated', 'true');
         setCookie('user_data', JSON.stringify(userData));
         setCookie('auth_token', access_token);
+        setCookie('refresh_token', refresh_token);
 
         console.log(
           '✅ Authentication data stored in both localStorage and cookies'
@@ -119,7 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           error: response.message || 'Login failed',
         };
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const apiError = error as ApiError;
 
       // Handle specific error cases
@@ -161,19 +218,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       // Ignore API errors, always clear local state
     }
-    setIsAuthenticated(false);
-    setUser(null);
-    // Clear localStorage
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('device_id');
-    // Clear cookies
-    deleteCookie('is_authenticated');
-    deleteCookie('user_data');
-    deleteCookie('auth_token');
+
+    clearAuthData();
+
     // Redirect to login
     router.push('/auth/login');
+  };
+
+  // Auto refresh token when needed
+  const refreshAccessToken = async (): Promise<boolean> => {
+    try {
+      const refreshToken =
+        localStorage.getItem('refresh_token') || getCookie('refresh_token');
+      if (!refreshToken) {
+        await logout();
+        return false;
+      }
+
+      const response = await apiService.refreshToken(refreshToken);
+      if (response.statusCode === 200 && response.data) {
+        const { access_token, refresh_token: newRefreshToken } = response.data;
+
+        // Update stored tokens
+        localStorage.setItem('auth_token', access_token);
+        localStorage.setItem('refresh_token', newRefreshToken);
+        setCookie('auth_token', access_token);
+        setCookie('refresh_token', newRefreshToken);
+
+        return true;
+      } else {
+        await logout();
+        return false;
+      }
+    } catch (err) {
+      await logout();
+      return false;
+    }
   };
 
   return (
@@ -184,6 +264,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         isLoading,
+        refreshAccessToken,
+        handleAuthError,
       }}
     >
       {children}

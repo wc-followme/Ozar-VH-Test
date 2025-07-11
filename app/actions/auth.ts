@@ -1,5 +1,6 @@
 'use server';
 
+import { LoginResponse } from '@/lib/api';
 import { validateLoginData } from '@/lib/validations/auth';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -20,29 +21,6 @@ interface LoginRequest {
   email: string;
   password: string;
   device_info: DeviceInfo;
-}
-
-interface LoginResponse {
-  statusCode: number;
-  message: string;
-  data?: {
-    access_token: string;
-    user: {
-      id: number;
-      first_name: string;
-      last_name: string;
-      email: string;
-      phone_number: string;
-      profile_image: string;
-      status: string;
-      created_at: string;
-      updated_at: string;
-      created_by: number | null;
-      updated_by: number | null;
-      role_id: number;
-      device_token: string;
-    };
-  };
 }
 
 // Get device information for server-side login
@@ -159,11 +137,18 @@ export async function serverLoginAction(_prevState: any, formData: FormData) {
 
     // Check for successful response
     if (response.statusCode === 200 && response.data) {
-      const { user, access_token } = response.data;
+      const { user, access_token, refresh_token } = response.data;
 
       // Set secure HTTP-only cookies
       const cookieStore = await cookies();
       cookieStore.set('auth_token', access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 30, // 30 minutes
+      });
+
+      cookieStore.set('refresh_token', refresh_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -174,7 +159,7 @@ export async function serverLoginAction(_prevState: any, formData: FormData) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
+        maxAge: 60 * 60 * 24 * 7, // 7 days (same as refresh token)
       });
 
       // Store in client-side for immediate access (optional)
@@ -271,11 +256,18 @@ export async function htmlLoginAction(formData: FormData) {
 
     // Check for successful response
     if (response.statusCode === 200 && response.data) {
-      const { user, access_token } = response.data;
+      const { user, access_token, refresh_token } = response.data;
 
       // Set secure HTTP-only cookies
       const cookieStore = await cookies();
       cookieStore.set('auth_token', access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 30, // 30 minutes
+      });
+
+      cookieStore.set('refresh_token', refresh_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -286,7 +278,7 @@ export async function htmlLoginAction(formData: FormData) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
+        maxAge: 60 * 60 * 24 * 7, // 7 days (same as refresh token)
       });
 
       // Store in client-side for immediate access (optional)
@@ -362,6 +354,7 @@ export async function logoutAction() {
 
   // Clear all authentication cookies
   cookieStore.delete('auth_token');
+  cookieStore.delete('refresh_token');
   cookieStore.delete('user_data');
   cookieStore.delete('is_authenticated');
 
