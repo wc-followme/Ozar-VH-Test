@@ -1,15 +1,13 @@
 'use client';
 
-import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { PhotoUpload } from '@/components/shared/PhotoUpload';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, UpdateUserRequest, User } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage, showToast } from '@/lib/utils';
-import { ChevronRight, Trash, X } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -34,7 +32,6 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -67,7 +64,6 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           // Set existing image if available
           if (userRes.data.profile_picture_url) {
             setFileKey(userRes.data.profile_picture_url);
-            // setImageUrl(cdnUrl + userRes.data.profile_picture_url); // Removed unused imageUrl
           }
         }
 
@@ -114,10 +110,6 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
-      // const cdnUrl = process.env['NEXT_PUBLIC_CDN_URL'] || '';
-      // setImageUrl( // Removed unused imageUrl
-      //   presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
-      // );
     } catch {
       alert(USER_MESSAGES.UPLOAD_ERROR);
     } finally {
@@ -174,27 +166,6 @@ export default function EditUserPage({ params }: EditUserPageProps) {
     }
   };
 
-  const handleDeleteUser = async () => {
-    try {
-      await apiService.deleteUser(resolvedParams.uuid);
-      showToast({
-        toast,
-        type: 'success',
-        title: 'Success',
-        description: USER_MESSAGES.DELETE_SUCCESS,
-      });
-      router.push('/user-management');
-    } catch (err: unknown) {
-      const message = extractApiErrorMessage(err, USER_MESSAGES.DELETE_ERROR);
-      showToast({
-        toast,
-        type: 'error',
-        title: 'Error',
-        description: message,
-      });
-    }
-  };
-
   if (loading) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
@@ -227,19 +198,11 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           </span>
         </div>
 
-        {/* Header with Delete Button */}
+        {/* Header */}
         <div className='flex items-center justify-between mb-6'>
           <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
             {USER_MESSAGES.EDIT_USER_TITLE}
           </h1>
-          <Button
-            variant='destructive'
-            onClick={() => setShowDeleteModal(true)}
-            className='h-[42px] px-6 bg-[var(--warning)] hover:bg-red-600 rounded-full font-semibold text-white flex items-center gap-2'
-          >
-            <Trash size={18} />
-            {USER_MESSAGES.DELETE_USER_BUTTON}
-          </Button>
         </div>
 
         {/* Main Content */}
@@ -324,15 +287,6 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           </Tabs>
         </div>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      <ConfirmDeleteModal
-        open={showDeleteModal}
-        title={USER_MESSAGES.DELETE_CONFIRM_TITLE}
-        subtitle={USER_MESSAGES.DELETE_CONFIRM_SUBTITLE}
-        onCancel={() => setShowDeleteModal(false)}
-        onDelete={handleDeleteUser}
-      />
     </div>
   );
 }
