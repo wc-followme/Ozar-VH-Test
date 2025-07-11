@@ -11,17 +11,22 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { Icon } from 'iconsax-react';
 import React, { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
+
 interface MenuOption {
   label: string;
   action: string;
   variant?: 'default' | 'destructive';
-  icon: Icon | any;
+  icon: React.ComponentType<{
+    size?: string | number;
+    color?: string;
+    variant?: 'Linear' | 'Outline' | 'Broken' | 'Bold' | 'Bulk' | 'TwoTone';
+  }>;
 }
+
 export interface RoleCardProps {
-  iconSrc: any;
+  iconSrc: React.ComponentType<{ size?: number; color?: string }>;
   iconBgColor: string;
   title: string;
   description?: string;
@@ -64,7 +69,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
         >
           {React.createElement(iconSrc, {
             size: 30,
-            color: iconColor,
+            color: iconColor || '#000000',
           })}
         </div>
 
@@ -88,7 +93,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
             className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
           >
             {menuOptions.map((option, index) => {
-              const Icon = option.icon; // ensure Icon is a capitalized component
+              const IconComponent = option.icon; // ensure Icon is a capitalized component
               return (
                 <DropdownMenuItem
                   key={index}
@@ -100,7 +105,11 @@ export const RoleCard: React.FC<RoleCardProps> = ({
                       : 'hover:bg-gray-100'
                   )}
                 >
-                  <Icon size='18' color='var(--text-dark)' variant='Outline' />
+                  <IconComponent
+                    size='18'
+                    color='var(--text-dark)'
+                    variant='Outline'
+                  />
                   <span>{option.label}</span>
                 </DropdownMenuItem>
               );

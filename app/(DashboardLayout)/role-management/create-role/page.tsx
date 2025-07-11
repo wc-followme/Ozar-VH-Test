@@ -4,72 +4,42 @@ import { RoleForm } from '@/components/shared/forms/RoleForm';
 import { useToast } from '@/components/ui/use-toast';
 import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
-import { showToast } from '@/lib/utils';
+import { extractApiErrorMessage } from '@/lib/utils';
+import { CreateRoleFormData } from '@/lib/validations/role';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ROLE_MESSAGES } from '../role-messages';
+import type { ApiResponse, CreateRoleRequest } from '../types';
 
 const CreateRole = () => {
   const router = useRouter();
-  const { toast } = useToast();
+  const { showSuccessToast, showErrorToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle form submission
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: CreateRoleFormData) => {
     setIsSubmitting(true);
     try {
-      const roleData = {
+      const roleData: CreateRoleRequest = {
         name: data.name,
         description: data.description,
         icon: data.icon,
         status: data.status,
       };
-      const response = await apiService.createRole(roleData);
+      const response: ApiResponse = await apiService.createRole(roleData);
       if (
         response.statusCode === STATUS_CODES.OK ||
         response.statusCode === STATUS_CODES.CREATED
       ) {
-        showToast({
-          toast,
-          type: 'success',
-          title: 'Success!',
-          description: ROLE_MESSAGES.CREATE_SUCCESS,
-        });
+        showSuccessToast(ROLE_MESSAGES.CREATE_SUCCESS);
         router.push('/role-management');
       } else {
         throw new Error(response.message || ROLE_MESSAGES.CREATE_ERROR);
       }
-    } catch (error) {
-      const apiError = error as {
-        status?: number;
-        message?: string;
-        errors?: any;
-      };
-      let errorMessage = ROLE_MESSAGES.UNEXPECTED_ERROR;
-      if (apiError.status === STATUS_CODES.BAD_REQUEST) {
-        errorMessage = ROLE_MESSAGES.INVALID_DATA;
-      } else if (apiError.status === STATUS_CODES.UNAUTHORIZED) {
-        errorMessage = ROLE_MESSAGES.UNAUTHORIZED;
-      } else if (apiError.status === STATUS_CODES.CONFLICT) {
-        errorMessage = ROLE_MESSAGES.DUPLICATE_ROLE;
-      } else if (apiError.status === STATUS_CODES.UNPROCESSABLE_ENTITY) {
-        if (apiError.errors) {
-          const errorMessages = Object.values(apiError.errors).flat();
-          errorMessage = errorMessages.join(', ');
-        } else {
-          errorMessage = apiError.message || ROLE_MESSAGES.VALIDATION_ERROR;
-        }
-      } else if (apiError.status === STATUS_CODES.NETWORK_ERROR) {
-        errorMessage = ROLE_MESSAGES.NETWORK_ERROR;
-      } else if (apiError.message) {
-        errorMessage = apiError.message;
-      }
-      showToast({
-        toast,
-        type: 'error',
-        title: 'Error',
-        description: errorMessage,
-      });
+    } catch (err: unknown) {
+      const message = extractApiErrorMessage(err, ROLE_MESSAGES.CREATE_ERROR);
+      setIsSubmitting(false);
+      showErrorToast(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -81,13 +51,13 @@ const CreateRole = () => {
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
           <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            Role Management
+            {ROLE_MESSAGES.ROLE_MANAGEMENT_BREADCRUMB}
           </span>
           <span className='text-[var(--text-dark)] text-[14px] font-normal'>
             /
           </span>
           <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            Create Role
+            {ROLE_MESSAGES.CREATE_ROLE_BREADCRUMB}
           </span>
         </div>
       </div>

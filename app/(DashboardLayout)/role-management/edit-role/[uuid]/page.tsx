@@ -7,11 +7,12 @@ import type { CreateRoleFormData } from '@/lib/validations/role';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ROLE_MESSAGES } from '../../role-messages';
+import type { ApiError, ApiResponse, Role } from '../../types';
 
 const EditRolePage = () => {
   const router = useRouter();
   const params = useParams();
-  const { toast } = useToast();
+  const { showSuccessToast, showErrorToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [initialValues, setInitialValues] = useState<CreateRoleFormData | null>(
     null
@@ -25,16 +26,20 @@ const EditRolePage = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = (await apiService.getRoleDetails(uuid)) as { data: any };
+        const res = (await apiService.getRoleDetails(
+          uuid
+        )) as ApiResponse<Role>;
         const data = res.data;
-        setInitialValues({
-          name: data.name || '',
-          description: data.description || '',
-          icon: data.icon || '',
-          status: data.status || 'ACTIVE',
-        });
-      } catch (err: any) {
-        setError('Failed to load role details.');
+        if (data) {
+          setInitialValues({
+            name: data.name || '',
+            description: data.description || '',
+            icon: data.icon || '',
+            status: data.status || 'ACTIVE',
+          });
+        }
+      } catch {
+        setError(ROLE_MESSAGES.LOAD_ERROR);
       } finally {
         setLoading(false);
       }
@@ -45,59 +50,54 @@ const EditRolePage = () => {
   const onSubmit = async (data: CreateRoleFormData) => {
     setIsSubmitting(true);
     try {
-      const response = (await apiService.updateRoleDetails(uuid, data)) as {
-        statusCode: number;
-        message?: string;
-      };
+      const response = (await apiService.updateRoleDetails(
+        uuid,
+        data
+      )) as ApiResponse;
       if (
         response.statusCode === STATUS_CODES.OK ||
         response.statusCode === STATUS_CODES.CREATED
       ) {
-        toast({
-          title: 'Success!',
-          description: ROLE_MESSAGES.UPDATE_SUCCESS,
-          variant: 'default',
-        });
+        showSuccessToast(ROLE_MESSAGES.UPDATE_SUCCESS);
         router.push('/role-management');
       } else {
         throw new Error(response.message || ROLE_MESSAGES.UPDATE_ERROR);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       let errorMessage = ROLE_MESSAGES.UPDATE_ERROR;
-      if (err.response) {
-        const apiError = err.response.data;
-        if (apiError.status === STATUS_CODES.BAD_REQUEST) {
+      const apiError = err as ApiError;
+
+      if (apiError.response) {
+        const apiErrorData = apiError.response.data;
+        if (apiErrorData.status === STATUS_CODES.BAD_REQUEST) {
           errorMessage = ROLE_MESSAGES.INVALID_DATA;
-        } else if (apiError.status === STATUS_CODES.UNAUTHORIZED) {
+        } else if (apiErrorData.status === STATUS_CODES.UNAUTHORIZED) {
           errorMessage = ROLE_MESSAGES.UNAUTHORIZED;
-        } else if (apiError.status === STATUS_CODES.CONFLICT) {
+        } else if (apiErrorData.status === STATUS_CODES.CONFLICT) {
           errorMessage = ROLE_MESSAGES.DUPLICATE_ROLE;
-        } else if (apiError.status === STATUS_CODES.UNPROCESSABLE_ENTITY) {
-          if (apiError.errors) {
-            const errorMessages = Object.values(apiError.errors).flat();
+        } else if (apiErrorData.status === STATUS_CODES.UNPROCESSABLE_ENTITY) {
+          if (apiErrorData.errors) {
+            const errorMessages = Object.values(apiErrorData.errors).flat();
             errorMessage = errorMessages.join(', ');
           } else {
-            errorMessage = apiError.message || ROLE_MESSAGES.VALIDATION_ERROR;
+            errorMessage =
+              apiErrorData.message || ROLE_MESSAGES.VALIDATION_ERROR;
           }
-        } else if (apiError.status === STATUS_CODES.NETWORK_ERROR) {
+        } else if (apiErrorData.status === STATUS_CODES.NETWORK_ERROR) {
           errorMessage = ROLE_MESSAGES.NETWORK_ERROR;
-        } else if (apiError.message) {
-          errorMessage = apiError.message;
+        } else if (apiErrorData.message) {
+          errorMessage = apiErrorData.message;
         }
-      } else if (err.message) {
-        errorMessage = err.message;
+      } else if (apiError.message) {
+        errorMessage = apiError.message;
       }
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
+      showErrorToast(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading) return <div className='p-8'>Loading...</div>;
+  if (loading) return <div className='p-8'>{ROLE_MESSAGES.LOADING}</div>;
   if (error) return <div className='p-8 text-red-500'>{error}</div>;
 
   if (!initialValues) return null;
@@ -107,13 +107,13 @@ const EditRolePage = () => {
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
           <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            Role Management
+            {ROLE_MESSAGES.ROLE_MANAGEMENT_BREADCRUMB}
           </span>
           <span className='text-[var(--text-dark)] text-[14px] font-normal'>
             /
           </span>
           <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            Edit Role
+            {ROLE_MESSAGES.EDIT_ROLE_BREADCRUMB}
           </span>
         </div>
       </div>
