@@ -33,6 +33,7 @@ body {
     --icon-light: #ffffff;
     --dark-background: #e8eaed;
     --hover-bg: #3bc44e;
+    --select-option: #e8eaed;
 
     /* Shadcn/ui variables needed for toast components */
     --foreground: 0 0% 10%;
@@ -62,6 +63,7 @@ body {
     --icon-light: #ffffff;
     --dark-background: #040612;
     --hover-bg: #3bc44e;
+    --select-option: #3bc44e;
 
     /* Shadcn/ui variables for dark theme */
     --foreground: 0 0% 98%;
