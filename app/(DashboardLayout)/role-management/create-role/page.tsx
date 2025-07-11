@@ -5,48 +5,41 @@ import { useToast } from '@/components/ui/use-toast';
 import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
 import { extractApiErrorMessage } from '@/lib/utils';
+import { CreateRoleFormData } from '@/lib/validations/role';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { ROLE_MESSAGES } from '../role-messages';
+import type { ApiResponse, CreateRoleRequest } from '../types';
 
 const CreateRole = () => {
   const router = useRouter();
-  const { toast } = useToast();
+  const { showSuccessToast, showErrorToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle form submission
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: CreateRoleFormData) => {
     setIsSubmitting(true);
     try {
-      const roleData = {
+      const roleData: CreateRoleRequest = {
         name: data.name,
         description: data.description,
         icon: data.icon,
         status: data.status,
       };
-      const response = await apiService.createRole(roleData);
+      const response: ApiResponse = await apiService.createRole(roleData);
       if (
         response.statusCode === STATUS_CODES.OK ||
         response.statusCode === STATUS_CODES.CREATED
       ) {
-        toast({
-          title: 'Success',
-          description: 'Role created successfully',
-          variant: 'default',
-          duration: 4000,
-        });
+        showSuccessToast(ROLE_MESSAGES.CREATE_SUCCESS);
         router.push('/role-management');
       } else {
-        throw new Error(response.message || 'Failed to create role');
+        throw new Error(response.message || ROLE_MESSAGES.CREATE_ERROR);
       }
-    } catch (err: any) {
-      const message = extractApiErrorMessage(err, 'Failed to create role');
+    } catch (err: unknown) {
+      const message = extractApiErrorMessage(err, ROLE_MESSAGES.CREATE_ERROR);
       setIsSubmitting(false);
-      toast({
-        title: 'Error',
-        description: message,
-        variant: 'destructive',
-        duration: 4000,
-      });
+      showErrorToast(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -58,13 +51,13 @@ const CreateRole = () => {
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
           <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            Role Management
+            {ROLE_MESSAGES.ROLE_MANAGEMENT_BREADCRUMB}
           </span>
           <span className='text-[var(--text-dark)] text-[14px] font-normal'>
             /
           </span>
           <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            Create Role
+            {ROLE_MESSAGES.CREATE_ROLE_BREADCRUMB}
           </span>
         </div>
       </div>

@@ -24,7 +24,7 @@ export default function AddUserPage() {
   const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
   const [formLoading, setFormLoading] = useState(false);
   const router = useRouter();
-  const { toast } = useToast();
+  const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
@@ -118,12 +118,7 @@ export default function AddUserPage() {
         profile_picture_url: fileKey,
       };
       await apiService.createUser(payload);
-      toast({
-        title: 'Success',
-        description: USER_MESSAGES.CREATE_SUCCESS,
-        variant: 'default',
-        duration: 4000,
-      });
+      showSuccessToast(USER_MESSAGES.CREATE_SUCCESS);
       router.push('/user-management');
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
@@ -132,12 +127,7 @@ export default function AddUserPage() {
       }
 
       const message = extractApiErrorMessage(err, USER_MESSAGES.CREATE_ERROR);
-      toast({
-        title: 'Error',
-        description: message,
-        variant: 'destructive',
-        duration: 4000,
-      });
+      showErrorToast(message);
     } finally {
       setFormLoading(false);
     }

@@ -25,7 +25,7 @@ export default function UserManagement() {
   const [loading, setLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const { toast } = useToast();
+  const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
   // Fetch roles and first page of users
@@ -95,12 +95,7 @@ export default function UserManagement() {
 
       const message =
         err instanceof Error ? err.message : USER_MESSAGES.FETCH_ERROR;
-      toast({
-        title: 'Error',
-        description: message,
-        variant: 'destructive',
-        duration: 4000,
-      });
+      showErrorToast(message);
       if (!append) setUsers([]);
       setHasMore(false);
     } finally {
@@ -119,12 +114,9 @@ export default function UserManagement() {
       setUsers(users =>
         users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
       );
-      toast({
-        title: 'Success',
-        description: `${USER_MESSAGES.STATUS_UPDATE_SUCCESS} to ${newStatus}.`,
-        variant: 'default',
-        duration: 4000,
-      });
+      showSuccessToast(
+        `${USER_MESSAGES.STATUS_UPDATE_SUCCESS} to ${newStatus}.`
+      );
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -133,12 +125,7 @@ export default function UserManagement() {
 
       const message =
         err instanceof Error ? err.message : USER_MESSAGES.STATUS_UPDATE_ERROR;
-      toast({
-        title: 'Error',
-        description: message,
-        variant: 'destructive',
-        duration: 4000,
-      });
+      showErrorToast(message);
     }
   };
 
@@ -147,12 +134,7 @@ export default function UserManagement() {
     try {
       await apiService.deleteUser(uuid);
       setUsers(users => users.filter(user => user.uuid !== uuid));
-      toast({
-        title: 'Success',
-        description: USER_MESSAGES.DELETE_SUCCESS,
-        variant: 'default',
-        duration: 4000,
-      });
+      showSuccessToast(USER_MESSAGES.DELETE_SUCCESS);
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -161,12 +143,7 @@ export default function UserManagement() {
 
       const message =
         err instanceof Error ? err.message : USER_MESSAGES.DELETE_ERROR;
-      toast({
-        title: 'Error',
-        description: message,
-        variant: 'destructive',
-        duration: 4000,
-      });
+      showErrorToast(message);
     }
   };
 

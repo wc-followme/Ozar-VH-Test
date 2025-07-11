@@ -33,7 +33,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { toast } = useToast();
+  const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
@@ -83,12 +83,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           err,
           USER_MESSAGES.FETCH_DETAILS_ERROR
         );
-        toast({
-          title: 'Error',
-          description: message,
-          variant: 'destructive',
-          duration: 4000,
-        });
+        showErrorToast(message);
         router.push('/user-management');
       } finally {
         setLoading(false);
@@ -97,7 +92,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
     };
 
     fetchData();
-  }, [resolvedParams.uuid, router, toast, handleAuthError]);
+  }, [resolvedParams.uuid, router, showErrorToast, handleAuthError]);
 
   const handlePhotoUpload = async (file: File) => {
     setUploading(true);
@@ -150,12 +145,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       }
 
       await apiService.updateUser(resolvedParams.uuid, payload);
-      toast({
-        title: 'Success',
-        description: USER_MESSAGES.UPDATE_SUCCESS,
-        variant: 'default',
-        duration: 4000,
-      });
+      showSuccessToast(USER_MESSAGES.UPDATE_SUCCESS);
       router.push('/user-management');
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
@@ -164,12 +154,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       }
 
       const message = extractApiErrorMessage(err, USER_MESSAGES.UPDATE_ERROR);
-      toast({
-        title: 'Error',
-        description: message,
-        variant: 'destructive',
-        duration: 4000,
-      });
+      showErrorToast(message);
     } finally {
       setFormLoading(false);
     }

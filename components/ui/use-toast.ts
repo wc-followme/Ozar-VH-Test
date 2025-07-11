@@ -175,6 +175,23 @@ function toast({ ...props }: Toast) {
   };
 }
 
+// Standardized toast functions with consistent duration and variants
+function showSuccessToast(message: string) {
+  return toast({
+    title: 'Success',
+    description: message,
+    variant: 'default', // Green variant for success
+  });
+}
+
+function showErrorToast(message: string) {
+  return toast({
+    title: 'Error',
+    description: message,
+    variant: 'destructive', // Red variant for errors
+  });
+}
+
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState);
 
@@ -191,6 +208,8 @@ function useToast() {
   return {
     ...state,
     toast,
+    showSuccessToast,
+    showErrorToast,
     dismiss: (toastId?: string) =>
       dispatch(
         toastId !== undefined
@@ -200,4 +219,4 @@ function useToast() {
   };
 }
 
-export { toast, useToast };
+export { showErrorToast, showSuccessToast, toast, useToast };
