@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Edit2, Trash } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 import { Badge } from '../../ui/badge';
 
@@ -31,18 +32,17 @@ export default function ToolCard({
   const [editOpen, setEditOpen] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
-  const menuOptions = [
-    { label: 'Edit', action: 'edit', icon: Edit2 },
-    { label: 'Delete', action: 'delete', icon: Trash, variant: 'destructive' },
-  ];
-
   return (
     <div className='bg-[var(--card-background)] hover:shadow-lg rounded-2xl p-3 flex flex-col border border-[var(--border-dark)] min-h-[6.25rem] relative transition-all'>
       <div className='flex gap-3'>
-        <img
+        <Image
           src={image}
           alt={name}
+          width={64}
+          height={64}
           className='w-16 h-16 rounded-[0.625rem] object-cover'
+          unoptimized
+          priority
         />
         <div className='flex flex-col flex-1 min-w-0'>
           <div className='font-bold text-base text-[var(--text-dark)] truncate pr-7'>
@@ -83,25 +83,20 @@ export default function ToolCard({
               align='end'
               className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
             >
-              {menuOptions.map((option, index) => {
-                const MenuIcon = option.icon;
-                return (
-                  <DropdownMenuItem
-                    key={index}
-                    onClick={
-                      option.action === 'edit'
-                        ? () => alert('Edit clicked')
-                        : option.action === 'delete'
-                          ? () => setShowDelete(true)
-                          : undefined
-                    }
-                    className={`text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 ${option.variant === 'destructive' ? ' hover:bg-red-50' : 'hover:bg-gray-100'}`}
-                  >
-                    <MenuIcon size={18} color='var(--text-dark)' />
-                    <span>{option.label}</span>
-                  </DropdownMenuItem>
-                );
-              })}
+              <DropdownMenuItem
+                onClick={() => alert('Edit clicked')}
+                className='text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100'
+              >
+                <Edit2 size={18} color='var(--text-dark)' />
+                <span>Edit</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setShowDelete(true)}
+                className='text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-red-50'
+              >
+                <Trash size={18} color='var(--text-dark)' />
+                <span>Delete</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <ConfirmDeleteModal

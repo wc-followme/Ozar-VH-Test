@@ -11,22 +11,6 @@ import { Label } from '@/components/ui/label';
 import { AddCircle } from 'iconsax-react';
 import { useRef, useState } from 'react';
 
-const iconOptions = [
-  // You can customize these for tools
-  {
-    value: 'wrench',
-    label: 'Wrench',
-    icon: AddCircle,
-    color: '#00A8BF',
-  },
-  {
-    value: 'drill',
-    label: 'Drill',
-    icon: AddCircle,
-    color: '#FFD700',
-  },
-];
-
 const dummyTools = [
   {
     id: 1,
@@ -129,9 +113,6 @@ const dummyTools = [
 const ToolsManagement = () => {
   const [tools, setTools] = useState(dummyTools);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState(
-    iconOptions?.[0]?.value ?? ''
-  );
 
   // Form state
   const [toolName, setToolName] = useState('');
@@ -154,16 +135,6 @@ const ToolsManagement = () => {
   };
 
   // Handlers for photo upload
-  const handlePhotoClick = () => {
-    photoInputRef.current?.click();
-  };
-
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setPhoto(e.target.files[0]);
-    }
-  };
-
   const handleDeletePhoto = () => {
     setPhoto(null);
     if (photoInputRef.current) {
@@ -221,9 +192,9 @@ const ToolsManagement = () => {
                 </>
               }
             />
-            {/* Service (Tool Type) Select */}
+            {/* Service Select */}
             <SelectField
-              label='Tool Type'
+              label='Service'
               value={service}
               onValueChange={setService}
               options={[
@@ -231,7 +202,7 @@ const ToolsManagement = () => {
                 { value: 'drill', label: 'Drill' },
                 { value: 'hammer', label: 'Hammer' },
               ]}
-              placeholder='Select Tool Type'
+              placeholder='Select Service'
               error={errors.service || ''}
             />
             {/* Tool Name */}

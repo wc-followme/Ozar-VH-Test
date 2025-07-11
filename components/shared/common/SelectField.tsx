@@ -15,7 +15,7 @@ interface Option {
 }
 
 interface SelectFieldProps {
-  label: string;
+  label?: string;
   value: string;
   onValueChange: (value: string) => void;
   options: Option[];
@@ -41,9 +41,11 @@ const SelectField: React.FC<SelectFieldProps> = ({
 }) => {
   return (
     <div className={`space-y-2 ${className}`}>
-      <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-        {label}
-      </Label>
+      {label && (
+        <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+          {label}
+        </Label>
+      )}
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
           <SelectValue placeholder={placeholder} />
