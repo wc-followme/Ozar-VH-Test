@@ -8,12 +8,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ROLE_MESSAGES } from './role-messages';
-import type {
-  FetchRolesParams,
-  MenuOption,
-  Role,
-  RoleApiResponse,
-} from './types';
+import type { FetchRolesParams, Role, RoleApiResponse } from './types';
+
+interface MenuOption {
+  label: string;
+  action: string;
+  icon: React.ComponentType<{
+    size?: string | number;
+    color?: string;
+    variant?: 'Linear' | 'Outline' | 'Broken' | 'Bold' | 'Bulk' | 'TwoTone';
+  }>;
+}
 
 const menuOptions: MenuOption[] = [
   { label: ROLE_MESSAGES.EDIT_MENU, action: 'edit', icon: Edit2 },
@@ -40,14 +45,13 @@ const RoleManagement = () => {
         search,
         name,
       };
-      const res: RoleApiResponse = await apiService.fetchRoles(params);
+      const res = (await apiService.fetchRoles(params)) as RoleApiResponse;
       const data = res.data || { data: [], total: 0 };
       const newRoles = data.data;
       setRoles(prev => (append ? [...prev, ...newRoles] : newRoles));
       const total = data.total;
       setHasMore(page * limit < total);
-    } catch (error) {
-      console.error(ROLE_MESSAGES.FETCH_ROLES_ERROR, error);
+    } catch {
       if (!append) setRoles([]);
       setHasMore(false);
     } finally {
@@ -80,8 +84,7 @@ const RoleManagement = () => {
     try {
       await apiService.deleteRole(uuid);
       setRoles(prev => prev.filter(role => role.uuid !== uuid));
-    } catch (error) {
-      console.error(ROLE_MESSAGES.DELETE_ERROR, error);
+    } catch {
       alert(ROLE_MESSAGES.DELETE_ERROR);
     }
   };
@@ -154,7 +157,7 @@ const RoleManagement = () => {
                   iconBgColor={iconOption.color + '26'}
                   title={role.name}
                   description={role.description}
-                  permissionCount={role.total_permissions}
+                  permissionCount={role.total_permissions || 0}
                   iconColor={iconOption.color}
                   onEdit={() => handleEditRole(role.uuid)}
                   onDelete={() => handleDeleteRole(role.uuid)}

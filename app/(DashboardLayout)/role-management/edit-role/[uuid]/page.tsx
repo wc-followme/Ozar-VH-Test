@@ -26,7 +26,9 @@ const EditRolePage = () => {
       setLoading(true);
       setError(null);
       try {
-        const res: ApiResponse<Role> = await apiService.getRoleDetails(uuid);
+        const res = (await apiService.getRoleDetails(
+          uuid
+        )) as ApiResponse<Role>;
         const data = res.data;
         if (data) {
           setInitialValues({
@@ -36,7 +38,7 @@ const EditRolePage = () => {
             status: data.status || 'ACTIVE',
           });
         }
-      } catch (_err: unknown) {
+      } catch {
         setError(ROLE_MESSAGES.LOAD_ERROR);
       } finally {
         setLoading(false);
@@ -48,10 +50,10 @@ const EditRolePage = () => {
   const onSubmit = async (data: CreateRoleFormData) => {
     setIsSubmitting(true);
     try {
-      const response: ApiResponse = await apiService.updateRoleDetails(
+      const response = (await apiService.updateRoleDetails(
         uuid,
         data
-      );
+      )) as ApiResponse;
       if (
         response.statusCode === STATUS_CODES.OK ||
         response.statusCode === STATUS_CODES.CREATED
