@@ -77,7 +77,7 @@ const menuOptions: {
   variant?: 'default' | 'destructive';
 }[] = [
   { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' },
-  { label: 'Delete', action: 'delete', icon: Trash, variant: 'destructive' },
+  { label: 'Archive', action: 'delete', icon: Trash, variant: 'destructive' },
 ];
 
 export default function TradeManagementPage() {
@@ -136,7 +136,7 @@ export default function TradeManagementPage() {
           Trade Management
         </h1>
         <Button
-          className='bg-green-500 hover:bg-green-600 rounded-full px-6 h-10 font-semibold text-white'
+          className='bg-[var(--secondary)] hover:bg-green-600 rounded-full px-6 h-10 font-semibold text-white'
           onClick={() => setSideSheetOpen(true)}
         >
           Create Trade
@@ -158,8 +158,8 @@ export default function TradeManagementPage() {
       </div>
       <ConfirmDeleteModal
         open={modalOpen}
-        title={'Delete Trade'}
-        subtitle={`Are you sure you want to delete "${deleteTradeName}"? This action cannot be undone.`}
+        title={'Archive Trade'}
+        subtitle={`Are you sure you want to Archive "${deleteTradeName}"? This action cannot be undone.`}
         onCancel={() => setModalOpen(false)}
         onDelete={handleDelete}
       />

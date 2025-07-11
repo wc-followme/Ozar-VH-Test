@@ -26,7 +26,7 @@ export const ROLE_MESSAGES = {
 
   // Menu options
   EDIT_MENU: 'Edit',
-  DELETE_MENU: 'Delete',
+  DELETE_MENU: 'Archive',
 
   // Loading and empty states
   LOADING: 'Loading...',

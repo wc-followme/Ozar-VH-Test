@@ -21,9 +21,9 @@ const CreateCompany = () => {
 
       {/* Main Content */}
       <div className=''>
-        <div className='flex items-start gap-6'>
+        <div className='flex items-start md:flex-col lg:flex-row gap-6'>
           {/* Left Column - Upload Photo */}
-          <div className='w-[412px] flex-shrink-0 bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[1rem]'>
+          <div className='w-[412px] flex-shrink-0 bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[1rem]'>
             <ImageUpload
               onClick={handleUploadClick}
               label='Upload your company logo'
@@ -39,7 +39,7 @@ const CreateCompany = () => {
           </div>
 
           {/* Right Column - Form Fields */}
-          <div className='flex-1 bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
+          <div className='flex-1 w-full bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
             <CompanyInfoForm />
           </div>
         </div>

@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { iconOptions } from '@/constants/sidebar-items';
+import { cn } from '@/lib/utils';
 import { CreateRoleFormData, createRoleSchema } from '@/lib/validations/role';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Loader2 } from 'lucide-react';
@@ -101,7 +102,13 @@ export const RoleForm: React.FC<RoleFormProps> = ({
               render={({ field }) => (
                 <Input
                   {...field}
-                  className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                  className={cn(
+                    'h-12 border-2',
+                    errors.name
+                      ? 'border-[var(--warning)]'
+                      : 'border-[var(--border-dark)]',
+                    'focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                  )}
                   placeholder={ROLE_MESSAGES.ROLE_NAME_PLACEHOLDER}
                   disabled={isSubmitting}
                 />
@@ -123,7 +130,13 @@ export const RoleForm: React.FC<RoleFormProps> = ({
               render={({ field }) => (
                 <Input
                   {...field}
-                  className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                  className={cn(
+                    'h-12 border-2',
+                    errors.description
+                      ? 'border-[var(--warning)]'
+                      : 'border-[var(--border-dark)]',
+                    'focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                  )}
                   placeholder={ROLE_MESSAGES.DESCRIPTION_PLACEHOLDER}
                   disabled={isSubmitting}
                 />
@@ -144,7 +157,15 @@ export const RoleForm: React.FC<RoleFormProps> = ({
               control={control}
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
+                  <SelectTrigger
+                    className={cn(
+                      'h-12 border-2',
+                      errors.status
+                        ? 'border-[var(--warning)]'
+                        : 'border-[var(--border-dark)]',
+                      'focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                    )}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>

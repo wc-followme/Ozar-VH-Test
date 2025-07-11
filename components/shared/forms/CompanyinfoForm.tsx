@@ -210,7 +210,7 @@ export function CompanyInfoForm() {
           Contractor Information{' '}
           <span className='text-sm font-normal text-gray-500'>(Optional)</span>
         </h2>
-        <div className='grid grid-cols-1 md:grid-cols-5 gap-6 items-end'>
+        <div className='grid grid-cols-1 xl:grid-cols-3 2xl:grid-cols-5 gap-6 items-end'>
           <div className='md:col-span-1 w-[220px] flex-shrink-0 bg-[var(--white-background)]'>
             <ImageUpload
               onClick={handleUploadClick}
@@ -220,7 +220,7 @@ export function CompanyInfoForm() {
               // text={''}
             />
           </div>
-          <div className='md:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div className='xl:col-span-2 2xl:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div className='space-y-2 md:col-span-2'>
               <Label
                 htmlFor='contractor-name'

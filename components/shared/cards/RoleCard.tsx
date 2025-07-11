@@ -90,7 +90,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
 
           <DropdownMenuContent
             align='end'
-            className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+            className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
           >
             {menuOptions.map((option, index) => {
               const IconComponent = option.icon; // ensure Icon is a capitalized component

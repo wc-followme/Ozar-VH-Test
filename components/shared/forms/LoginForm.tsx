@@ -211,7 +211,7 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
               onBlur={() => handleBlur('password')}
               className={`pl-12 pr-10 h-12 border-2 text-[#2d2d2d] border-[#E8EAED] focus:ring-green-500 bg-white rounded-[10px] !placeholder-[#C0C6CD] ${
                 errors.password && touched.password
-                  ? 'border-red-500 focus:border-red-500'
+                  ? 'border-[var(--warning)]'
                   : 'focus:border-green-500'
               }`}
               disabled={isLoading}

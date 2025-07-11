@@ -61,6 +61,10 @@ const config: Config = {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        cyanwave: {
+          main: '#00A8BF',
+          light: '#00A8BF26',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

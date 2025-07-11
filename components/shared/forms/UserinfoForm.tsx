@@ -168,7 +168,14 @@ export function UserInfoForm({
           onValueChange={setRoleId}
           disabled={loadingRoles || false}
         >
-          <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
+          <SelectTrigger
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.roleCategory
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
+          >
             <SelectValue
               placeholder={
                 loadingRoles
@@ -201,7 +208,12 @@ export function UserInfoForm({
             placeholder={USER_MESSAGES.ENTER_FULL_NAME}
             value={fullName}
             onChange={e => setFullName(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.fullName
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.fullName || ''} />
         </div>
@@ -217,7 +229,12 @@ export function UserInfoForm({
             placeholder={USER_MESSAGES.ENTER_JOB_TITLE}
             value={designation}
             onChange={e => setDesignation(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.designation
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.designation || ''} />
         </div>
@@ -233,8 +250,11 @@ export function UserInfoForm({
               <Button
                 variant='outline'
                 className={cn(
-                  'h-12 w-full pl-3 text-left font-normal border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
-                  !date && 'text-muted-foreground'
+                  'h-12 w-full pl-3 text-left font-normal border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                  !date && 'text-muted-foreground',
+                  errors.date
+                    ? 'border-[var(--warning)]'
+                    : 'border-[var(--border-dark)]'
                 )}
               >
                 {date ? (
@@ -245,7 +265,10 @@ export function UserInfoForm({
                 <Calendar1 className='ml-auto h-4 w-4 opacity-50' />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className='w-auto p-0' align='start'>
+            <PopoverContent
+              className='w-auto p-0 bg-[var(--card-background)]'
+              align='start'
+            >
               <CalendarComponent
                 mode='single'
                 selected={date}
@@ -275,7 +298,12 @@ export function UserInfoForm({
             placeholder={USER_MESSAGES.ENTER_EMAIL}
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.email
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.email || ''} />
         </div>
@@ -301,7 +329,12 @@ export function UserInfoForm({
             }
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.password
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.password || ''} />
         </div>
@@ -316,9 +349,10 @@ export function UserInfoForm({
             <Select value={country} onValueChange={setCountry}>
               <SelectTrigger
                 className={cn(
-                  'w-24 h-12 rounded-l-[10px] rounded-r-none border-2 border-r-0 border-[var(--border-dark)]',
-                  'focus:border-green-500 focus:ring-green-500',
-                  'bg-[var(--white-background)]'
+                  'w-24 h-12 rounded-l-[10px] rounded-r-none border-2 border-r-0 bg-[var(--white-background)]',
+                  errors.phone
+                    ? 'border-[var(--warning)]'
+                    : 'border-[var(--border-dark)]'
                 )}
               >
                 <SelectValue />
@@ -1022,9 +1056,10 @@ export function UserInfoForm({
               value={phone}
               onChange={e => setPhone(e.target.value)}
               className={cn(
-                'h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 border-[var(--border-dark)] !placeholder-[var(--text-placeholder)]',
-                'focus:border-green-500 focus:ring-green-500',
-                'bg-[var(--white-background)]'
+                'h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 bg-[var(--white-background)] !placeholder-[var(--text-placeholder)]',
+                errors.phone
+                  ? 'border-[var(--warning)]'
+                  : 'border-[var(--border-dark)]'
               )}
             />
           </div>
@@ -1038,7 +1073,14 @@ export function UserInfoForm({
             {USER_MESSAGES.COMMUNICATION_LABEL}
           </Label>
           <Select value={communication} onValueChange={setCommunication}>
-            <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
+            <SelectTrigger
+              className={cn(
+                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                errors.communication
+                  ? 'border-[var(--warning)]'
+                  : 'border-[var(--border-dark)]'
+              )}
+            >
               <SelectValue
                 placeholder={USER_MESSAGES.SELECT_COMMUNICATION}
                 className='[&>span]:text-[var(--text-placeholder)]'
@@ -1076,7 +1118,12 @@ export function UserInfoForm({
           placeholder={USER_MESSAGES.ENTER_ADDRESS}
           value={address}
           onChange={e => setAddress(e.target.value)}
-          className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+          className={cn(
+            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            errors.address
+              ? 'border-[var(--warning)]'
+              : 'border-[var(--border-dark)]'
+          )}
         />
         <FormErrorMessage message={errors.address || ''} />
       </div>
@@ -1094,7 +1141,12 @@ export function UserInfoForm({
             placeholder={USER_MESSAGES.ENTER_CITY}
             value={city}
             onChange={e => setCity(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.city
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.city || ''} />
         </div>
@@ -1110,7 +1162,12 @@ export function UserInfoForm({
             placeholder={USER_MESSAGES.ENTER_PIN_CODE}
             value={pinCode}
             onChange={e => setPinCode(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.pinCode
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.pinCode || ''} />
         </div>

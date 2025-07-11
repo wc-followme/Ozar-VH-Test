@@ -155,7 +155,7 @@ export default function JobDetailsPage() {
                   </span>
                   <div className='w-32 h-2 bg-gray-200 rounded-full overflow-hidden'>
                     <div
-                      className='h-2 bg-green-500'
+                      className='h-2 bg-[var(--secondary)]'
                       style={{ width: `${(job.spent / job.budget) * 100}%` }}
                     />
                   </div>

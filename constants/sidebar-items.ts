@@ -73,7 +73,7 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: 'Tools Management',
-    href: '/tools',
+    href: '/tools-management',
     icon: Tool,
   },
 ];

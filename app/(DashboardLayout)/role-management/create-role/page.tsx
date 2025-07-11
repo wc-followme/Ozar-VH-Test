@@ -50,13 +50,13 @@ const CreateRole = () => {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
+          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
             {ROLE_MESSAGES.ROLE_MANAGEMENT_BREADCRUMB}
           </span>
           <span className='text-[var(--text-dark)] text-[14px] font-normal'>
             /
           </span>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
+          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
             {ROLE_MESSAGES.CREATE_ROLE_BREADCRUMB}
           </span>
         </div>

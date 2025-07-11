@@ -148,7 +148,7 @@ export default function AddUserPage() {
         </div>
 
         {/* Main Content */}
-        <div className='bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
+        <div className='bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
           <Tabs
             value={selectedTab}
             onValueChange={setSelectedTab}

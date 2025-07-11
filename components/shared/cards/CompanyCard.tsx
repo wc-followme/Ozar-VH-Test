@@ -96,7 +96,7 @@ export function CompanyCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align='end'
-                className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+                className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
               >
                 {menuOptions.map((option, index) => {
                   const Icon: any = option.icon; // ensure Icon is a capitalized component
@@ -155,7 +155,7 @@ export function CompanyCard({
           disabled={isToggling}
           className='
               h-4 w-9 
-              data-[state=checked]:bg-green-500 
+              data-[state=checked]:bg-[var(--secondary)] 
               data-[state=unchecked]:bg-gray-300
               [&>span]:h-3 
               [&>span]:w-3 

@@ -26,7 +26,7 @@ export function SidebarMobile({ open, onOpenChange }: SidebarMobileProps) {
                 <Link
                   href={item.href}
                   className={cn(
-                    'flex items-center flex-nowrap w-full px-[18px] rounded-[16px] h-[60px] text-[var(--text-dark)] transition-colors hover:bg-[var(--primary)] group',
+                    'flex items-center flex-nowrap w-full px-[8px] rounded-[8px] h-[48px] text-[var(--text-dark)] transition-colors hover:bg-[var(--primary)] group',
                     pathname === item.href && 'bg-[var(--primary)] text-white'
                   )}
                   onClick={() => onOpenChange(false)}

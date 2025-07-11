@@ -89,7 +89,7 @@ const menuOptions: {
   variant?: 'default' | 'destructive';
 }[] = [
   { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' },
-  { label: 'Delete', action: 'delete', icon: Trash, variant: 'destructive' },
+  { label: 'Archive', action: 'delete', icon: Trash, variant: 'destructive' },
 ];
 
 export default function ServiceManagementPage() {
@@ -151,7 +151,7 @@ export default function ServiceManagementPage() {
           Service Management
         </h1>
         <Button
-          className='bg-green-500 hover:bg-green-600 rounded-full px-6 h-10 font-semibold text-white'
+          className='bg-[var(--secondary)] hover:bg-green-600 rounded-full px-6 h-10 font-semibold text-white'
           onClick={() => setSideSheetOpen(true)}
         >
           Create Service
@@ -173,8 +173,8 @@ export default function ServiceManagementPage() {
       </div>
       <ConfirmDeleteModal
         open={modalOpen}
-        title={'Delete Service'}
-        subtitle={`Are you sure you want to delete "${deleteServiceName}"? This action cannot be undone.`}
+        title={'Archive Service'}
+        subtitle={`Are you sure you want to Archive "${deleteServiceName}"? This action cannot be undone.`}
         onCancel={() => setModalOpen(false)}
         onDelete={handleDelete}
       />

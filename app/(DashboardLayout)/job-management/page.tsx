@@ -1,5 +1,4 @@
 'use client';
-import { Tabs } from '@radix-ui/react-tabs';
 import { IconFlag } from '@tabler/icons-react';
 import { Add, Profile2User } from 'iconsax-react';
 import { DollarSign } from 'lucide-react';
@@ -12,6 +11,7 @@ import { CreateJobForm } from '../../../components/shared/forms/CreateJobForm';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import {
+  Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
@@ -155,7 +155,7 @@ export default function JobManagement() {
     <div className=''>
       <div className=''>
         {/* Stats Cards */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 xl:gap-6 mb-8'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-8'>
           {stats.map((stat, index) => (
             <StatsCard key={index} {...stat} />
           ))}
@@ -168,11 +168,11 @@ export default function JobManagement() {
             onValueChange={setSelectedTab}
             className='w-full'
           >
-            <div className='flex items-center'>
-              <TabsList className='grid w-full max-w-fit grid-cols-5 bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal'>
+            <div className='flex items-center gap-2 w-full'>
+              <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start'>
                 <TabsTrigger
                   value='info'
-                  className='rounded-md px-4 py-2 text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                  className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Need Attention{' '}
                   <Badge className='py-[4px] px-[6px] text-sm font-medium bg-[#6B77BF] rounded-[8px]'>
@@ -181,7 +181,7 @@ export default function JobManagement() {
                 </TabsTrigger>
                 <TabsTrigger
                   value='permissions'
-                  className='rounded-md px-8 py-2 text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                  className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   New Leads
                   <Badge className='py-[4px] px-[6px] text-sm text-[#90C91D] font-medium bg-transparent rounded-[8px]'>
@@ -190,7 +190,7 @@ export default function JobManagement() {
                 </TabsTrigger>
                 <TabsTrigger
                   value='permissions'
-                  className='rounded-md px-8 py-2 text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                  className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Ongoing Job
                   <Badge className='py-[4px] px-[6px] text-sm text-[#EBB402] font-medium bg-transparent rounded-[8px]'>
@@ -199,7 +199,7 @@ export default function JobManagement() {
                 </TabsTrigger>
                 <TabsTrigger
                   value='permissions'
-                  className='rounded-md px-8 py-2 text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                  className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Waiting on Client
                   <Badge className='py-[4px] px-[6px] text-sm font-medium text-[#EBB402] bg-transparent rounded-[8px]'>
@@ -208,7 +208,7 @@ export default function JobManagement() {
                 </TabsTrigger>
                 <TabsTrigger
                   value='permissions'
-                  className='rounded-md px-8 py-2 text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                  className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Archive
                   <Badge className='py-[4px] px-[6px] text-sm font-medium bg-transparent text-[#818181] rounded-[8px]'>

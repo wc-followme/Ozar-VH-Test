@@ -1,15 +1,10 @@
 import FormErrorMessage from '@/components/shared/common/FormErrorMessage';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import React, { useState } from 'react';
+import MultiSelect from '../common/MultiSelect';
 
 const TRADE_OPTIONS = [
   'Plumbing',
@@ -75,61 +70,14 @@ export default function ServiceForm({
         >
           Trade
         </Label>
-        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              type='button'
-              className='h-12 w-full flex items-center justify-between border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] px-3 py-2 min-h-[40px] shadow-none focus:border-green-500 focus:ring-green-500'
-            >
-              <div className='flex flex-wrap gap-2'>
-                {trades.length === 0 && (
-                  <span className='text-gray-400'>Select Trade</span>
-                )}
-                {displayTags.map(tag => (
-                  <span
-                    key={tag}
-                    className='bg-[#00A8BF26] text-[var(--text-dark)] rounded-full px-3 py-1 text-sm font-medium'
-                  >
-                    {tag}
-                  </span>
-                ))}
-                {moreCount > 0 && (
-                  <span className='bg-[#00A8BF26] text-[var(--text-dark)] rounded-full px-3 py-1 text-sm font-medium'>
-                    +{moreCount} more
-                  </span>
-                )}
-              </div>
-              <ChevronDown className='ml-2 w-5 h-5 text-gray-400' />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className='w-full bg-[var(--card-background)] min-w-[var(--radix-popover-trigger-width)] p-2 rounded-[12px] border border-[var(--border-dark)]'>
-            {TRADE_OPTIONS.map(option => (
-              <label
-                key={option}
-                className='flex items-center gap-3 py-2 px-2 cursor-pointer text-[var(--text-dark)] text-base border-b border-[var(--border-dark)] last-of-type:border-b-0'
-              >
-                <Checkbox
-                  checked={trades.includes(option)}
-                  onCheckedChange={() => handleToggle(option)}
-                  className='
-                    rounded-[6px] 
-                    border-2 
-                    border-[#BFBFBF]
-                    data-[state=checked]:bg-[--primary]
-                    data-[state=checked]:border-[--primary]
-                    data-[state=checked]:text-white
-                    text-white 
-                    w-6 h-6
-                    flex items-base justify-center
-                    mt-0.5
-                  '
-                />
-                <span>{option}</span>
-              </label>
-            ))}
-          </PopoverContent>
-        </Popover>
-        <FormErrorMessage message={errors.trades || ''} />
+        <MultiSelect
+          options={TRADE_OPTIONS.map(opt => ({ value: opt, label: opt }))}
+          value={trades}
+          onChange={setTrades}
+          placeholder='Select Trade'
+          error={errors.trades || ''}
+          name='trades'
+        />
       </div>
       <div className='space-y-2'>
         <Label
@@ -143,7 +91,12 @@ export default function ServiceForm({
           value={serviceName}
           onChange={e => setServiceName(e.target.value)}
           placeholder='Enter Service Name'
-          className='h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+          className={cn(
+            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            errors.serviceName
+              ? 'border-[var(--warning)]'
+              : 'border-[var(--border-dark)]'
+          )}
         />
         <FormErrorMessage message={errors.serviceName || ''} />
       </div>
@@ -159,7 +112,7 @@ export default function ServiceForm({
         </Button>
         <Button
           type='submit'
-          className='h-[48px] px-12 bg-green-500 hover:bg-green-600 rounded-full font-semibold text-white'
+          className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'
           disabled={loading}
         >
           {loading ? 'Creating...' : 'Create'}

@@ -86,7 +86,7 @@ const CompanyManagement = () => {
 
   const menuOptions: any = [
     { label: 'Edit', action: 'edit', icon: Edit2 },
-    { label: 'Delete', action: 'delete', icon: Trash },
+    { label: 'Archive', action: 'delete', icon: Trash },
   ];
 
   return (
@@ -111,7 +111,7 @@ const CompanyManagement = () => {
           </Link>
         </div>
       </div>
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
         {company.map(company => (
           <CompanyCard
             key={company.id}
