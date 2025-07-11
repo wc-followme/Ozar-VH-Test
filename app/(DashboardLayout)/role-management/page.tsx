@@ -118,7 +118,7 @@ const RoleManagement = () => {
         />
       </div> */}
       {/* Roles Grid */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full'>
+      <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
         {roles.length === 0 && !loading ? (
           <div className='col-span-4 text-center py-8'>No roles found.</div>
         ) : (

@@ -158,7 +158,7 @@ export default function ServiceManagementPage() {
         </Button>
       </div>
       {/* Service Grid */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6'>
+      <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 xl:gap-6'>
         {services.map((service, idx) => (
           <InfoCard
             key={service.initials + '-' + idx}
@@ -182,6 +182,7 @@ export default function ServiceManagementPage() {
         title='Create Service'
         open={sideSheetOpen}
         onOpenChange={setSideSheetOpen}
+        size='600px'
       >
         <ServiceForm
           onSubmit={handleCreateService}

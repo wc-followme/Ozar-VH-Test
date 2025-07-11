@@ -1,14 +1,13 @@
 'use client';
 import { ModeToggle } from '@/components/mode-toggle';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth-context';
 import { UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '../../lib/utils';
-import { Notification } from '../icons/Notification';
 import { Search } from '../icons/Search';
 import { SignoutIcon } from '../icons/SignoutIcon';
-import { useAuth } from '@/lib/auth-context';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +27,27 @@ const menuOptions = [
 ];
 export function Header() {
   const { logout } = useAuth();
+
+  // Add scroll direction state
+  const [showHeader, setShowHeader] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
+        // Scrolling down
+        setShowHeader(false);
+      } else {
+        // Scrolling up
+        setShowHeader(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleMenuAction = (action: string) => {
     if (action === 'delete') {
       logout();
@@ -35,7 +55,12 @@ export function Header() {
     return action;
   };
   return (
-    <header className='bg-[var(--white-background)] px-6 py-3'>
+    <header
+      className={cn(
+        'bg-[var(--white-background)] px-6 py-3 sticky top-0 z-50 transition-transform ease-in-out duration-200',
+        showHeader ? 'translate-y-0' : '-translate-y-full'
+      )}
+    >
       <div className=' flex h-14 items-center justify-between'>
         <div className='flex items-center space-x-4'>
           <h1 className='text-2xl font-bold'>Virtual Homes</h1>
@@ -62,9 +87,9 @@ export function Header() {
             </Button>
           </div>
           <ModeToggle />
-          <Link href='/'>
+          {/* <Link href='/'>
             <Notification />
-          </Link>
+          </Link> */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

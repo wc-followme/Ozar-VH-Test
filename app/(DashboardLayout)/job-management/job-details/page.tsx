@@ -31,14 +31,14 @@ export default function JobDetailsPage() {
   return (
     <div className=''>
       {/* Breadcrumb */}
-      <div className='flex items-center text-sm text-[var(--text-secondary)] font-normal mb-1 mb- w-full'>
+      <div className='flex flex-wrap items-start text-sm text-[var(--text-secondary)] font-normal mb-1 w-full md:text-base md:mb-3'>
         <span>Home</span>
         <span className='mx-2'>&gt;</span>
         <a href='#' className='text-blue-600 font-medium hover:underline'>
           Job#789
         </a>
         {/* 3-dots menu */}
-        <div className='ml-auto'>
+        <div className='ml-auto mt-2 md:mt-0'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -106,21 +106,21 @@ export default function JobDetailsPage() {
         </div>
       </div>
       {/* Card */}
-      <div className='bg-[var(--card-background)] rounded-[20px] p-6 flex items-center justify-between border border-[var(--border-dark)] max-w-full'>
+      <div className='bg-[var(--card-background)] rounded-[20px] p-4 md:p-6 flex flex-col md:flex-row md:justify-between border border-[var(--border-dark)] max-w-full gap-4 md:gap-0'>
         {/* Project Image */}
-        <div className='flex-shrink-0'>
+        <div className='flex-shrink-0 flex justify-center md:block mb-4 md:mb-0'>
           <Image
             src='/images/auth/login-slider-01.webp'
             alt='Project'
             width={120}
             height={120}
-            className='rounded-[8px] object-cover w-[120px] h-[120px]'
+            className='rounded-[8px] object-cover w-[100px] h-[100px] md:w-[120px] md:h-[120px]'
           />
         </div>
         {/* Details */}
-        <div className='flex-1 px-6'>
-          <div className='grid grid-cols-5 gap-4 border-b border-[var(--border-dark)] pb-2 mb-3'>
-            <div>
+        <div className='flex-1 px-0 md:px-6 w-full'>
+          <div className='grid grid-cols-3 xl:grid-cols-5 gap-y-4 md:gap-4 border-b border-[var(--border-dark)] pb-2 mb-3'>
+            <div className='min-w-0 break-words'>
               <div className='text-sm text-[var(--text-secondary)] font-normal mb-1'>
                 Project ID
               </div>
@@ -128,7 +128,7 @@ export default function JobDetailsPage() {
                 {job.id}
               </div>
             </div>
-            <div>
+            <div className='min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
                 Project Name
               </div>
@@ -136,7 +136,7 @@ export default function JobDetailsPage() {
                 {job.name}
               </div>
             </div>
-            <div>
+            <div className='min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
                 Job category
               </div>
@@ -144,7 +144,7 @@ export default function JobDetailsPage() {
                 {job.category}
               </div>
             </div>
-            <div className='col-span-2 flex items-center gap-2'>
+            <div className='md:col-span-2 flex flex-col md:flex-row md:items-center gap-2 min-w-0 break-words'>
               <div>
                 <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
                   Budget
@@ -166,8 +166,8 @@ export default function JobDetailsPage() {
               </div>
             </div>
           </div>
-          <div className='grid grid-cols-5 gap-4 items-center'>
-            <div>
+          <div className='grid grid-cols-3 xl:grid-cols-5 gap-y-4 md:gap-4 items-start md:items-center mt-2'>
+            <div className='min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
                 Client Name
               </div>
@@ -175,7 +175,7 @@ export default function JobDetailsPage() {
                 {job.client.name}
               </div>
             </div>
-            <div>
+            <div className='min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
                 Email
               </div>
@@ -183,7 +183,7 @@ export default function JobDetailsPage() {
                 {job.client.email}
               </div>
             </div>
-            <div>
+            <div className='min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
                 Phone Number
               </div>
@@ -191,7 +191,7 @@ export default function JobDetailsPage() {
                 {job.client.phone}
               </div>
             </div>
-            <div className='col-span-2'>
+            <div className='md:col-span-2 min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
                 Address
               </div>
@@ -202,13 +202,13 @@ export default function JobDetailsPage() {
           </div>
         </div>
         {/* Map Image */}
-        <div className='flex flex-col items-end gap-2'>
+        <div className='flex flex-row md:flex-col items-center md:items-end gap-2 mt-4 md:mt-0'>
           <Image
             src='/images/map-placeholder.png'
             alt='Map'
             width={100}
             height={100}
-            className='rounded-[8px] object-cover w-[120px] h-[120px]'
+            className='rounded-[8px] object-cover w-[100px] h-[100px] md:w-[120px] md:h-[120px]'
           />
         </div>
       </div>

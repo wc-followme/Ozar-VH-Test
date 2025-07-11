@@ -155,7 +155,7 @@ export default function JobManagement() {
     <div className=''>
       <div className=''>
         {/* Stats Cards */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 xl:gap-6 mb-8'>
           {stats.map((stat, index) => (
             <StatsCard key={index} {...stat} />
           ))}
@@ -225,7 +225,7 @@ export default function JobManagement() {
               </Button>
             </div>
             <TabsContent value='info' className='pt-8'>
-              <div className='grid grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
+              <div className='grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
                 {mockJobs.map(job => (
                   <JobCard key={job.id} job={job} />
                 ))}
