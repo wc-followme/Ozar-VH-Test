@@ -5,6 +5,7 @@ import { PhotoUpload } from '@/components/shared/PhotoUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, UpdateUserRequest, User } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
 import { ChevronRight, X } from 'lucide-react';
@@ -33,6 +34,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { toast } = useToast();
+  const { handleAuthError } = useAuth();
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -72,6 +74,11 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           roleList.map((role: Role) => ({ id: role.id, name: role.name }))
         );
       } catch (err: unknown) {
+        // Handle auth errors first (will redirect to login if 401)
+        if (handleAuthError(err)) {
+          return; // Don't show toast or redirect if it's an auth error
+        }
+
         const message = extractApiErrorMessage(
           err,
           USER_MESSAGES.FETCH_DETAILS_ERROR
@@ -90,7 +97,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
     };
 
     fetchData();
-  }, [resolvedParams.uuid, router, toast]);
+  }, [resolvedParams.uuid, router, toast, handleAuthError]);
 
   const handlePhotoUpload = async (file: File) => {
     setUploading(true);
@@ -151,6 +158,11 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       });
       router.push('/user-management');
     } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
       const message = extractApiErrorMessage(err, USER_MESSAGES.UPDATE_ERROR);
       toast({
         title: 'Error',

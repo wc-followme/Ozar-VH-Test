@@ -5,6 +5,7 @@ import { PhotoUpload } from '@/components/shared/PhotoUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, CreateUserRequest } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
 import { ChevronRight, X } from 'lucide-react';
@@ -24,6 +25,7 @@ export default function AddUserPage() {
   const [formLoading, setFormLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { handleAuthError } = useAuth();
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -47,13 +49,18 @@ export default function AddUserPage() {
           roleList.map((role: Role) => ({ id: role.id, name: role.name }))
         );
       } catch (err: unknown) {
+        // Handle auth errors first (will redirect to login if 401)
+        if (handleAuthError(err)) {
+          return; // Don't log error if it's an auth error
+        }
+
         console.error(USER_MESSAGES.LOAD_ROLES_ERROR, err);
       } finally {
         setLoadingRoles(false);
       }
     };
     fetchRoles();
-  }, []);
+  }, [handleAuthError]);
 
   const handlePhotoUpload = async (file: File) => {
     setUploading(true);
@@ -119,6 +126,11 @@ export default function AddUserPage() {
       });
       router.push('/user-management');
     } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
       const message = extractApiErrorMessage(err, USER_MESSAGES.CREATE_ERROR);
       toast({
         title: 'Error',

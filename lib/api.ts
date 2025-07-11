@@ -298,11 +298,15 @@ class ApiService {
             }
           }
         } catch (refreshError) {
-          // If refresh fails, redirect to login
+          // If refresh fails, clear tokens and throw 401 error to be handled by auth context
           if (typeof window !== 'undefined') {
-            localStorage.clear();
-            window.location.href = '/auth/login';
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('user');
           }
+          // Re-throw the original 401 error so auth context can handle the redirect
+          throw error;
         }
       }
       throw error;

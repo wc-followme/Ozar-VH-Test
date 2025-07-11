@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, FetchUsersResponse, User } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -25,6 +26,7 @@ export default function UserManagement() {
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const { toast } = useToast();
+  const { handleAuthError } = useAuth();
 
   // Fetch roles and first page of users
   useEffect(() => {
@@ -86,6 +88,11 @@ export default function UserManagement() {
       setPage(targetPage);
       setHasMore(usersRes.pagination.page < usersRes.pagination.totalPages);
     } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
       const message =
         err instanceof Error ? err.message : USER_MESSAGES.FETCH_ERROR;
       toast({
@@ -119,6 +126,11 @@ export default function UserManagement() {
         duration: 4000,
       });
     } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
       const message =
         err instanceof Error ? err.message : USER_MESSAGES.STATUS_UPDATE_ERROR;
       toast({
@@ -142,6 +154,11 @@ export default function UserManagement() {
         duration: 4000,
       });
     } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
       const message =
         err instanceof Error ? err.message : USER_MESSAGES.DELETE_ERROR;
       toast({
