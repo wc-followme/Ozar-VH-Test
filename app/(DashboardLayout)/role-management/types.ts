@@ -30,9 +30,14 @@ export interface CreateRoleRequest {
   status: 'ACTIVE' | 'INACTIVE';
 }
 
-export interface UpdateRoleRequest extends CreateRoleRequest {}
+export interface UpdateRoleRequest {
+  name: string;
+  description: string;
+  icon: string;
+  status: 'ACTIVE' | 'INACTIVE';
+}
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   statusCode: number;
   message?: string;
   data?: T;
@@ -53,7 +58,11 @@ export interface ApiError {
 export interface MenuOption {
   label: string;
   action: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{
+    size?: string | number;
+    color?: string;
+    variant?: 'Outline' | 'Linear' | 'Broken' | 'Bold' | 'Bulk' | 'TwoTone';
+  }>;
 }
 
 export interface FetchRolesParams {
@@ -61,4 +70,4 @@ export interface FetchRolesParams {
   limit: number;
   search?: string;
   name?: string;
-} 
+}

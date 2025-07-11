@@ -18,11 +18,15 @@ interface MenuOption {
   label: string;
   action: string;
   variant?: 'default' | 'destructive';
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{
+    size?: string | number;
+    color?: string;
+    variant?: 'Linear' | 'Outline' | 'Broken' | 'Bold' | 'Bulk' | 'TwoTone';
+  }>;
 }
 
 export interface RoleCardProps {
-  iconSrc: React.ComponentType<any>;
+  iconSrc: React.ComponentType<{ size?: number; color?: string }>;
   iconBgColor: string;
   title: string;
   description?: string;
@@ -65,7 +69,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
         >
           {React.createElement(iconSrc, {
             size: 30,
-            color: iconColor,
+            color: iconColor || '#000000',
           })}
         </div>
 
