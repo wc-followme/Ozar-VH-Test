@@ -1,0 +1,80 @@
+# Cursor AI Coding Rules
+
+## TypeScript & JavaScript Rules
+
+- Never use `any` type - always provide proper type definitions
+- Use `const` or `let` instead of `var`
+- Remove all unused imports, variables, and code
+- Enforce strict TypeScript configuration
+
+## Code Organization
+
+- All static text content must come from constants files (constants/messages.ts, constants/api.ts, etc.)
+- Organize imports in this order:
+  1. Built-in modules (React, Node.js)
+  2. External libraries (axios, lodash)
+  3. Internal constants and utilities
+  4. Relative component imports
+  5. Type imports (separate from value imports)
+
+## React Best Practices
+
+- Never use array index as key in map operations - use unique identifiers
+- Don't pass setter methods directly as props - create wrapper functions
+- Use generic utility functions for reusable functionality (toasters, API calls)
+
+## Function Patterns
+
+- Create wrapper functions instead of passing setters directly:
+
+  ```tsx
+  // ❌ Bad
+
+  // ✅ Good
+  <Component onUpdate={data => handleUserUpdate(data)} />
+  ```
+
+## Constants Pattern
+
+- All hardcoded strings should be in constants files:
+  ```tsx
+  // constants/messages.ts
+  export const MESSAGES = {
+    WELCOME: 'Welcome to our app',
+    ERROR: {
+      GENERIC: 'Something went wrong',
+    },
+  };
+  ```
+
+## Generic Utilities
+
+- Create reusable utility functions:
+  ```tsx
+  // utils/toast.ts
+  export const showToast = (type: 'success' | 'error', message: string) => {
+    // implementation
+  };
+  ```
+
+## Key Naming
+
+- Use meaningful names for keys in React lists:
+
+  ```tsx
+  // ❌ Bad
+  {
+    items.map((item, index) => {
+      item;
+    });
+  }
+
+  // ✅ Good
+  {
+    items.map(item => {
+      item.name;
+    });
+  }
+  ```
+
+Always follow these rules when generating or suggesting code.
