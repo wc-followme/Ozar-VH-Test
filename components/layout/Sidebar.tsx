@@ -12,7 +12,7 @@ export function Sidebar() {
   return (
     <div
       className={cn(
-        'pb-12 transition-all duration-300 ease h-screen bg-[var(--white-background)] sticky top-0'
+        'hidden lg:block pb-12 transition-all duration-300 ease h-screen bg-[var(--white-background)] sticky top-0'
       )}
     >
       <div className='space-y-4 py-3'>

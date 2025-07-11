@@ -2,7 +2,7 @@
 import { ModeToggle } from '@/components/mode-toggle';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
-import { UserOctagon } from 'iconsax-react';
+import { HambergerMenu, UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '../../lib/utils';
@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Input } from '../ui/input';
+import { SidebarMobile } from './SidebarMobile';
 type MenuOption = {
   label: string;
   action: string;
@@ -31,6 +32,7 @@ export function Header() {
   // Add scroll direction state
   const [showHeader, setShowHeader] = useState(true);
   const lastScrollY = useRef(0);
+  const [sideSheetOpen, setSideSheetOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,18 +63,32 @@ export function Header() {
         showHeader ? 'translate-y-0' : '-translate-y-full'
       )}
     >
-      <div className=' flex h-14 items-center justify-between'>
-        <div className='flex items-center space-x-4'>
+      <div className='flex h-14 items-center gap-3'>
+        <div className='block lg:hidden'>
+          <Button
+            onClick={() => setSideSheetOpen(true)}
+            variant='ghost'
+            size='icon'
+          >
+            <HambergerMenu
+              size='64'
+              color='var(--text-dark)'
+              className='!h-7 !w-7'
+            />
+          </Button>
+          <SidebarMobile open={sideSheetOpen} onOpenChange={setSideSheetOpen} />
+        </div>
+        <div className='flex items-center space-x-4 mr-auto'>
           <h1 className='text-2xl font-bold'>Virtual Homes</h1>
         </div>
         <div className='flex items-center gap-6'>
-          <div className='flex items-center border-2 border-[var(--border-dark)] rounded-[20px] overflow-hidden w-[443px] focus-within:border-green-500'>
+          <div className='flex items-center border-2 border-[var(--border-dark)] rounded-[20px] overflow-hidden w-[280px] xl:w-[443px] focus-within:border-green-500'>
             {/* Search Input */}
             <Input
               id='Search'
               type='Search'
               placeholder='What are you looking for?'
-              className='pl-4 h-12 border-2 text-[16px] border-0 focus:border-green-500 focus:ring-green-500 bg-transparent rounded-[10px] placeholder-[#C0C6CD] !placeholder-[var(--text-placeholder)]'
+              className='pl-4 h-12 text-[16px] border-0 focus:border-green-500 focus:ring-green-500 bg-transparent rounded-[10px] placeholder-[#C0C6CD] !placeholder-[var(--text-placeholder)]'
               required
             />
             {/* Type Selector */}
