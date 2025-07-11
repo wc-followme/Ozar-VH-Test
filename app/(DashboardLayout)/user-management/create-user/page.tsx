@@ -12,43 +12,42 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { Role, RoleApiResponse, UserFormData } from '../types';
 import { USER_MESSAGES } from '../user-messages';
 
 export default function AddUserPage() {
   const [selectedTab, setSelectedTab] = useState('info');
-  const [imageUrl, setImageUrl] = useState<string>('');
   const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
-  const [roles, setRoles] = useState<{ id: number; name: string }[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const router = useRouter();
   const { toast } = useToast();
 
+  const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'data' in obj &&
+      typeof (obj as RoleApiResponse).data === 'object' &&
+      (obj as RoleApiResponse).data !== null &&
+      'data' in (obj as RoleApiResponse).data &&
+      Array.isArray((obj as RoleApiResponse).data.data)
+    );
+  };
+
   useEffect(() => {
     const fetchRoles = async () => {
       setLoadingRoles(true);
       try {
         const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
-        function isRoleApiResponse(
-          obj: unknown
-        ): obj is { data: { data: any[] } } {
-          return (
-            typeof obj === 'object' &&
-            obj !== null &&
-            'data' in obj &&
-            typeof (obj as any).data === 'object' &&
-            (obj as any).data !== null &&
-            'data' in (obj as any).data &&
-            Array.isArray((obj as any).data.data)
-          );
-        }
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
-          roleList.map((role: any) => ({ id: role.id, name: role.name }))
+          roleList.map((role: Role) => ({ id: role.id, name: role.name }))
         );
-      } catch (err) {
+      } catch (err: unknown) {
         console.error(USER_MESSAGES.LOAD_ROLES_ERROR, err);
       } finally {
         setLoadingRoles(false);
@@ -76,10 +75,10 @@ export default function AddUserPage() {
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
       const cdnUrl = process.env['NEXT_PUBLIC_CDN_URL'] || '';
-      setImageUrl(
-        presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
-      );
-    } catch (err) {
+      // setImageUrl(
+      //   presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
+      // );
+    } catch (err: unknown) {
       console.log('err', err);
       alert(USER_MESSAGES.UPLOAD_ERROR);
     } finally {
@@ -87,13 +86,14 @@ export default function AddUserPage() {
     }
   };
 
-  const handleCreateUser = async (data: any) => {
+  const handleCreateUser = async (data: UserFormData) => {
     setFormLoading(true);
     setFormError(undefined);
     try {
-      // You may want to prompt for password or generate one here
+      // Ensure password is provided for create operation
       const payload = {
         ...data,
+        password: data.password || 'password123', // Always provide a password for create
         profile_picture_url: fileKey,
       };
       await apiService.createUser(payload);
@@ -104,7 +104,7 @@ export default function AddUserPage() {
         description: USER_MESSAGES.CREATE_SUCCESS,
       });
       router.push('/user-management');
-    } catch (err: any) {
+    } catch (err: unknown) {
       const message = extractApiErrorMessage(err, USER_MESSAGES.CREATE_ERROR);
       setFormError(message);
       showToast({
@@ -174,7 +174,7 @@ export default function AddUserPage() {
                         className='absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1 shadow hover:bg-opacity-100 transition'
                         onClick={() => {
                           setFileKey('');
-                          setImageUrl('');
+                          // setImageUrl(''); // This line was removed
                         }}
                         aria-label={USER_MESSAGES.REMOVE_PHOTO_ARIA}
                       >

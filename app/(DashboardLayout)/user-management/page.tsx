@@ -15,11 +15,12 @@ import { showToast } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { MenuOption, Role, RoleApiResponse } from './types';
 import { USER_MESSAGES } from './user-messages';
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
-  const [roles, setRoles] = useState<{ id: number; name: string }[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
@@ -52,28 +53,27 @@ export default function UserManagement() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, hasMore, page, filter]);
 
+  const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'data' in obj &&
+      typeof (obj as RoleApiResponse).data === 'object' &&
+      (obj as RoleApiResponse).data !== null &&
+      'data' in (obj as RoleApiResponse).data &&
+      Array.isArray((obj as RoleApiResponse).data.data)
+    );
+  };
+
   const fetchUsers = async (targetPage = 1, append = false) => {
     setLoading(true);
     try {
       // Fetch roles only on first load
       if (targetPage === 1) {
         const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
-        function isRoleApiResponse(
-          obj: unknown
-        ): obj is { data: { data: any[] } } {
-          return (
-            typeof obj === 'object' &&
-            obj !== null &&
-            'data' in obj &&
-            typeof (obj as any).data === 'object' &&
-            (obj as any).data !== null &&
-            'data' in (obj as any).data &&
-            Array.isArray((obj as any).data.data)
-          );
-        }
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
-          roleList.map((role: any) => ({ id: role.id, name: role.name }))
+          roleList.map((role: Role) => ({ id: role.id, name: role.name }))
         );
       }
       const role_id = filter !== 'all' ? filter : '';
@@ -86,12 +86,14 @@ export default function UserManagement() {
       setUsers(prev => (append ? [...prev, ...newUsers] : newUsers));
       setPage(targetPage);
       setHasMore(usersRes.pagination.page < usersRes.pagination.totalPages);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : USER_MESSAGES.FETCH_ERROR;
       showToast({
         toast,
         type: 'error',
         title: 'Error',
-        description: err?.message || USER_MESSAGES.FETCH_ERROR,
+        description: message,
       });
       if (!append) setUsers([]);
       setHasMore(false);
@@ -152,13 +154,13 @@ export default function UserManagement() {
     }
   };
 
-  const menuOptions = [
-    { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' as const },
+  const menuOptions: MenuOption[] = [
+    { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' },
     {
       label: 'Delete',
       action: 'delete',
       icon: Trash,
-      variant: 'destructive' as const,
+      variant: 'destructive',
     },
   ];
 

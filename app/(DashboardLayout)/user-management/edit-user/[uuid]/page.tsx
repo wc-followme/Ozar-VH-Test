@@ -14,6 +14,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { Role, RoleApiResponse, UserFormData } from '../../types';
 import { USER_MESSAGES } from '../../user-messages';
 
 interface EditUserPageProps {
@@ -27,7 +28,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const [selectedTab, setSelectedTab] = useState('info');
   const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
-  const [roles, setRoles] = useState<{ id: number; name: string }[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | undefined>(undefined);
@@ -36,6 +37,18 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+
+  const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'data' in obj &&
+      typeof (obj as RoleApiResponse).data === 'object' &&
+      (obj as RoleApiResponse).data !== null &&
+      'data' in (obj as RoleApiResponse).data &&
+      Array.isArray((obj as RoleApiResponse).data.data)
+    );
+  };
 
   // Fetch user details and roles
   useEffect(() => {
@@ -59,24 +72,11 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         }
 
         // Set roles data
-        function isRoleApiResponse(
-          obj: unknown
-        ): obj is { data: { data: any[] } } {
-          return (
-            typeof obj === 'object' &&
-            obj !== null &&
-            'data' in obj &&
-            typeof (obj as any).data === 'object' &&
-            (obj as any).data !== null &&
-            'data' in (obj as any).data &&
-            Array.isArray((obj as any).data.data)
-          );
-        }
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
-          roleList.map((role: any) => ({ id: role.id, name: role.name }))
+          roleList.map((role: Role) => ({ id: role.id, name: role.name }))
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
         const message = extractApiErrorMessage(
           err,
           USER_MESSAGES.FETCH_DETAILS_ERROR
@@ -118,14 +118,14 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       // setImageUrl( // Removed unused imageUrl
       //   presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
       // );
-    } catch (err) {
+    } catch (err: unknown) {
       alert(USER_MESSAGES.UPLOAD_ERROR);
     } finally {
       setUploading(false);
     }
   };
 
-  const handleUpdateUser = async (data: any) => {
+  const handleUpdateUser = async (data: UserFormData) => {
     setFormLoading(true);
     setFormError(undefined);
     try {
@@ -141,7 +141,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         description: USER_MESSAGES.UPDATE_SUCCESS,
       });
       router.push('/user-management');
-    } catch (err: any) {
+    } catch (err: unknown) {
       const message = extractApiErrorMessage(err, USER_MESSAGES.UPDATE_ERROR);
       setFormError(message);
       showToast({
@@ -165,7 +165,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         description: USER_MESSAGES.DELETE_SUCCESS,
       });
       router.push('/user-management');
-    } catch (err: any) {
+    } catch (err: unknown) {
       const message = extractApiErrorMessage(err, USER_MESSAGES.DELETE_ERROR);
       showToast({
         toast,
@@ -308,11 +308,11 @@ export default function EditUserPage({ params }: EditUserPageProps) {
 
       {/* Delete Confirmation Modal */}
       <ConfirmDeleteModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={handleDeleteUser}
+        open={showDeleteModal}
         title={USER_MESSAGES.DELETE_CONFIRM_TITLE}
-        description={USER_MESSAGES.DELETE_CONFIRM_SUBTITLE}
+        subtitle={USER_MESSAGES.DELETE_CONFIRM_SUBTITLE}
+        onCancel={() => setShowDeleteModal(false)}
+        onDelete={handleDeleteUser}
       />
     </div>
   );

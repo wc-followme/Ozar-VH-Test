@@ -1,5 +1,11 @@
 'use client';
 
+import {
+  FormErrors,
+  Role,
+  UserFormData,
+  UserInitialData,
+} from '@/app/(DashboardLayout)/user-management/types';
 import { USER_MESSAGES } from '@/app/(DashboardLayout)/user-management/user-messages';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -17,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CreateUserRequest } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
@@ -25,17 +30,13 @@ import { useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
 
 interface UserInfoFormProps {
-  roles: { id: number; name: string }[];
+  roles: Role[];
   loadingRoles?: boolean;
   imageUrl?: string;
-  onSubmit: (
-    data: Omit<CreateUserRequest, 'profile_picture_url'> & {
-      profile_picture_url?: string;
-    }
-  ) => void;
+  onSubmit: (data: UserFormData) => void;
   loading?: boolean;
   error?: string | undefined;
-  initialData?: any; // User data for edit mode
+  initialData?: UserInitialData;
   isEditMode?: boolean;
 }
 
@@ -61,7 +62,7 @@ export function UserInfoForm({
   const [city, setCity] = useState('');
   const [pinCode, setPinCode] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<FormErrors>({});
 
   // Prefill form with initial data in edit mode
   useEffect(() => {
@@ -81,8 +82,8 @@ export function UserInfoForm({
     }
   }, [isEditMode, initialData]);
 
-  const validate = () => {
-    const newErrors: any = {};
+  const validate = (): boolean => {
+    const newErrors: FormErrors = {};
     if (!roleId) newErrors.roleCategory = USER_MESSAGES.ROLE_REQUIRED;
     if (!fullName) newErrors.fullName = USER_MESSAGES.FULL_NAME_REQUIRED;
     if (!designation)
@@ -102,15 +103,15 @@ export function UserInfoForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validate()) {
-      const payload: any = {
+      const payload: UserFormData = {
         role_id: Number(roleId),
         name: fullName,
         email,
         phone_number: phone,
-        profile_picture_url: imageUrl,
+        profile_picture_url: imageUrl || '',
         date_of_joining: date ? date.toISOString().split('T')[0] : '',
         designation,
         preferred_communication_method: communication,
@@ -119,16 +120,16 @@ export function UserInfoForm({
         pincode: pinCode,
       };
 
-      // Only include password if provided (for edit mode) or always (for create mode)
+      // Add password only if provided or required (for create mode)
       if (!isEditMode || password) {
-        payload.password = password || 'password123'; // Default for create mode
+        payload.password = password || 'password123';
       }
 
       onSubmit(payload);
     }
   };
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     // TODO: Implement cancel logic, e.g., close modal or reset form
     // For now, just reset all fields
     setRoleId('');
@@ -159,7 +160,7 @@ export function UserInfoForm({
         <Select
           value={roleId}
           onValueChange={setRoleId}
-          disabled={loadingRoles}
+          disabled={loadingRoles || false}
         >
           <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
             <SelectValue
@@ -178,7 +179,7 @@ export function UserInfoForm({
             ))}
           </SelectContent>
         </Select>
-        <FormErrorMessage message={errors.roleCategory} />
+        <FormErrorMessage message={errors.roleCategory || ''} />
       </div>
       {/* First Row - Full Name, Designation, Date of Joining */}
       <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
@@ -196,7 +197,7 @@ export function UserInfoForm({
             onChange={e => setFullName(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
-          <FormErrorMessage message={errors.fullName} />
+          <FormErrorMessage message={errors.fullName || ''} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -212,7 +213,7 @@ export function UserInfoForm({
             onChange={e => setDesignation(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
-          <FormErrorMessage message={errors.designation} />
+          <FormErrorMessage message={errors.designation || ''} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -250,7 +251,7 @@ export function UserInfoForm({
               />
             </PopoverContent>
           </Popover>
-          <FormErrorMessage message={errors.date} />
+          <FormErrorMessage message={errors.date || ''} />
         </div>
       </div>
       {/* Second Row - Email, Password, Phone, Communication */}
@@ -270,7 +271,7 @@ export function UserInfoForm({
             onChange={e => setEmail(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
-          <FormErrorMessage message={errors.email} />
+          <FormErrorMessage message={errors.email || ''} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -296,7 +297,7 @@ export function UserInfoForm({
             onChange={e => setPassword(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
-          <FormErrorMessage message={errors.password} />
+          <FormErrorMessage message={errors.password || ''} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -349,7 +350,7 @@ export function UserInfoForm({
               )}
             />
           </div>
-          <FormErrorMessage message={errors.phone} />
+          <FormErrorMessage message={errors.phone || ''} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -381,7 +382,7 @@ export function UserInfoForm({
               </SelectItem>
             </SelectContent>
           </Select>
-          <FormErrorMessage message={errors.communication} />
+          <FormErrorMessage message={errors.communication || ''} />
         </div>
       </div>
       {/* Third Row - Address */}
@@ -399,7 +400,7 @@ export function UserInfoForm({
           onChange={e => setAddress(e.target.value)}
           className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
         />
-        <FormErrorMessage message={errors.address} />
+        <FormErrorMessage message={errors.address || ''} />
       </div>
       {/* Fourth Row - City, Pin Code */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -417,7 +418,7 @@ export function UserInfoForm({
             onChange={e => setCity(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
-          <FormErrorMessage message={errors.city} />
+          <FormErrorMessage message={errors.city || ''} />
         </div>
         <div className='space-y-2'>
           <Label
@@ -433,7 +434,7 @@ export function UserInfoForm({
             onChange={e => setPinCode(e.target.value)}
             className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
-          <FormErrorMessage message={errors.pinCode} />
+          <FormErrorMessage message={errors.pinCode || ''} />
         </div>
       </div>
       {error && <FormErrorMessage message={error} />}
@@ -448,6 +449,7 @@ export function UserInfoForm({
         <Button
           type='submit'
           className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
+          disabled={loading}
         >
           {isEditMode
             ? USER_MESSAGES.UPDATE_BUTTON
