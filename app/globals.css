@@ -33,6 +33,13 @@ body {
     --icon-light: #ffffff;
     --dark-background: #e8eaed;
     --hover-bg: #3bc44e;
+
+    /* Shadcn/ui variables needed for toast components */
+    --foreground: 0 0% 10%;
+    --border: 0 0% 90%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -55,6 +62,12 @@ body {
     --icon-light: #ffffff;
     --dark-background: #040612;
     --hover-bg: #3bc44e;
+
+    /* Shadcn/ui variables for dark theme */
+    --foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 86% 97%;
   }
 }
 
@@ -64,5 +77,71 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Toast component overrides to ensure visibility */
+@layer components {
+  [data-sonner-toaster] {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    pointer-events: none !important;
+  }
+
+  [data-sonner-toast] {
+    pointer-events: auto !important;
+    background: white !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin-bottom: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    color: #333 !important;
+  }
+
+  [data-sonner-toast][data-type='error'] {
+    background: #fee !important;
+    border-color: #fca5a5 !important;
+    color: #b91c1c !important;
+  }
+
+  /* Radix toast overrides */
+  [data-radix-toast-viewport] {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    max-width: 420px !important;
+    padding: 16px !important;
+  }
+
+  [data-state='open'][data-radix-toast-root] {
+    background: white !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin-bottom: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    color: #333 !important;
+    animation: slideInFromTop 0.3s ease-out !important;
+  }
+
+  [data-state='open'][data-radix-toast-root].destructive {
+    background: #fee !important;
+    border-color: #fca5a5 !important;
+    color: #b91c1c !important;
+  }
+
+  @keyframes slideInFromTop {
+    0% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 }
