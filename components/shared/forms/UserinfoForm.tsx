@@ -111,14 +111,22 @@ export function UserInfoForm({
         name: fullName,
         email,
         phone_number: phone,
-        profile_picture_url: imageUrl || '',
-        date_of_joining: date ? date.toISOString().split('T')[0] : '',
         designation,
         preferred_communication_method: communication,
         address,
         city,
         pincode: pinCode,
       };
+
+      // Add profile picture URL only if provided
+      if (imageUrl) {
+        payload.profile_picture_url = imageUrl;
+      }
+
+      // Add date only if it's provided
+      if (date) {
+        payload.date_of_joining = date.toISOString().split('T')[0];
+      }
 
       // Add password only if provided or required (for create mode)
       if (!isEditMode || password) {

@@ -4,7 +4,7 @@ import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { PhotoUpload } from '@/components/shared/PhotoUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { apiService } from '@/lib/api';
+import { apiService, CreateUserRequest } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage, showToast } from '@/lib/utils';
 import { ChevronRight, X } from 'lucide-react';
@@ -74,7 +74,7 @@ export default function AddUserPage() {
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
-      const cdnUrl = process.env['NEXT_PUBLIC_CDN_URL'] || '';
+      // const cdnUrl = process.env['NEXT_PUBLIC_CDN_URL'] || '';
       // setImageUrl(
       //   presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
       // );
@@ -90,10 +90,26 @@ export default function AddUserPage() {
     setFormLoading(true);
     setFormError(undefined);
     try {
-      // Ensure password is provided for create operation
-      const payload = {
-        ...data,
-        password: data.password || 'password123', // Always provide a password for create
+      // Ensure all required fields are provided for create operation
+      if (!data.password) {
+        throw new Error('Password is required for user creation');
+      }
+      if (!data.date_of_joining) {
+        throw new Error('Date of joining is required for user creation');
+      }
+
+      const payload: CreateUserRequest = {
+        role_id: data.role_id,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        phone_number: data.phone_number,
+        date_of_joining: data.date_of_joining,
+        designation: data.designation,
+        preferred_communication_method: data.preferred_communication_method,
+        address: data.address,
+        city: data.city,
+        pincode: data.pincode,
         profile_picture_url: fileKey,
       };
       await apiService.createUser(payload);

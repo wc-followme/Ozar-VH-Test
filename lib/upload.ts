@@ -25,7 +25,7 @@ export async function getPresignedUrl(
   const token =
     typeof window !== 'undefined' ? localStorage.getItem('auth_token') : '';
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/upload/presigned-url`,
+    `${process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:5000'}/api/upload/presigned-url`,
     {
       method: 'POST',
       headers: {

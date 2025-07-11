@@ -6,7 +6,7 @@ import { PhotoUpload } from '@/components/shared/PhotoUpload';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { apiService, User } from '@/lib/api';
+import { apiService, UpdateUserRequest, User } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage, showToast } from '@/lib/utils';
 import { ChevronRight, Trash, X } from 'lucide-react';
@@ -118,7 +118,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       // setImageUrl( // Removed unused imageUrl
       //   presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
       // );
-    } catch (err: unknown) {
+    } catch {
       alert(USER_MESSAGES.UPLOAD_ERROR);
     } finally {
       setUploading(false);
@@ -129,10 +129,29 @@ export default function EditUserPage({ params }: EditUserPageProps) {
     setFormLoading(true);
     setFormError(undefined);
     try {
-      const payload = {
-        ...data,
+      const payload: UpdateUserRequest = {
+        role_id: data.role_id,
+        name: data.name,
+        email: data.email,
+        phone_number: data.phone_number,
+        designation: data.designation,
+        preferred_communication_method: data.preferred_communication_method,
+        address: data.address,
+        city: data.city,
+        pincode: data.pincode,
         profile_picture_url: fileKey,
       };
+
+      // Only include password if provided
+      if (data.password) {
+        payload.password = data.password;
+      }
+
+      // Only include date if provided
+      if (data.date_of_joining) {
+        payload.date_of_joining = data.date_of_joining;
+      }
+
       await apiService.updateUser(resolvedParams.uuid, payload);
       showToast({
         toast,
