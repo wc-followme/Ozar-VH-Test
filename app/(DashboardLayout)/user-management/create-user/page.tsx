@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, CreateUserRequest } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
-import { extractApiErrorMessage, showToast } from '@/lib/utils';
+import { extractApiErrorMessage } from '@/lib/utils';
 import { ChevronRight, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -22,7 +22,6 @@ export default function AddUserPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
   const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState<string | undefined>(undefined);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -88,7 +87,6 @@ export default function AddUserPage() {
 
   const handleCreateUser = async (data: UserFormData) => {
     setFormLoading(true);
-    setFormError(undefined);
     try {
       // Ensure all required fields are provided for create operation
       if (!data.password) {
@@ -113,21 +111,20 @@ export default function AddUserPage() {
         profile_picture_url: fileKey,
       };
       await apiService.createUser(payload);
-      showToast({
-        toast,
-        type: 'success',
+      toast({
         title: 'Success',
         description: USER_MESSAGES.CREATE_SUCCESS,
+        variant: 'default',
+        duration: 4000,
       });
       router.push('/user-management');
     } catch (err: unknown) {
       const message = extractApiErrorMessage(err, USER_MESSAGES.CREATE_ERROR);
-      setFormError(message);
-      showToast({
-        toast,
-        type: 'error',
+      toast({
         title: 'Error',
         description: message,
+        variant: 'destructive',
+        duration: 4000,
       });
     } finally {
       setFormLoading(false);
@@ -215,7 +212,6 @@ export default function AddUserPage() {
                     imageUrl={fileKey}
                     onSubmit={handleCreateUser}
                     loading={formLoading}
-                    error={formError}
                   />
                 </div>
               </div>

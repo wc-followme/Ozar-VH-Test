@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, UpdateUserRequest, User } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
-import { extractApiErrorMessage, showToast } from '@/lib/utils';
+import { extractApiErrorMessage } from '@/lib/utils';
 import { ChevronRight, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -29,7 +29,6 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
   const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState<string | undefined>(undefined);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -77,11 +76,11 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           err,
           USER_MESSAGES.FETCH_DETAILS_ERROR
         );
-        showToast({
-          toast,
-          type: 'error',
+        toast({
           title: 'Error',
           description: message,
+          variant: 'destructive',
+          duration: 4000,
         });
         router.push('/user-management');
       } finally {
@@ -119,7 +118,6 @@ export default function EditUserPage({ params }: EditUserPageProps) {
 
   const handleUpdateUser = async (data: UserFormData) => {
     setFormLoading(true);
-    setFormError(undefined);
     try {
       const payload: UpdateUserRequest = {
         role_id: data.role_id,
@@ -145,21 +143,20 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       }
 
       await apiService.updateUser(resolvedParams.uuid, payload);
-      showToast({
-        toast,
-        type: 'success',
+      toast({
         title: 'Success',
         description: USER_MESSAGES.UPDATE_SUCCESS,
+        variant: 'default',
+        duration: 4000,
       });
       router.push('/user-management');
     } catch (err: unknown) {
       const message = extractApiErrorMessage(err, USER_MESSAGES.UPDATE_ERROR);
-      setFormError(message);
-      showToast({
-        toast,
-        type: 'error',
+      toast({
         title: 'Error',
         description: message,
+        variant: 'destructive',
+        duration: 4000,
       });
     } finally {
       setFormLoading(false);
@@ -271,7 +268,6 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                     imageUrl={fileKey}
                     onSubmit={handleUpdateUser}
                     loading={formLoading}
-                    error={formError}
                     initialData={user}
                     isEditMode={true}
                   />

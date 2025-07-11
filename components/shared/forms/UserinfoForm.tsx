@@ -35,7 +35,6 @@ interface UserInfoFormProps {
   imageUrl?: string;
   onSubmit: (data: UserFormData) => void;
   loading?: boolean;
-  error?: string | undefined;
   initialData?: UserInitialData;
   isEditMode?: boolean;
 }
@@ -46,7 +45,6 @@ export function UserInfoForm({
   imageUrl,
   onSubmit,
   loading,
-  error,
   initialData,
   isEditMode,
 }: UserInfoFormProps) {
@@ -1117,7 +1115,6 @@ export function UserInfoForm({
           <FormErrorMessage message={errors.pinCode || ''} />
         </div>
       </div>
-      {error && <FormErrorMessage message={error} />}
       <div className='pt-4 flex items-center justify-end gap-3'>
         <Button
           type='button'

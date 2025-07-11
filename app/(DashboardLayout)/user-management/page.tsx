@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, FetchUsersResponse, User } from '@/lib/api';
-import { showToast } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -89,11 +88,11 @@ export default function UserManagement() {
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : USER_MESSAGES.FETCH_ERROR;
-      showToast({
-        toast,
-        type: 'error',
+      toast({
         title: 'Error',
         description: message,
+        variant: 'destructive',
+        duration: 4000,
       });
       if (!append) setUsers([]);
       setHasMore(false);
@@ -113,20 +112,20 @@ export default function UserManagement() {
       setUsers(users =>
         users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
       );
-      showToast({
-        toast,
-        type: 'success',
+      toast({
         title: 'Success',
         description: `${USER_MESSAGES.STATUS_UPDATE_SUCCESS} to ${newStatus}.`,
+        variant: 'default',
+        duration: 4000,
       });
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : USER_MESSAGES.STATUS_UPDATE_ERROR;
-      showToast({
-        toast,
-        type: 'error',
+      toast({
         title: 'Error',
         description: message,
+        variant: 'destructive',
+        duration: 4000,
       });
     }
   };
@@ -136,20 +135,20 @@ export default function UserManagement() {
     try {
       await apiService.deleteUser(uuid);
       setUsers(users => users.filter(user => user.uuid !== uuid));
-      showToast({
-        toast,
-        type: 'success',
+      toast({
         title: 'Success',
         description: USER_MESSAGES.DELETE_SUCCESS,
+        variant: 'default',
+        duration: 4000,
       });
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : USER_MESSAGES.DELETE_ERROR;
-      showToast({
-        toast,
-        type: 'error',
+      toast({
         title: 'Error',
         description: message,
+        variant: 'destructive',
+        duration: 4000,
       });
     }
   };

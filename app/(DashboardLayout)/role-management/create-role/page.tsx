@@ -4,10 +4,9 @@ import { RoleForm } from '@/components/shared/forms/RoleForm';
 import { useToast } from '@/components/ui/use-toast';
 import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
-import { extractApiErrorMessage, showToast } from '@/lib/utils';
+import { extractApiErrorMessage } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { ROLE_MESSAGES } from '../role-messages';
 
 const CreateRole = () => {
   const router = useRouter();
@@ -29,24 +28,24 @@ const CreateRole = () => {
         response.statusCode === STATUS_CODES.OK ||
         response.statusCode === STATUS_CODES.CREATED
       ) {
-        showToast({
-          toast,
-          type: 'success',
-          title: 'Success!',
-          description: ROLE_MESSAGES.CREATE_SUCCESS,
+        toast({
+          title: 'Success',
+          description: 'Role created successfully',
+          variant: 'default',
+          duration: 4000,
         });
         router.push('/role-management');
       } else {
-        throw new Error(response.message || ROLE_MESSAGES.CREATE_ERROR);
+        throw new Error(response.message || 'Failed to create role');
       }
     } catch (err: any) {
-      const message = extractApiErrorMessage(err, 'Failed to create role.');
+      const message = extractApiErrorMessage(err, 'Failed to create role');
       setIsSubmitting(false);
-      showToast({
-        toast,
-        type: 'error',
+      toast({
         title: 'Error',
         description: message,
+        variant: 'destructive',
+        duration: 4000,
       });
     } finally {
       setIsSubmitting(false);
