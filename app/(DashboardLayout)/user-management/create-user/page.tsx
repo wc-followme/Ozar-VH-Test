@@ -1,15 +1,14 @@
 'use client';
 
+import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
-import { PhotoUpload } from '@/components/shared/PhotoUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, CreateUserRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
-import { ChevronRight, X } from 'lucide-react';
-import Image from 'next/image';
+import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -26,6 +25,7 @@ export default function AddUserPage() {
   const router = useRouter();
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -62,13 +62,17 @@ export default function AddUserPage() {
     fetchRoles();
   }, [handleAuthError]);
 
-  const handlePhotoUpload = async (file: File) => {
+  const handlePhotoChange = async (file: File | null) => {
+    if (!file) {
+      setPhotoFile(null);
+      setFileKey('');
+      return;
+    }
+    setPhotoFile(file);
     setUploading(true);
     try {
-      // Generate a unique file name: user_<uuid>_<timestamp>.<ext>
       const ext = file.name.split('.').pop() || 'png';
       const timestamp = Date.now();
-      // If you have a user UUID, use it. Otherwise, generate a temp one for the upload.
       const userUuid = uuidv4();
       const generatedFileName = `user_${userUuid}_${timestamp}.${ext}`;
       const presigned = await getPresignedUrl({
@@ -80,16 +84,19 @@ export default function AddUserPage() {
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
-      // const cdnUrl = process.env['NEXT_PUBLIC_CDN_URL'] || '';
-      // setImageUrl(
-      //   presigned.data['fileKey'] ? cdnUrl + presigned.data['fileKey'] : ''
-      // );
     } catch (err: unknown) {
       console.log('err', err);
       alert(USER_MESSAGES.UPLOAD_ERROR);
+      setPhotoFile(null);
+      setFileKey('');
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleDeletePhoto = () => {
+    setPhotoFile(null);
+    setFileKey('');
   };
 
   const handleCreateUser = async (data: UserFormData) => {
@@ -173,32 +180,13 @@ export default function AddUserPage() {
               <div className='flex items-start gap-6'>
                 {/* Left Column - Upload Photo */}
                 <div className='w-[250px] flex-shrink-0 relative'>
-                  {fileKey ? (
-                    <div className='relative'>
-                      <Image
-                        src={
-                          (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
-                        }
-                        alt='Uploaded'
-                        className='rounded-lg w-full h-auto'
-                        width={250}
-                        height={250}
-                      />
-                      <button
-                        type='button'
-                        className='absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1 shadow hover:bg-opacity-100 transition'
-                        onClick={() => {
-                          setFileKey('');
-                          // setImageUrl(''); // This line was removed
-                        }}
-                        aria-label={USER_MESSAGES.REMOVE_PHOTO_ARIA}
-                      >
-                        <X className='w-5 h-5 text-gray-700' />
-                      </button>
-                    </div>
-                  ) : (
-                    <PhotoUpload onFileUpload={handlePhotoUpload} />
-                  )}
+                  <PhotoUploadField
+                    photo={photoFile}
+                    onPhotoChange={handlePhotoChange}
+                    onDeletePhoto={handleDeletePhoto}
+                    label={USER_MESSAGES.UPLOAD_PHOTO_LABEL}
+                    text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
+                  />
                   {uploading && (
                     <div className='text-xs mt-2'>
                       {USER_MESSAGES.UPLOADING}

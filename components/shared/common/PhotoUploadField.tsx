@@ -1,4 +1,5 @@
 import { GalleryAdd } from 'iconsax-react';
+import Image from 'next/image';
 import React, { useRef } from 'react';
 import { JSX } from 'react/jsx-runtime';
 
@@ -51,41 +52,47 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
           className='w-full min-h-[9.375rem] rounded-xl border-2 border-dashed border-cyanwave-main bg-cyanwave-light flex flex-col items-center justify-center cursor-pointer relative py-10'
           onClick={handleClick}
         >
-          <GalleryAdd size='32' color='#00A8BF' variant='Outline' />
-          <div className='mt-2 text-base font-medium text-center text-[var(--text-dark)]'>
-            {photo ? photo.name : label}
-          </div>
+          {photo ? (
+            <div className='w-full h-full flex flex-col items-center justify-center'>
+              <Image
+                src={URL.createObjectURL(photo)}
+                alt='Preview'
+                className='rounded-lg max-w-full max-h-32 object-cover'
+                width={120}
+                height={120}
+              />
+              <div className='mt-2 text-sm text-center text-[var(--text-dark)]'>
+                {photo.name}
+              </div>
+            </div>
+          ) : (
+            <>
+              <GalleryAdd size='32' color='#00A8BF' variant='Outline' />
+              <div className='mt-2 text-base font-medium text-center text-[var(--text-dark)]'>
+                {label}
+              </div>
+              {text && (
+                <div className='text-sm text-[var(--text-secondary)] mt-1.5 text-center'>
+                  {text}
+                </div>
+              )}
+            </>
+          )}
           {/* {!photo && (
             <div className='text-sm text-gray-500 font-normal mt-1 leading-none'>
               &nbsp;
             </div>
           )} */}
-          {text && (
-            <div className='text-sm text-[var(--text-secondary)] mt-1.5 text-center'>
-              {photo ? '' : text}
-            </div>
-          )}
-          {photo && (
-            <button
-              type='button'
-              className='absolute top-2 right-2 rounded-full bg-white border border-gray-200 p-1 hover:bg-gray-100 shadow'
-              onClick={e => {
-                e.stopPropagation();
-                onDeletePhoto();
-              }}
-              aria-label='Remove photo'
-            >
-              <svg width='18' height='18' viewBox='0 0 20 20' fill='none'>
-                <path
-                  d='M6 6L14 14M6 14L14 6'
-                  stroke='#888'
-                  strokeWidth='2'
-                  strokeLinecap='round'
-                />
-              </svg>
-            </button>
-          )}
         </div>
+        {photo && (
+          <button
+            type='button'
+            className='w-full mt-2 px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)]/90 transition-colors text-sm font-medium'
+            onClick={handleClick}
+          >
+            Change Photo
+          </button>
+        )}
       </div>
     </div>
   );
