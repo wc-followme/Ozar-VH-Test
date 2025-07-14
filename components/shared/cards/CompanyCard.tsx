@@ -11,6 +11,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 interface MenuOption {
@@ -33,6 +34,7 @@ interface companyCardProps {
   onToggle: () => void;
   menuOptions: MenuOption[];
   isDefault?: boolean;
+  companyUuid: string;
 }
 
 export function CompanyCard({
@@ -44,8 +46,10 @@ export function CompanyCard({
   onToggle,
   menuOptions,
   isDefault = false,
+  companyUuid,
 }: companyCardProps) {
   const [isToggling, setIsToggling] = useState(false);
+  const router = useRouter();
 
   const handleToggle = async () => {
     setIsToggling(true);
@@ -54,11 +58,14 @@ export function CompanyCard({
   };
 
   const handleMenuAction = (action: string) => {
-    console.log(`Action ${action} triggered for user ${name}`);
+    if (action === 'edit') {
+      router.push(`/company-management/edit-company/${companyUuid}`);
+    }
+    // Other actions (like delete) can be handled by parent component
   };
 
   // Filter menu options based on isDefault
-  const filteredMenuOptions = isDefault 
+  const filteredMenuOptions = isDefault
     ? menuOptions.filter(option => option.action !== 'delete')
     : menuOptions;
 

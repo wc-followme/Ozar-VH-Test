@@ -17,6 +17,7 @@ export const COMPANY_MESSAGES = {
   DEFAULT_COMPANY_STATUS_ERROR: 'Default company status cannot be changed.',
   DEFAULT_COMPANY_DELETE_ERROR: 'Default company cannot be deleted.',
   UPLOAD_ERROR: 'Failed to upload image',
+  COMPANY_NOT_FOUND: 'Company not found',
 
   // Validation Messages
   NAME_REQUIRED: 'Company name is required.',
@@ -88,7 +89,8 @@ export const COMPANY_MESSAGES = {
 
   // Photo Upload
   UPLOAD_PHOTO_LABEL: 'Upload Company Logo',
-  UPLOAD_PHOTO_TEXT: '1600 x 1200 (4:3) recommended. PNG and JPG files are allowed.',
+  UPLOAD_PHOTO_TEXT:
+    '1600 x 1200 (4:3) recommended. PNG and JPG files are allowed.',
 
   // Communication Options
   EMAIL_OPTION: 'Email',
@@ -101,6 +103,13 @@ export const COMPANY_MESSAGES = {
   COMPANY_MANAGEMENT_TITLE: 'Company Management',
   ADD_COMPANY_TITLE: 'Add Company',
   EDIT_COMPANY_TITLE: 'Edit Company',
+
+  // Breadcrumbs
+  BREADCRUMB_COMPANIES: 'Companies',
+
+  // Tabs
+  TAB_COMPANY_INFO: 'Company Info',
+  TAB_PHOTO: 'Photo',
 
   // Menu Options
   EDIT_MENU: 'Edit',

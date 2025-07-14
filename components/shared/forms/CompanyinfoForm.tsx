@@ -67,10 +67,7 @@ export function CompanyInfoForm({
   const [city, setCity] = useState('');
   const [pincode, setPincode] = useState('');
   const [projects, setProjects] = useState('');
-  const [contractorName, setContractorName] = useState('');
-  const [contractorEmail, setContractorEmail] = useState('');
-  const [contractorPhone, setContractorPhone] = useState('');
-  const [contractorCountryCode, setContractorCountryCode] = useState('+1');
+
   const [errors, setErrors] = useState<CompanyFormErrors>({});
 
   // Set initial data for edit mode
@@ -89,9 +86,7 @@ export function CompanyInfoForm({
       setCity(initialData.city || '');
       setPincode(initialData.pincode || '');
       setProjects(initialData.projects || '');
-      setContractorName(initialData.contractor_name || '');
-      setContractorEmail(initialData.contractor_email || '');
-      setContractorPhone(initialData.contractor_phone || '');
+
       if (initialData.expiry_date) {
         setExpiryDate(new Date(initialData.expiry_date));
       }
@@ -117,12 +112,6 @@ export function CompanyInfoForm({
     if (!city) newErrors.city = COMPANY_MESSAGES.CITY_REQUIRED;
     if (!pincode) newErrors.pincode = COMPANY_MESSAGES.PINCODE_REQUIRED;
     if (!projects) newErrors.projects = COMPANY_MESSAGES.PROJECTS_REQUIRED;
-    if (!contractorName)
-      newErrors.contractor_name = COMPANY_MESSAGES.CONTRACTOR_NAME_REQUIRED;
-    if (!contractorEmail)
-      newErrors.contractor_email = COMPANY_MESSAGES.CONTRACTOR_EMAIL_REQUIRED;
-    if (!contractorPhone)
-      newErrors.contractor_phone = COMPANY_MESSAGES.CONTRACTOR_PHONE_REQUIRED;
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -145,14 +134,11 @@ export function CompanyInfoForm({
       phone_number: phoneCountryCode + phoneNumber,
       communication,
       website,
-      expiry_date: (expiryDate as Date).toISOString().split('T')[0],
+      expiry_date: expiryDate.toISOString().split('T')[0],
       preferred_communication_method: preferredCommunication,
       city,
       pincode,
       projects,
-      contractor_name: contractorName,
-      contractor_email: contractorEmail,
-      contractor_phone: contractorCountryCode + contractorPhone,
       image: imageUrl,
     };
 
@@ -184,7 +170,7 @@ export function CompanyInfoForm({
               placeholder={COMPANY_MESSAGES.ENTER_COMPANY_NAME}
               className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
-            <FormErrorMessage error={errors.name} />
+            <FormErrorMessage message={errors.name || ''} />
           </div>
 
           {/* Tagline */}
@@ -202,7 +188,7 @@ export function CompanyInfoForm({
               placeholder={COMPANY_MESSAGES.ENTER_TAGLINE}
               className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
-            <FormErrorMessage error={errors.tagline} />
+            <FormErrorMessage message={errors.tagline || ''} />
           </div>
 
           {/* Email */}
@@ -221,7 +207,7 @@ export function CompanyInfoForm({
               placeholder={COMPANY_MESSAGES.ENTER_EMAIL}
               className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
-            <FormErrorMessage error={errors.email} />
+            <FormErrorMessage message={errors.email || ''} />
           </div>
 
           {/* Phone Number */}
@@ -256,7 +242,7 @@ export function CompanyInfoForm({
                 className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
               />
             </div>
-            <FormErrorMessage error={errors.phone_number} />
+            <FormErrorMessage message={errors.phone_number || ''} />
           </div>
 
           {/* Website */}
@@ -275,7 +261,7 @@ export function CompanyInfoForm({
               placeholder={COMPANY_MESSAGES.ENTER_WEBSITE}
               className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
-            <FormErrorMessage error={errors.website} />
+            <FormErrorMessage message={errors.website || ''} />
           </div>
 
           {/* Expiry Date */}
@@ -309,7 +295,7 @@ export function CompanyInfoForm({
                 />
               </PopoverContent>
             </Popover>
-            <FormErrorMessage error={errors.expiry_date} />
+            <FormErrorMessage message={errors.expiry_date || ''} />
           </div>
 
           {/* City */}
@@ -327,7 +313,7 @@ export function CompanyInfoForm({
               placeholder={COMPANY_MESSAGES.ENTER_CITY}
               className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
-            <FormErrorMessage error={errors.city} />
+            <FormErrorMessage message={errors.city || ''} />
           </div>
 
           {/* Pin Code */}
@@ -345,7 +331,7 @@ export function CompanyInfoForm({
               placeholder={COMPANY_MESSAGES.ENTER_PINCODE}
               className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
-            <FormErrorMessage error={errors.pincode} />
+            <FormErrorMessage message={errors.pincode || ''} />
           </div>
 
           {/* Preferred Communication */}
@@ -380,7 +366,9 @@ export function CompanyInfoForm({
                 </SelectItem>
               </SelectContent>
             </Select>
-            <FormErrorMessage error={errors.preferred_communication_method} />
+            <FormErrorMessage
+              message={errors.preferred_communication_method || ''}
+            />
           </div>
         </div>
 
@@ -400,7 +388,7 @@ export function CompanyInfoForm({
             rows={3}
             className='border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
-          <FormErrorMessage error={errors.about} />
+          <FormErrorMessage message={errors.about || ''} />
         </div>
 
         {/* Communication - Full Width */}
@@ -419,7 +407,7 @@ export function CompanyInfoForm({
             rows={3}
             className='border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
-          <FormErrorMessage error={errors.communication} />
+          <FormErrorMessage message={errors.communication || ''} />
         </div>
 
         {/* Projects - Full Width */}
@@ -438,85 +426,7 @@ export function CompanyInfoForm({
             rows={3}
             className='border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
           />
-          <FormErrorMessage error={errors.projects} />
-        </div>
-      </div>
-
-      {/* Contractor Information */}
-      <div>
-        <h2 className='text-lg font-bold mb-4'>Contractor Information</h2>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          {/* Contractor Name */}
-          <div className='space-y-2'>
-            <Label
-              htmlFor='contractor-name'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
-              {COMPANY_MESSAGES.CONTRACTOR_NAME_LABEL}
-            </Label>
-            <Input
-              id='contractor-name'
-              value={contractorName}
-              onChange={e => setContractorName(e.target.value)}
-              placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_NAME}
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-            />
-            <FormErrorMessage error={errors.contractor_name} />
-          </div>
-
-          {/* Contractor Email */}
-          <div className='space-y-2'>
-            <Label
-              htmlFor='contractor-email'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
-              {COMPANY_MESSAGES.CONTRACTOR_EMAIL_LABEL}
-            </Label>
-            <Input
-              id='contractor-email'
-              type='email'
-              value={contractorEmail}
-              onChange={e => setContractorEmail(e.target.value)}
-              placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_EMAIL}
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-            />
-            <FormErrorMessage error={errors.contractor_email} />
-          </div>
-
-          {/* Contractor Phone */}
-          <div className='space-y-2'>
-            <Label
-              htmlFor='contractor-phone'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
-              {COMPANY_MESSAGES.CONTRACTOR_PHONE_LABEL}
-            </Label>
-            <div className='flex gap-2'>
-              <Select
-                value={contractorCountryCode}
-                onValueChange={setContractorCountryCode}
-              >
-                <SelectTrigger className='w-[120px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {countryCodes.map(country => (
-                    <SelectItem key={country.code} value={country.code}>
-                      {country.flag} {country.code}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                id='contractor-phone'
-                value={contractorPhone}
-                onChange={e => setContractorPhone(e.target.value)}
-                placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_PHONE}
-                className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-              />
-            </div>
-            <FormErrorMessage error={errors.contractor_phone} />
-          </div>
+          <FormErrorMessage message={errors.projects || ''} />
         </div>
       </div>
 

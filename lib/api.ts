@@ -240,6 +240,53 @@ export interface CreateCompanyResponse {
   data?: Company;
 }
 
+export interface UpdateCompanyRequest {
+  name?: string;
+  tagline?: string;
+  about?: string;
+  email?: string;
+  phone_number?: string;
+  communication?: string;
+  website?: string;
+  expiry_date?: string;
+  preferred_communication_method?: string;
+  city?: string;
+  pincode?: string;
+  projects?: string;
+  image?: string;
+  is_default?: boolean;
+  status?: 'ACTIVE' | 'INACTIVE';
+  contractor_name?: string;
+  contractor_email?: string;
+  contractor_phone?: string;
+}
+
+export interface UpdateCompanyResponse {
+  statusCode: number;
+  message: string;
+  data?: Company;
+}
+
+export interface GetCompanyResponse {
+  statusCode: number;
+  message: string;
+  data: Company & {
+    tagline: string;
+    about: string;
+    email: string;
+    phone_number: string;
+    communication: string;
+    website: string;
+    preferred_communication_method: string;
+    city: string;
+    pincode: string;
+    projects: string;
+    contractor_name: string;
+    contractor_email: string;
+    contractor_phone: string;
+  };
+}
+
 // Get device information for login
 const getDeviceInfo = (): DeviceInfo => {
   const navigator = typeof window !== 'undefined' ? window.navigator : null;
@@ -616,6 +663,26 @@ class ApiService {
       method: 'PATCH',
       headers: this.getRoleHeaders(),
       body: JSON.stringify({ status }),
+    });
+  }
+
+  // Get company details
+  async getCompanyDetails(uuid: string): Promise<GetCompanyResponse> {
+    return this.makeRequest(`/companies/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update company
+  async updateCompany(
+    uuid: string,
+    payload: UpdateCompanyRequest
+  ): Promise<UpdateCompanyResponse> {
+    return this.makeRequest(`/companies/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
     });
   }
 

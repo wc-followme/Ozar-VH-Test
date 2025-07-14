@@ -180,6 +180,7 @@ export default function CompanyManagement() {
               onToggle={() => handleToggleStatus(company.id, company.status)}
               menuOptions={menuOptions}
               isDefault={company.is_default}
+              companyUuid={company.uuid}
             />
           ))}
         </div>

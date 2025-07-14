@@ -14,9 +14,6 @@ export interface CompanyFormErrors {
   city?: string;
   pincode?: string;
   projects?: string;
-  contractor_name?: string;
-  contractor_email?: string;
-  contractor_phone?: string;
   general?: string;
 }
 
@@ -34,9 +31,6 @@ export interface CompanyCreateFormData {
   city: string;
   pincode: string;
   projects: string;
-  contractor_name: string;
-  contractor_email: string;
-  contractor_phone: string;
   image?: string;
 }
 
@@ -54,9 +48,6 @@ export interface CompanyInitialData {
   city?: string;
   pincode?: string;
   projects?: string;
-  contractor_name?: string;
-  contractor_email?: string;
-  contractor_phone?: string;
   image?: string;
 }
 
