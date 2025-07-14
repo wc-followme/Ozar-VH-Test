@@ -14,6 +14,8 @@ export const COMPANY_MESSAGES = {
   FETCH_DETAILS_ERROR: 'Failed to fetch company details.',
   STATUS_UPDATE_ERROR: 'Failed to update company status.',
   COMPANY_NOT_FOUND_ERROR: 'Company UUID not found',
+  DEFAULT_COMPANY_STATUS_ERROR: 'Default company status cannot be changed.',
+  DEFAULT_COMPANY_DELETE_ERROR: 'Default company cannot be deleted.',
 
   // Loading Messages
   LOADING: 'Loading...',

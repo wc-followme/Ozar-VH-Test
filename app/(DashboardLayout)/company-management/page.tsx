@@ -7,25 +7,22 @@ import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
 import { AddCircle, Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { COMPANY_MESSAGES } from './company-messages';
 import { FetchCompaniesParams } from './types';
 
-const menuOptions: Array<{
-  label: string;
-  action: string;
-  variant?: 'default' | 'destructive';
-  icon: ReactNode;
-}> = [
+const menuOptions = [
   {
     label: COMPANY_MESSAGES.EDIT_MENU,
     action: 'edit',
-    icon: <Edit2 size='18' color='var(--text-dark)' variant='Outline' />,
+    icon: Edit2,
+    variant: 'default' as const,
   },
   {
     label: COMPANY_MESSAGES.DELETE_MENU,
     action: 'delete',
-    icon: <Trash size='18' color='var(--text-dark)' />,
+    icon: Trash,
+    variant: 'destructive' as const,
   },
 ];
 

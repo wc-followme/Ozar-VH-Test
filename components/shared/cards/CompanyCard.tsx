@@ -11,13 +11,17 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 
 interface MenuOption {
   label: string;
   action: string;
   variant?: 'default' | 'destructive';
-  icon: ReactNode;
+  icon: React.ComponentType<{
+    size?: string | number;
+    color?: string;
+    variant?: 'Linear' | 'Outline' | 'Broken' | 'Bold' | 'Bulk' | 'TwoTone';
+  }>;
 }
 
 interface companyCardProps {
