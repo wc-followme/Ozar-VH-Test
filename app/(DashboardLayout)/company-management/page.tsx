@@ -64,26 +64,22 @@ export default function CompanyManagement() {
         sortOrder: 'ASC',
       };
 
-      console.log('🚀 Fetching companies with params:', params);
       const res = await apiService.fetchCompanies(params);
-      console.log('📦 API Response:', res);
 
       if (isCompanyApiResponse(res)) {
         const newCompanies = res.data.data;
-        console.log('✅ Companies received:', newCompanies);
         setCompanies(prev =>
           append ? [...prev, ...newCompanies] : newCompanies
         );
         _setPage(targetPage);
         _setHasMore(res.data.page < res.data.totalPages);
       } else {
-        console.warn('⚠️ Unexpected response structure:', res);
         // Fallback for unexpected response structure
         setCompanies([]);
         _setHasMore(false);
       }
     } catch (err: unknown) {
-      console.error('❌ API Error:', err);
+      // API Error handling
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
         return; // Don't show toast if it's an auth error
@@ -175,7 +171,11 @@ export default function CompanyManagement() {
               name={company.name}
               createdOn={formatDate(company.created_at)}
               subsEnd={formatDate(company.expiry_date)}
-              image={company.image}
+              image={
+                company.image
+                  ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + company.image
+                  : ''
+              }
               status={company.status === 'ACTIVE'}
               onToggle={() => handleToggleStatus(company.id, company.status)}
               menuOptions={menuOptions}
