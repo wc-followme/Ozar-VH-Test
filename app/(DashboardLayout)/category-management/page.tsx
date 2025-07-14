@@ -111,7 +111,7 @@ const CategoryManagement = () => {
   const [showDeleteIdx, setShowDeleteIdx] = useState<number | null>(null);
   const [categoryName, setCategoryName] = useState('');
   const [description, setDescription] = useState('');
-  const [errors, setErrors] = useState<{
+  const [errors] = useState<{
     icon?: string;
     categoryName?: string;
     description?: string;

@@ -36,15 +36,6 @@ export default function ServiceForm({
     serviceName?: string;
     trades?: string;
   }>({});
-  const [popoverOpen, setPopoverOpen] = useState(false);
-
-  const handleToggle = (option: string) => {
-    if (trades.includes(option)) {
-      setTrades(trades.filter(v => v !== option));
-    } else {
-      setTrades([...trades, option]);
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,9 +48,6 @@ export default function ServiceForm({
       onSubmit({ serviceName, trades });
     }
   };
-
-  const displayTags = trades.slice(0, 3);
-  const moreCount = trades.length - displayTags.length;
 
   return (
     <form onSubmit={handleSubmit} className='space-y-6 w-full max-w-xl'>

@@ -34,15 +34,6 @@ export default function MaterialForm({
     materialName?: string;
     categories?: string;
   }>({});
-  const [popoverOpen, setPopoverOpen] = useState(false);
-
-  const handleCategoryToggle = (option: string) => {
-    if (categories.includes(option)) {
-      setCategories(categories.filter(v => v !== option));
-    } else {
-      setCategories([...categories, option]);
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,9 +46,6 @@ export default function MaterialForm({
       onSubmit({ materialName, category: categories.join(', ') });
     }
   };
-
-  const displayTags = categories.slice(0, 3);
-  const moreCount = categories.length - displayTags.length;
 
   return (
     <form onSubmit={handleSubmit} className='space-y-6 w-full max-w-xl'>

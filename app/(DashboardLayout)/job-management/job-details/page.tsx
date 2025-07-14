@@ -91,7 +91,7 @@ export default function JobDetailsPage() {
               align='end'
               className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
             >
-              {dropdownMenuItems.map((item, idx) => {
+              {dropdownMenuItems.map(item => {
                 const Icon = item.icon;
                 return (
                   <DropdownMenuItem
