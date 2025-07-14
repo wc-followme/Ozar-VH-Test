@@ -39,7 +39,7 @@ export const ROLE_MESSAGES = {
   // Error messages
   CREATE_ERROR: 'Failed to create role. Please try again.',
   UPDATE_ERROR: 'Failed to update role. Please try again.',
-  DELETE_ERROR: 'Failed to delete role. Please try again.',
+  DELETE_ERROR: 'Failed to Archive role. Please try again.',
   LOAD_ERROR: 'Failed to load role details.',
   FETCH_ROLES_ERROR: 'Failed to fetch roles.',
   NETWORK_ERROR: 'Network error. Please check your connection.',
@@ -50,6 +50,6 @@ export const ROLE_MESSAGES = {
   INVALID_DATA: 'Invalid role data. Please check your input.',
 
   // Confirmation dialogs
-  DELETE_CONFIRM_TITLE: 'Are you sure you want to delete?',
+  DELETE_CONFIRM_TITLE: 'Are you sure you want to Archive?',
   DELETE_CONFIRM_SUBTITLE: 'This action cannot be undone.',
 };

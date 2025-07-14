@@ -65,7 +65,7 @@ export function ConfirmDeleteModal({
             type='submit'
             className='h-[48px] px-12 bg-[var(--warning)] hover:bg-[var(--warning)] rounded-full font-semibold text-white'
           >
-            Delete
+            Archive
           </Button>
         </div>
       </CustomDialogContent>

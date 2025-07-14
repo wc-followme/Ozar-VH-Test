@@ -199,7 +199,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
             {USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB}
           </span>
           <ChevronRight className='h-4 w-4 mx-2' />
-          <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
+          <span className='text-[14px] font-normal text-[var(--primary)]'>
             {USER_MESSAGES.EDIT_USER_BREADCRUMB}
           </span>
         </div>

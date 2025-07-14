@@ -1,3 +1,4 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -21,6 +22,7 @@ interface InfoCardProps {
   initialsBg: string;
   tradeName: string;
   category: string;
+  image?: string;
   menuOptions?: MenuOption[];
   onMenuAction?: (action: string) => void;
 }
@@ -30,22 +32,41 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   initialsBg,
   tradeName,
   category,
+  image,
   menuOptions = [],
   onMenuAction,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   return (
     <div className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] w-full p-[10px] flex items-center gap-4 min-h-[64px] hover:shadow-md transition-shadow duration-200'>
-      {/* Initials */}
-      <div
-        className={cn(
-          'w-[60px] h-[60px] flex items-center justify-center rounded-[10px] text-base font-bold',
-          initialsBg
-        )}
-      >
-        {initials}
-      </div>
+      {/* Avatar with image, fallback to placeholder or initials */}
+      <Avatar className='w-[60px] h-[60px] rounded-[10px]'>
+        {image && !imgError ? (
+          <AvatarImage
+            src={image}
+            alt={tradeName}
+            className='object-cover rounded-[10px]'
+            width={60}
+            height={60}
+            onError={() => setImgError(true)}
+          />
+        ) : imgError ? (
+          <AvatarImage
+            src='/img-placeholder-sm.png'
+            alt='placeholder'
+            className='object-cover rounded-[10px]'
+            width={60}
+            height={60}
+          />
+        ) : null}
+        <AvatarFallback
+          className={`w-full h-full flex items-center justify-center rounded-[10px] text-base font-bold ${initialsBg}`}
+        >
+          {initials}
+        </AvatarFallback>
+      </Avatar>
       {/* Info */}
       <div className='flex flex-col flex-1 min-w-0'>
         <span className='font-semibold text-[var(--text-dark)] text-base leading-tight truncate'>

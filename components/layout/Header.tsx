@@ -1,13 +1,15 @@
 'use client';
 import { ModeToggle } from '@/components/mode-toggle';
+import ChangePasswordForm from '@/components/shared/forms/ChangePasswordForm';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
-import { HambergerMenu, UserOctagon } from 'iconsax-react';
+import { HambergerMenu, Key, UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '../../lib/utils';
 import { Search } from '../icons/Search';
 import { SignoutIcon } from '../icons/SignoutIcon';
+import SideSheet from '../shared/common/SideSheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +26,7 @@ type MenuOption = {
 };
 const menuOptions = [
   { label: 'View Profile', action: 'edit', icon: UserOctagon },
+  { label: 'Change Password', action: 'changePassword', icon: Key },
   { label: 'Logout', action: 'delete', icon: SignoutIcon },
 ];
 export function Header() {
@@ -33,6 +36,7 @@ export function Header() {
   const [showHeader, setShowHeader] = useState(true);
   const lastScrollY = useRef(0);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,6 +57,8 @@ export function Header() {
   const handleMenuAction = (action: string) => {
     if (action === 'delete') {
       logout();
+    } else if (action === 'changePassword') {
+      setChangePasswordOpen(true);
     }
     return action;
   };
@@ -156,6 +162,14 @@ export function Header() {
           </DropdownMenu>
         </div>
       </div>
+      <SideSheet
+        title='Change Password'
+        open={changePasswordOpen}
+        onOpenChange={setChangePasswordOpen}
+        size='600px'
+      >
+        <ChangePasswordForm onCancel={() => setChangePasswordOpen(false)} />
+      </SideSheet>
     </header>
   );
 }

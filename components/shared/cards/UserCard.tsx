@@ -52,6 +52,7 @@ export function UserCard({
 }: UserCardProps) {
   const [isToggling, setIsToggling] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const router = useRouter();
 
   const handleToggle = async () => {
@@ -83,11 +84,20 @@ export function UserCard({
       {/* Header with Avatar, User Info and Menu */}
       <div className='flex items-start gap-4 mb-2'>
         <Avatar className='w-20 h-20 rounded-[10px]'>
-          <AvatarImage
-            src={image}
-            alt={name}
-            className='rounded-[10px] object-cover'
-          />
+          {image && !imgError ? (
+            <AvatarImage
+              src={image}
+              alt={name}
+              className='rounded-[10px] object-cover'
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <AvatarImage
+              src='/img-placeholder-sm.png'
+              alt='placeholder'
+              className='rounded-[10px] object-cover'
+            />
+          )}
           <AvatarFallback className='bg-gray-100 text-gray-600 font-medium rounded-[10px]'>
             {getInitials(name)}
           </AvatarFallback>
