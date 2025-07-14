@@ -1,5 +1,6 @@
 'use client';
 
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { PhotoUpload } from '@/components/shared/PhotoUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,11 +9,12 @@ import { apiService, CreateUserRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
-import { ChevronRight, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import ComingSoon from '../../../../components/shared/common/ComingSoon';
 import { Role, RoleApiResponse, UserFormData } from '../types';
 import { USER_MESSAGES } from '../user-messages';
 
@@ -133,18 +135,19 @@ export default function AddUserPage() {
     }
   };
 
+  const breadcrumbData: BreadcrumbItem[] = [
+    {
+      name: USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB,
+      href: '/user-management',
+    },
+    { name: USER_MESSAGES.ADD_USER_BREADCRUMB },
+  ];
   return (
     <div className=''>
       <div className=''>
         {/* Breadcrumb */}
-        <div className='flex items-center text-sm text-gray-500 mb-6 mt-2'>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            {USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB}
-          </span>
-          <ChevronRight className='h-4 w-4 mx-2' />
-          <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            {USER_MESSAGES.ADD_USER_BREADCRUMB}
-          </span>
+        <div className='flex items-center mb-6 mt-2'>
+          <Breadcrumb items={breadcrumbData} />
         </div>
 
         {/* Main Content */}
@@ -220,9 +223,7 @@ export default function AddUserPage() {
             </TabsContent>
 
             <TabsContent value='permissions' className='pt-8'>
-              <div className='text-center py-10 text-gray-500'>
-                Permissions management coming soon...
-              </div>
+              <ComingSoon />
             </TabsContent>
           </Tabs>
         </div>

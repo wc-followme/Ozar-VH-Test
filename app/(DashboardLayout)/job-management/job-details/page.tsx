@@ -1,3 +1,6 @@
+'use client';
+
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -27,16 +30,47 @@ const job = {
   mapImage: '/public/images/map-placeholder.png',
 };
 
+const dropdownMenuItems = [
+  {
+    label: 'Close job',
+    icon: ClipboardClose,
+    action: () => {},
+    className:
+      'text-sm px-3 py-2 rounded-md var(--text-dark) cursor-pointer transition-colors flex items-center gap-2',
+  },
+  {
+    label: 'Add Employee',
+    icon: UserAdd,
+    action: () => {},
+    className:
+      'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100',
+  },
+  {
+    label: 'Move to Archive',
+    icon: MoveBoxIcon,
+    action: () => {},
+    className:
+      'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100',
+  },
+  {
+    label: 'Settings',
+    icon: Setting2,
+    action: () => {},
+    className:
+      'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100',
+  },
+];
+
 export default function JobDetailsPage() {
+  const breadcrumbData: BreadcrumbItem[] = [
+    { name: 'Home', href: '/' },
+    { name: job.id },
+  ];
   return (
     <div className=''>
       {/* Breadcrumb */}
-      <div className='flex flex-wrap items-start text-sm text-[var(--text-secondary)] font-normal mb-1 w-full md:text-base md:mb-3'>
-        <span>Home</span>
-        <span className='mx-2'>&gt;</span>
-        <a href='#' className='text-blue-600 font-medium hover:underline'>
-          Job#789
-        </a>
+      <div className='flex flex-wrap items-start text-sm font-normal mb-1 w-full md:text-base md:mb-3'>
+        <Breadcrumb items={breadcrumbData} className='flex-1' />
         {/* 3-dots menu */}
         <div className='ml-auto mt-2 md:mt-0'>
           <DropdownMenu>
@@ -57,50 +91,23 @@ export default function JobDetailsPage() {
               align='end'
               className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
             >
-              <DropdownMenuItem
-                className={
-                  'text-sm px-3 py-2 rounded-md var(--text-dark) cursor-pointer transition-colors flex items-center gap-2'
-                }
-              >
-                <ClipboardClose
-                  size='32'
-                  color='var(--text-dark)'
-                  className='!h-6 !w-6'
-                />
-                Close job
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={
-                  'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100'
-                }
-              >
-                <UserAdd
-                  size='32'
-                  color='var(--text-dark)'
-                  className='!h-6 !w-6'
-                />
-                Add Employee
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={
-                  'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100'
-                }
-              >
-                <MoveBoxIcon className='text-[var(--text-dark)] !h-6 !w-6' />{' '}
-                Move to Archive
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={
-                  'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100'
-                }
-              >
-                <Setting2
-                  size='32'
-                  color='var(--text-dark)'
-                  className='!h-6 !w-6'
-                />
-                Settings
-              </DropdownMenuItem>
+              {dropdownMenuItems.map((item, idx) => {
+                const Icon = item.icon;
+                return (
+                  <DropdownMenuItem
+                    key={item.label}
+                    className={item.className}
+                    onClick={item.action}
+                  >
+                    <Icon
+                      size='32'
+                      color='var(--text-dark)'
+                      className='!h-6 !w-6'
+                    />
+                    {item.label}
+                  </DropdownMenuItem>
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

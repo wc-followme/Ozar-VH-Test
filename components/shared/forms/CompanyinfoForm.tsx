@@ -12,6 +12,7 @@ import Link from 'next/link';
 // import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ImageUpload } from '../ImageUpload';
+import SelectField from '../common/SelectField';
 
 export function CompanyInfoForm() {
   const [contractorCountry, setContractorCountry] = useState('us');
@@ -175,18 +176,21 @@ export function CompanyInfoForm() {
             >
               Preferred Method of Communication
             </Label>
-            <Select>
-              <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'>
-                <SelectValue placeholder='eg: email, phone, etc.' />
-              </SelectTrigger>
-              <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                <SelectItem value='email'>Email</SelectItem>
-                <SelectItem value='phone'>Phone</SelectItem>
-                <SelectItem value='sms'>SMS</SelectItem>
-                <SelectItem value='slack'>Slack</SelectItem>
-                <SelectItem value='teams'>Microsoft Teams</SelectItem>
-              </SelectContent>
-            </Select>
+            <SelectField
+              label='Preferred Method of Communication'
+              value={''}
+              onValueChange={() => {}}
+              options={[
+                { value: 'email', label: 'Email' },
+                { value: 'phone', label: 'Phone' },
+                { value: 'sms', label: 'SMS' },
+                { value: 'slack', label: 'Slack' },
+                { value: 'teams', label: 'Microsoft Teams' },
+              ]}
+              placeholder='eg: email, phone, etc.'
+              error={''}
+              className=''
+            />
           </div>
           <div className='space-y-2'>
             <Label

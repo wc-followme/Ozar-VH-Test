@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { FlagHookIcon } from '../../../components/icons/FalgHookIcon';
 import { JobCard } from '../../../components/shared/cards/JobCard';
 import { StatsCard } from '../../../components/shared/cards/StatsCard';
+import ComingSoon from '../../../components/shared/common/ComingSoon';
 import SideSheet from '../../../components/shared/common/SideSheet';
 import { CreateJobForm } from '../../../components/shared/forms/CreateJobForm';
 import { Badge } from '../../../components/ui/badge';
@@ -169,7 +170,7 @@ export default function JobManagement() {
             className='w-full'
           >
             <div className='flex items-center gap-2 w-full'>
-              <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start'>
+              <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start flex-wrap max-w-fit'>
                 <TabsTrigger
                   value='info'
                   className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
@@ -233,7 +234,7 @@ export default function JobManagement() {
             </TabsContent>
 
             <TabsContent value='permissions' className='p-8'>
-              ddfsd
+              <ComingSoon />
             </TabsContent>
           </Tabs>
         </div>

@@ -74,7 +74,7 @@ const ToolForm: React.FC<ToolFormProps> = ({
           placeholder='Select Service'
           error={errors.service || ''}
           className={cn(
-            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            '!placeholder-[var(--text-placeholder)]',
             errors.service
               ? 'border-[var(--warning)]'
               : 'border-[var(--border-dark)]'

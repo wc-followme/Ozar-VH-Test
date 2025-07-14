@@ -28,6 +28,7 @@ import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
 import { useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
+import SelectField from '../common/SelectField';
 
 interface UserInfoFormProps {
   roles: Role[];
@@ -157,42 +158,22 @@ export function UserInfoForm({
     <form className='space-y-6' onSubmit={handleSubmit} noValidate>
       {/* Role Dropdown */}
       <div className='space-y-2'>
-        <Label
-          htmlFor='role'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
-          {USER_MESSAGES.ROLE_LABEL}
-        </Label>
-        <Select
+        <SelectField
+          label={USER_MESSAGES.ROLE_LABEL}
           value={roleId}
           onValueChange={setRoleId}
-          disabled={loadingRoles || false}
-        >
-          <SelectTrigger
-            className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
-              errors.roleCategory
-                ? 'border-[var(--warning)]'
-                : 'border-[var(--border-dark)]'
-            )}
-          >
-            <SelectValue
-              placeholder={
-                loadingRoles
-                  ? USER_MESSAGES.LOADING_ROLES
-                  : USER_MESSAGES.SELECT_ROLE
-              }
-            />
-          </SelectTrigger>
-          <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-            {roles.map(role => (
-              <SelectItem key={role.id} value={String(role.id)}>
-                {role.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <FormErrorMessage message={errors.roleCategory || ''} />
+          options={roles.map(role => ({
+            value: String(role.id),
+            label: role.name,
+          }))}
+          placeholder={
+            loadingRoles
+              ? USER_MESSAGES.LOADING_ROLES
+              : USER_MESSAGES.SELECT_ROLE
+          }
+          error={errors.roleCategory || ''}
+          className=''
+        />
       </div>
       {/* First Row - Full Name, Designation, Date of Joining */}
       <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
@@ -1066,43 +1047,21 @@ export function UserInfoForm({
           <FormErrorMessage message={errors.phone || ''} />
         </div>
         <div className='space-y-2'>
-          <Label
-            htmlFor='communication'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
-            {USER_MESSAGES.COMMUNICATION_LABEL}
-          </Label>
-          <Select value={communication} onValueChange={setCommunication}>
-            <SelectTrigger
-              className={cn(
-                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
-                errors.communication
-                  ? 'border-[var(--warning)]'
-                  : 'border-[var(--border-dark)]'
-              )}
-            >
-              <SelectValue
-                placeholder={USER_MESSAGES.SELECT_COMMUNICATION}
-                className='[&>span]:text-[var(--text-placeholder)]'
-              />
-            </SelectTrigger>
-            <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-              <SelectItem value='email'>
-                {USER_MESSAGES.EMAIL_OPTION}
-              </SelectItem>
-              <SelectItem value='phone'>
-                {USER_MESSAGES.PHONE_OPTION}
-              </SelectItem>
-              <SelectItem value='sms'>{USER_MESSAGES.SMS_OPTION}</SelectItem>
-              <SelectItem value='slack'>
-                {USER_MESSAGES.SLACK_OPTION}
-              </SelectItem>
-              <SelectItem value='teams'>
-                {USER_MESSAGES.TEAMS_OPTION}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <FormErrorMessage message={errors.communication || ''} />
+          <SelectField
+            label={USER_MESSAGES.COMMUNICATION_LABEL}
+            value={communication}
+            onValueChange={setCommunication}
+            options={[
+              { value: 'email', label: USER_MESSAGES.EMAIL_OPTION },
+              { value: 'phone', label: USER_MESSAGES.PHONE_OPTION },
+              { value: 'sms', label: USER_MESSAGES.SMS_OPTION },
+              { value: 'slack', label: USER_MESSAGES.SLACK_OPTION },
+              { value: 'teams', label: USER_MESSAGES.TEAMS_OPTION },
+            ]}
+            placeholder={USER_MESSAGES.SELECT_COMMUNICATION}
+            error={errors.communication || ''}
+            className=''
+          />
         </div>
       </div>
       {/* Third Row - Address */}
