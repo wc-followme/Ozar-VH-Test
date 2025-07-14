@@ -65,18 +65,19 @@ export default function AddCompanyPage() {
         phone_number: data.phone_number,
         communication: data.communication,
         website: data.website,
-        expiry_date: data.expiry_date,
         preferred_communication_method: data.preferred_communication_method,
         city: data.city,
         pincode: data.pincode,
         projects: data.projects,
         is_default: false,
         status: 'ACTIVE',
-        contractor_name: data.contractor_name,
-        contractor_email: data.contractor_email,
-        contractor_phone: data.contractor_phone,
         image: fileKey,
       };
+
+      // Add expiry_date only if it's provided
+      if (data.expiry_date) {
+        payload.expiry_date = data.expiry_date;
+      }
 
       await apiService.createCompany(payload);
       showSuccessToast(COMPANY_MESSAGES.CREATE_SUCCESS);

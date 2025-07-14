@@ -26,12 +26,12 @@ export interface CompanyCreateFormData {
   phone_number: string;
   communication: string;
   website: string;
-  expiry_date: string;
+  expiry_date?: string | undefined;
   preferred_communication_method: string;
   city: string;
   pincode: string;
   projects: string;
-  image?: string;
+  image?: string | undefined;
 }
 
 // Company initial data for form (for edit mode)

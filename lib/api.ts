@@ -95,6 +95,12 @@ export interface User {
   status: string;
   created_at: string;
   updated_at: string;
+  date_of_joining?: string;
+  designation?: string;
+  preferred_communication_method?: string;
+  address?: string;
+  city?: string;
+  pincode?: string;
   role: {
     id: number;
     name: string;
@@ -221,16 +227,13 @@ export interface CreateCompanyRequest {
   phone_number: string;
   communication: string;
   website: string;
-  expiry_date: string;
+  expiry_date?: string;
   preferred_communication_method: string;
   city: string;
   pincode: string;
   projects: string;
   is_default: boolean;
   status: 'ACTIVE' | 'INACTIVE';
-  contractor_name: string;
-  contractor_email: string;
-  contractor_phone: string;
   image?: string;
 }
 
@@ -256,9 +259,6 @@ export interface UpdateCompanyRequest {
   image?: string;
   is_default?: boolean;
   status?: 'ACTIVE' | 'INACTIVE';
-  contractor_name?: string;
-  contractor_email?: string;
-  contractor_phone?: string;
 }
 
 export interface UpdateCompanyResponse {

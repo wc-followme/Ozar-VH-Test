@@ -134,13 +134,20 @@ export function CompanyInfoForm({
       phone_number: phoneCountryCode + phoneNumber,
       communication,
       website,
-      expiry_date: expiryDate.toISOString().split('T')[0],
       preferred_communication_method: preferredCommunication,
       city,
       pincode,
       projects,
-      image: imageUrl,
     };
+
+    // Add optional fields only if they're set
+    if (expiryDate) {
+      payload.expiry_date = expiryDate.toISOString().split('T')[0];
+    }
+
+    if (imageUrl) {
+      payload.image = imageUrl;
+    }
 
     onSubmit(payload);
   };

@@ -243,6 +243,12 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                     onDeletePhoto={handleDeletePhoto}
                     label={USER_MESSAGES.UPLOAD_PHOTO_LABEL}
                     text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
+                    uploading={uploading}
+                    existingImageUrl={
+                      fileKey && !photoFile
+                        ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
+                        : ''
+                    }
                   />
                   {uploading && (
                     <div className='text-xs mt-2'>

@@ -133,12 +133,16 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
         phone_number: data.phone_number,
         communication: data.communication,
         website: data.website,
-        expiry_date: data.expiry_date,
         preferred_communication_method: data.preferred_communication_method,
         city: data.city,
         pincode: data.pincode,
         projects: data.projects,
       };
+
+      // Add expiry_date only if it's provided
+      if (data.expiry_date) {
+        updatePayload.expiry_date = data.expiry_date;
+      }
 
       // Add image if file was uploaded
       if (fileKey) {
@@ -168,10 +172,6 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
     } finally {
       setFormLoading(false);
     }
-  };
-
-  const handleCancel = () => {
-    router.push('/company-management');
   };
 
   // Convert company data to form initial data
@@ -264,13 +264,15 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
 
           {/* Right Column - Form Fields */}
           <div className='flex-1 bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
-            <CompanyInfoForm
-              imageUrl={fileKey}
-              onSubmit={handleUpdateCompany}
-              loading={formLoading}
-              initialData={getInitialData()}
-              isEditMode={true}
-            />
+            {getInitialData() && (
+              <CompanyInfoForm
+                imageUrl={fileKey}
+                onSubmit={handleUpdateCompany}
+                loading={formLoading}
+                initialData={getInitialData()!}
+                isEditMode={true}
+              />
+            )}
           </div>
         </div>
       </div>

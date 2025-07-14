@@ -42,7 +42,6 @@ export const COMPANY_MESSAGES = {
 
   // Status Messages
   NO_COMPANIES_FOUND: 'No companies found.',
-  COMPANY_NOT_FOUND: 'Company not found',
 
   // Button Labels
   ADD_COMPANY_BUTTON: 'Add Company',
