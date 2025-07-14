@@ -187,8 +187,8 @@ export interface GetUserResponse {
 export interface Company {
   id: number;
   name: string;
-  createdOn: string;
-  subsEnd: string;
+  created_at: string;
+  expiry_date: string;
   image: string;
   status: boolean;
 }

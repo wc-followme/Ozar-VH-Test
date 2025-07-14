@@ -4,7 +4,7 @@ import { CompanyCard } from '@/components/shared/cards/CompanyCard';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, formatDate } from '@/lib/utils';
 import { AddCircle, Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
 import { ReactNode, useEffect, useState } from 'react';
@@ -147,8 +147,8 @@ export default function CompanyManagement() {
             <CompanyCard
               key={company.id}
               name={company.name}
-              createdOn={company.createdOn}
-              subsEnd={company.subsEnd}
+              createdOn={formatDate(company.created_at)}
+              subsEnd={formatDate(company.expiry_date)}
               image={company.image}
               status={company.status}
               onToggle={() => handleToggleStatus(company.id)}
