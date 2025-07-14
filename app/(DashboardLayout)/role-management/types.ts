@@ -27,14 +27,14 @@ export interface CreateRoleRequest {
   name: string;
   description: string;
   icon: string;
-  status: 'ACTIVE' | 'INACTIVE';
+  status?: 'ACTIVE' | 'INACTIVE';
 }
 
 export interface UpdateRoleRequest {
   name: string;
   description: string;
   icon: string;
-  status: 'ACTIVE' | 'INACTIVE';
+  status?: 'ACTIVE' | 'INACTIVE';
 }
 
 export interface ApiResponse<T = unknown> {

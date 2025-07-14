@@ -2,13 +2,6 @@ import { ROLE_MESSAGES } from '@/app/(DashboardLayout)/role-management/role-mess
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { iconOptions } from '@/constants/sidebar-items';
 import { cn } from '@/lib/utils';
 import { CreateRoleFormData, createRoleSchema } from '@/lib/validations/role';
@@ -47,7 +40,6 @@ export const RoleForm: React.FC<RoleFormProps> = ({
       name: '',
       description: '',
       icon: defaultIconOption?.value ?? '',
-      status: 'ACTIVE',
       ...initialValues,
     },
   });
@@ -59,7 +51,6 @@ export const RoleForm: React.FC<RoleFormProps> = ({
         name: initialValues.name || '',
         description: initialValues.description || '',
         icon: (initialValues.icon || defaultIconOption?.value) ?? '',
-        status: initialValues.status || 'ACTIVE',
       });
     }
   }, [initialValues, reset, defaultIconOption?.value]);
@@ -145,41 +136,6 @@ export const RoleForm: React.FC<RoleFormProps> = ({
             {errors.description && (
               <FormErrorMessage message={errors.description.message || ''} />
             )}
-          </div>
-
-          {/* Status selector */}
-          <div className='flex flex-col items-start gap-1'>
-            <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-              {ROLE_MESSAGES.STATUS_LABEL}
-            </Label>
-            <Controller
-              name='status'
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger
-                    className={cn(
-                      'h-12 border-2',
-                      errors.status
-                        ? 'border-[var(--warning)]'
-                        : 'border-[var(--border-dark)]',
-                      'focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    )}
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                    <SelectItem value='ACTIVE'>
-                      {ROLE_MESSAGES.STATUS_ACTIVE}
-                    </SelectItem>
-                    <SelectItem value='INACTIVE'>
-                      {ROLE_MESSAGES.STATUS_INACTIVE}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FormErrorMessage message={errors.status?.message || ''} />
           </div>
         </div>
 
