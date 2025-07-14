@@ -10,13 +10,13 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div
+    <aside
       className={cn(
-        'pb-12 transition-all duration-300 ease h-screen bg-[var(--white-background)]'
+        'hidden lg:block pb-12 transition-all duration-300 ease h-screen bg-[var(--white-background)] sticky top-0'
       )}
     >
-      <div className='space-y-4 py-3'>
-        <div className='px-3'>
+      <div className='space-y-4'>
+        <div className='px-3 py-3 flex flex-col max-h-screen'>
           {/* Burger Menu */}
           <div className='w-[60px] h-[60px] flex items-center px-[18px]'>
             <div
@@ -45,7 +45,7 @@ export function Sidebar() {
           </div>
 
           {/* Sidebar Links */}
-          <ul className='py-2 [&>li+li]:mt-0.5 '>
+          <ul className='py-2 [&>li+li]:mt-0.5 flex-1 overflow-auto '>
             {sidebarItems.map((item, index) => (
               <li key={index}>
                 <Link
@@ -74,6 +74,6 @@ export function Sidebar() {
           </ul>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }

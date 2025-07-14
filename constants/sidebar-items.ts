@@ -4,7 +4,6 @@ import { Company } from './../components/icons/Company';
 import { JobIcon } from './../components/icons/JobIcon';
 import { Material } from './../components/icons/Material';
 import { RoleIcon } from './../components/icons/RoleIcon';
-import { Service } from './../components/icons/Service';
 import { Tool } from './../components/icons/Tool';
 import { Trade } from './../components/icons/Trade';
 
@@ -18,6 +17,7 @@ import {
   Shield,
   Users,
 } from 'lucide-react';
+import { Service } from '../components/icons/Service';
 
 type SidebarItem = {
   title: string;
@@ -37,42 +37,42 @@ export const sidebarItems: SidebarItem[] = [
     icon: JobIcon,
   },
   {
-    title: 'Role Manag.',
+    title: 'Role Management',
     href: '/role-management',
     icon: RoleIcon,
   },
   {
-    title: 'User Manag.',
+    title: 'User Management',
     href: '/user-management',
     icon: CircleUserIcon,
   },
   {
-    title: 'Company Manag.',
+    title: 'Company Management',
     href: '/company-management',
     icon: Company,
   },
   {
-    title: 'Category Manag.',
+    title: 'Category Management',
     href: '/category-management',
     icon: Category,
   },
   {
-    title: 'Trade Manag.',
-    href: '/material',
+    title: 'Trade Management',
+    href: '/trade-management',
     icon: Trade,
   },
   {
-    title: 'Service Manag.',
-    href: '/tools',
+    title: 'Service Management',
+    href: '/service-management',
     icon: Service,
   },
   {
-    title: 'Material Manag.',
-    href: '/tools',
+    title: 'Material Management',
+    href: '/material-management',
     icon: Material,
   },
   {
-    title: 'Tools Manag.',
+    title: 'Tools Management',
     href: '/tools-management',
     icon: Tool,
   },

@@ -172,13 +172,14 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
               value={email}
               onChange={handleEmailChange}
               onBlur={() => handleBlur('email')}
-              className={`pl-12 h-12 border-2 focus:ring-green-500 bg-white rounded-[10px] !placeholder-[#C0C6CD] ${
+              className={`pl-12 h-12 border-2 focus:ring-green-500 border-[#E8EAED] bg-white rounded-[10px] text-[#2d2d2d] !placeholder-[#C0C6CD] ${
                 errors.email && touched.email
                   ? 'border-red-500 focus:border-red-500'
-                  : 'border-[var(--border-dark)] focus:border-green-500'
+                  : 'focus:border-green-500'
               }`}
               disabled={isLoading}
               autoComplete='email'
+              autoFocus={false}
             />
           </div>
           {errors.email && touched.email && (
@@ -208,10 +209,10 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
               value={password}
               onChange={handlePasswordChange}
               onBlur={() => handleBlur('password')}
-              className={`pl-12 pr-10 h-12 border-2 focus:ring-green-500 bg-white rounded-[10px] !placeholder-[#C0C6CD] ${
+              className={`pl-12 pr-10 h-12 border-2 text-[#2d2d2d] border-[#E8EAED] focus:ring-green-500 bg-white rounded-[10px] !placeholder-[#C0C6CD] ${
                 errors.password && touched.password
-                  ? 'border-red-500 focus:border-red-500'
-                  : 'border-[var(--border-dark)] focus:border-green-500'
+                  ? 'border-[var(--warning)]'
+                  : 'focus:border-green-500'
               }`}
               disabled={isLoading}
               autoComplete='current-password'
@@ -240,7 +241,7 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
       <div className='text-right'>
         <a
           href='#'
-          className='text-[16px] text-[var(--text)] hover:text-green-600 transition-colors'
+          className='text-[16px] text-[#2d2d2d] hover:text-green-600 transition-colors'
           onClick={e => e.preventDefault()}
         >
           Forgot Password?

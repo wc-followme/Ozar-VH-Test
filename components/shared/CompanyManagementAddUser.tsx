@@ -139,7 +139,7 @@ const CompanyManagementAddUser = () => {
         >
           Cancel
         </Link>
-        <Button className='h-[48px] px-12 bg-green-500 hover:bg-green-600 rounded-full font-semibold text-white'>
+        <Button className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'>
           Save
         </Button>
       </div>

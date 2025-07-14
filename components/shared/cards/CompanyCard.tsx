@@ -60,7 +60,7 @@ export function CompanyCard({
   };
 
   return (
-    <div className='bg-[var(--white-background)] rounded-[12px] border border-[var(--border-dark)] p-[16px] hover:shadow-lg transition-shadow duration-200'>
+    <div className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[16px] hover:shadow-lg transition-shadow duration-200'>
       {/* Header with Avatar, User Info and Menu */}
       <div className='mb-4'>
         <Avatar className='w-[6.25rem] h-[6.25rem] rounded-none mt-[0.875rem] mb-10 mx-auto'>
@@ -96,7 +96,7 @@ export function CompanyCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align='end'
-                className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+                className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
               >
                 {menuOptions.map((option, index) => {
                   const Icon: any = option.icon; // ensure Icon is a capitalized component
@@ -155,7 +155,7 @@ export function CompanyCard({
           disabled={isToggling}
           className='
               h-4 w-9 
-              data-[state=checked]:bg-green-500 
+              data-[state=checked]:bg-[var(--secondary)] 
               data-[state=unchecked]:bg-gray-300
               [&>span]:h-3 
               [&>span]:w-3 

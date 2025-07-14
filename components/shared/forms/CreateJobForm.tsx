@@ -111,7 +111,7 @@ export function CreateJobForm() {
             >
               Select Boxes
             </Label>
-            <div className='grid gap-4 md:grid-cols-1 lg:grid-cols-3'>
+            <div className='grid gap-4 grid-cols-3 md:grid-cols-3'>
               {selectBoxOptions.map(option => (
                 <SelectBoxCard
                   key={option.id}

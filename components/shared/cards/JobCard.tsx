@@ -22,7 +22,7 @@ interface JobCardProps {
 
 export function JobCard({ job }: JobCardProps) {
   const getProgressColor = (progress: number) => {
-    if (progress >= 90) return 'bg-green-500';
+    if (progress >= 90) return 'bg-[var(--secondary)]';
     if (progress >= 70) return 'bg-blue-500';
     if (progress >= 50) return 'bg-yellow-500';
     return 'bg-orange-500';

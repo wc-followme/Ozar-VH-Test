@@ -81,7 +81,7 @@ export default function ToolCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align='end'
-              className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+              className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
             >
               <DropdownMenuItem
                 onClick={() => alert('Edit clicked')}
@@ -95,7 +95,7 @@ export default function ToolCard({
                 className='text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-red-50'
               >
                 <Trash size={18} color='var(--text-dark)' />
-                <span>Delete</span>
+                <span>Archive</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
