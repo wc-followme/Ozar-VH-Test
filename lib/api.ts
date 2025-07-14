@@ -183,6 +183,28 @@ export interface GetUserResponse {
   data: User;
 }
 
+// Company interfaces
+export interface Company {
+  id: number;
+  name: string;
+  createdOn: string;
+  subsEnd: string;
+  image: string;
+  status: boolean;
+}
+
+export interface FetchCompaniesResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    data: Company[];
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 // Get device information for login
 const getDeviceInfo = (): DeviceInfo => {
   const navigator = typeof window !== 'undefined' ? window.navigator : null;
@@ -512,6 +534,29 @@ class ApiService {
   async deleteUser(uuid: string): Promise<DeleteUserResponse> {
     return this.makeRequest(`/users/${uuid}`, {
       method: 'DELETE',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Fetch companies with pagination, status, and sortOrder
+  async fetchCompanies({
+    page = 1,
+    limit = 10,
+    status = 'ACTIVE',
+    sortOrder = 'ASC',
+  }: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    sortOrder?: 'ASC' | 'DESC';
+  }): Promise<FetchCompaniesResponse> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (status) params.append('status', status);
+    if (sortOrder) params.append('sortOrder', sortOrder);
+    return this.makeRequest(`/companies?${params.toString()}`, {
+      method: 'GET',
       headers: this.getRoleHeaders(),
     });
   }
