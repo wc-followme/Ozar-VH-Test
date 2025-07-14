@@ -11,13 +11,13 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 
 interface MenuOption {
   label: string;
   action: string;
   variant?: 'default' | 'destructive';
-  icon: ReactNode;
+  icon: React.ElementType;
 }
 
 interface companyCardProps {
@@ -98,15 +98,17 @@ export function CompanyCard({
                 align='end'
                 className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
               >
-                {menuOptions.map((option, index) => {
-                  const Icon: any = option.icon; // ensure Icon is a capitalized component
-                  return (
+                {menuOptions.map(
+                  (
+                    { icon: Icon, label, action, variant }: MenuOption,
+                    index: number
+                  ) => (
                     <DropdownMenuItem
                       key={index}
-                      onClick={() => handleMenuAction(option.action)}
+                      onClick={() => handleMenuAction(action)}
                       className={cn(
                         'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2',
-                        option.variant === 'destructive'
+                        variant === 'destructive'
                           ? 'text-red-600 hover:bg-red-50'
                           : 'hover:bg-gray-100'
                       )}
@@ -116,10 +118,10 @@ export function CompanyCard({
                         color='var(--text-dark)'
                         variant='Outline'
                       />
-                      <span>{option.label}</span>
+                      <span>{label}</span>
                     </DropdownMenuItem>
-                  );
-                })}
+                  )
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

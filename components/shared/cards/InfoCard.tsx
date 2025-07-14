@@ -71,21 +71,18 @@ export const InfoCard: React.FC<InfoCardProps> = ({
             align='end'
             className='bg-[var(--card-background)] border border-[var(--border-dark)] rounded-[8px]'
           >
-            {menuOptions.map((option, idx) => {
-              const Icon = option.icon;
-              return (
-                <DropdownMenuItem
-                  key={idx}
-                  onClick={() => onMenuAction && onMenuAction(option.action)}
-                  className={cn(
-                    'text-sm px-3 py-2 rounded-md cursor-pointer flex items-center gap-2'
-                  )}
-                >
-                  {Icon && <Icon size={18} color='var(--text-dark)' />}
-                  <span>{option.label}</span>
-                </DropdownMenuItem>
-              );
-            })}
+            {menuOptions.map(({ icon: Icon, label, action }) => (
+              <DropdownMenuItem
+                key={label}
+                onClick={() => onMenuAction && onMenuAction(action)}
+                className={cn(
+                  'text-sm px-3 py-2 rounded-md cursor-pointer flex items-center gap-2'
+                )}
+              >
+                {Icon && <Icon size={18} color='var(--text-dark)' />}
+                <span>{label}</span>
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       )}

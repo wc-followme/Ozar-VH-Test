@@ -136,25 +136,24 @@ export function UserCard({
             align='end'
             className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
           >
-            {menuOptions.map((option, index) => {
-              const Icon = option.icon; // ensure Icon is a capitalized component
-              return (
+            {menuOptions.map(
+              ({ icon: Icon, label, action, variant }, index) => (
                 <DropdownMenuItem
                   key={index}
-                  onClick={() => handleMenuAction(option.action)}
+                  onClick={() => handleMenuAction(action)}
                   className={cn(
                     'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2',
-                    option.variant === 'destructive'
+                    variant === 'destructive'
                       ? 'hover:bg-red-50'
                       : 'hover:bg-gray-100'
                   )}
                   disabled={!!disableActions}
                 >
                   <Icon size='18' color='var(--text-dark)' variant='Outline' />
-                  <span>{option.label}</span>
+                  <span>{label}</span>
                 </DropdownMenuItem>
-              );
-            })}
+              )
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

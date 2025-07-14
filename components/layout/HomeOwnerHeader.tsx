@@ -59,15 +59,17 @@ export function HomeOwnerHeader() {
               align='end'
               className='bg-[var(--card-background)] border border-[var(--border-dark)] min-w-[185px] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px] p-[10px]'
             >
-              {menuOptions.map((option: MenuOption, index: number) => {
-                const Icon = option.icon; // ensure Icon is a capitalized component
-                return (
+              {menuOptions.map(
+                (
+                  { icon: Icon, label, action, variant }: MenuOption,
+                  index: number
+                ) => (
                   <DropdownMenuItem
                     key={index}
-                    onClick={() => handleMenuAction(option.action)}
+                    onClick={() => handleMenuAction(action)}
                     className={cn(
                       'text-base p-3 rounded-md cursor-pointer text-[var(--text-dark)] transition-colors flex items-center gap-2',
-                      option.variant === 'destructive'
+                      variant === 'destructive'
                         ? 'text-red-600 hover:bg-red-50'
                         : 'hover:bg-gray-100'
                     )}
@@ -78,10 +80,10 @@ export function HomeOwnerHeader() {
                       variant='Outline'
                       className='!h-6 !w-6'
                     />
-                    <span>{option.label}</span>
+                    <span>{label}</span>
                   </DropdownMenuItem>
-                );
-              })}
+                )
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

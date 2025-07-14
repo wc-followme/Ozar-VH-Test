@@ -188,25 +188,24 @@ const CategoryManagement = () => {
                     align='end'
                     className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
                   >
-                    {menuOptions.map(option => {
-                      const MenuIcon = option.icon;
-                      return (
+                    {menuOptions.map(
+                      ({ icon: Icon, id, label, action, variant }) => (
                         <DropdownMenuItem
-                          key={option.id}
+                          key={id}
                           onClick={() => {
-                            if (option.action === 'edit') {
+                            if (action === 'edit') {
                               alert(`Edit ${cat.title}`);
-                            } else if (option.action === 'delete') {
+                            } else if (action === 'delete') {
                               setShowDeleteIdx(idx);
                             }
                           }}
-                          className={`text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 ${option.variant === 'destructive' ? ' hover:bg-red-50' : 'hover:bg-gray-100'}`}
+                          className={`text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 ${variant === 'destructive' ? ' hover:bg-red-50' : 'hover:bg-gray-100'}`}
                         >
-                          <MenuIcon size='18' color='var(--text-dark)' />
-                          <span>{option.label}</span>
+                          <Icon size='18' color='var(--text-dark)' />
+                          <span>{label}</span>
                         </DropdownMenuItem>
-                      );
-                    })}
+                      )
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <ConfirmDeleteModal
