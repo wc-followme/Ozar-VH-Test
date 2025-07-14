@@ -58,6 +58,10 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
 
         if (isCompanyApiResponse(response)) {
           setCompany(response.data);
+          // Set existing image if available
+          if (response.data.image) {
+            setFileKey(response.data.image);
+          }
         } else {
           throw new Error('Invalid response format');
         }
@@ -90,7 +94,18 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
       setUploading(true);
       setPhotoFile(file);
 
-      const presigned = await getPresignedUrl(file.name, file.type, 'company');
+      const ext = file.name.split('.').pop() || 'png';
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(2, 15);
+      const generatedFileName = `company_${randomId}_${timestamp}.${ext}`;
+
+      const presigned = await getPresignedUrl({
+        fileName: generatedFileName,
+        fileType: file.type,
+        fileSize: file.size,
+        purpose: 'company',
+        customPath: '',
+      });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
     } catch (err: unknown) {
@@ -237,8 +252,8 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
               text={COMPANY_MESSAGES.UPLOAD_PHOTO_TEXT}
               uploading={uploading}
               existingImageUrl={
-                company.image
-                  ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + company.image
+                fileKey && !photoFile
+                  ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
                   : ''
               }
             />
