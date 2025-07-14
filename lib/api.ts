@@ -186,11 +186,13 @@ export interface GetUserResponse {
 // Company interfaces
 export interface Company {
   id: number;
+  uuid: string;
   name: string;
   created_at: string;
   expiry_date: string;
   image: string;
-  status: boolean;
+  status: 'ACTIVE' | 'INACTIVE';
+  is_default: boolean;
 }
 
 export interface FetchCompaniesResponse {
@@ -203,6 +205,12 @@ export interface FetchCompaniesResponse {
     total: number;
     totalPages: number;
   };
+}
+
+export interface UpdateCompanyStatusResponse {
+  statusCode: number;
+  message: string;
+  data?: Company;
 }
 
 // Get device information for login
@@ -558,6 +566,18 @@ class ApiService {
     return this.makeRequest(`/companies?${params.toString()}`, {
       method: 'GET',
       headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update company status
+  async updateCompanyStatus(
+    uuid: string,
+    status: 'ACTIVE' | 'INACTIVE'
+  ): Promise<UpdateCompanyStatusResponse> {
+    return this.makeRequest(`/companies/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify({ status }),
     });
   }
 

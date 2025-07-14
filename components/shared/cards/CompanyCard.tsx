@@ -28,6 +28,7 @@ interface companyCardProps {
   status: boolean;
   onToggle: () => void;
   menuOptions: MenuOption[];
+  isDefault?: boolean;
 }
 
 export function CompanyCard({
@@ -38,6 +39,7 @@ export function CompanyCard({
   status,
   onToggle,
   menuOptions,
+  isDefault = false,
 }: companyCardProps) {
   const [isToggling, setIsToggling] = useState(false);
 
@@ -50,6 +52,11 @@ export function CompanyCard({
   const handleMenuAction = (action: string) => {
     console.log(`Action ${action} triggered for user ${name}`);
   };
+
+  // Filter menu options based on isDefault
+  const filteredMenuOptions = isDefault 
+    ? menuOptions.filter(option => option.action !== 'delete')
+    : menuOptions;
 
   const getInitials = (name: string) => {
     return name
@@ -98,7 +105,7 @@ export function CompanyCard({
                 align='end'
                 className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
               >
-                {menuOptions.map((option, index) => {
+                {filteredMenuOptions.map((option, index) => {
                   const Icon: any = option.icon; // ensure Icon is a capitalized component
                   return (
                     <DropdownMenuItem
@@ -145,27 +152,29 @@ export function CompanyCard({
       </div>
 
       {/* Status Toggle */}
-      <div className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
-        <span className='text-[12px] font-medium text-[var(--text-dark)]'>
-          Enable
-        </span>
-        <Switch
-          checked={status}
-          onCheckedChange={handleToggle}
-          disabled={isToggling}
-          className='
-              h-4 w-9 
-              data-[state=checked]:bg-green-500 
-              data-[state=unchecked]:bg-gray-300
-              [&>span]:h-3 
-              [&>span]:w-3 
-              [&>span]:bg-white 
-              data-[state=checked]:[&>span]:border-green-400
-              [&>span]:transition-all
-              [&>span]:duration-200
-            '
-        />
-      </div>
+      {!isDefault && (
+        <div className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
+          <span className='text-[12px] font-medium text-[var(--text-dark)]'>
+            Enable
+          </span>
+          <Switch
+            checked={status}
+            onCheckedChange={handleToggle}
+            disabled={isToggling}
+            className='
+                h-4 w-9 
+                data-[state=checked]:bg-green-500 
+                data-[state=unchecked]:bg-gray-300
+                [&>span]:h-3 
+                [&>span]:w-3 
+                [&>span]:bg-white 
+                data-[state=checked]:[&>span]:border-green-400
+                [&>span]:transition-all
+                [&>span]:duration-200
+              '
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -101,15 +101,44 @@ export default function CompanyManagement() {
     }
   };
 
-  // Status toggle handler
-  const handleToggleStatus = (id: number) => {
-    setCompanies(
-      companies.map(company =>
-        company.id === id ? { ...company, status: !company.status } : company
-      )
-    );
-    // In a real implementation, you would call an API to update the status
-    // showSuccessToast(COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS);
+  // Status toggle handler - updated to actually call API
+  const handleToggleStatus = async (
+    id: number,
+    currentStatus: 'ACTIVE' | 'INACTIVE'
+  ) => {
+    try {
+      const company = companies.find(c => c.id === id);
+      if (!company || !company.uuid)
+        throw new Error(COMPANY_MESSAGES.COMPANY_NOT_FOUND_ERROR);
+
+      // Prevent status changes for default companies
+      if (company.is_default) {
+        showErrorToast(COMPANY_MESSAGES.DEFAULT_COMPANY_STATUS_ERROR);
+        return;
+      }
+
+      const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+      await apiService.updateCompanyStatus(company.uuid, newStatus);
+
+      setCompanies(companies =>
+        companies.map(c => (c.id === id ? { ...c, status: newStatus } : c))
+      );
+
+      showSuccessToast(
+        `${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS} Status changed to ${newStatus}.`
+      );
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        COMPANY_MESSAGES.STATUS_UPDATE_ERROR
+      );
+      showErrorToast(message);
+    }
   };
 
   return (
@@ -150,9 +179,10 @@ export default function CompanyManagement() {
               createdOn={formatDate(company.created_at)}
               subsEnd={formatDate(company.expiry_date)}
               image={company.image}
-              status={company.status}
-              onToggle={() => handleToggleStatus(company.id)}
+              status={company.status === 'ACTIVE'}
+              onToggle={() => handleToggleStatus(company.id, company.status)}
               menuOptions={menuOptions}
+              isDefault={company.is_default}
             />
           ))}
         </div>
