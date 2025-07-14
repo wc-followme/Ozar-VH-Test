@@ -117,8 +117,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
     } catch (err: unknown) {
-      console.log('err', err);
-      alert(USER_MESSAGES.UPLOAD_ERROR);
+      showErrorToast(USER_MESSAGES.UPLOAD_ERROR);
       setPhotoFile(null);
       setFileKey('');
     } finally {
