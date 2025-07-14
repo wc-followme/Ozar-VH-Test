@@ -6,7 +6,6 @@ import { JSX } from 'react/jsx-runtime';
 interface PhotoUploadFieldProps {
   photo: File | null;
   onPhotoChange: (file: File | null) => void;
-  onDeletePhoto: () => void;
   label?: string;
   text?: JSX.Element | string;
   className?: string;
@@ -15,7 +14,6 @@ interface PhotoUploadFieldProps {
 const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
   photo,
   onPhotoChange,
-  onDeletePhoto,
   label = 'Upload Photo or Drag and Drop',
   text,
   className = '',

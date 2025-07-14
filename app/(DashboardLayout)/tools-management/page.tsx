@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AddCircle } from 'iconsax-react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 const dummyTools = [
   {
@@ -127,19 +127,11 @@ const ToolsManagement = () => {
   }>({});
   const [service, setService] = useState('');
 
-  // Refs
-  const photoInputRef = useRef<HTMLInputElement>(null);
+  // Refs - commented out as currently unused
+  // const _photoInputRef = useRef<HTMLInputElement>(null);
 
   const handleDelete = (id: number) => {
     setTools(currentTools => currentTools.filter(tool => tool.id !== id));
-  };
-
-  // Handlers for photo upload
-  const handleDeletePhoto = () => {
-    setPhoto(null);
-    if (photoInputRef.current) {
-      photoInputRef.current.value = '';
-    }
   };
 
   function onClose() {
@@ -183,7 +175,6 @@ const ToolsManagement = () => {
             <PhotoUploadField
               photo={photo}
               onPhotoChange={file => setPhoto(file)}
-              onDeletePhoto={handleDeletePhoto}
               label='Upload Photo or Drag and Drop'
               text={
                 <>

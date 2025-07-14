@@ -213,6 +213,33 @@ export interface UpdateCompanyStatusResponse {
   data?: Company;
 }
 
+export interface CreateCompanyRequest {
+  name: string;
+  tagline: string;
+  about: string;
+  email: string;
+  phone_number: string;
+  communication: string;
+  website: string;
+  expiry_date: string;
+  preferred_communication_method: string;
+  city: string;
+  pincode: string;
+  projects: string;
+  is_default: boolean;
+  status: 'ACTIVE' | 'INACTIVE';
+  contractor_name: string;
+  contractor_email: string;
+  contractor_phone: string;
+  image?: string;
+}
+
+export interface CreateCompanyResponse {
+  statusCode: number;
+  message: string;
+  data?: Company;
+}
+
 // Get device information for login
 const getDeviceInfo = (): DeviceInfo => {
   const navigator = typeof window !== 'undefined' ? window.navigator : null;
@@ -327,7 +354,7 @@ class ApiService {
               return await makeApiCall();
             }
           }
-        } catch (refreshError) {
+        } catch (_refreshError) {
           // If refresh fails, clear tokens and throw 401 error to be handled by auth context
           if (typeof window !== 'undefined') {
             localStorage.removeItem('auth_token');
@@ -566,6 +593,17 @@ class ApiService {
     return this.makeRequest(`/companies?${params.toString()}`, {
       method: 'GET',
       headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Create company
+  async createCompany(
+    payload: CreateCompanyRequest
+  ): Promise<CreateCompanyResponse> {
+    return this.makeRequest('/companies', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
     });
   }
 

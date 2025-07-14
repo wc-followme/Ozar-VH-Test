@@ -29,8 +29,8 @@ const menuOptions = [
 export default function CompanyManagement() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [_page, _setPage] = useState<number>(1);
+  const [_hasMore, _setHasMore] = useState<boolean>(true);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
@@ -74,13 +74,13 @@ export default function CompanyManagement() {
         setCompanies(prev =>
           append ? [...prev, ...newCompanies] : newCompanies
         );
-        setPage(targetPage);
-        setHasMore(res.data.page < res.data.totalPages);
+        _setPage(targetPage);
+        _setHasMore(res.data.page < res.data.totalPages);
       } else {
         console.warn('⚠️ Unexpected response structure:', res);
         // Fallback for unexpected response structure
         setCompanies([]);
-        setHasMore(false);
+        _setHasMore(false);
       }
     } catch (err: unknown) {
       console.error('❌ API Error:', err);
@@ -92,7 +92,7 @@ export default function CompanyManagement() {
       const message = extractApiErrorMessage(err, COMPANY_MESSAGES.FETCH_ERROR);
       showErrorToast(message);
       if (!append) setCompanies([]);
-      setHasMore(false);
+      _setHasMore(false);
     } finally {
       setLoading(false);
     }
