@@ -24,7 +24,7 @@ const CreateRole = () => {
         name: data.name,
         description: data.description,
         icon: data.icon,
-        status: data.status,
+        status: 'ACTIVE', // Default to ACTIVE when creating
       };
       const response: ApiResponse = await apiService.createRole(roleData);
       if (

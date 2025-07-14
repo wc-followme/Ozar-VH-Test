@@ -13,9 +13,6 @@ export const ROLE_MESSAGES = {
   ROLE_NAME_PLACEHOLDER: 'Enter role name',
   DESCRIPTION_LABEL: 'Description',
   DESCRIPTION_PLACEHOLDER: 'Enter role description',
-  STATUS_LABEL: 'Status',
-  STATUS_ACTIVE: 'Active',
-  STATUS_INACTIVE: 'Inactive',
 
   // Button texts
   CANCEL_BUTTON: 'Cancel',

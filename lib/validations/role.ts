@@ -15,11 +15,6 @@ export const createRoleSchema = yup.object({
     .max(200, 'Description must not exceed 200 characters'),
 
   icon: yup.string().required('Icon is required'),
-
-  status: yup
-    .string()
-    .oneOf(['ACTIVE', 'INACTIVE'], 'Status must be either ACTIVE or INACTIVE')
-    .required('Status is required'),
 });
 
 export type CreateRoleFormData = yup.InferType<typeof createRoleSchema>;

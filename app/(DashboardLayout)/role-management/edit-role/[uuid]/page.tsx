@@ -35,7 +35,6 @@ const EditRolePage = () => {
             name: data.name || '',
             description: data.description || '',
             icon: data.icon || '',
-            status: data.status || 'ACTIVE',
           });
         }
       } catch {
