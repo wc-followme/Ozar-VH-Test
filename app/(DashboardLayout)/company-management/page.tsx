@@ -134,6 +134,34 @@ export default function CompanyManagement() {
     }
   };
 
+  // Delete handler
+  const handleDeleteCompany = async (uuid: string) => {
+    try {
+      const company = companies.find(c => c.uuid === uuid);
+
+      // Prevent deletion of default companies
+      if (company?.is_default) {
+        showErrorToast(COMPANY_MESSAGES.DEFAULT_COMPANY_DELETE_ERROR);
+        return;
+      }
+
+      await apiService.deleteCompany(uuid);
+      setCompanies(companies => companies.filter(c => c.uuid !== uuid));
+      showSuccessToast(COMPANY_MESSAGES.DELETE_SUCCESS);
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        COMPANY_MESSAGES.DELETE_ERROR
+      );
+      showErrorToast(message);
+    }
+  };
+
   return (
     <div className='w-full p-6 overflow-y-auto'>
       {/* Header */}
@@ -181,6 +209,7 @@ export default function CompanyManagement() {
               menuOptions={menuOptions}
               isDefault={company.is_default}
               companyUuid={company.uuid}
+              onDelete={() => handleDeleteCompany(company.uuid)}
             />
           ))}
         </div>

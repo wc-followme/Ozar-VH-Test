@@ -267,6 +267,12 @@ export interface UpdateCompanyResponse {
   data?: Company;
 }
 
+// Company delete response
+export interface DeleteCompanyResponse {
+  statusCode: number;
+  message: string;
+}
+
 export interface GetCompanyResponse {
   statusCode: number;
   message: string;
@@ -683,6 +689,14 @@ class ApiService {
       method: 'PATCH',
       headers: this.getRoleHeaders(),
       body: JSON.stringify(payload),
+    });
+  }
+
+  // Delete company
+  async deleteCompany(uuid: string): Promise<DeleteCompanyResponse> {
+    return this.makeRequest(`/companies/${uuid}`, {
+      method: 'DELETE',
+      headers: this.getRoleHeaders(),
     });
   }
 

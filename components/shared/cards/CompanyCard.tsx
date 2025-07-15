@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 
 interface MenuOption {
   label: string;
@@ -35,6 +36,7 @@ interface companyCardProps {
   menuOptions: MenuOption[];
   isDefault?: boolean;
   companyUuid: string;
+  onDelete?: () => void;
 }
 
 export function CompanyCard({
@@ -47,8 +49,10 @@ export function CompanyCard({
   menuOptions,
   isDefault = false,
   companyUuid,
+  onDelete,
 }: companyCardProps) {
   const [isToggling, setIsToggling] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   const router = useRouter();
 
   const handleToggle = async () => {
@@ -60,6 +64,8 @@ export function CompanyCard({
   const handleMenuAction = (action: string) => {
     if (action === 'edit') {
       router.push(`/company-management/edit-company/${companyUuid}`);
+    } else if (action === 'delete') {
+      setShowDelete(true);
     }
     // Other actions (like delete) can be handled by parent component
   };
@@ -186,6 +192,16 @@ export function CompanyCard({
           />
         </div>
       )}
+      <ConfirmDeleteModal
+        open={showDelete}
+        title='Are you sure you want to delete?'
+        subtitle='This action cannot be undone.'
+        onCancel={() => setShowDelete(false)}
+        onDelete={async () => {
+          setShowDelete(false);
+          if (onDelete) await onDelete();
+        }}
+      />
     </div>
   );
 }
