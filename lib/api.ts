@@ -1,3 +1,5 @@
+import { PAGINATION } from '@/constants/common';
+
 interface DeviceInfo {
   fcm_token?: string;
   device_id: string;
@@ -90,11 +92,18 @@ export interface User {
   company_id: string;
   name: string;
   email: string;
+  country_code: string;
   phone_number: string;
   profile_picture_url: string;
   status: string;
   created_at: string;
   updated_at: string;
+  date_of_joining?: string;
+  designation?: string;
+  preferred_communication_method?: string;
+  address?: string;
+  city?: string;
+  pincode?: string;
   role: {
     id: number;
     name: string;
@@ -136,6 +145,7 @@ export interface CreateUserRequest {
   name: string;
   email: string;
   password: string;
+  country_code: string;
   phone_number: string;
   profile_picture_url?: string;
   date_of_joining: string;
@@ -158,6 +168,7 @@ export interface UpdateUserRequest {
   name?: string;
   email?: string;
   password?: string;
+  country_code?: string;
   phone_number?: string;
   profile_picture_url?: string;
   date_of_joining?: string;
@@ -181,6 +192,113 @@ export interface GetUserResponse {
   statusCode: number;
   message: string;
   data: User;
+}
+
+// Company interfaces
+export interface Company {
+  id: number;
+  uuid: string;
+  name: string;
+  created_at: string;
+  expiry_date: string;
+  image: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  is_default: boolean;
+}
+
+export interface FetchCompaniesResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    data: Company[];
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface UpdateCompanyStatusResponse {
+  statusCode: number;
+  message: string;
+  data?: Company;
+}
+
+export interface CreateCompanyRequest {
+  name: string;
+  tagline: string;
+  about: string;
+  email: string;
+  country_code: string;
+  phone_number: string;
+  communication: string;
+  website: string;
+  expiry_date?: string;
+  preferred_communication_method: string;
+  city: string;
+  pincode: string;
+  projects: string;
+  is_default: boolean;
+  status: 'ACTIVE' | 'INACTIVE';
+  image?: string;
+}
+
+export interface CreateCompanyResponse {
+  statusCode: number;
+  message: string;
+  data?: Company;
+}
+
+export interface UpdateCompanyRequest {
+  name?: string;
+  tagline?: string;
+  about?: string;
+  email?: string;
+  country_code?: string;
+  phone_number?: string;
+  communication?: string;
+  website?: string;
+  expiry_date?: string;
+  preferred_communication_method?: string;
+  city?: string;
+  pincode?: string;
+  projects?: string;
+  image?: string;
+  is_default?: boolean;
+  status?: 'ACTIVE' | 'INACTIVE';
+}
+
+export interface UpdateCompanyResponse {
+  statusCode: number;
+  message: string;
+  data?: Company;
+}
+
+// Company delete response
+export interface DeleteCompanyResponse {
+  statusCode: number;
+  message: string;
+}
+
+export interface GetCompanyResponse {
+  statusCode: number;
+  message: string;
+  data: Company & {
+    tagline: string;
+    about: string;
+    email: string;
+    country_code: string;
+    phone_number: string;
+    communication: string;
+    website: string;
+    preferred_communication_method: string;
+    city: string;
+    pincode: string;
+    projects: string;
+    contractor_name: string;
+    contractor_email: string;
+    contractor_phone: string;
+  };
 }
 
 // Get device information for login
@@ -297,7 +415,7 @@ class ApiService {
               return await makeApiCall();
             }
           }
-        } catch (refreshError) {
+        } catch (_refreshError) {
           // If refresh fails, clear tokens and throw 401 error to be handled by auth context
           if (typeof window !== 'undefined') {
             localStorage.removeItem('auth_token');
@@ -381,7 +499,7 @@ class ApiService {
   // Fetch roles with pagination, search, and name filter
   async fetchRoles({
     page = 1,
-    limit = 10,
+    limit = PAGINATION.DEFAULT_LIMIT,
     search = '',
     name = '',
   }: {
@@ -447,20 +565,23 @@ class ApiService {
   // User management API
   async fetchUsers({
     page = 1,
-    limit = 10,
+    limit = PAGINATION.DEFAULT_LIMIT,
     role_id = '',
     company_id = '',
+    search = '',
   }: {
     page?: number;
     limit?: number;
     role_id?: string | number;
     company_id?: string | number;
+    search?: string;
   }): Promise<FetchUsersResponse> {
     const params = new URLSearchParams();
     params.append('page', String(page));
     params.append('limit', String(limit));
     if (role_id) params.append('role_id', String(role_id));
     if (company_id) params.append('company_id', String(company_id));
+    if (search) params.append('search', search);
     return this.makeRequest(`/users?${params.toString()}`, {
       method: 'GET',
       headers: this.getRoleHeaders(),
@@ -511,6 +632,80 @@ class ApiService {
   // Delete user
   async deleteUser(uuid: string): Promise<DeleteUserResponse> {
     return this.makeRequest(`/users/${uuid}`, {
+      method: 'DELETE',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Fetch companies with pagination, status, and sortOrder
+  async fetchCompanies({
+    page = 1,
+    limit = PAGINATION.DEFAULT_LIMIT,
+    status = 'ACTIVE',
+    sortOrder = 'ASC',
+  }: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    sortOrder?: 'ASC' | 'DESC';
+  }): Promise<FetchCompaniesResponse> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (status) params.append('status', status);
+    if (sortOrder) params.append('sortOrder', sortOrder);
+    return this.makeRequest(`/companies?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Create company
+  async createCompany(
+    payload: CreateCompanyRequest
+  ): Promise<CreateCompanyResponse> {
+    return this.makeRequest('/companies', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Update company status
+  async updateCompanyStatus(
+    uuid: string,
+    status: 'ACTIVE' | 'INACTIVE'
+  ): Promise<UpdateCompanyStatusResponse> {
+    return this.makeRequest(`/companies/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify({ status }),
+    });
+  }
+
+  // Get company details
+  async getCompanyDetails(uuid: string): Promise<GetCompanyResponse> {
+    return this.makeRequest(`/companies/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update company
+  async updateCompany(
+    uuid: string,
+    payload: UpdateCompanyRequest
+  ): Promise<UpdateCompanyResponse> {
+    return this.makeRequest(`/companies/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Delete company
+  async deleteCompany(uuid: string): Promise<DeleteCompanyResponse> {
+    return this.makeRequest(`/companies/${uuid}`, {
       method: 'DELETE',
       headers: this.getRoleHeaders(),
     });

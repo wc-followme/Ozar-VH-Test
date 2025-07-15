@@ -43,6 +43,7 @@ export interface UserCreateFormData {
   name: string;
   email: string;
   password: string; // Required for create
+  country_code: string;
   phone_number: string;
   profile_picture_url?: string;
   date_of_joining: string; // Required for create
@@ -59,6 +60,7 @@ export interface UserUpdateFormData {
   name?: string;
   email?: string;
   password?: string; // Optional for updates
+  country_code?: string;
   phone_number?: string;
   profile_picture_url?: string;
   date_of_joining?: string; // Optional for updates
@@ -74,6 +76,7 @@ export interface UserFormData {
   role_id: number; // Required for form validation
   name: string; // Required for form validation
   email: string; // Required for form validation
+  country_code: string; // Required for form validation
   phone_number: string; // Required for form validation
   designation: string; // Required for form validation
   preferred_communication_method: string; // Required for form validation
@@ -90,6 +93,7 @@ export interface UserInitialData {
   role_id?: number;
   name?: string;
   email?: string;
+  country_code?: string;
   phone_number?: string;
   date_of_joining?: string;
   designation?: string;
@@ -114,16 +118,4 @@ export interface MenuOption {
   action: string;
   icon: Icon;
   variant?: 'default' | 'destructive';
-}
-
-// Props interfaces for components
-export interface UserInfoFormProps {
-  roles: Role[];
-  loadingRoles?: boolean;
-  imageUrl?: string;
-  onSubmit: (data: UserFormData) => void;
-  loading?: boolean;
-  error?: string | undefined;
-  initialData?: UserInitialData;
-  isEditMode?: boolean;
 }

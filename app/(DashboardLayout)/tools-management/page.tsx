@@ -5,7 +5,7 @@ import SideSheet from '@/components/shared/common/SideSheet';
 import ToolForm from '@/components/shared/forms/ToolForm';
 import ToolCardSkeleton from '@/components/shared/skeleton/ToolCardSkeleton';
 import { AddCircle } from 'iconsax-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const dummyTools = [
   {
@@ -124,19 +124,15 @@ const ToolsManagement = () => {
   }>({});
   const [service, setService] = useState('');
 
-  // Refs
-  const photoInputRef = useRef<HTMLInputElement>(null);
+  // Refs - commented out as currently unused
+  // const _photoInputRef = useRef<HTMLInputElement>(null);
 
   const handleDelete = (id: number) => {
     setTools(currentTools => currentTools.filter(tool => tool.id !== id));
   };
 
-  // Handlers for photo upload
   const handleDeletePhoto = () => {
     setPhoto(null);
-    if (photoInputRef.current) {
-      photoInputRef.current.value = '';
-    }
   };
 
   function onClose() {
