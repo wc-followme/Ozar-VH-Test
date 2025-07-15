@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
-import { apiService, GetCompanyResponse } from '@/lib/api';
+import { apiService, GetCompanyResponse, FetchUsersResponse, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
@@ -22,7 +22,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { UserCard } from '../../../../../components/shared/cards/UserCard';
+import { MenuOption, Role, RoleApiResponse } from '../../../user-management/types';
 import { COMPANY_MESSAGES } from '../../company-messages';
+import { USER_MESSAGES } from '../../../user-management/user-messages';
 
 interface CompanyDetailsPageProps {
   params: Promise<{
@@ -35,130 +37,6 @@ const breadcrumbData: BreadcrumbItem[] = [
   { name: 'Company Details' }, // current page
 ];
 
-// Dummy user data
-const dummyUsers = [
-  {
-    id: 1,
-    name: 'Alex Johnson',
-    role: 'Admin',
-    phone: '(555) 123-4567',
-    email: 'alex.johnson@example.com',
-    image:
-      'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 2,
-    name: 'Maria Smith',
-    role: 'Contractor',
-    phone: '(555) 123-4567',
-    email: 'maria.smith@example.com',
-    image:
-      'https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 3,
-    name: 'David Brown',
-    role: 'Project Manager',
-    phone: '(555) 123-4567',
-    email: 'david.brown@example.com',
-    image:
-      'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 4,
-    name: 'Sophia Davis',
-    role: 'Estimator',
-    phone: '(555) 123-4567',
-    email: 'sophia.davis@example.com',
-    image:
-      'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 5,
-    name: 'James Wilson',
-    role: 'Employee',
-    phone: '(555) 123-4567',
-    email: 'james.wilson@example.com',
-    image:
-      'https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 6,
-    name: 'Olivia Garcia',
-    role: 'Employee',
-    phone: '(555) 123-4567',
-    email: 'olivia.garcia@example.com',
-    image:
-      'https://images.pexels.com/photos/2625122/pexels-photo-2625122.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 7,
-    name: 'Liam Martinez',
-    role: 'Employee',
-    phone: '(555) 123-4567',
-    email: 'liam.martinez@example.com',
-    image:
-      'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 8,
-    name: 'Emma Rodriguez',
-    role: 'Employee',
-    phone: '(555) 123-4567',
-    email: 'emma.rodriguez@example.com',
-    image:
-      'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 9,
-    name: 'Noah Hernandez',
-    role: 'Employee',
-    phone: '(555) 123-4567',
-    email: 'noah.hernandez@example.com',
-    image:
-      'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 10,
-    name: 'Ava Lopez',
-    role: 'Employee',
-    phone: '(555) 123-4567',
-    email: 'ava.lopez@example.com',
-    image:
-      'https://images.pexels.com/photos/1102341/pexels-photo-1102341.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 11,
-    name: 'Ethan Gonzalez',
-    role: 'Employee',
-    phone: '(555) 123-4567',
-    email: 'ethan.gonzalez@example.com',
-    image:
-      'https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-  {
-    id: 12,
-    name: 'Isabella Perez',
-    role: 'Employee',
-    phone: '(555) 123-4567',
-    email: 'isabella.perez@example.com',
-    image:
-      'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
-    status: true,
-  },
-];
-
 const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
   const resolvedParams = React.use(params);
   const [enabled, setEnabled] = useState(true);
@@ -168,11 +46,17 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
     null
   );
   const [loading, setLoading] = useState(true);
+
+  // User management state
+  const [users, setUsers] = useState<User[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
   const router = useRouter();
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
-
-  const [users, setUsers] = useState(dummyUsers);
 
   const isCompanyApiResponse = (obj: unknown): obj is GetCompanyResponse => {
     return (
@@ -181,6 +65,18 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
       'statusCode' in obj &&
       'data' in obj &&
       typeof (obj as GetCompanyResponse).data === 'object'
+    );
+  };
+
+  const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'data' in obj &&
+      typeof (obj as RoleApiResponse).data === 'object' &&
+      (obj as RoleApiResponse).data !== null &&
+      'data' in (obj as RoleApiResponse).data &&
+      Array.isArray((obj as RoleApiResponse).data.data)
     );
   };
 
@@ -217,26 +113,135 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
     fetchCompanyDetails();
   }, [resolvedParams.uuid, router, showErrorToast, handleAuthError]);
 
-  const handleToggleStatus = (id: number) => {
-    setUsers(
-      users.map(user =>
-        user.id === id ? { ...user, status: !user.status } : user
-      )
-    );
+  // Fetch users when filter changes or when switching to user management tab
+  useEffect(() => {
+    if (selectedTab === 'usermanagement' && company) {
+      setPage(1);
+      setHasMore(true);
+      setUsers([]);
+      fetchUsers(1, false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, selectedTab, company]);
+
+  // Infinite scroll for user management tab
+  useEffect(() => {
+    if (selectedTab !== 'usermanagement') return;
+
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >=
+          document.body.offsetHeight - 200 &&
+        !usersLoading &&
+        hasMore
+      ) {
+        fetchUsers(page + 1, true);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usersLoading, hasMore, page, filter, selectedTab]);
+
+  // Fetch users function - same as user-management page but with company_id filter
+  const fetchUsers = async (targetPage = 1, append = false) => {
+    if (!company) return;
+
+    setUsersLoading(true);
+    try {
+      // Fetch roles only on first load
+      if (targetPage === 1) {
+        const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
+        const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
+        setRoles(
+          roleList.map((role: Role) => ({ id: role.id, name: role.name }))
+        );
+      }
+
+      const role_id = filter !== 'all' ? filter : '';
+      const usersRes: FetchUsersResponse = await apiService.fetchUsers({
+        page: targetPage,
+        limit: 20,
+        role_id,
+        company_id: company.id, // Filter by current company
+      });
+
+      const newUsers = usersRes.data;
+      setUsers(prev => (append ? [...prev, ...newUsers] : newUsers));
+      setPage(targetPage);
+      setHasMore(usersRes.pagination.page < usersRes.pagination.totalPages);
+    } catch (err: unknown) {
+      if (handleAuthError(err)) {
+        return;
+      }
+
+      const message = extractApiErrorMessage(err, USER_MESSAGES.FETCH_ERROR);
+      showErrorToast(message);
+      if (!append) setUsers([]);
+      setHasMore(false);
+    } finally {
+      setUsersLoading(false);
+    }
   };
+
+  // User status toggle handler - same as user-management page
+  const handleUserToggleStatus = async (id: number, currentStatus: boolean) => {
+    try {
+      const user = users.find(u => u.id === id);
+      if (!user || !user.uuid)
+        throw new Error(USER_MESSAGES.USER_NOT_FOUND_ERROR);
+      const newStatus = currentStatus ? 'INACTIVE' : 'ACTIVE';
+      await apiService.updateUserStatus(user.uuid, newStatus);
+      setUsers(users =>
+        users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
+      );
+      showSuccessToast(
+        `${USER_MESSAGES.STATUS_UPDATE_SUCCESS} to ${newStatus}.`
+      );
+    } catch (err: unknown) {
+      if (handleAuthError(err)) {
+        return;
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        USER_MESSAGES.STATUS_UPDATE_ERROR
+      );
+      showErrorToast(message);
+    }
+  };
+
+  // User delete handler - same as user-management page
+  const handleDeleteUser = async (uuid: string) => {
+    try {
+      await apiService.deleteUser(uuid);
+      setUsers(users => users.filter(user => user.uuid !== uuid));
+      showSuccessToast(USER_MESSAGES.DELETE_SUCCESS);
+    } catch (err: unknown) {
+      if (handleAuthError(err)) {
+        return;
+      }
+
+      const message = extractApiErrorMessage(err, USER_MESSAGES.DELETE_ERROR);
+      showErrorToast(message);
+    }
+  };
+
+  // Filter users based on role
   const filteredUsers = users.filter(user => {
     if (filter === 'all') return true;
-    if (filter === 'admin') return user.role === 'Admin';
-    if (filter === 'contractor') return user.role === 'Contractor';
-    if (filter === 'manager') return user.role === 'Project Manager';
-    if (filter === 'employee') return user.role === 'Employee';
-    if (filter === 'estimator') return user.role === 'Estimator';
-    return true;
+    return user.role_id === parseInt(filter);
   });
 
-  const menuOptions: any = [
-    { label: 'Edit', action: 'edit', icon: Edit2 },
-    { label: 'Delete', action: 'delete', icon: Trash },
+  // Menu options for user cards
+  const menuOptions: MenuOption[] = [
+    { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' },
+    {
+      label: 'Delete',
+      action: 'delete',
+      icon: Trash,
+      variant: 'destructive',
+    },
   ];
 
   const switchStyleSm =
@@ -527,48 +532,67 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
               </div>
               <Select value={filter} onValueChange={setFilter}>
                 <SelectTrigger className='w-40 bg-[var(--white-background)] rounded-[30px] border-2 border-[var(--border-dark)] h-[42px] focus:border-[var(--secondary)] focus:ring-0 focus:outline-none'>
-                  <SelectValue placeholder='All Users' />
+                  <SelectValue placeholder={USER_MESSAGES.ALL_USERS} />
                 </SelectTrigger>
                 <SelectContent className={selectContentStyle}>
                   <SelectItem value='all' className={selectItemStyle}>
-                    All Users
+                    {USER_MESSAGES.ALL_USERS}
                   </SelectItem>
-                  <SelectItem value='admin' className={selectItemStyle}>
-                    Admin
-                  </SelectItem>
-                  <SelectItem value='contractor' className={selectItemStyle}>
-                    Contractor
-                  </SelectItem>
-                  <SelectItem value='manager' className={selectItemStyle}>
-                    Project Manager
-                  </SelectItem>
-                  <SelectItem value='employee' className={selectItemStyle}>
-                    Employee
-                  </SelectItem>
-                  <SelectItem value='estimator' className={selectItemStyle}>
-                    Estimator
-                  </SelectItem>
+                  {roles.map(role => (
+                    <SelectItem
+                      key={role.id}
+                      value={String(role.id)}
+                      className={selectItemStyle}
+                    >
+                      {role.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className='mt-6'>
               {/* User Grid */}
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
-                {filteredUsers.map(user => (
-                  <UserCard
-                    key={user.id}
-                    name={user.name}
-                    role={user.role}
-                    phone={user.phone}
-                    email={user.email}
-                    image={user.image}
-                    status={user.status}
-                    onToggle={() => handleToggleStatus(user.id)}
-                    menuOptions={menuOptions}
-                    userUuid={String(user.id)}
-                  />
-                ))}
-              </div>
+              {usersLoading && users.length === 0 ? (
+                <div className='text-center py-10'>{USER_MESSAGES.LOADING}</div>
+              ) : users.length === 0 ? (
+                <div className='text-center py-10 text-gray-500'>
+                  {USER_MESSAGES.NO_USERS_FOUND}
+                </div>
+              ) : (
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+                  {filteredUsers.map(user => (
+                    <UserCard
+                      key={user.id}
+                      name={user.name}
+                      role={user.role?.name || ''}
+                      phone={user.phone_number}
+                      email={user.email}
+                      image={
+                        user.profile_picture_url
+                          ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+                            user.profile_picture_url
+                          : ''
+                      }
+                      status={user.status === 'ACTIVE'}
+                      onToggle={() =>
+                        handleUserToggleStatus(
+                          user.id,
+                          user.status === 'ACTIVE'
+                        )
+                      }
+                      onDelete={() => handleDeleteUser(user.uuid)}
+                      menuOptions={menuOptions}
+                      userUuid={user.uuid}
+                      disableActions={usersLoading}
+                    />
+                  ))}
+                </div>
+              )}
+              {usersLoading && users.length > 0 && (
+                <div className='text-center py-4'>
+                  {USER_MESSAGES.LOADING_MORE}
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
