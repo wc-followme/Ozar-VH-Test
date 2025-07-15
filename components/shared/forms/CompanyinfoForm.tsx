@@ -170,12 +170,6 @@ export function CompanyInfoForm() {
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
           <div className='space-y-2'>
-            <Label
-              htmlFor='communication'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
-              Preferred Method of Communication
-            </Label>
             <SelectField
               label='Preferred Method of Communication'
               value={''}

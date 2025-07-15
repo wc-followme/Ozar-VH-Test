@@ -85,14 +85,14 @@ export default function ToolCard({
             >
               <DropdownMenuItem
                 onClick={() => alert('Edit clicked')}
-                className='text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100'
+                className='text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]'
               >
                 <Edit2 size={18} color='var(--text-dark)' />
                 <span>Edit</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setShowDelete(true)}
-                className='text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-red-50'
+                className='text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]'
               >
                 <Trash size={18} color='var(--text-dark)' />
                 <span>Archive</span>

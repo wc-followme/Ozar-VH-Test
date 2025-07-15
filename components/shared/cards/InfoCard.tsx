@@ -78,7 +78,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
                   key={idx}
                   onClick={() => onMenuAction && onMenuAction(option.action)}
                   className={cn(
-                    'text-sm px-3 py-2 rounded-md cursor-pointer flex items-center gap-2'
+                    'text-sm px-3 py-2 rounded-md cursor-pointer flex items-center gap-2 hover:!bg-[var(--select-option)]'
                   )}
                 >
                   {Icon && <Icon size={18} color='var(--text-dark)' />}
