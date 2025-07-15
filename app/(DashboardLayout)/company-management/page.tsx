@@ -117,7 +117,7 @@ export default function CompanyManagement() {
       );
 
       showSuccessToast(
-        `${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS} Status changed to ${newStatus}.`
+        `${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS}`
       );
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)

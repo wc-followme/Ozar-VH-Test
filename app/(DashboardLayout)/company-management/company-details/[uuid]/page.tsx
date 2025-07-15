@@ -231,7 +231,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
         users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
       );
       showSuccessToast(
-        `${USER_MESSAGES.STATUS_UPDATE_SUCCESS} to ${newStatus}.`
+        `${USER_MESSAGES.STATUS_UPDATE_SUCCESS}`
       );
     } catch (err: unknown) {
       if (handleAuthError(err)) {
@@ -311,7 +311,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
       setEnabled(newStatus === 'ACTIVE');
 
       showSuccessToast(
-        `${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS} Status changed to ${newStatus}.`
+        `${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS}`
       );
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)

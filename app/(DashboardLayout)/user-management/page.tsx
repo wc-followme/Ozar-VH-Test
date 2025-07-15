@@ -135,7 +135,7 @@ export default function UserManagement() {
         users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
       );
       showSuccessToast(
-        `${USER_MESSAGES.STATUS_UPDATE_SUCCESS} to ${newStatus}.`
+        `${USER_MESSAGES.STATUS_UPDATE_SUCCESS}`
       );
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
