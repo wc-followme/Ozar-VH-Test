@@ -1,6 +1,7 @@
 'use client';
 
 import { CompanyCard } from '@/components/shared/cards/CompanyCard';
+import CompanyCardSkeleton from '@/components/shared/skeleton/CompanyCardSkeleton';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
@@ -182,7 +183,12 @@ export default function CompanyManagement() {
 
       {/* Company Grid */}
       {loading && companies.length === 0 ? (
-        <div className='text-center py-10'>{COMPANY_MESSAGES.LOADING}</div>
+        // <div className='text-center py-10'>{COMPANY_MESSAGES.LOADING}</div>
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
+          {Array.from({ length: 8 }).map((_, idx) => (
+            <CompanyCardSkeleton key={idx} />
+          ))}
+        </div>
       ) : companies.length === 0 ? (
         <div className='text-center py-10 text-gray-500'>
           {COMPANY_MESSAGES.NO_COMPANIES_FOUND}

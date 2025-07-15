@@ -92,7 +92,7 @@ export default function TradeManagementPage() {
 
   // Show skeletons for 3 seconds on mount
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoadingSkeleton(false), 2000);
+    const timer = setTimeout(() => setLoadingSkeleton(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 

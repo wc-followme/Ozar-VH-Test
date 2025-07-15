@@ -3,9 +3,10 @@ import { InfoCard } from '@/components/shared/cards/InfoCard';
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import SideSheet from '@/components/shared/common/SideSheet';
 import ServiceForm from '@/components/shared/forms/ServiceForm';
+import TradeCardSkeleton from '@/components/shared/skeleton/TradeCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { Edit2, Trash } from 'iconsax-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const dummyServices = [
   {
@@ -99,6 +100,13 @@ export default function ServiceManagementPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingSkeleton, setLoadingSkeleton] = useState(true);
+
+  // Show skeletons for 2 seconds on mount
+  React.useEffect(() => {
+    const timer = setTimeout(() => setLoadingSkeleton(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleMenuAction = (action: string, idx: number) => {
     if (action === 'edit') {
@@ -159,17 +167,21 @@ export default function ServiceManagementPage() {
       </div>
       {/* Service Grid */}
       <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 xl:gap-6'>
-        {services.map((service, idx) => (
-          <InfoCard
-            key={service.initials + '-' + idx}
-            initials={service.initials}
-            initialsBg={service.initialsBg}
-            tradeName={service.serviceName}
-            category={service.trade}
-            menuOptions={menuOptions}
-            onMenuAction={action => handleMenuAction(action, idx)}
-          />
-        ))}
+        {loadingSkeleton
+          ? Array.from({ length: 10 }).map((_, idx) => (
+              <TradeCardSkeleton key={idx} />
+            ))
+          : services.map((service, idx) => (
+              <InfoCard
+                key={service.initials + '-' + idx}
+                initials={service.initials}
+                initialsBg={service.initialsBg}
+                tradeName={service.serviceName}
+                category={service.trade}
+                menuOptions={menuOptions}
+                onMenuAction={action => handleMenuAction(action, idx)}
+              />
+            ))}
       </div>
       <ConfirmDeleteModal
         open={modalOpen}

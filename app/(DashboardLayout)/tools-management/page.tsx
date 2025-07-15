@@ -147,7 +147,7 @@ const ToolsManagement = () => {
 
   // Show skeletons for 3 seconds
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 3000);
+    const timer = setTimeout(() => setLoading(false), 300);
     return () => clearTimeout(timer);
   }, []);
 
@@ -195,7 +195,7 @@ const ToolsManagement = () => {
       </SideSheet>
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
         {loading
-          ? Array.from({ length: 12 }).map((_, idx) => (
+          ? Array.from({ length: 8 }).map((_, idx) => (
               <ToolCardSkeleton key={idx} />
             ))
           : tools.map(tool => (

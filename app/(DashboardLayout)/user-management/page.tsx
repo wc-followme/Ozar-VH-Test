@@ -1,6 +1,7 @@
 'use client';
 
 import { UserCard } from '@/components/shared/cards/UserCard';
+import UserCardSkeleton from '@/components/shared/skeleton/UserCardSkeleton';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -211,7 +212,11 @@ export default function UserManagement() {
       </div>
       {/* User Grid */}
       {loading && users.length === 0 ? (
-        <div className='text-center py-10'>{USER_MESSAGES.LOADING}</div>
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
+          {Array.from({ length: 8 }).map((_, idx) => (
+            <UserCardSkeleton key={idx} />
+          ))}
+        </div>
       ) : users.length === 0 ? (
         <div className='text-center py-10 text-gray-500'>
           {USER_MESSAGES.NO_USERS_FOUND}

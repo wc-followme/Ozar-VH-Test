@@ -145,7 +145,14 @@ const RoleManagement = () => {
       </div> */}
       {/* Roles Grid */}
       <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
-        {roles.length === 0 && !loading ? (
+        {loading && roles.length === 0 ? (
+          Array.from({ length: 8 }).map((_, idx) => (
+            <div key={idx}>
+              {/* Dynamically import to avoid breaking SSR if needed */}
+              {require('@/components/shared/skeleton/RoleCardSkeleton').default()}
+            </div>
+          ))
+        ) : roles.length === 0 && !loading ? (
           <div className='col-span-4 text-center py-8'>
             {ROLE_MESSAGES.NO_ROLES_FOUND}
           </div>

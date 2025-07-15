@@ -2,9 +2,10 @@
 import { InfoCard } from '@/components/shared/cards/InfoCard';
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import SideSheet from '@/components/shared/common/SideSheet';
+import TradeCardSkeleton from '@/components/shared/skeleton/TradeCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { Edit2, Trash } from 'iconsax-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import MaterialForm from '../../../components/shared/forms/MaterialForm';
 
 const dummyMaterials = [
@@ -57,6 +58,13 @@ export default function MaterialManagementPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingSkeleton, setLoadingSkeleton] = useState(true);
+
+  // Show skeletons for 2 seconds on mount
+  React.useEffect(() => {
+    const timer = setTimeout(() => setLoadingSkeleton(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleMenuAction = (action: string, idx: number) => {
     if (action === 'edit') {
@@ -117,17 +125,21 @@ export default function MaterialManagementPage() {
       </div>
       {/* Material Grid */}
       <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 xl:gap-6'>
-        {materials.map((material, idx) => (
-          <InfoCard
-            key={material.initials + '-' + idx}
-            initials={material.initials}
-            initialsBg={material.initialsBg}
-            tradeName={material.materialName}
-            category={material.category}
-            menuOptions={menuOptions}
-            onMenuAction={action => handleMenuAction(action, idx)}
-          />
-        ))}
+        {loadingSkeleton
+          ? Array.from({ length: 10 }).map((_, idx) => (
+              <TradeCardSkeleton key={idx} />
+            ))
+          : materials.map((material, idx) => (
+              <InfoCard
+                key={material.initials + '-' + idx}
+                initials={material.initials}
+                initialsBg={material.initialsBg}
+                tradeName={material.materialName}
+                category={material.category}
+                menuOptions={menuOptions}
+                onMenuAction={action => handleMenuAction(action, idx)}
+              />
+            ))}
       </div>
       <ConfirmDeleteModal
         open={modalOpen}
