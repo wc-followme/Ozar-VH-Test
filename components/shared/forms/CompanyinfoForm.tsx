@@ -23,26 +23,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { COUNTRY_CODES } from '@/constants/common';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
-
-// Country codes for phone number dropdown (reusing from user module pattern)
-const countryCodes = [
-  { code: '+1', country: 'US', flag: '🇺🇸' },
-  { code: '+44', country: 'UK', flag: '🇬🇧' },
-  { code: '+91', country: 'IN', flag: '🇮🇳' },
-  { code: '+86', country: 'CN', flag: '🇨🇳' },
-  { code: '+81', country: 'JP', flag: '🇯🇵' },
-  { code: '+49', country: 'DE', flag: '🇩🇪' },
-  { code: '+33', country: 'FR', flag: '🇫🇷' },
-  { code: '+61', country: 'AU', flag: '🇦🇺' },
-  { code: '+55', country: 'BR', flag: '🇧🇷' },
-  { code: '+7', country: 'RU', flag: '🇷🇺' },
-];
 
 export function CompanyInfoForm({
   imageUrl,
@@ -86,7 +73,7 @@ export function CompanyInfoForm({
       } else if (initialData.phone_number) {
         // Combined phone number - extract country code
         const phoneStr = initialData.phone_number;
-        const matchedCountry = countryCodes.find(country =>
+        const matchedCountry = COUNTRY_CODES.LIST.find(country =>
           phoneStr.startsWith(country.code)
         );
         if (matchedCountry) {
@@ -256,8 +243,8 @@ export function CompanyInfoForm({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {countryCodes.map(country => (
-                    <SelectItem key={country.code} value={country.code}>
+                  {COUNTRY_CODES.LIST.map(country => (
+                    <SelectItem key={country.key} value={country.code}>
                       {country.flag} {country.code}
                     </SelectItem>
                   ))}
