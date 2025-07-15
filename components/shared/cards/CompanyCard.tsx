@@ -81,11 +81,11 @@ export function CompanyCard({
               {name}
             </h3>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild className='-mr-2'>
                 <Button
                   variant='ghost'
                   size='sm'
-                  className='h-8 w-8 p-0 flex-shrink-0'
+                  className='h-7 w-6 p-0 flex-shrink-0'
                 >
                   <IconDotsVertical
                     className='!w-6 !h-6'
