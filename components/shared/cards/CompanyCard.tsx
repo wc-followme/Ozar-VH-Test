@@ -88,7 +88,7 @@ export function CompanyCard({
   };
 
   return (
-    <div 
+    <div
       className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[16px] hover:shadow-lg transition-shadow duration-200 cursor-pointer'
       onClick={handleCardClick}
     >
@@ -116,8 +116,8 @@ export function CompanyCard({
                 <Button
                   variant='ghost'
                   size='sm'
-                  className='h-8 w-8 p-0 flex-shrink-0'
-                  onClick={(e) => {
+                  className='h-7 w-6 p-0 flex-shrink-0 -mr-2 mt-0.5'
+                  onClick={e => {
                     e.stopPropagation(); // Prevent card click when clicking menu
                   }}
                 >
@@ -137,7 +137,7 @@ export function CompanyCard({
                   return (
                     <DropdownMenuItem
                       key={index}
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation(); // Prevent card click when clicking menu item
                         handleMenuAction(option.action);
                       }}
@@ -183,9 +183,9 @@ export function CompanyCard({
 
       {/* Status Toggle */}
       {!isDefault && (
-        <div 
+        <div
           className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation(); // Prevent card click when clicking toggle
           }}
         >

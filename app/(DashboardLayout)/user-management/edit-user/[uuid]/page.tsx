@@ -12,7 +12,6 @@ import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { Role, RoleApiResponse, UserFormData } from '../../types';
 import { USER_MESSAGES } from '../../user-messages';
 
@@ -113,19 +112,22 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       setFileKey('');
       return;
     }
-    setPhotoFile(file);
-    setUploading(true);
+
     try {
+      setUploading(true);
+      setPhotoFile(file);
+
       const ext = file.name.split('.').pop() || 'png';
       const timestamp = Date.now();
-      const userUuid = uuidv4();
-      const generatedFileName = `user_${userUuid}_${timestamp}.${ext}`;
+      const randomId = Math.random().toString(36).substring(2, 15);
+      const generatedFileName = `user_${randomId}_${timestamp}.${ext}`;
+
       const presigned = await getPresignedUrl({
         fileName: generatedFileName,
         fileType: file.type,
         fileSize: file.size,
-        purpose: 'profile-picture',
-        customPath: ``,
+        purpose: 'user',
+        customPath: '',
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
