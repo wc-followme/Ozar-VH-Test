@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 
@@ -34,6 +33,7 @@ interface CategoryCardProps {
   menuOptions: MenuOption[];
   categoryUuid: string;
   onDelete?: () => void;
+  onEdit?: () => void;
 }
 
 export function CategoryCard({
@@ -43,16 +43,18 @@ export function CategoryCard({
   iconColor,
   iconBgColor,
   menuOptions,
-  categoryUuid,
+  categoryUuid: _categoryUuid,
   onDelete,
+  onEdit,
 }: CategoryCardProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const router = useRouter();
 
   const handleMenuAction = (action: string) => {
     switch (action) {
       case 'edit':
-        router.push(`/category-management/edit-category/${categoryUuid}`);
+        if (onEdit) {
+          onEdit();
+        }
         break;
       case 'delete':
         setShowDeleteModal(true);

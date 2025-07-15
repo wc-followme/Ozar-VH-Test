@@ -12,7 +12,13 @@ import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { iconOptions } from '@/constants/sidebar-items';
 import { STATUS_CODES } from '@/constants/status-codes';
-import { apiService, Category, CreateCategoryRequest } from '@/lib/api';
+import {
+  apiService,
+  Category,
+  CreateCategoryRequest,
+  GetCategoryResponse,
+  UpdateCategoryRequest,
+} from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage } from '@/lib/utils';
 import {
@@ -44,6 +50,8 @@ const CategoryManagement = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [open, setOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [isLoadingCategory, setIsLoadingCategory] = useState(false);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
@@ -142,37 +150,29 @@ const CategoryManagement = () => {
     }
   };
 
-  // Handle form submission
-  const onSubmit = async (data: CreateCategoryFormData) => {
-    setIsSubmitting(true);
+  // Fetch category details for editing
+  const fetchCategoryDetails = async (uuid: string) => {
+    setIsLoadingCategory(true);
     try {
-      const categoryData: CreateCategoryRequest = {
-        name: data.name,
-        description: data.description,
-        icon: data.icon,
-        status: 'ACTIVE', // Default to ACTIVE when creating
-        is_default: false, // New categories are not default
-      };
+      const response: GetCategoryResponse =
+        await apiService.getCategoryDetails(uuid);
 
-      const response = await apiService.createCategory(categoryData);
-      if (
-        response.statusCode === STATUS_CODES.OK ||
-        response.statusCode === STATUS_CODES.CREATED
-      ) {
-        showSuccessToast(CATEGORY_MESSAGES.CREATE_SUCCESS);
+      if (response.statusCode === STATUS_CODES.OK && response.data) {
+        const category = response.data;
+        setEditingCategory(category);
 
-        // Reset form and close modal
+        // Reset form with category data
         reset({
-          name: '',
-          description: '',
-          icon: defaultIconOption?.value ?? '',
+          name: category.name,
+          description: category.description,
+          icon: category.icon,
         });
-        setOpen(false);
 
-        // Refresh categories list
-        fetchCategories();
+        setOpen(true);
       } else {
-        throw new Error(response.message || CATEGORY_MESSAGES.CREATE_ERROR);
+        throw new Error(
+          response.message || CATEGORY_MESSAGES.FETCH_DETAILS_ERROR
+        );
       }
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
@@ -182,7 +182,101 @@ const CategoryManagement = () => {
 
       const message = extractApiErrorMessage(
         err,
-        CATEGORY_MESSAGES.CREATE_ERROR
+        CATEGORY_MESSAGES.FETCH_DETAILS_ERROR
+      );
+      showErrorToast(message);
+    } finally {
+      setIsLoadingCategory(false);
+    }
+  };
+
+  // Handle edit category
+  const handleEditCategory = (uuid: string) => {
+    fetchCategoryDetails(uuid);
+  };
+
+  // Handle form submission
+  const onSubmit = async (data: CreateCategoryFormData) => {
+    setIsSubmitting(true);
+    try {
+      if (editingCategory) {
+        // Update existing category
+        const updateData: UpdateCategoryRequest = {
+          name: data.name,
+          description: data.description,
+          icon: data.icon,
+        };
+
+        const response = await apiService.updateCategory(
+          editingCategory.uuid,
+          updateData
+        );
+        if (
+          response.statusCode === STATUS_CODES.OK ||
+          response.statusCode === STATUS_CODES.CREATED
+        ) {
+          showSuccessToast(CATEGORY_MESSAGES.UPDATE_SUCCESS);
+
+          // Update the category in the list
+          setCategories(categories =>
+            categories.map(c =>
+              c.uuid === editingCategory.uuid ? { ...c, ...updateData } : c
+            )
+          );
+
+          // Reset form and close modal
+          reset({
+            name: '',
+            description: '',
+            icon: defaultIconOption?.value ?? '',
+          });
+          setEditingCategory(null);
+          setOpen(false);
+        } else {
+          throw new Error(response.message || CATEGORY_MESSAGES.UPDATE_ERROR);
+        }
+      } else {
+        // Create new category
+        const categoryData: CreateCategoryRequest = {
+          name: data.name,
+          description: data.description,
+          icon: data.icon,
+          status: 'ACTIVE', // Default to ACTIVE when creating
+          is_default: false, // New categories are not default
+        };
+
+        const response = await apiService.createCategory(categoryData);
+        if (
+          response.statusCode === STATUS_CODES.OK ||
+          response.statusCode === STATUS_CODES.CREATED
+        ) {
+          showSuccessToast(CATEGORY_MESSAGES.CREATE_SUCCESS);
+
+          // Reset form and close modal
+          reset({
+            name: '',
+            description: '',
+            icon: defaultIconOption?.value ?? '',
+          });
+          setOpen(false);
+
+          // Refresh categories list
+          fetchCategories();
+        } else {
+          throw new Error(response.message || CATEGORY_MESSAGES.CREATE_ERROR);
+        }
+      }
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        editingCategory
+          ? CATEGORY_MESSAGES.UPDATE_ERROR
+          : CATEGORY_MESSAGES.CREATE_ERROR
       );
       showErrorToast(message);
     } finally {
@@ -192,6 +286,7 @@ const CategoryManagement = () => {
 
   const handleClose = () => {
     setOpen(false);
+    setEditingCategory(null);
     reset({
       name: '',
       description: '',
@@ -245,103 +340,121 @@ const CategoryManagement = () => {
                 menuOptions={menuOptions}
                 categoryUuid={category.uuid}
                 onDelete={() => handleDeleteCategory(category.uuid)}
+                onEdit={() => handleEditCategory(category.uuid)}
               />
             );
           })}
         </div>
       )}
 
-      {/* Create Category Side Sheet */}
+      {/* Create/Edit Category Side Sheet */}
       <SideSheet
-        title={CATEGORY_MESSAGES.ADD_CATEGORY_TITLE}
+        title={
+          editingCategory
+            ? CATEGORY_MESSAGES.EDIT_CATEGORY_TITLE
+            : CATEGORY_MESSAGES.ADD_CATEGORY_TITLE
+        }
         open={open}
         onOpenChange={setOpen}
         size='400px'
       >
         <div className='space-y-6'>
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-            {/* Icon Selector */}
-            <div className='space-y-2'>
-              <Controller
-                name='icon'
-                control={control}
-                render={({ field }) => (
-                  <IconFieldWrapper
-                    label={CATEGORY_MESSAGES.ICON_LABEL}
-                    value={field.value}
-                    onChange={field.onChange}
-                    iconOptions={iconOptions}
-                    error={errors.icon?.message || ''}
-                  />
-                )}
-              />
+          {isLoadingCategory ? (
+            <div className='text-center py-10'>
+              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4'></div>
+              <p className='text-gray-600'>{CATEGORY_MESSAGES.LOADING}</p>
             </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+              {/* Icon Selector */}
+              <div className='space-y-2'>
+                <Controller
+                  name='icon'
+                  control={control}
+                  render={({ field }) => (
+                    <IconFieldWrapper
+                      label={CATEGORY_MESSAGES.ICON_LABEL}
+                      value={field.value}
+                      onChange={field.onChange}
+                      iconOptions={iconOptions}
+                      error={errors.icon?.message || ''}
+                    />
+                  )}
+                />
+              </div>
 
-            {/* Category Name */}
-            <div className='space-y-2'>
-              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
-              </Label>
-              <Controller
-                name='name'
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
-                    className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    disabled={isSubmitting}
+              {/* Category Name */}
+              <div className='space-y-2'>
+                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                  {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
+                </Label>
+                <Controller
+                  name='name'
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
+                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                      disabled={isSubmitting}
+                    />
+                  )}
+                />
+                {errors.name && (
+                  <FormErrorMessage message={errors.name.message || ''} />
+                )}
+              </div>
+              {/* Description */}
+              <div className='space-y-2'>
+                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                  {CATEGORY_MESSAGES.DESCRIPTION_LABEL}
+                </Label>
+                <Controller
+                  name='description'
+                  control={control}
+                  render={({ field }) => (
+                    <Textarea
+                      {...field}
+                      placeholder={CATEGORY_MESSAGES.ENTER_DESCRIPTION}
+                      className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                      disabled={isSubmitting}
+                    />
+                  )}
+                />
+                {errors.description && (
+                  <FormErrorMessage
+                    message={errors.description.message || ''}
                   />
                 )}
-              />
-              {errors.name && (
-                <FormErrorMessage message={errors.name.message || ''} />
-              )}
-            </div>
-            {/* Description */}
-            <div className='space-y-2'>
-              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                {CATEGORY_MESSAGES.DESCRIPTION_LABEL}
-              </Label>
-              <Controller
-                name='description'
-                control={control}
-                render={({ field }) => (
-                  <Textarea
-                    {...field}
-                    placeholder={CATEGORY_MESSAGES.ENTER_DESCRIPTION}
-                    className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    disabled={isSubmitting}
-                  />
-                )}
-              />
-              {errors.description && (
-                <FormErrorMessage message={errors.description.message || ''} />
-              )}
-            </div>
+              </div>
 
-            {/* Actions */}
-            <div className='flex gap-4 pt-2'>
-              <Button
-                type='button'
-                variant='outline'
-                className='h-[48px] px-8 rounded-full font-semibold text-[var(--text-dark)] border-2 border-[var(--border-dark)] bg-transparent'
-                onClick={handleClose}
-                disabled={isSubmitting}
-              >
-                {CATEGORY_MESSAGES.CANCEL_BUTTON}
-              </Button>
-              <Button
-                type='submit'
-                className='h-[48px] px-12 bg-[#38B24D] hover:bg-[#2e9c41] rounded-full font-semibold text-white'
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? CATEGORY_MESSAGES.CREATING_BUTTON
-                  : CATEGORY_MESSAGES.CREATE_BUTTON}
-              </Button>
-            </div>
-          </form>
+              {/* Actions */}
+              <div className='flex gap-4 pt-2'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='h-[48px] px-8 rounded-full font-semibold text-[var(--text-dark)] border-2 border-[var(--border-dark)] bg-transparent'
+                  onClick={handleClose}
+                  disabled={isSubmitting}
+                >
+                  {CATEGORY_MESSAGES.CANCEL_BUTTON}
+                </Button>
+                <Button
+                  type='submit'
+                  className='h-[48px] px-12 bg-[#38B24D] hover:bg-[#2e9c41] rounded-full font-semibold text-white'
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? editingCategory
+                      ? CATEGORY_MESSAGES.UPDATING_BUTTON
+                      : CATEGORY_MESSAGES.CREATING_BUTTON
+                    : editingCategory
+                      ? CATEGORY_MESSAGES.UPDATE_BUTTON
+                      : CATEGORY_MESSAGES.CREATE_BUTTON}
+                </Button>
+              </div>
+            </form>
+          )}
         </div>
       </SideSheet>
     </section>
