@@ -118,6 +118,7 @@ export default function AddUserPage() {
         name: data.name,
         email: data.email,
         password: data.password,
+        country_code: data.country_code,
         phone_number: data.phone_number,
         date_of_joining: data.date_of_joining,
         designation: data.designation,

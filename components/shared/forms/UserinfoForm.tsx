@@ -29,6 +29,97 @@ import { Calendar1 } from 'iconsax-react';
 import { useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
 
+// Country code mapping
+const countryCodeMap: Record<string, string> = {
+  us: '+1',
+  ca: '+1',
+  gb: '+44',
+  au: '+61',
+  de: '+49',
+  fr: '+33',
+  it: '+39',
+  es: '+34',
+  nl: '+31',
+  ch: '+41',
+  se: '+46',
+  no: '+47',
+  dk: '+45',
+  fi: '+358',
+  at: '+43',
+  be: '+32',
+  pt: '+351',
+  ie: '+353',
+  lu: '+352',
+  in: '+91',
+  jp: '+81',
+  kr: '+82',
+  cn: '+86',
+  hk: '+852',
+  sg: '+65',
+  my: '+60',
+  th: '+66',
+  ph: '+63',
+  id: '+62',
+  vn: '+84',
+  tw: '+886',
+  ru: '+7',
+  ua: '+380',
+  pl: '+48',
+  cz: '+420',
+  sk: '+421',
+  hu: '+36',
+  ro: '+40',
+  bg: '+359',
+  hr: '+385',
+  si: '+386',
+  ee: '+372',
+  lv: '+371',
+  lt: '+370',
+  is: '+354',
+  mt: '+356',
+  cy: '+357',
+  br: '+55',
+  ar: '+54',
+  cl: '+56',
+  co: '+57',
+  pe: '+51',
+  mx: '+52',
+  za: '+27',
+  eg: '+20',
+  ma: '+212',
+  ng: '+234',
+  ke: '+254',
+  tz: '+255',
+  tr: '+90',
+  il: '+972',
+  ae: '+971',
+  sa: '+966',
+  kw: '+965',
+  qa: '+974',
+  bh: '+973',
+  om: '+968',
+  jo: '+962',
+  lb: '+961',
+  iq: '+964',
+  ir: '+98',
+  af: '+93',
+  pk: '+92',
+  bd: '+880',
+  lk: '+94',
+  np: '+977',
+  bt: '+975',
+  mv: '+960',
+  mn: '+976',
+};
+
+// Reverse mapping to find country from country code
+const getCountryFromCode = (code: string): string => {
+  const entry = Object.entries(countryCodeMap).find(
+    ([, value]) => value === code
+  );
+  return entry ? entry[0] : 'us'; // Default to US if not found
+};
+
 interface UserInfoFormProps {
   roles: Role[];
   loadingRoles?: boolean;
@@ -69,7 +160,30 @@ export function UserInfoForm({
       setFullName(initialData.name || '');
       setDesignation(initialData.designation || '');
       setEmail(initialData.email || '');
-      setPhone(initialData.phone_number || '');
+
+      // Handle phone number and country code
+      if (initialData.country_code && initialData.phone_number) {
+        // Separate fields available
+        const countryKey = getCountryFromCode(initialData.country_code);
+        setCountry(countryKey);
+        setPhone(initialData.phone_number);
+      } else if (initialData.phone_number) {
+        // Combined phone number - extract country code
+        const phoneStr = initialData.phone_number;
+        const matchedEntry = Object.entries(countryCodeMap).find(([, code]) =>
+          phoneStr.startsWith(code)
+        );
+        if (matchedEntry) {
+          const [countryKey, code] = matchedEntry;
+          setCountry(countryKey);
+          setPhone(phoneStr.substring(code.length));
+        } else {
+          // Default to US if no country code found
+          setCountry('us');
+          setPhone(phoneStr);
+        }
+      }
+
       setCommunication(initialData.preferred_communication_method || '');
       setAddress(initialData.address || '');
       setCity(initialData.city || '');
@@ -108,6 +222,7 @@ export function UserInfoForm({
         role_id: Number(roleId),
         name: fullName,
         email,
+        country_code: countryCodeMap[country] || '+1',
         phone_number: phone,
         designation,
         preferred_communication_method: communication,

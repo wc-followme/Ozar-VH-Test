@@ -92,6 +92,7 @@ export interface User {
   company_id: string;
   name: string;
   email: string;
+  country_code: string;
   phone_number: string;
   profile_picture_url: string;
   status: string;
@@ -144,6 +145,7 @@ export interface CreateUserRequest {
   name: string;
   email: string;
   password: string;
+  country_code: string;
   phone_number: string;
   profile_picture_url?: string;
   date_of_joining: string;
@@ -166,6 +168,7 @@ export interface UpdateUserRequest {
   name?: string;
   email?: string;
   password?: string;
+  country_code?: string;
   phone_number?: string;
   profile_picture_url?: string;
   date_of_joining?: string;

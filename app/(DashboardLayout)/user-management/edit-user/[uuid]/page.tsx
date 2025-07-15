@@ -146,6 +146,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         role_id: data.role_id,
         name: data.name,
         email: data.email,
+        country_code: data.country_code,
         phone_number: data.phone_number,
         designation: data.designation,
         preferred_communication_method: data.preferred_communication_method,
