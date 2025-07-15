@@ -1,5 +1,6 @@
 'use client';
 
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,7 +9,6 @@ import { apiService, UpdateUserRequest, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,6 +20,11 @@ interface EditUserPageProps {
     uuid: string;
   }>;
 }
+
+const breadcrumbData: BreadcrumbItem[] = [
+  { name: 'User Management', href: '/user-management' },
+  { name: 'Edit User' }, // current page
+];
 
 export default function EditUserPage({ params }: EditUserPageProps) {
   const resolvedParams = React.use(params);
@@ -194,15 +199,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
     <div className=''>
       <div className=''>
         {/* Breadcrumb */}
-        <div className='flex items-center text-sm text-gray-500 mb-6 mt-2'>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            {USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB}
-          </span>
-          <ChevronRight className='h-4 w-4 mx-2' />
-          <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            {USER_MESSAGES.EDIT_USER_BREADCRUMB}
-          </span>
-        </div>
+        <Breadcrumb items={breadcrumbData} className='mb-5' />
 
         {/* Header */}
         <div className='flex items-center justify-between mb-6'>
