@@ -1,5 +1,6 @@
 'use client';
 
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { CompanyInfoForm } from '@/components/shared/forms/CompanyinfoForm';
 import { useToast } from '@/components/ui/use-toast';
@@ -11,11 +12,15 @@ import {
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { COMPANY_MESSAGES } from '../../company-messages';
 import { CompanyCreateFormData, CompanyInitialData } from '../../company-types';
+
+const breadcrumbData: BreadcrumbItem[] = [
+  { name: 'Company Management', href: '/company-management' },
+  { name: 'Edit Company' }, // current page
+];
 
 interface EditCompanyPageProps {
   params: Promise<{
@@ -223,18 +228,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
-          <div className='flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-2'>
-            <span
-              className='cursor-pointer hover:text-[var(--text)]'
-              onClick={() => router.push('/company-management')}
-            >
-              {COMPANY_MESSAGES.BREADCRUMB_COMPANIES}
-            </span>
-            <ChevronRight size={14} />
-            <span className='text-[var(--text)]'>
-              {COMPANY_MESSAGES.EDIT_COMPANY_TITLE}
-            </span>
-          </div>
+          <Breadcrumb items={breadcrumbData} className='mb-2' />
           <h1 className='text-2xl font-bold text-[var(--text)]'>
             {COMPANY_MESSAGES.EDIT_COMPANY_TITLE}
           </h1>

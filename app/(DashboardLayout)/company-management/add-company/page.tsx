@@ -1,5 +1,6 @@
 'use client';
 
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { CompanyInfoForm } from '@/components/shared/forms/CompanyinfoForm';
 import { useToast } from '@/components/ui/use-toast';
@@ -7,12 +8,16 @@ import { apiService, CreateCompanyRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { COMPANY_MESSAGES } from '../company-messages';
 import { CompanyCreateFormData } from '../company-types';
+
+const breadcrumbData: BreadcrumbItem[] = [
+  { name: 'Company Management', href: '/company-management' },
+  { name: 'Add Company' }, // current page
+];
 
 export default function AddCompanyPage() {
   const [fileKey, setFileKey] = useState<string>('');
@@ -103,15 +108,7 @@ export default function AddCompanyPage() {
     <div className=''>
       <div className=''>
         {/* Breadcrumb */}
-        <div className='flex items-center text-sm text-gray-500 mb-6 mt-2'>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            {COMPANY_MESSAGES.COMPANY_MANAGEMENT_TITLE}
-          </span>
-          <ChevronRight className='h-4 w-4 mx-2' />
-          <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            {COMPANY_MESSAGES.ADD_COMPANY_TITLE}
-          </span>
-        </div>
+        <Breadcrumb items={breadcrumbData} className='mb-6 mt-2' />
 
         {/* Main Content */}
         <div className=''>
