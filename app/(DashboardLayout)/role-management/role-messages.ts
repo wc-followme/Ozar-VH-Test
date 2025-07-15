@@ -50,6 +50,6 @@ export const ROLE_MESSAGES = {
   INVALID_DATA: 'Invalid role data. Please check your input.',
 
   // Confirmation dialogs
-  DELETE_CONFIRM_TITLE: 'Are you sure you want to delete?',
+  DELETE_CONFIRM_TITLE: 'Are you sure you want to archive?',
   DELETE_CONFIRM_SUBTITLE: 'This action cannot be undone.',
 };

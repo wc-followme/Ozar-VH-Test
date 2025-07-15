@@ -63,9 +63,9 @@ export const CATEGORY_MESSAGES = {
 
   // Menu Options
   EDIT_MENU: 'Edit',
-  DELETE_MENU: 'Delete',
+  DELETE_MENU: 'Archive',
 
   // Confirm Modal Messages
-  DELETE_CONFIRM_TITLE: 'Are you sure you want to delete?',
+  DELETE_CONFIRM_TITLE: 'Are you sure you want to archive?',
   DELETE_CONFIRM_SUBTITLE: 'This action cannot be undone.',
 };

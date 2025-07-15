@@ -101,7 +101,7 @@ export default function ToolCard({
           </DropdownMenu>
           <ConfirmDeleteModal
             open={showDelete}
-            title={`Are you sure you want to delete "${name}"?`}
+            title={`Are you sure you want to archive "${name}"?`}
             subtitle={`This action cannot be undone.`}
             onCancel={() => setShowDelete(false)}
             onDelete={() => {

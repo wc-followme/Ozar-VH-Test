@@ -112,7 +112,7 @@ export const COMPANY_MESSAGES = {
 
   // Menu Options
   EDIT_MENU: 'Edit',
-  DELETE_MENU: 'Delete',
+  DELETE_MENU: 'Archive',
 
   // General Messages
   NETWORK_ERROR: 'Network error. Please check your connection.',
@@ -121,6 +121,6 @@ export const COMPANY_MESSAGES = {
   UNAUTHORIZED: 'You are not authorized to perform this action.',
 
   // Confirm Modal Messages
-  DELETE_CONFIRM_TITLE: 'Are you sure you want to delete?',
+  DELETE_CONFIRM_TITLE: 'Are you sure you want to archive?',
   DELETE_CONFIRM_SUBTITLE: 'This action cannot be undone.',
 };

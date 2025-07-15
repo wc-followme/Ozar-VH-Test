@@ -144,7 +144,7 @@ export function CategoryCard({
         open={showDeleteModal}
         onCancel={() => setShowDeleteModal(false)}
         onDelete={handleDelete}
-        title='Are you sure you want to delete?'
+        title='Are you sure you want to archive?'
         subtitle='This action cannot be undone.'
       />
     </>

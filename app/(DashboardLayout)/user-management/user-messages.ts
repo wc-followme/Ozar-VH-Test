@@ -112,6 +112,6 @@ export const USER_MESSAGES = {
   INVALID_DATA: 'Invalid user data. Please check your input.',
 
   // Confirm Modal Messages
-  DELETE_CONFIRM_TITLE: 'Are you sure you want to delete?',
+  DELETE_CONFIRM_TITLE: 'Are you sure you want to archive?',
   DELETE_CONFIRM_SUBTITLE: 'This action cannot be undone.',
 };
