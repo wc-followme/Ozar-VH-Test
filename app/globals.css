@@ -6,12 +6,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
 @layer base {
   :root {
     --primary: #24338c;
@@ -72,7 +66,20 @@ body {
     --destructive-foreground: 0 86% 97%;
   }
 }
-
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .btn-primary {
+    @apply h-[42px] px-6 bg-[var(--secondary)] hover:!bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2;
+  }
+  .btn-secondary {
+    @apply h-[42px] px-[18px] border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center;
+  }
+  .page-title {
+    @apply text-2xl font-medium text-[var(--text-dark)];
+  }
+}
 @layer base {
   * {
     @apply border-border;

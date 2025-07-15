@@ -1,6 +1,6 @@
 'use client';
 import { IconFlag } from '@tabler/icons-react';
-import { Add, Profile2User } from 'iconsax-react';
+import { Profile2User } from 'iconsax-react';
 import { DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { FlagHookIcon } from '../../../components/icons/FalgHookIcon';
@@ -218,10 +218,10 @@ export default function JobManagement() {
                 </TabsTrigger>
               </TabsList>
               <Button
-                className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] gap-1 rounded-full font-semibold text-white ml-auto'
+                variant='ghost'
+                className='btn-primary !h-[48px] ml-auto hover:text-white'
                 onClick={() => setIsOpen(true)}
               >
-                <Add size='52' color='#fff' className='!h-5 !w-5' />
                 Create Job
               </Button>
             </div>

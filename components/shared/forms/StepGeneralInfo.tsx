@@ -228,10 +228,7 @@ export function StepGeneralInfo({
         </div>
         {/* Next Step Button */}
         <div className='flex justify-end mt-4'>
-          <Button
-            type='submit'
-            className='bg-[var(--secondary)] hover:bg-green-600 text-white px-10 py-6 rounded-full font-semibold'
-          >
+          <Button type='submit' className='btn-primary !h-12 !px-12'>
             Next Step
           </Button>
         </div>

@@ -143,16 +143,12 @@ export const RoleForm: React.FC<RoleFormProps> = ({
         <div className='flex items-start justify-end gap-3'>
           <button
             type='button'
-            className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
+            className='btn-secondary !px-8'
             onClick={() => router.push('/role-management')}
           >
             {ROLE_MESSAGES.CANCEL_BUTTON}
           </button>
-          <button
-            type='submit'
-            className='h-[48px] font-semibold text-white text-base bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-[30px] px-6'
-            disabled={isSubmitting}
-          >
+          <button type='submit' className='btn-primary' disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />

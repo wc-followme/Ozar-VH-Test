@@ -484,14 +484,14 @@ export function UserInfoForm({
       <div className='pt-4 flex items-center justify-end gap-3'>
         <Button
           type='button'
-          className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
+          className='btn-secondary !h-12 !px-8'
           onClick={handleCancel}
         >
           {USER_MESSAGES.CANCEL_BUTTON}
         </Button>
         <Button
           type='submit'
-          className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
+          className='btn-primary !h-12 !px-12'
           disabled={loading}
         >
           {isEditMode

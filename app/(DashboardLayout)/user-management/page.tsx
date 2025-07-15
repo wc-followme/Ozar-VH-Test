@@ -13,9 +13,10 @@ import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { apiService, FetchUsersResponse, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { extractApiErrorMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MenuOption, Role, RoleApiResponse } from './types';
 import { USER_MESSAGES } from './user-messages';
 
@@ -24,10 +25,77 @@ export default function UserManagement() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(1);
+  const [_page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+
+  const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'data' in obj &&
+      typeof (obj as RoleApiResponse).data === 'object' &&
+      (obj as RoleApiResponse).data !== null &&
+      'data' in (obj as RoleApiResponse).data &&
+      Array.isArray((obj as RoleApiResponse).data.data)
+    );
+  };
+
+  const fetchUsers = useCallback(
+    async (targetPage = 1, append = false) => {
+      setLoading(true);
+      try {
+        // Fetch roles only on first load
+        if (targetPage === 1) {
+          const rolesRes = await apiService.fetchRoles({
+            page: 1,
+            limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+          });
+          const roleList = isRoleApiResponse(rolesRes)
+            ? rolesRes.data.data
+            : [];
+          setRoles(
+            roleList.map((role: Role) => ({ id: role.id, name: role.name }))
+          );
+        }
+        const role_id = filter !== 'all' ? filter : '';
+        const usersRes: FetchUsersResponse = await apiService.fetchUsers({
+          page: targetPage,
+          limit: PAGINATION.USERS_LIMIT,
+          role_id,
+        });
+        const newUsers = usersRes.data;
+
+        setUsers(prev => {
+          if (append) {
+            // Filter out duplicates when appending to prevent duplicate keys
+            const existingUuids = new Set(prev.map(user => user.uuid));
+            const uniqueNewUsers = newUsers.filter(
+              user => !existingUuids.has(user.uuid)
+            );
+            return [...prev, ...uniqueNewUsers];
+          } else {
+            return newUsers;
+          }
+        });
+
+        setPage(targetPage);
+        setHasMore(usersRes.pagination.page < usersRes.pagination.totalPages);
+      } catch (err: unknown) {
+        if (handleAuthError(err)) {
+          return;
+        }
+        const message = extractApiErrorMessage(err, USER_MESSAGES.FETCH_ERROR);
+        showErrorToast(message);
+        if (!append) setUsers([]);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filter, handleAuthError, showErrorToast]
+  );
 
   // Fetch roles and first page of users
   useEffect(() => {
@@ -35,8 +103,7 @@ export default function UserManagement() {
     setHasMore(true);
     setUsers([]);
     fetchUsers(1, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+  }, [fetchUsers]);
 
   // Infinite scroll
   useEffect(() => {
@@ -56,72 +123,7 @@ export default function UserManagement() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [loading, hasMore]); // Removed page and filter from dependencies
-
-  const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
-    return (
-      typeof obj === 'object' &&
-      obj !== null &&
-      'data' in obj &&
-      typeof (obj as RoleApiResponse).data === 'object' &&
-      (obj as RoleApiResponse).data !== null &&
-      'data' in (obj as RoleApiResponse).data &&
-      Array.isArray((obj as RoleApiResponse).data.data)
-    );
-  };
-
-  const fetchUsers = async (targetPage = 1, append = false) => {
-    setLoading(true);
-    try {
-      // Fetch roles only on first load
-      if (targetPage === 1) {
-        const rolesRes = await apiService.fetchRoles({
-          page: 1,
-          limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
-        });
-        const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
-        setRoles(
-          roleList.map((role: Role) => ({ id: role.id, name: role.name }))
-        );
-      }
-      const role_id = filter !== 'all' ? filter : '';
-      const usersRes: FetchUsersResponse = await apiService.fetchUsers({
-        page: targetPage,
-        limit: PAGINATION.USERS_LIMIT,
-        role_id,
-      });
-      const newUsers = usersRes.data;
-
-      setUsers(prev => {
-        if (append) {
-          // Filter out duplicates when appending to prevent duplicate keys
-          const existingUuids = new Set(prev.map(user => user.uuid));
-          const uniqueNewUsers = newUsers.filter(
-            user => !existingUuids.has(user.uuid)
-          );
-          return [...prev, ...uniqueNewUsers];
-        } else {
-          return newUsers;
-        }
-      });
-
-      // Don't call setPage here as it's managed in the scroll handler
-      setHasMore(usersRes.pagination.page < usersRes.pagination.totalPages);
-    } catch (err: unknown) {
-      // Handle auth errors first (will redirect to login if 401)
-      if (handleAuthError(err)) {
-        return; // Don't show toast if it's an auth error
-      }
-
-      const message =
-        err instanceof Error ? err.message : USER_MESSAGES.FETCH_ERROR;
-      showErrorToast(message);
-      if (!append) setUsers([]);
-      setHasMore(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [loading, hasMore, fetchUsers]); // Added fetchUsers to dependencies
 
   // Status toggle handler
   const handleToggleStatus = async (id: number, currentStatus: boolean) => {
@@ -134,9 +136,7 @@ export default function UserManagement() {
       setUsers(users =>
         users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
       );
-      showSuccessToast(
-        `${USER_MESSAGES.STATUS_UPDATE_SUCCESS}`
-      );
+      showSuccessToast(`${USER_MESSAGES.STATUS_UPDATE_SUCCESS}`);
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -181,9 +181,7 @@ export default function UserManagement() {
     <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
-        <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
-          {USER_MESSAGES.USER_MANAGEMENT_TITLE}
-        </h1>
+        <h2 className='page-title'>{USER_MESSAGES.USER_MANAGEMENT_TITLE}</h2>
         <div className='flex items-center gap-4'>
           <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger className='w-40 bg-[var(--white-background)] rounded-[30px] border-2 border-[var(--border-dark)] h-[42px]'>
@@ -198,11 +196,7 @@ export default function UserManagement() {
               ))}
             </SelectContent>
           </Select>
-          <Button
-            asChild
-            className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
-            disabled={loading}
-          >
+          <Button asChild className='btn-primary' disabled={loading}>
             <Link href='/user-management/create-user'>
               {USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
             </Link>

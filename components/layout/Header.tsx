@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import { HambergerMenu, Key, UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '../../lib/utils';
 import { Search } from '../icons/Search';
@@ -79,7 +80,9 @@ export function Header() {
           <SidebarMobile open={sideSheetOpen} onOpenChange={setSideSheetOpen} />
         </div>
         <div className='flex items-center space-x-4 mr-auto'>
-          <h1 className='text-2xl font-bold'>Virtual Homes</h1>
+          <Link href='/' className='text-2xl font-bold'>
+            Virtual Homes
+          </Link>
         </div>
         <div className='flex items-center gap-6'>
           <div className='flex items-center border-2 border-[var(--border-dark)] rounded-[20px] overflow-hidden w-[280px] xl:w-[443px] focus-within:border-green-500'>

@@ -10,11 +10,7 @@ import { CreateRoleFormData } from '@/lib/validations/role';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ROLE_MESSAGES } from '../../role-messages';
-import type {
-  ApiResponse,
-  GetRoleResponse,
-  UpdateRoleRequest,
-} from '../../types';
+import type { ApiResponse, Role, UpdateRoleRequest } from '../../types';
 
 const breadcrumbData: BreadcrumbItem[] = [
   { name: ROLE_MESSAGES.ROLE_MANAGEMENT_BREADCRUMB, href: '/role-management' },
@@ -40,7 +36,7 @@ const EditRolePage = () => {
       try {
         const res = (await apiService.getRoleDetails(
           uuid
-        )) as ApiResponse<GetRoleResponse>;
+        )) as ApiResponse<Role>;
         const data = res.data;
         if (data) {
           setInitialValues({
@@ -76,7 +72,7 @@ const EditRolePage = () => {
       }
     } catch (err: unknown) {
       let errorMessage = ROLE_MESSAGES.UPDATE_ERROR;
-      const apiError = err as ApiResponse;
+      const apiError = err as any; // Using any for flexibility with different error structures
 
       if (apiError.statusCode === STATUS_CODES.BAD_REQUEST) {
         errorMessage = ROLE_MESSAGES.INVALID_DATA;
@@ -96,8 +92,8 @@ const EditRolePage = () => {
       } else if (apiError.message) {
         errorMessage = apiError.message;
       }
+
       showErrorToast(errorMessage);
-    } finally {
       setIsSubmitting(false);
     }
   };

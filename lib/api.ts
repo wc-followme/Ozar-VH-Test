@@ -280,6 +280,76 @@ export interface DeleteCompanyResponse {
   message: string;
 }
 
+// Category interfaces
+export interface Category {
+  id: number;
+  uuid: string;
+  name: string;
+  description: string;
+  icon: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FetchCategoriesResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    data: Category[];
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CreateCategoryRequest {
+  name: string;
+  description: string;
+  icon: string;
+  is_default?: boolean;
+  status?: 'ACTIVE' | 'INACTIVE';
+}
+
+export interface CreateCategoryResponse {
+  statusCode: number;
+  message: string;
+  data?: Category;
+}
+
+export interface UpdateCategoryRequest {
+  name?: string;
+  description?: string;
+  icon?: string;
+  is_default?: boolean;
+  status?: 'ACTIVE' | 'INACTIVE';
+}
+
+export interface UpdateCategoryResponse {
+  statusCode: number;
+  message: string;
+  data?: Category;
+}
+
+export interface UpdateCategoryStatusResponse {
+  statusCode: number;
+  message: string;
+  data?: Category;
+}
+
+export interface DeleteCategoryResponse {
+  statusCode: number;
+  message: string;
+}
+
+export interface GetCategoryResponse {
+  statusCode: number;
+  message: string;
+  data: Category;
+}
+
 export interface GetCompanyResponse {
   statusCode: number;
   message: string;
@@ -706,6 +776,75 @@ class ApiService {
   // Delete company
   async deleteCompany(uuid: string): Promise<DeleteCompanyResponse> {
     return this.makeRequest(`/companies/${uuid}`, {
+      method: 'DELETE',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Category management APIs
+  async fetchCategories({
+    page = 1,
+    limit = PAGINATION.DEFAULT_LIMIT,
+    search = '',
+    name = '',
+  }: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    name?: string;
+  }): Promise<FetchCategoriesResponse> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (search) params.append('search', search);
+    if (name) params.append('name', name);
+    return this.makeRequest(`/categories?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  async createCategory(
+    payload: CreateCategoryRequest
+  ): Promise<CreateCategoryResponse> {
+    return this.makeRequest('/categories', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getCategoryDetails(uuid: string): Promise<GetCategoryResponse> {
+    return this.makeRequest(`/categories/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  async updateCategory(
+    uuid: string,
+    payload: UpdateCategoryRequest
+  ): Promise<UpdateCategoryResponse> {
+    return this.makeRequest(`/categories/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async updateCategoryStatus(
+    uuid: string,
+    status: 'ACTIVE' | 'INACTIVE'
+  ): Promise<UpdateCategoryStatusResponse> {
+    return this.makeRequest(`/categories/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify({ status }),
+    });
+  }
+
+  async deleteCategory(uuid: string): Promise<DeleteCategoryResponse> {
+    return this.makeRequest(`/categories/${uuid}`, {
       method: 'DELETE',
       headers: this.getRoleHeaders(),
     });

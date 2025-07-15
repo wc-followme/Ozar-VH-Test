@@ -132,7 +132,7 @@ export default function ChangePasswordForm({
       </div>
       <Button
         type='submit'
-        className='w-full h-12 bg-[var(--secondary)] hover:bg-green-600 text-white font-semibold rounded-full text-base mb-6'
+        className='btn-primary !h-12 !px-12 w-full mb-8'
         disabled={loading}
       >
         Change Password

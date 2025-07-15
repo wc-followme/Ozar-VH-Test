@@ -6,7 +6,7 @@ import { PAGINATION } from '@/constants/common';
 import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
-import { AddCircle, Edit2, Trash } from 'iconsax-react';
+import { Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { COMPANY_MESSAGES } from './company-messages';
@@ -62,7 +62,6 @@ export default function CompanyManagement() {
         limit: PAGINATION.DEFAULT_LIMIT,
         status: 'ACTIVE',
         sortOrder: 'ASC',
-        sortBy: 'created_at',
       });
 
       if (isCompanyApiResponse(res)) {
@@ -116,9 +115,7 @@ export default function CompanyManagement() {
         companies.map(c => (c.id === id ? { ...c, status: newStatus } : c))
       );
 
-      showSuccessToast(
-        `${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS}`
-      );
+      showSuccessToast(`${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS}`);
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -165,19 +162,14 @@ export default function CompanyManagement() {
     <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
-        <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
+        <h1 className='page-title'>
           {COMPANY_MESSAGES.COMPANY_MANAGEMENT_TITLE}
         </h1>
         <div className='flex items-center gap-4'>
           <Link
-            className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-2'
+            className='btn-primary'
             href={'/company-management/add-company'}
           >
-            <AddCircle
-              size='32'
-              color='currentColor'
-              className='!w-[1.375rem] !h-[1.375rem]'
-            />
             <span>{COMPANY_MESSAGES.ADD_COMPANY_BUTTON}</span>
           </Link>
         </div>

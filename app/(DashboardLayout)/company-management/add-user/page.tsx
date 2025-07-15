@@ -48,7 +48,6 @@ export default function AddCompanyUserPage() {
   };
   const handleUploadClick = () => {
     // Implement upload logic
-    console.log('Upload clicked');
   };
 
   return (

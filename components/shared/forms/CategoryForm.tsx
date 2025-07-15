@@ -94,15 +94,12 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           <Button
             type='button'
             variant='outline'
-            className='h-[48px] px-8 rounded-full font-semibold text-[var(--text-dark)] border-2 border-[var(--border-dark)] bg-transparent'
+            className='btn-secondary !h-12 !px-8'
             onClick={onClose}
           >
             Cancel
           </Button>
-          <Button
-            type='submit'
-            className='h-[48px] px-12 bg-[#38B24D] hover:bg-[#2e9c41] rounded-full font-semibold text-white'
-          >
+          <Button type='submit' className='btn-primary !h-12 !px-12'>
             Create
           </Button>
         </div>

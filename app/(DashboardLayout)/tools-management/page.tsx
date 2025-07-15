@@ -4,7 +4,6 @@ import ToolCard from '@/components/shared/cards/ToolCard';
 import SideSheet from '@/components/shared/common/SideSheet';
 import ToolForm from '@/components/shared/forms/ToolForm';
 import ToolCardSkeleton from '@/components/shared/skeleton/ToolCardSkeleton';
-import { AddCircle } from 'iconsax-react';
 import { useEffect, useState } from 'react';
 
 const dummyTools = [
@@ -155,18 +154,8 @@ const ToolsManagement = () => {
     <div className='w-full'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
-        <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
-          Tools Management
-        </h1>
-        <button
-          className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-2'
-          onClick={() => setSideSheetOpen(true)}
-        >
-          <AddCircle
-            size='32'
-            color='currentColor'
-            className='!w-[1.375rem] !h-[1.375rem]'
-          />
+        <h2 className='page-title'>Tools Management</h2>
+        <button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
           <span>Add Tool</span>
         </button>
       </div>

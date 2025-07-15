@@ -302,7 +302,10 @@ export function CompanyInfoForm({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className='w-auto p-0 bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]' align='start'>
+              <PopoverContent
+                className='w-auto p-0 bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+                align='start'
+              >
                 <Calendar
                   mode='single'
                   selected={expiryDate}
@@ -447,26 +450,26 @@ export function CompanyInfoForm({
       </div>
 
       {/* Form Actions */}
-      <div className='flex items-center gap-4 pt-6'>
+      <div className='flex items-center justify-end gap-4 pt-6'>
+        <Button
+          type='button'
+          variant='outline'
+          onClick={handleCancel}
+          disabled={loading}
+          className='btn-secondary !h-12 !px-8'
+        >
+          {COMPANY_MESSAGES.CANCEL_BUTTON}
+        </Button>
         <Button
           type='submit'
           disabled={loading}
-          className='px-8 py-3 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] text-white rounded-[10px] font-semibold'
+          className='btn-primary !h-12 !px-12'
         >
           {loading
             ? 'Creating...'
             : isEditMode
               ? COMPANY_MESSAGES.UPDATE_BUTTON
               : COMPANY_MESSAGES.CREATE_BUTTON}
-        </Button>
-        <Button
-          type='button'
-          variant='outline'
-          onClick={handleCancel}
-          disabled={loading}
-          className='px-8 py-3 border-2 border-[var(--border-dark)] bg-[var(--white-background)] text-[var(--text-dark)] rounded-[10px] font-semibold hover:bg-gray-50'
-        >
-          {COMPANY_MESSAGES.CANCEL_BUTTON}
         </Button>
       </div>
     </form>

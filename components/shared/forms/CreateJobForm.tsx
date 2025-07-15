@@ -141,13 +141,8 @@ export function CreateJobForm() {
 
           {/* Submit Button */}
           <div className='pt-4 flex items-center gap-3'>
-            <Button className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'>
-              Continue Estimate
-            </Button>
-            <Button
-              type='submit'
-              className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
-            >
+            <Button className='btn-secondary !h-12'>Continue Estimate</Button>
+            <Button type='submit' className='btn-primary !h-12'>
               Create Job
             </Button>
           </div>

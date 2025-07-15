@@ -110,13 +110,8 @@ const RoleManagement = () => {
   return (
     <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
-        <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
-          {ROLE_MESSAGES.PAGE_TITLE}
-        </h2>
-        <Link
-          href={'/role-management/create-role'}
-          className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
-        >
+        <h2 className='page-title'>{ROLE_MESSAGES.PAGE_TITLE}</h2>
+        <Link href={'/role-management/create-role'} className='btn-primary'>
           {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
         </Link>
       </header>

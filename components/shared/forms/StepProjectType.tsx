@@ -94,17 +94,14 @@ export function StepProjectType({
       <div className='flex w-full justify-between mt-6'>
         <button
           type='button'
-          className={
-            cancelButtonClass ||
-            'h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
-          }
+          className={cancelButtonClass || 'btn-secondary !h-12 !px-8'}
           onClick={onPrev}
         >
           Previous
         </button>
         <button
           type='button'
-          className='bg-[var(--secondary)] hover:bg-green-600 text-white px-10 py-3 rounded-full font-semibold'
+          className='btn-primary !h-12 !px-12'
           onClick={onSubmit}
         >
           Submit

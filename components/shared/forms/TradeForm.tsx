@@ -89,7 +89,7 @@ export default function TradeForm({
         <Button
           type='button'
           variant='outline'
-          className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
+          className='btn-secondary !px-8 !h-12'
           onClick={onCancel}
           disabled={loading}
         >
@@ -97,7 +97,7 @@ export default function TradeForm({
         </Button>
         <Button
           type='submit'
-          className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'
+          className='btn-primary !h-12 !px-12'
           disabled={loading}
         >
           {loading ? 'Creating...' : 'Create'}

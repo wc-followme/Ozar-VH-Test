@@ -12,7 +12,6 @@ import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 
 import ComingSoon from '../../../../components/shared/common/ComingSoon';
 import { Role, RoleApiResponse, UserFormData } from '../types';
@@ -59,12 +58,11 @@ export default function AddUserPage() {
           roleList.map((role: Role) => ({ id: role.id, name: role.name }))
         );
       } catch (err: unknown) {
-        // Handle auth errors first (will redirect to login if 401)
         if (handleAuthError(err)) {
-          return; // Don't log error if it's an auth error
+          return; // Don't show toast if it's an auth error
         }
-
-        console.error(USER_MESSAGES.LOAD_ROLES_ERROR, err);
+        // Error fetching roles - proceed with empty array
+        setRoles([]);
       } finally {
         setLoadingRoles(false);
       }
@@ -83,8 +81,8 @@ export default function AddUserPage() {
     try {
       const ext = file.name.split('.').pop() || 'png';
       const timestamp = Date.now();
-      const userUuid = uuidv4();
-      const generatedFileName = `user_${userUuid}_${timestamp}.${ext}`;
+      const randomId = Math.random().toString(36).substring(2, 15);
+      const generatedFileName = `user_${randomId}_${timestamp}.${ext}`;
       const presigned = await getPresignedUrl({
         fileName: generatedFileName,
         fileType: file.type,

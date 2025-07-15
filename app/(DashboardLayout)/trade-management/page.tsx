@@ -140,13 +140,8 @@ export default function TradeManagementPage() {
     <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
-        <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
-          Trade Management
-        </h1>
-        <Button
-          className='bg-[var(--secondary)] hover:bg-green-600 rounded-full px-6 h-10 font-semibold text-white'
-          onClick={() => setSideSheetOpen(true)}
-        >
+        <h2 className='page-title'>Trade Management</h2>
+        <Button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
           Create Trade
         </Button>
       </div>

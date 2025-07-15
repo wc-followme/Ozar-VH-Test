@@ -230,9 +230,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
       setUsers(users =>
         users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
       );
-      showSuccessToast(
-        `${USER_MESSAGES.STATUS_UPDATE_SUCCESS}`
-      );
+      showSuccessToast(`${USER_MESSAGES.STATUS_UPDATE_SUCCESS}`);
     } catch (err: unknown) {
       if (handleAuthError(err)) {
         return;
@@ -310,9 +308,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
       setCompany(prev => (prev ? { ...prev, status: newStatus } : null));
       setEnabled(newStatus === 'ACTIVE');
 
-      showSuccessToast(
-        `${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS}`
-      );
+      showSuccessToast(`${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS}`);
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -363,19 +359,25 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
         {/* Header */}
         <div className='flex gap-6'>
           <div className='flex-0 w-[120px]'>
-            <div className='w-[120px] h-[120px] p-3 rounded-[16px] border border-[var(--border-dark)] flex items-center justify-center'>
-              <Image
-                src={
-                  company.image
-                    ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + company.image
-                    : '/images/company-management/company-img-1.png'
-                }
-                height={90}
-                width={90}
-                alt='company'
-                className='mx-auto'
-              />
-            </div>
+            {company.image ? (
+              <div className='w-[120px] h-[120px] p-3 rounded-[16px] border border-[var(--border-dark)] flex items-center justify-center'>
+                <Image
+                  src={
+                    (process.env['NEXT_PUBLIC_CDN_URL'] || '') + company.image
+                  }
+                  height={90}
+                  width={90}
+                  alt='company'
+                  className='mx-auto'
+                />
+              </div>
+            ) : (
+              <div className='w-[120px] h-[120px] rounded-[16px] border border-[var(--border-dark)] flex items-center justify-center bg-gray-50'>
+                <span className='text-gray-400 text-sm text-center'>
+                  No Image
+                </span>
+              </div>
+            )}
           </div>
           <div className='flex-1 -mt-[5px]'>
             <div className='flex items-center gap-4 border-b border-[var(--border-dark)] pb-4 mb-4'>
