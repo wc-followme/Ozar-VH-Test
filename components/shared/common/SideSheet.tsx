@@ -55,7 +55,7 @@ export default function SideSheet({
         style={{ maxWidth: size }}
       >
         <SheetHeader className='flex items-center flex-row pb-8'>
-          <SheetTitle className='text-[var(--text-dark)] text-[24px] font-medium'>
+          <SheetTitle className='text-[var(--text-dark)] text-[24px] font-medium '>
             {title}
           </SheetTitle>
           <Button

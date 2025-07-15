@@ -2,16 +2,10 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { useState } from 'react';
+import Dropdown from '../common/Dropdown';
 
 interface MenuOption {
   label: string;
@@ -80,8 +74,10 @@ export function CompanyCard({
             <h3 className='font-bold text-[var(--text)] truncate text-base'>
               {name}
             </h3>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            <Dropdown
+              menuOptions={menuOptions}
+              onAction={handleMenuAction}
+              trigger={
                 <Button
                   variant='ghost'
                   size='sm'
@@ -93,37 +89,9 @@ export function CompanyCard({
                     color='var(--text)'
                   />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align='end'
-                className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
-              >
-                {menuOptions.map(
-                  (
-                    { icon: Icon, label, action, variant }: MenuOption,
-                    index: number
-                  ) => (
-                    <DropdownMenuItem
-                      key={index}
-                      onClick={() => handleMenuAction(action)}
-                      className={cn(
-                        'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2',
-                        variant === 'destructive'
-                          ? 'text-red-600 hover:bg-red-50'
-                          : 'hover:bg-gray-100'
-                      )}
-                    >
-                      <Icon
-                        size='18'
-                        color='var(--text-dark)'
-                        variant='Outline'
-                      />
-                      <span>{label}</span>
-                    </DropdownMenuItem>
-                  )
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+              }
+              align='end'
+            />
           </div>
 
           {/* Contact Info */}

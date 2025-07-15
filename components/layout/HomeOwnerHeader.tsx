@@ -4,15 +4,9 @@ import { Button } from '@/components/ui/button';
 import { UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { cn } from '../../lib/utils';
 import { SignoutIcon } from '../icons/SignoutIcon';
 import { SupportIcon } from '../icons/SupportIcon';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+import Dropdown from '../shared/common/Dropdown';
 type MenuOption = {
   label: string;
   action: string;
@@ -38,8 +32,10 @@ export function HomeOwnerHeader() {
             <SupportIcon className='text-[var(--text-dark)]' />
           </Link>
           <ModeToggle />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Dropdown
+            menuOptions={menuOptions}
+            onAction={handleMenuAction}
+            trigger={
               <Button
                 variant='ghost'
                 size='sm'
@@ -53,39 +49,10 @@ export function HomeOwnerHeader() {
                   className='h-full w-full rounded-full'
                 />
               </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent
-              align='end'
-              className='bg-[var(--card-background)] border border-[var(--border-dark)] min-w-[185px] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px] p-[10px]'
-            >
-              {menuOptions.map(
-                (
-                  { icon: Icon, label, action, variant }: MenuOption,
-                  index: number
-                ) => (
-                  <DropdownMenuItem
-                    key={index}
-                    onClick={() => handleMenuAction(action)}
-                    className={cn(
-                      'text-base p-3 rounded-md cursor-pointer text-[var(--text-dark)] transition-colors flex items-center gap-2',
-                      variant === 'destructive'
-                        ? 'text-red-600 hover:bg-red-50'
-                        : 'hover:bg-gray-100'
-                    )}
-                  >
-                    <Icon
-                      size='40'
-                      color='currentcolor'
-                      variant='Outline'
-                      className='!h-6 !w-6'
-                    />
-                    <span>{label}</span>
-                  </DropdownMenuItem>
-                )
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            }
+            align='end'
+            className='min-w-[185px] p-[10px]'
+          />
         </div>
       </div>
     </header>

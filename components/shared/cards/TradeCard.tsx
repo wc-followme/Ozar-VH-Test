@@ -1,13 +1,8 @@
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React, { useState } from 'react';
+import Dropdown from '../common/Dropdown';
 
 interface MenuOption {
   label: string;
@@ -57,8 +52,14 @@ export const TradeCard: React.FC<TradeCardProps> = ({
       </div>
       {/* Menu Button */}
       {menuOptions.length > 0 && (
-        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-          <DropdownMenuTrigger asChild className='self-start'>
+        <Dropdown
+          menuOptions={
+            menuOptions.filter(
+              (opt): opt is Required<MenuOption> => !!opt.icon
+            ) as import('../common/Dropdown').DropdownOption[]
+          }
+          onAction={onMenuAction ?? (() => {})}
+          trigger={
             <Button variant='ghost' size='icon' className='h-8 w-8 p-0'>
               <IconDotsVertical
                 className='!w-6 !h-6'
@@ -66,25 +67,9 @@ export const TradeCard: React.FC<TradeCardProps> = ({
                 color='var(--text)'
               />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align='end'
-            className='bg-white border border-[var(--border-dark)] rounded-[8px]'
-          >
-            {menuOptions.map(({ icon: Icon, label, action }, idx) => (
-              <DropdownMenuItem
-                key={idx}
-                onClick={() => onMenuAction && onMenuAction(action)}
-                className={cn(
-                  'text-sm px-3 py-2 rounded-md cursor-pointer flex items-center gap-2'
-                )}
-              >
-                {Icon && <Icon size={18} color='var(--text-dark)' />}
-                <span>{label}</span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          }
+          align='end'
+        />
       )}
     </div>
   );

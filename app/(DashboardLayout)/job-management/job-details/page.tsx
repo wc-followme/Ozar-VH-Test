@@ -1,13 +1,8 @@
 'use client';
 
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
+import Dropdown from '@/components/shared/common/Dropdown';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { ClipboardClose, Setting2, UserAdd } from 'iconsax-react';
 import Image from 'next/image';
@@ -73,8 +68,17 @@ export default function JobDetailsPage() {
         <Breadcrumb items={breadcrumbData} className='flex-1' />
         {/* 3-dots menu */}
         <div className='ml-auto mt-2 md:mt-0'>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Dropdown
+            menuOptions={dropdownMenuItems.map(item => ({
+              icon: item.icon,
+              label: item.label,
+              action: item.label,
+            }))}
+            onAction={action => {
+              const item = dropdownMenuItems.find(i => i.label === action);
+              if (item && item.action) item.action();
+            }}
+            trigger={
               <Button
                 variant='ghost'
                 size='icon'
@@ -86,30 +90,9 @@ export default function JobDetailsPage() {
                   color='var(--text)'
                 />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align='end'
-              className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
-            >
-              {dropdownMenuItems.map(item => {
-                const Icon = item.icon;
-                return (
-                  <DropdownMenuItem
-                    key={item.label}
-                    className={item.className}
-                    onClick={item.action}
-                  >
-                    <Icon
-                      size='32'
-                      color='var(--text-dark)'
-                      className='!h-6 !w-6'
-                    />
-                    {item.label}
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            }
+            align='end'
+          />
         </div>
       </div>
       {/* Card */}

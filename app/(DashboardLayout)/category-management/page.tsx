@@ -7,14 +7,9 @@ import { Interior } from '@/components/icons/Interior';
 import { ToolsIcon } from '@/components/icons/ToolsIcon';
 import { WrenchIcon } from '@/components/icons/WrenchIcon';
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
+import Dropdown from '@/components/shared/common/Dropdown';
 import SideSheet from '@/components/shared/common/SideSheet';
 import CategoryForm from '@/components/shared/forms/CategoryForm';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Edit2, Hammer, Trash, Wrench } from 'lucide-react';
 import { useState } from 'react';
@@ -174,8 +169,22 @@ const CategoryManagement = () => {
               </div>
               {/* DropdownMenu for actions */}
               <div className='absolute top-4 right-4 cursor-pointer'>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                <Dropdown
+                  menuOptions={menuOptions.map(
+                    ({ icon, id, label, action }) => ({
+                      icon,
+                      label,
+                      action,
+                    })
+                  )}
+                  onAction={action => {
+                    if (action === 'edit') {
+                      alert(`Edit ${cat.title}`);
+                    } else if (action === 'delete') {
+                      setShowDeleteIdx(idx);
+                    }
+                  }}
+                  trigger={
                     <button className='h-8 w-8 p-0 flex items-center justify-center rounded-full '>
                       <IconDotsVertical
                         className='!w-6 !h-6'
@@ -183,31 +192,9 @@ const CategoryManagement = () => {
                         color='var(--text-dark)'
                       />
                     </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align='end'
-                    className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
-                  >
-                    {menuOptions.map(
-                      ({ icon: Icon, id, label, action, variant }) => (
-                        <DropdownMenuItem
-                          key={id}
-                          onClick={() => {
-                            if (action === 'edit') {
-                              alert(`Edit ${cat.title}`);
-                            } else if (action === 'delete') {
-                              setShowDeleteIdx(idx);
-                            }
-                          }}
-                          className={`text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 ${variant === 'destructive' ? ' hover:bg-red-50' : 'hover:bg-gray-100'}`}
-                        >
-                          <Icon size='18' color='var(--text-dark)' />
-                          <span>{label}</span>
-                        </DropdownMenuItem>
-                      )
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  }
+                  align='end'
+                />
                 <ConfirmDeleteModal
                   open={showDeleteIdx === idx}
                   title={`Are you sure you want to Archive "${cat.title}"?`}

@@ -2,19 +2,13 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Call, Icon, Sms } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
+import Dropdown from '../common/Dropdown';
 
 interface MenuOption {
   label: string;
@@ -80,7 +74,7 @@ export function UserCard({
   };
 
   return (
-    <div className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[10px] hover:shadow-lg transition-shadow duration-200'>
+    <div className='flex flex-col bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[10px] hover:shadow-lg transition-shadow duration-200'>
       {/* Header with Avatar, User Info and Menu */}
       <div className='flex items-start gap-4 mb-2'>
         <Avatar className='w-20 h-20 rounded-[10px]'>
@@ -105,13 +99,34 @@ export function UserCard({
 
         <div className='flex-1 min-w-0'>
           {/* User Info */}
-          <div className='mb-1'>
-            <h3 className='font-bold text-[var(--text)] truncate text-base'>
-              {name}
-            </h3>
-            <p className='text-[12px] font-medium text-[var(--text-dark)]'>
-              {role}
-            </p>
+          <div className='flex items-start'>
+            <div className='mb-1 flex-1'>
+              <h3 className='font-bold text-[var(--text)] truncate text-base'>
+                {name}
+              </h3>
+              <p className='text-[12px] font-medium text-[var(--text-dark)]'>
+                {role}
+              </p>
+            </div>
+            <Dropdown
+              menuOptions={menuOptions}
+              onAction={handleMenuAction}
+              trigger={
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='h-8 w-8 p-0 flex-shrink-0'
+                  disabled={disableActions}
+                >
+                  <IconDotsVertical
+                    className='!w-6 !h-6'
+                    strokeWidth={2}
+                    color='var(--text)'
+                  />
+                </Button>
+              }
+              align='end'
+            />
           </div>
 
           {/* Contact Info */}
@@ -126,50 +141,10 @@ export function UserCard({
             </div>
           </div>
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant='ghost'
-              size='sm'
-              className='h-8 w-8 p-0 flex-shrink-0'
-              disabled={disableActions}
-            >
-              <IconDotsVertical
-                className='!w-6 !h-6'
-                strokeWidth={2}
-                color='var(--text)'
-              />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align='end'
-            className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
-          >
-            {menuOptions.map(
-              ({ icon: Icon, label, action, variant }, index) => (
-                <DropdownMenuItem
-                  key={index}
-                  onClick={() => handleMenuAction(action)}
-                  className={cn(
-                    'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2',
-                    variant === 'destructive'
-                      ? 'hover:bg-red-50'
-                      : 'hover:bg-gray-100'
-                  )}
-                  disabled={!!disableActions}
-                >
-                  <Icon size='18' color='var(--text-dark)' variant='Outline' />
-                  <span>{label}</span>
-                </DropdownMenuItem>
-              )
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       {/* Status Toggle */}
-      <div className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
+      <div className='flex items-center mt-auto justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
         <span className='text-[12px] font-medium text-[var(--text-dark)]'>
           Enable
         </span>
