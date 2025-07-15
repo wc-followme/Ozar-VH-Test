@@ -1,229 +1,350 @@
 'use client';
 
-import { FlagHookIcon } from '@/components/icons/FalgHookIcon';
-import { Home } from '@/components/icons/Home';
-import { HomeIcon2 } from '@/components/icons/HomeIcon2';
-import { Interior } from '@/components/icons/Interior';
-import { ToolsIcon } from '@/components/icons/ToolsIcon';
-import { WrenchIcon } from '@/components/icons/WrenchIcon';
-import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
+import { CategoryCard } from '@/components/shared/cards/CategoryCard';
 import SideSheet from '@/components/shared/common/SideSheet';
-import CategoryForm from '@/components/shared/forms/CategoryForm';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { IconDotsVertical } from '@tabler/icons-react';
-import { Edit2, Hammer, Trash, Wrench } from 'lucide-react';
-import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/use-toast';
+import { PAGINATION } from '@/constants/common';
+import { apiService, Category, CreateCategoryRequest } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
+import { extractApiErrorMessage, formatDate } from '@/lib/utils';
+import { AddCircle, Edit2, Trash } from 'iconsax-react';
+import { useCallback, useEffect, useState } from 'react';
+import { CATEGORY_MESSAGES } from './category-messages';
+import { CategoryFormErrors } from './category-types';
 
-function hexToRgba(hex: string, alpha: number = 0.15): string {
-  let c = hex.replace('#', '');
-  if (c.length === 3)
-    c = c
-      .split('')
-      .map(x => x + x)
-      .join('');
-  const num = parseInt(c, 16);
-  return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
-}
-
-const categories = [
-  {
-    title: 'Full Home Build/Addition',
-    description:
-      'Start a new home from scratch or add a room, floor, or extension to your existing space.',
-    icon: FlagHookIcon,
-    iconBg: '#90C91D',
-  },
-  {
-    title: 'Interior',
-    description:
-      'Renovate or upgrade interiors like kitchen, bathroom, living room, or complete home redesign.',
-    icon: Interior,
-    iconBg: '#24338C',
-  },
-  {
-    title: 'Exterior',
-    description:
-      'Enhance outdoor spaces including roofing, siding, painting, landscaping, or fencing work.',
-    icon: HomeIcon2,
-    iconBg: '#F58B1E',
-  },
-  {
-    title: 'Single/Multi Trade',
-    description:
-      'Get help with one or more specific trades like plumbing, electrical, flooring, or carpentry.',
-    icon: ToolsIcon,
-    iconBg: '#EBB402',
-  },
-  {
-    title: 'Repair',
-    description:
-      'Fix issues like leaks, cracks, broken fixtures, or any small-scale home damage.',
-    icon: WrenchIcon,
-    iconBg: '#00A8BF',
-  },
-];
-
-const iconOptions = [
-  {
-    value: 'star',
-    label: 'Star',
-    icon: Edit2,
-    color: '#FFD700', // Gold color
-  },
-  {
-    value: 'heart',
-    label: 'Heart',
-    icon: Hammer,
-    color: '#FF0000', // Red color
-  },
-  {
-    value: 'bolt',
-    label: 'Bolt',
-    icon: Home,
-    color: '#1E90FF', // Blue color
-  },
-  {
-    value: 'service',
-    label: 'service',
-    icon: Wrench,
-    color: '#00A8BF', // Blue color
-  },
-];
 const menuOptions = [
-  { id: 1, label: 'Edit', action: 'edit', icon: Edit2 },
   {
-    id: 2,
-    label: 'Archive',
+    label: CATEGORY_MESSAGES.EDIT_MENU,
+    action: 'edit',
+    icon: Edit2,
+    variant: 'default' as const,
+  },
+  {
+    label: CATEGORY_MESSAGES.DELETE_MENU,
     action: 'delete',
     icon: Trash,
-    variant: 'destructive',
+    variant: 'destructive' as const,
   },
 ];
 
 const CategoryManagement = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [open, setOpen] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState('star');
-  const [showDeleteIdx, setShowDeleteIdx] = useState<number | null>(null);
-  const [categoryName, setCategoryName] = useState('');
+  const { showSuccessToast, showErrorToast } = useToast();
+  const { handleAuthError } = useAuth();
+
+  // Form state
+  const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [errors] = useState<{
-    icon?: string;
-    categoryName?: string;
-    description?: string;
-  }>({});
+  const [icon, setIcon] = useState('fas fa-folder');
+  const [errors, setErrors] = useState<CategoryFormErrors>({});
+
+  const fetchCategories = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await apiService.fetchCategories({
+        page: 1,
+        limit: PAGINATION.DEFAULT_LIMIT,
+      });
+
+      // Handle different possible response structures
+      let newCategories: Category[] = [];
+
+      if (res && res.data) {
+        // If data is directly an array
+        if (Array.isArray(res.data)) {
+          newCategories = res.data;
+        }
+        // If data is nested under data.data
+        else if (res.data.data && Array.isArray(res.data.data)) {
+          newCategories = res.data.data;
+        }
+        // If data is just the response itself (fallback)
+        else if (Array.isArray(res)) {
+          newCategories = res;
+        }
+      }
+
+      setCategories(newCategories);
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        CATEGORY_MESSAGES.FETCH_ERROR
+      );
+      showErrorToast(message);
+      setCategories([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [handleAuthError, showErrorToast]);
+
+  // Fetch categories
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  // Status toggle handler
+  const handleToggleStatus = async (
+    id: number,
+    currentStatus: 'ACTIVE' | 'INACTIVE'
+  ) => {
+    try {
+      const category = categories.find(c => c.id === id);
+      if (!category || !category.uuid)
+        throw new Error(CATEGORY_MESSAGES.CATEGORY_NOT_FOUND_ERROR);
+
+      // Prevent status changes for default categories
+      if (category.is_default) {
+        showErrorToast(CATEGORY_MESSAGES.DEFAULT_CATEGORY_STATUS_ERROR);
+        return;
+      }
+
+      const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+      await apiService.updateCategoryStatus(category.uuid, newStatus);
+
+      setCategories(categories =>
+        categories.map(c => (c.id === id ? { ...c, status: newStatus } : c))
+      );
+
+      showSuccessToast(
+        `${CATEGORY_MESSAGES.STATUS_UPDATE_SUCCESS} Status changed to ${newStatus}.`
+      );
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        CATEGORY_MESSAGES.STATUS_UPDATE_ERROR
+      );
+      showErrorToast(message);
+    }
+  };
+
+  // Delete handler
+  const handleDeleteCategory = async (uuid: string) => {
+    try {
+      const category = categories.find(c => c.uuid === uuid);
+
+      // Prevent deletion of default categories
+      if (category?.is_default) {
+        showErrorToast(CATEGORY_MESSAGES.DEFAULT_CATEGORY_DELETE_ERROR);
+        return;
+      }
+
+      await apiService.deleteCategory(uuid);
+      setCategories(categories => categories.filter(c => c.uuid !== uuid));
+      showSuccessToast(CATEGORY_MESSAGES.DELETE_SUCCESS);
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        CATEGORY_MESSAGES.DELETE_ERROR
+      );
+      showErrorToast(message);
+    }
+  };
+
+  const validate = (): boolean => {
+    const newErrors: CategoryFormErrors = {};
+    if (!name.trim()) newErrors.name = CATEGORY_MESSAGES.NAME_REQUIRED;
+    if (!description.trim())
+      newErrors.description = CATEGORY_MESSAGES.DESCRIPTION_REQUIRED;
+    if (!icon.trim()) newErrors.icon = CATEGORY_MESSAGES.ICON_REQUIRED;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    try {
+      const payload: CreateCategoryRequest = {
+        name: name.trim(),
+        description: description.trim(),
+        icon: icon.trim(),
+        is_default: false,
+        status: 'ACTIVE',
+      };
+
+      await apiService.createCategory(payload);
+      showSuccessToast(CATEGORY_MESSAGES.CREATE_SUCCESS);
+
+      // Reset form and close modal
+      setName('');
+      setDescription('');
+      setIcon('fas fa-folder');
+      setErrors({});
+      setOpen(false);
+
+      // Refresh categories list
+      fetchCategories();
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        CATEGORY_MESSAGES.CREATE_ERROR
+      );
+      showErrorToast(message);
+    }
+  };
+
+  const resetForm = () => {
+    setName('');
+    setDescription('');
+    setIcon('fas fa-folder');
+    setErrors({});
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    resetForm();
+  };
+
   return (
-    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
+    <section className='flex flex-col w-full items-start gap-8 p-6 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
         <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
-          Category Management
+          {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
         </h2>
-        <button
-          className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
+        <Button
           onClick={() => setOpen(true)}
+          className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
         >
-          Create Category
-        </button>
+          <AddCircle
+            size='32'
+            color='currentColor'
+            className='!w-[1.375rem] !h-[1.375rem]'
+          />
+          {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
+        </Button>
       </header>
+
+      {/* Categories Grid */}
+      {loading ? (
+        <div className='text-center py-10'>{CATEGORY_MESSAGES.LOADING}</div>
+      ) : categories.length === 0 ? (
+        <div className='text-center py-10 text-gray-500'>
+          {CATEGORY_MESSAGES.NO_CATEGORIES_FOUND}
+        </div>
+      ) : (
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
+          {categories.map(category => (
+            <CategoryCard
+              key={category.id}
+              name={category.name}
+              description={category.description}
+              icon={category.icon}
+              createdOn={formatDate(category.created_at)}
+              status={category.status === 'ACTIVE'}
+              onToggle={() => handleToggleStatus(category.id, category.status)}
+              menuOptions={menuOptions}
+              isDefault={category.is_default}
+              categoryUuid={category.uuid}
+              onDelete={() => handleDeleteCategory(category.uuid)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Create Category Side Sheet */}
       <SideSheet
-        title='Create Category'
+        title={CATEGORY_MESSAGES.ADD_CATEGORY_TITLE}
         open={open}
         onOpenChange={setOpen}
-        size='600px'
+        size='400px'
       >
-        <CategoryForm
-          selectedIcon={selectedIcon}
-          setSelectedIcon={setSelectedIcon}
-          iconOptions={iconOptions}
-          errors={errors}
-          categoryName={categoryName}
-          setCategoryName={setCategoryName}
-          description={description}
-          setDescription={setDescription}
-          onClose={() => setOpen(false)}
-          onSubmit={e => e.preventDefault()}
-        />
-      </SideSheet>
-      <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
-        {categories.map((cat, idx) => {
-          const Icon = cat.icon;
-
-          return (
-            <div
-              key={cat.title}
-              className='bg-[var(--white-background)] rounded-2xl p-6 flex flex-col shadow-sm min-h-[210px] relative'
-            >
-              <div
-                className='w-[60px] h-[60px] flex items-center justify-center rounded-[16px] mb-3.5'
-                style={{
-                  background: hexToRgba(cat.iconBg, 0.15),
-                  color: cat.iconBg,
-                }}
-              >
-                <Icon className='w-8 h-8' color='CurrentColor' />
-              </div>
-              <div className='font-semibold text-base text-[var(--text-dark)] mb-1.5'>
-                {cat.title}
-              </div>
-              <div className='text-gray-500 text-base leading-snug'>
-                {cat.description}
-              </div>
-              {/* DropdownMenu for actions */}
-              <div className='absolute top-4 right-4 cursor-pointer'>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className='h-8 w-8 p-0 flex items-center justify-center rounded-full '>
-                      <IconDotsVertical
-                        className='!w-6 !h-6'
-                        strokeWidth={2}
-                        color='var(--text-dark)'
-                      />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align='end'
-                    className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
-                  >
-                    {menuOptions.map(option => {
-                      const MenuIcon = option.icon;
-                      return (
-                        <DropdownMenuItem
-                          key={option.id}
-                          onClick={() => {
-                            if (option.action === 'edit') {
-                              alert(`Edit ${cat.title}`);
-                            } else if (option.action === 'delete') {
-                              setShowDeleteIdx(idx);
-                            }
-                          }}
-                          className={`text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]${option.variant === 'destructive' ? ' hover:bg-red-50' : ''}`}
-                        >
-                          <MenuIcon size='18' color='var(--text-dark)' />
-                          <span>{option.label}</span>
-                        </DropdownMenuItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <ConfirmDeleteModal
-                  open={showDeleteIdx === idx}
-                  title={`Are you sure you want to Archive "${cat.title}"?`}
-                  subtitle={`This action cannot be undone.`}
-                  onCancel={() => setShowDeleteIdx(null)}
-                  onDelete={() => {
-                    setShowDeleteIdx(null);
-                    alert(`Deleted ${cat.title}`);
-                  }}
-                />
-              </div>
+        <div className='space-y-6'>
+          <form onSubmit={handleSubmit} className='space-y-4'>
+            {/* Category Name */}
+            <div className='space-y-2'>
+              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
+              </Label>
+              <Input
+                placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
+                value={name}
+                onChange={e => setName(e.target.value)}
+                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+              />
+              {errors.name && (
+                <p className='text-red-500 text-sm'>{errors.name}</p>
+              )}
             </div>
-          );
-        })}
-      </div>
+
+            {/* Icon */}
+            <div className='space-y-2'>
+              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                {CATEGORY_MESSAGES.ICON_LABEL}
+              </Label>
+              <Input
+                placeholder={CATEGORY_MESSAGES.SELECT_ICON}
+                value={icon}
+                onChange={e => setIcon(e.target.value)}
+                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+              />
+              {errors.icon && (
+                <p className='text-red-500 text-sm'>{errors.icon}</p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className='space-y-2'>
+              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                {CATEGORY_MESSAGES.DESCRIPTION_LABEL}
+              </Label>
+              <Textarea
+                placeholder={CATEGORY_MESSAGES.ENTER_DESCRIPTION}
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+              />
+              {errors.description && (
+                <p className='text-red-500 text-sm'>{errors.description}</p>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className='flex gap-4 pt-2'>
+              <Button
+                type='button'
+                variant='outline'
+                className='h-[48px] px-8 rounded-full font-semibold text-[var(--text-dark)] border-2 border-[var(--border-dark)] bg-transparent'
+                onClick={handleClose}
+              >
+                {CATEGORY_MESSAGES.CANCEL_BUTTON}
+              </Button>
+              <Button
+                type='submit'
+                className='h-[48px] px-12 bg-[#38B24D] hover:bg-[#2e9c41] rounded-full font-semibold text-white'
+              >
+                {CATEGORY_MESSAGES.CREATE_BUTTON}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </SideSheet>
     </section>
   );
 };
