@@ -130,6 +130,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
         tagline: data.tagline,
         about: data.about,
         email: data.email,
+        country_code: data.country_code,
         phone_number: data.phone_number,
         communication: data.communication,
         website: data.website,
@@ -183,6 +184,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
       tagline: company.tagline,
       about: company.about,
       email: company.email,
+      country_code: company.country_code, // Now properly typed
       phone_number: company.phone_number,
       communication: company.communication,
       website: company.website,

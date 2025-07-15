@@ -6,6 +6,7 @@ export interface CompanyFormErrors {
   tagline?: string;
   about?: string;
   email?: string;
+  country_code?: string;
   phone_number?: string;
   communication?: string;
   website?: string;
@@ -23,6 +24,7 @@ export interface CompanyCreateFormData {
   tagline: string;
   about: string;
   email: string;
+  country_code: string;
   phone_number: string;
   communication: string;
   website: string;
@@ -40,6 +42,7 @@ export interface CompanyInitialData {
   tagline?: string;
   about?: string;
   email?: string;
+  country_code?: string;
   phone_number?: string;
   communication?: string;
   website?: string;

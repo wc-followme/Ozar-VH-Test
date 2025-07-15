@@ -226,6 +226,7 @@ export interface CreateCompanyRequest {
   tagline: string;
   about: string;
   email: string;
+  country_code: string;
   phone_number: string;
   communication: string;
   website: string;
@@ -250,6 +251,7 @@ export interface UpdateCompanyRequest {
   tagline?: string;
   about?: string;
   email?: string;
+  country_code?: string;
   phone_number?: string;
   communication?: string;
   website?: string;
@@ -282,6 +284,7 @@ export interface GetCompanyResponse {
     tagline: string;
     about: string;
     email: string;
+    country_code: string;
     phone_number: string;
     communication: string;
     website: string;

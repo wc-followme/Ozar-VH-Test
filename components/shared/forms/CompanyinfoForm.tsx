@@ -77,7 +77,28 @@ export function CompanyInfoForm({
       setTagline(initialData.tagline || '');
       setAbout(initialData.about || '');
       setEmail(initialData.email || '');
-      setPhoneNumber(initialData.phone_number || '');
+
+      // Handle phone number and country code
+      if (initialData.country_code && initialData.phone_number) {
+        // Separate fields available
+        setPhoneCountryCode(initialData.country_code);
+        setPhoneNumber(initialData.phone_number);
+      } else if (initialData.phone_number) {
+        // Combined phone number - extract country code
+        const phoneStr = initialData.phone_number;
+        const matchedCountry = countryCodes.find(country =>
+          phoneStr.startsWith(country.code)
+        );
+        if (matchedCountry) {
+          setPhoneCountryCode(matchedCountry.code);
+          setPhoneNumber(phoneStr.substring(matchedCountry.code.length));
+        } else {
+          // Default to +1 if no country code found
+          setPhoneCountryCode('+1');
+          setPhoneNumber(phoneStr);
+        }
+      }
+
       setCommunication(initialData.communication || '');
       setWebsite(initialData.website || '');
       setPreferredCommunication(
@@ -131,7 +152,8 @@ export function CompanyInfoForm({
       tagline,
       about,
       email,
-      phone_number: phoneCountryCode + phoneNumber,
+      country_code: phoneCountryCode,
+      phone_number: phoneNumber,
       communication,
       website,
       preferred_communication_method: preferredCommunication,

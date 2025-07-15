@@ -62,6 +62,7 @@ export default function AddCompanyPage() {
         tagline: data.tagline,
         about: data.about,
         email: data.email,
+        country_code: data.country_code,
         phone_number: data.phone_number,
         communication: data.communication,
         website: data.website,
