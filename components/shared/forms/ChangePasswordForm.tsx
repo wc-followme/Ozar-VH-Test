@@ -18,7 +18,6 @@ interface ChangePasswordFormProps {
 export default function ChangePasswordForm({
   onSubmit,
   loading,
-  onCancel,
 }: ChangePasswordFormProps) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
