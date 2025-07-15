@@ -242,7 +242,7 @@ export function CompanyInfoForm({
                 <SelectTrigger className='w-[120px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
                   {COUNTRY_CODES.LIST.map(country => (
                     <SelectItem key={country.key} value={country.code}>
                       {country.flag} {country.code}
@@ -302,7 +302,7 @@ export function CompanyInfoForm({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className='w-auto p-0' align='start'>
+              <PopoverContent className='w-auto p-0 bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]' align='start'>
                 <Calendar
                   mode='single'
                   selected={expiryDate}
