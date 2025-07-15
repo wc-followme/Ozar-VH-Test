@@ -8,16 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
-import {
-  apiService,
-  Category,
-  CreateCategoryRequest,
-  FetchCategoriesResponse,
-} from '@/lib/api';
+import { apiService, Category, CreateCategoryRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
 import { AddCircle, Edit2, Trash } from 'iconsax-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CATEGORY_MESSAGES } from './category-messages';
 import { CategoryFormErrors } from './category-types';
 
@@ -49,20 +44,13 @@ const CategoryManagement = () => {
   const [icon, setIcon] = useState('fas fa-folder');
   const [errors, setErrors] = useState<CategoryFormErrors>({});
 
-  // Fetch categories
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
       const res = await apiService.fetchCategories({
         page: 1,
         limit: PAGINATION.DEFAULT_LIMIT,
       });
-
-      console.log('API Response:', res); // Debug log to see actual structure
 
       // Handle different possible response structures
       let newCategories: Category[] = [];
@@ -82,11 +70,8 @@ const CategoryManagement = () => {
         }
       }
 
-      console.log('Processed Categories:', newCategories); // Debug log
       setCategories(newCategories);
     } catch (err: unknown) {
-      console.error('Fetch Categories Error:', err); // Debug log
-
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
         return; // Don't show toast if it's an auth error
@@ -101,7 +86,12 @@ const CategoryManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [handleAuthError, showErrorToast]);
+
+  // Fetch categories
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   // Status toggle handler
   const handleToggleStatus = async (

@@ -62,7 +62,6 @@ export default function CompanyManagement() {
         limit: PAGINATION.DEFAULT_LIMIT,
         status: 'ACTIVE',
         sortOrder: 'ASC',
-        sortBy: 'created_at',
       });
 
       if (isCompanyApiResponse(res)) {
@@ -116,9 +115,7 @@ export default function CompanyManagement() {
         companies.map(c => (c.id === id ? { ...c, status: newStatus } : c))
       );
 
-      showSuccessToast(
-        `${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS}`
-      );
+      showSuccessToast(`${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS}`);
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {

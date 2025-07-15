@@ -122,14 +122,13 @@ export function CategoryCard({
                 >
                   <option.icon
                     size={16}
-                    className='mr-2'
                     color={
                       option.variant === 'destructive'
                         ? '#dc2626'
                         : 'currentColor'
                     }
                   />
-                  {option.label}
+                  <span className='ml-2'>{option.label}</span>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
