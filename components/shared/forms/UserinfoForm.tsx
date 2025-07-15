@@ -35,6 +35,7 @@ interface UserInfoFormProps {
   loadingRoles?: boolean;
   imageUrl?: string;
   onSubmit: (data: UserFormData) => void;
+  onCancel?: () => void;
   loading?: boolean;
   initialData?: UserInitialData;
   isEditMode?: boolean;
@@ -45,6 +46,7 @@ export function UserInfoForm({
   loadingRoles,
   imageUrl,
   onSubmit,
+  onCancel,
   loading,
   initialData,
   isEditMode,
@@ -163,21 +165,24 @@ export function UserInfoForm({
   };
 
   const handleCancel = (): void => {
-    // TODO: Implement cancel logic, e.g., close modal or reset form
-    // For now, just reset all fields
-    setRoleId('');
-    setFullName('');
-    setDesignation('');
-    setDate(undefined);
-    setEmail('');
-    setPhone('');
-    setCountry('us');
-    setCommunication('');
-    setAddress('');
-    setCity('');
-    setPinCode('');
-    setPassword('');
-    setErrors({});
+    if (onCancel) {
+      onCancel();
+    } else {
+      // Fallback: reset form fields if no onCancel provided
+      setRoleId('');
+      setFullName('');
+      setDesignation('');
+      setDate(undefined);
+      setEmail('');
+      setPhone('');
+      setCountry('us');
+      setCommunication('');
+      setAddress('');
+      setCity('');
+      setPinCode('');
+      setPassword('');
+      setErrors({});
+    }
   };
 
   return (

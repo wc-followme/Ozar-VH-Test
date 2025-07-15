@@ -42,6 +42,10 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const { handleAuthError } = useAuth();
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
+  const handleCancel = () => {
+    router.push('/user-management');
+  };
+
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
       typeof obj === 'object' &&
@@ -266,6 +270,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                     loadingRoles={loadingRoles}
                     imageUrl={fileKey}
                     onSubmit={handleUpdateUser}
+                    onCancel={handleCancel}
                     loading={formLoading}
                     initialData={user}
                     isEditMode={true}

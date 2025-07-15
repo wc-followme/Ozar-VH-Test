@@ -1,5 +1,6 @@
 'use client';
 
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,12 +10,16 @@ import { apiService, CreateUserRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Role, RoleApiResponse, UserFormData } from '../types';
 import { USER_MESSAGES } from '../user-messages';
+
+const breadcrumbData: BreadcrumbItem[] = [
+  { name: USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB, href: '/user-management' },
+  { name: USER_MESSAGES.ADD_USER_BREADCRUMB }, // current page
+];
 
 export default function AddUserPage() {
   const [selectedTab, setSelectedTab] = useState('info');
@@ -27,6 +32,10 @@ export default function AddUserPage() {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+
+  const handleCancel = () => {
+    router.push('/user-management');
+  };
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -148,15 +157,7 @@ export default function AddUserPage() {
     <div className=''>
       <div className=''>
         {/* Breadcrumb */}
-        <div className='flex items-center text-sm text-gray-500 mb-6 mt-2'>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            {USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB}
-          </span>
-          <ChevronRight className='h-4 w-4 mx-2' />
-          <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            {USER_MESSAGES.ADD_USER_BREADCRUMB}
-          </span>
-        </div>
+        <Breadcrumb items={breadcrumbData} className='mb-6 mt-2' />
 
         {/* Main Content */}
         <div className='bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
@@ -205,6 +206,7 @@ export default function AddUserPage() {
                     loadingRoles={loadingRoles}
                     imageUrl={fileKey}
                     onSubmit={handleCreateUser}
+                    onCancel={handleCancel}
                     loading={formLoading}
                   />
                 </div>

@@ -119,15 +119,3 @@ export interface MenuOption {
   icon: Icon;
   variant?: 'default' | 'destructive';
 }
-
-// Props interfaces for components
-export interface UserInfoFormProps {
-  roles: Role[];
-  loadingRoles?: boolean;
-  imageUrl?: string;
-  onSubmit: (data: UserFormData) => void;
-  loading?: boolean;
-  error?: string | undefined;
-  initialData?: UserInitialData;
-  isEditMode?: boolean;
-}
