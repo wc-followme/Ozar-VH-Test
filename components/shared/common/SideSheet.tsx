@@ -54,8 +54,10 @@ export default function SideSheet({
         className={`w-full bg-[var(--card-background)] border-0 overflow-auto`}
         style={{ maxWidth: size }}
       >
-        <SheetHeader className='text-[var(--text-dark)] text-[24px] font-medium flex items-center flex-row pb-8'>
-          <SheetTitle>{title}</SheetTitle>
+        <SheetHeader className='flex items-center flex-row pb-8'>
+          <SheetTitle className='text-[var(--text-dark)] text-[24px] font-medium '>
+            {title}
+          </SheetTitle>
           <Button
             variant='ghost'
             onClick={() => onOpenChange(false)} // ✅ This now works

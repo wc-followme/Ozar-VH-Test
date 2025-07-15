@@ -1,13 +1,15 @@
 'use client';
 import { ModeToggle } from '@/components/mode-toggle';
+import ChangePasswordForm from '@/components/shared/forms/ChangePasswordForm';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
-import { HambergerMenu, UserOctagon } from 'iconsax-react';
+import { HambergerMenu, Key, UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '../../lib/utils';
 import { Search } from '../icons/Search';
 import { SignoutIcon } from '../icons/SignoutIcon';
+import SideSheet from '../shared/common/SideSheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,10 +22,10 @@ type MenuOption = {
   label: string;
   action: string;
   icon: React.ElementType;
-  variant?: 'default' | 'destructive';
 };
 const menuOptions = [
   { label: 'View Profile', action: 'edit', icon: UserOctagon },
+  { label: 'Change Password', action: 'changePassword', icon: Key },
   { label: 'Logout', action: 'delete', icon: SignoutIcon },
 ];
 export function Header() {
@@ -33,6 +35,7 @@ export function Header() {
   const [showHeader, setShowHeader] = useState(true);
   const lastScrollY = useRef(0);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,6 +56,8 @@ export function Header() {
   const handleMenuAction = (action: string) => {
     if (action === 'delete') {
       logout();
+    } else if (action === 'changePassword') {
+      setChangePasswordOpen(true);
     }
     return action;
   };
@@ -127,17 +132,13 @@ export function Header() {
               align='end'
               className='bg-[var(--card-background)] border border-[var(--border-dark)] min-w-[185px] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px] p-[10px]'
             >
-              {menuOptions.map((option: MenuOption, index: number) => {
-                const Icon = option.icon; // ensure Icon is a capitalized component
-                return (
+              {menuOptions.map(
+                ({ icon: Icon, label, action }: MenuOption, index: number) => (
                   <DropdownMenuItem
                     key={index}
-                    onClick={() => handleMenuAction(option.action)}
+                    onClick={() => handleMenuAction(action)}
                     className={cn(
-                      'text-base p-3 rounded-md cursor-pointer text-[var(--text-dark)] transition-colors flex items-center gap-2',
-                      option.variant === 'destructive'
-                        ? 'text-red-600 hover:bg-red-50'
-                        : 'hover:bg-gray-100'
+                      'text-base p-3 rounded-md cursor-pointer text-[var(--text-dark)] transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]'
                     )}
                   >
                     <Icon
@@ -146,14 +147,22 @@ export function Header() {
                       variant='Outline'
                       className='!h-6 !w-6'
                     />
-                    <span>{option.label}</span>
+                    <span>{label}</span>
                   </DropdownMenuItem>
-                );
-              })}
+                )
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+      <SideSheet
+        title='Change Password'
+        open={changePasswordOpen}
+        onOpenChange={setChangePasswordOpen}
+        size='600px'
+      >
+        <ChangePasswordForm onCancel={() => setChangePasswordOpen(false)} />
+      </SideSheet>
     </header>
   );
 }

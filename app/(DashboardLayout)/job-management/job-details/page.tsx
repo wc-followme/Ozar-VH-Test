@@ -96,7 +96,7 @@ export default function JobDetailsPage() {
                 return (
                   <DropdownMenuItem
                     key={item.label}
-                    className={item.className}
+                    className={`hover:!bg-[var(--select-option)] ${item.className || ''}`}
                     onClick={item.action}
                   >
                     <Icon
