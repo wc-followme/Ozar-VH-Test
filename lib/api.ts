@@ -560,17 +560,20 @@ class ApiService {
     limit = 10,
     role_id = '',
     company_id = '',
+    search = '',
   }: {
     page?: number;
     limit?: number;
     role_id?: string | number;
     company_id?: string | number;
+    search?: string;
   }): Promise<FetchUsersResponse> {
     const params = new URLSearchParams();
     params.append('page', String(page));
     params.append('limit', String(limit));
     if (role_id) params.append('role_id', String(role_id));
     if (company_id) params.append('company_id', String(company_id));
+    if (search) params.append('search', search);
     return this.makeRequest(`/users?${params.toString()}`, {
       method: 'GET',
       headers: this.getRoleHeaders(),

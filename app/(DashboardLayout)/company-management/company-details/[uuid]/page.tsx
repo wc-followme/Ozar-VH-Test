@@ -12,7 +12,12 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
-import { apiService, GetCompanyResponse, FetchUsersResponse, User } from '@/lib/api';
+import {
+  apiService,
+  FetchUsersResponse,
+  GetCompanyResponse,
+  User,
+} from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
@@ -22,9 +27,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { UserCard } from '../../../../../components/shared/cards/UserCard';
-import { MenuOption, Role, RoleApiResponse } from '../../../user-management/types';
-import { COMPANY_MESSAGES } from '../../company-messages';
+import {
+  MenuOption,
+  Role,
+  RoleApiResponse,
+} from '../../../user-management/types';
 import { USER_MESSAGES } from '../../../user-management/user-messages';
+import { COMPANY_MESSAGES } from '../../company-messages';
 
 interface CompanyDetailsPageProps {
   params: Promise<{
@@ -53,6 +62,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
   const [usersLoading, setUsersLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const router = useRouter();
   const { showSuccessToast, showErrorToast } = useToast();
@@ -113,16 +123,20 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
     fetchCompanyDetails();
   }, [resolvedParams.uuid, router, showErrorToast, handleAuthError]);
 
-  // Fetch users when filter changes or when switching to user management tab
+  // Debounced search effect
   useEffect(() => {
-    if (selectedTab === 'usermanagement' && company) {
+    if (selectedTab !== 'usermanagement' || !company) return;
+
+    const timeoutId = setTimeout(() => {
       setPage(1);
       setHasMore(true);
       setUsers([]);
       fetchUsers(1, false);
-    }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, selectedTab, company]);
+  }, [searchTerm, filter, selectedTab, company]);
 
   // Infinite scroll for user management tab
   useEffect(() => {
@@ -141,7 +155,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usersLoading, hasMore, page, filter, selectedTab]);
+  }, [usersLoading, hasMore, page, filter, selectedTab, searchTerm]);
 
   // Fetch users function - same as user-management page but with company_id filter
   const fetchUsers = async (targetPage = 1, append = false) => {
@@ -159,12 +173,18 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
       }
 
       const role_id = filter !== 'all' ? filter : '';
-      const usersRes: FetchUsersResponse = await apiService.fetchUsers({
+      const searchParam = searchTerm.trim();
+      const fetchParams: any = {
         page: targetPage,
         limit: 20,
         role_id,
         company_id: company.id, // Filter by current company
-      });
+      };
+      if (searchParam) {
+        fetchParams.search = searchParam;
+      }
+      const usersRes: FetchUsersResponse =
+        await apiService.fetchUsers(fetchParams);
 
       const newUsers = usersRes.data;
       setUsers(prev => (append ? [...prev, ...newUsers] : newUsers));
@@ -526,6 +546,8 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                 <Input
                   id='search'
                   placeholder='Search here...'
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[30px] pl-12 placeholder:text-[var(--text-secondary)]'
                 />
                 <Search className='absolute top-3 left-4' />
