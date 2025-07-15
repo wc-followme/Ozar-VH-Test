@@ -113,7 +113,7 @@ export function Header() {
               <Button
                 variant='ghost'
                 size='sm'
-                className='h-8 w-8 p-0 flex-shrink-0'
+                className='h-8 w-8 p-0 flex-shrink-0 self-center'
               >
                 <Image
                   src={'/images/profile.jpg'}

@@ -14,3 +14,50 @@ export function extractApiErrorMessage(
   if (err?.message) return err.message;
   return fallback;
 }
+
+// Formats a date string to DD/MM/YYYY format (e.g., "30/08/2024")
+// This is the standard date format used across all modules
+export function formatDate(dateString: string): string {
+  if (!dateString) return '';
+
+  try {
+    const date = new Date(dateString);
+
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return dateString; // Return original string if invalid
+    }
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString();
+
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    return dateString; // Return original string if parsing fails
+  }
+}
+
+// Formats a date string to include time in DD/MM/YYYY HH:mm format
+export function formatDateTime(dateString: string): string {
+  if (!dateString) return '';
+
+  try {
+    const date = new Date(dateString);
+
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return dateString; // Return original string if invalid
+    }
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  } catch (error) {
+    return dateString; // Return original string if parsing fails
+  }
+}

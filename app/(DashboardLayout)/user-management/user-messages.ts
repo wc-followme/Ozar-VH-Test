@@ -4,7 +4,7 @@ export const USER_MESSAGES = {
   CREATE_SUCCESS: 'User created successfully.',
   UPDATE_SUCCESS: 'User updated successfully.',
   DELETE_SUCCESS: 'User deleted successfully.',
-  STATUS_UPDATE_SUCCESS: 'User status updated.',
+  STATUS_UPDATE_SUCCESS: 'User status updated successfully.',
 
   // Error Messages
   CREATE_ERROR: 'Failed to create user.',

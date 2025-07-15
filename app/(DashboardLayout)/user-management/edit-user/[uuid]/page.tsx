@@ -1,17 +1,17 @@
 'use client';
 
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
+import { PAGINATION } from '@/constants/common';
 import { apiService, UpdateUserRequest, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { Role, RoleApiResponse, UserFormData } from '../../types';
 import { USER_MESSAGES } from '../../user-messages';
 
@@ -20,6 +20,11 @@ interface EditUserPageProps {
     uuid: string;
   }>;
 }
+
+const breadcrumbData: BreadcrumbItem[] = [
+  { name: 'User Management', href: '/user-management' },
+  { name: 'Edit User' }, // current page
+];
 
 export default function EditUserPage({ params }: EditUserPageProps) {
   const resolvedParams = React.use(params);
@@ -35,6 +40,10 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+
+  const handleCancel = () => {
+    router.push('/user-management');
+  };
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -56,7 +65,10 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         // Fetch user details and roles in parallel
         const [userRes, rolesRes] = await Promise.all([
           apiService.getUserDetails(resolvedParams.uuid),
-          apiService.fetchRoles({ page: 1, limit: 50 }),
+          apiService.fetchRoles({
+            page: 1,
+            limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+          }),
         ]);
 
         // Set user data
@@ -100,19 +112,22 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       setFileKey('');
       return;
     }
-    setPhotoFile(file);
-    setUploading(true);
+
     try {
+      setUploading(true);
+      setPhotoFile(file);
+
       const ext = file.name.split('.').pop() || 'png';
       const timestamp = Date.now();
-      const userUuid = uuidv4();
-      const generatedFileName = `user_${userUuid}_${timestamp}.${ext}`;
+      const randomId = Math.random().toString(36).substring(2, 15);
+      const generatedFileName = `user_${randomId}_${timestamp}.${ext}`;
+
       const presigned = await getPresignedUrl({
         fileName: generatedFileName,
         fileType: file.type,
         fileSize: file.size,
-        purpose: 'profile-picture',
-        customPath: ``,
+        purpose: 'user',
+        customPath: '',
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
@@ -137,6 +152,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         role_id: data.role_id,
         name: data.name,
         email: data.email,
+        country_code: data.country_code,
         phone_number: data.phone_number,
         designation: data.designation,
         preferred_communication_method: data.preferred_communication_method,
@@ -194,22 +210,14 @@ export default function EditUserPage({ params }: EditUserPageProps) {
     <div className=''>
       <div className=''>
         {/* Breadcrumb */}
-        <div className='flex items-center text-sm text-gray-500 mb-6 mt-2'>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            {USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB}
-          </span>
-          <ChevronRight className='h-4 w-4 mx-2' />
-          <span className='text-[14px] font-normal text-[var(--primary)]'>
-            {USER_MESSAGES.EDIT_USER_BREADCRUMB}
-          </span>
-        </div>
+        <Breadcrumb items={breadcrumbData} className='mb-5' />
 
         {/* Header */}
-        <div className='flex items-center justify-between mb-6'>
+        {/* <div className='flex items-center justify-between mb-6'>
           <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
             {USER_MESSAGES.EDIT_USER_TITLE}
           </h1>
-        </div>
+        </div> */}
 
         {/* Main Content */}
         <div className='bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
@@ -221,13 +229,13 @@ export default function EditUserPage({ params }: EditUserPageProps) {
             <TabsList className='grid w-full max-w-[328px] grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal'>
               <TabsTrigger
                 value='info'
-                className='rounded-md px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
                 {USER_MESSAGES.INFO_TAB}
               </TabsTrigger>
               <TabsTrigger
                 value='permissions'
-                className='rounded-md px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
                 {USER_MESSAGES.PERMISSIONS_TAB}
               </TabsTrigger>
@@ -242,7 +250,14 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                     onPhotoChange={handlePhotoChange}
                     onDeletePhoto={handleDeletePhoto}
                     label={USER_MESSAGES.UPLOAD_PHOTO_LABEL}
-                    text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
+                    // text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
+                    uploading={uploading}
+                    existingImageUrl={
+                      fileKey && !photoFile
+                        ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
+                        : ''
+                    }
+                    className='h-[250px]'
                   />
                   {uploading && (
                     <div className='text-xs mt-2'>
@@ -258,6 +273,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                     loadingRoles={loadingRoles}
                     imageUrl={fileKey}
                     onSubmit={handleUpdateUser}
+                    onCancel={handleCancel}
                     loading={formLoading}
                     initialData={user}
                     isEditMode={true}

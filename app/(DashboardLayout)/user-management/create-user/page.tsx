@@ -1,9 +1,11 @@
 'use client';
 
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
+import { PAGINATION } from '@/constants/common';
 import { apiService, CreateUserRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
@@ -11,10 +13,7 @@ import { extractApiErrorMessage } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-} from '../../../../components/shared/Breadcrumb';
+
 import ComingSoon from '../../../../components/shared/common/ComingSoon';
 import { Role, RoleApiResponse, UserFormData } from '../types';
 import { USER_MESSAGES } from '../user-messages';
@@ -30,6 +29,10 @@ export default function AddUserPage() {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+
+  const handleCancel = () => {
+    router.push('/user-management');
+  };
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -47,7 +50,10 @@ export default function AddUserPage() {
     const fetchRoles = async () => {
       setLoadingRoles(true);
       try {
-        const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
+        const rolesRes = await apiService.fetchRoles({
+          page: 1,
+          limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+        });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
           roleList.map((role: Role) => ({ id: role.id, name: role.name }))
@@ -118,6 +124,7 @@ export default function AddUserPage() {
         name: data.name,
         email: data.email,
         password: data.password,
+        country_code: data.country_code,
         phone_number: data.phone_number,
         date_of_joining: data.date_of_joining,
         designation: data.designation,
@@ -154,9 +161,7 @@ export default function AddUserPage() {
     <div className=''>
       <div className=''>
         {/* Breadcrumb */}
-        <div className='flex items-center mb-6 mt-2'>
-          <Breadcrumb items={breadcrumbData} />
-        </div>
+        <Breadcrumb items={breadcrumbData} className='mb-6 mt-2' />
 
         {/* Main Content */}
         <div className='bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
@@ -181,7 +186,7 @@ export default function AddUserPage() {
             </TabsList>
 
             <TabsContent value='info' className='pt-8'>
-              <div className='flex items-start gap-6'>
+              <div className='flex flex-col lg:flex-row items-start gap-6'>
                 {/* Left Column - Upload Photo */}
                 <div className='w-[250px] flex-shrink-0 relative'>
                   <PhotoUploadField
@@ -189,7 +194,8 @@ export default function AddUserPage() {
                     onPhotoChange={handlePhotoChange}
                     onDeletePhoto={handleDeletePhoto}
                     label={USER_MESSAGES.UPLOAD_PHOTO_LABEL}
-                    text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
+                    // text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
+                    className='h-[250px]'
                   />
                   {uploading && (
                     <div className='text-xs mt-2'>
@@ -199,12 +205,13 @@ export default function AddUserPage() {
                 </div>
 
                 {/* Right Column - Form Fields */}
-                <div className='flex-1'>
+                <div className='w-full lg:flex-1'>
                   <UserInfoForm
                     roles={roles}
                     loadingRoles={loadingRoles}
                     imageUrl={fileKey}
                     onSubmit={handleCreateUser}
+                    onCancel={handleCancel}
                     loading={formLoading}
                   />
                 </div>

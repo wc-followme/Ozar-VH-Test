@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { COUNTRY_CODES } from '@/constants/common';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
@@ -35,6 +36,7 @@ interface UserInfoFormProps {
   loadingRoles?: boolean;
   imageUrl?: string;
   onSubmit: (data: UserFormData) => void;
+  onCancel?: () => void;
   loading?: boolean;
   initialData?: UserInitialData;
   isEditMode?: boolean;
@@ -45,6 +47,7 @@ export function UserInfoForm({
   loadingRoles,
   imageUrl,
   onSubmit,
+  onCancel,
   loading,
   initialData,
   isEditMode,
@@ -70,7 +73,32 @@ export function UserInfoForm({
       setFullName(initialData.name || '');
       setDesignation(initialData.designation || '');
       setEmail(initialData.email || '');
-      setPhone(initialData.phone_number || '');
+
+      // Handle phone number and country code
+      if (initialData.country_code && initialData.phone_number) {
+        // Separate fields available
+        const countryKey = COUNTRY_CODES.getCountryFromCode(
+          initialData.country_code
+        );
+        setCountry(countryKey);
+        setPhone(initialData.phone_number);
+      } else if (initialData.phone_number) {
+        // Combined phone number - extract country code
+        const phoneStr = initialData.phone_number;
+        const matchedEntry = Object.entries(COUNTRY_CODES.MAP).find(
+          ([, code]) => phoneStr.startsWith(code)
+        );
+        if (matchedEntry) {
+          const [countryKey, code] = matchedEntry;
+          setCountry(countryKey);
+          setPhone(phoneStr.substring(code.length));
+        } else {
+          // Default to US if no country code found
+          setCountry('us');
+          setPhone(phoneStr);
+        }
+      }
+
       setCommunication(initialData.preferred_communication_method || '');
       setAddress(initialData.address || '');
       setCity(initialData.city || '');
@@ -109,6 +137,7 @@ export function UserInfoForm({
         role_id: Number(roleId),
         name: fullName,
         email,
+        country_code: COUNTRY_CODES.getCodeFromCountry(country),
         phone_number: phone,
         designation,
         preferred_communication_method: communication,
@@ -137,21 +166,24 @@ export function UserInfoForm({
   };
 
   const handleCancel = (): void => {
-    // TODO: Implement cancel logic, e.g., close modal or reset form
-    // For now, just reset all fields
-    setRoleId('');
-    setFullName('');
-    setDesignation('');
-    setDate(undefined);
-    setEmail('');
-    setPhone('');
-    setCountry('us');
-    setCommunication('');
-    setAddress('');
-    setCity('');
-    setPinCode('');
-    setPassword('');
-    setErrors({});
+    if (onCancel) {
+      onCancel();
+    } else {
+      // Fallback: reset form fields if no onCancel provided
+      setRoleId('');
+      setFullName('');
+      setDesignation('');
+      setDate(undefined);
+      setEmail('');
+      setPhone('');
+      setCountry('us');
+      setCommunication('');
+      setAddress('');
+      setCity('');
+      setPinCode('');
+      setPassword('');
+      setErrors({});
+    }
   };
 
   return (
@@ -339,696 +371,14 @@ export function UserInfoForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px] max-h-60 overflow-y-auto'>
-                <SelectItem value='us'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇺🇸</span>
-                    <span>+1</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ca'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇨🇦</span>
-                    <span>+1</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='gb'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇬🇧</span>
-                    <span>+44</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='au'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇦🇺</span>
-                    <span>+61</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='de'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇩🇪</span>
-                    <span>+49</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='fr'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇫🇷</span>
-                    <span>+33</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='it'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇮🇹</span>
-                    <span>+39</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='es'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇪🇸</span>
-                    <span>+34</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='nl'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇳🇱</span>
-                    <span>+31</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ch'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇨🇭</span>
-                    <span>+41</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='se'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇸🇪</span>
-                    <span>+46</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='no'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇳🇴</span>
-                    <span>+47</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='dk'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇩🇰</span>
-                    <span>+45</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='fi'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇫🇮</span>
-                    <span>+358</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='at'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇦🇹</span>
-                    <span>+43</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='be'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇧🇪</span>
-                    <span>+32</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ie'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇮🇪</span>
-                    <span>+353</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='pt'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇵🇹</span>
-                    <span>+351</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='gr'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇬🇷</span>
-                    <span>+30</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='pl'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇵🇱</span>
-                    <span>+48</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='cz'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇨🇿</span>
-                    <span>+420</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='hu'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇭🇺</span>
-                    <span>+36</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ro'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇷🇴</span>
-                    <span>+40</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='bg'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇧🇬</span>
-                    <span>+359</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='hr'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇭🇷</span>
-                    <span>+385</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='si'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇸🇮</span>
-                    <span>+386</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='sk'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇸🇰</span>
-                    <span>+421</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='lt'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇱🇹</span>
-                    <span>+370</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='lv'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇱🇻</span>
-                    <span>+371</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ee'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇪🇪</span>
-                    <span>+372</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ru'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇷🇺</span>
-                    <span>+7</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ua'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇺🇦</span>
-                    <span>+380</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='by'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇧🇾</span>
-                    <span>+375</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='md'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇩</span>
-                    <span>+373</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='in'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇮🇳</span>
-                    <span>+91</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='cn'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇨🇳</span>
-                    <span>+86</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='jp'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇯🇵</span>
-                    <span>+81</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='kr'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇰🇷</span>
-                    <span>+82</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='sg'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇸🇬</span>
-                    <span>+65</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='my'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇾</span>
-                    <span>+60</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='th'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇹🇭</span>
-                    <span>+66</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='vn'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇻🇳</span>
-                    <span>+84</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ph'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇵🇭</span>
-                    <span>+63</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='id'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇮🇩</span>
-                    <span>+62</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='hk'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇭🇰</span>
-                    <span>+852</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='tw'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇹🇼</span>
-                    <span>+886</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='mo'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇴</span>
-                    <span>+853</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='bd'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇧🇩</span>
-                    <span>+880</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='pk'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇵🇰</span>
-                    <span>+92</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='lk'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇱🇰</span>
-                    <span>+94</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='mm'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇲</span>
-                    <span>+95</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='kh'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇰🇭</span>
-                    <span>+855</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='la'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇱🇦</span>
-                    <span>+856</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='np'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇳🇵</span>
-                    <span>+977</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='bt'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇧🇹</span>
-                    <span>+975</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='mv'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇻</span>
-                    <span>+960</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='br'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇧🇷</span>
-                    <span>+55</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ar'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇦🇷</span>
-                    <span>+54</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='mx'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇽</span>
-                    <span>+52</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='cl'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇨🇱</span>
-                    <span>+56</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='co'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇨🇴</span>
-                    <span>+57</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='pe'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇵🇪</span>
-                    <span>+51</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ve'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇻🇪</span>
-                    <span>+58</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ec'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇪🇨</span>
-                    <span>+593</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='uy'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇺🇾</span>
-                    <span>+598</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='py'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇵🇾</span>
-                    <span>+595</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='bo'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇧🇴</span>
-                    <span>+591</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='gf'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇬🇫</span>
-                    <span>+594</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='sr'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇸🇷</span>
-                    <span>+597</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='gy'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇬🇾</span>
-                    <span>+592</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='eg'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇪🇬</span>
-                    <span>+20</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='za'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇿🇦</span>
-                    <span>+27</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ng'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇳🇬</span>
-                    <span>+234</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ke'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇰🇪</span>
-                    <span>+254</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='gh'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇬🇭</span>
-                    <span>+233</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='tz'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇹🇿</span>
-                    <span>+255</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ug'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇺🇬</span>
-                    <span>+256</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='mz'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇿</span>
-                    <span>+258</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='mg'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇬</span>
-                    <span>+261</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='zw'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇿🇼</span>
-                    <span>+263</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='zm'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇿🇲</span>
-                    <span>+260</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='mw'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇼</span>
-                    <span>+265</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='bw'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇧🇼</span>
-                    <span>+267</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='sz'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇸🇿</span>
-                    <span>+268</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ls'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇱🇸</span>
-                    <span>+266</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ma'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇦</span>
-                    <span>+212</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='dz'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇩🇿</span>
-                    <span>+213</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='tn'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇹🇳</span>
-                    <span>+216</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ly'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇱🇾</span>
-                    <span>+218</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='sd'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇸🇩</span>
-                    <span>+249</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='et'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇪🇹</span>
-                    <span>+251</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='so'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇸🇴</span>
-                    <span>+252</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='dj'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇩🇯</span>
-                    <span>+253</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ae'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇦🇪</span>
-                    <span>+971</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='sa'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇸🇦</span>
-                    <span>+966</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='qa'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇶🇦</span>
-                    <span>+974</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='kw'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇰🇼</span>
-                    <span>+965</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='bh'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇧🇭</span>
-                    <span>+973</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='om'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇴🇲</span>
-                    <span>+968</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='jo'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇯🇴</span>
-                    <span>+962</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='lb'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇱🇧</span>
-                    <span>+961</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='sy'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇸🇾</span>
-                    <span>+963</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='iq'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇮🇶</span>
-                    <span>+964</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ir'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇮🇷</span>
-                    <span>+98</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='il'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇮🇱</span>
-                    <span>+972</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='ps'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇵🇸</span>
-                    <span>+970</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='tr'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇹🇷</span>
-                    <span>+90</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='cy'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇨🇾</span>
-                    <span>+357</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='af'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇦🇫</span>
-                    <span>+93</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='kz'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇰🇿</span>
-                    <span>+7</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='uz'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇺🇿</span>
-                    <span>+998</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='tm'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇹🇲</span>
-                    <span>+993</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='tj'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇹🇯</span>
-                    <span>+992</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='kg'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇰🇬</span>
-                    <span>+996</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='mn'>
-                  <div className='flex items-center gap-2'>
-                    <span>🇲🇳</span>
-                    <span>+976</span>
-                  </div>
-                </SelectItem>
+                {COUNTRY_CODES.LIST.map(country => (
+                  <SelectItem key={country.key} value={country.key}>
+                    <div className='flex items-center gap-2'>
+                      <span>{country.flag}</span>
+                      <span>{country.code}</span>
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Input

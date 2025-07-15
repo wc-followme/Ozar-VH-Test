@@ -1,5 +1,6 @@
 'use client';
 
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import { RoleForm } from '@/components/shared/forms/RoleForm';
 import { useToast } from '@/components/ui/use-toast';
 import { STATUS_CODES } from '@/constants/status-codes';
@@ -10,6 +11,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ROLE_MESSAGES } from '../role-messages';
 import type { ApiResponse, CreateRoleRequest } from '../types';
+
+const breadcrumbData: BreadcrumbItem[] = [
+  { name: ROLE_MESSAGES.ROLE_MANAGEMENT_BREADCRUMB, href: '/role-management' },
+  { name: ROLE_MESSAGES.CREATE_ROLE_BREADCRUMB }, // current page
+];
 
 const CreateRole = () => {
   const router = useRouter();
@@ -47,20 +53,9 @@ const CreateRole = () => {
 
   return (
     <div className='flex flex-col gap-8 flex-1 w-full'>
-      {/* Header */}
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-2'>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            {ROLE_MESSAGES.ROLE_MANAGEMENT_BREADCRUMB}
-          </span>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            /
-          </span>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            {ROLE_MESSAGES.CREATE_ROLE_BREADCRUMB}
-          </span>
-        </div>
-      </div>
+      {/* Breadcrumb */}
+      <Breadcrumb items={breadcrumbData} className='mb-2' />
+
       {/* Main Content */}
       <RoleForm mode='create' isSubmitting={isSubmitting} onSubmit={onSubmit} />
     </div>

@@ -4,14 +4,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 import Dropdown from '../common/Dropdown';
 
 interface MenuOption {
   label: string;
   action: string;
   variant?: 'default' | 'destructive';
-  icon: React.ElementType;
+  icon: React.ComponentType<{
+    size?: string | number;
+    color?: string;
+    variant?: 'Linear' | 'Outline' | 'Broken' | 'Bold' | 'Bulk' | 'TwoTone';
+  }>;
 }
 
 interface companyCardProps {
@@ -22,6 +28,9 @@ interface companyCardProps {
   status: boolean;
   onToggle: () => void;
   menuOptions: MenuOption[];
+  isDefault?: boolean;
+  companyUuid: string;
+  onDelete?: () => void;
 }
 
 export function CompanyCard({
@@ -32,8 +41,13 @@ export function CompanyCard({
   status,
   onToggle,
   menuOptions,
+  isDefault = false,
+  companyUuid,
+  onDelete,
 }: companyCardProps) {
   const [isToggling, setIsToggling] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const router = useRouter();
 
   const handleToggle = async () => {
     setIsToggling(true);
@@ -41,9 +55,23 @@ export function CompanyCard({
     setTimeout(() => setIsToggling(false), 300);
   };
 
-  const handleMenuAction = (action: string) => {
-    console.log(`Action ${action} triggered for user ${name}`);
+  const handleCardClick = () => {
+    router.push(`/company-management/company-details/${companyUuid}`);
   };
+
+  const handleMenuAction = (action: string) => {
+    if (action === 'edit') {
+      router.push(`/company-management/edit-company/${companyUuid}`);
+    } else if (action === 'delete') {
+      setShowDelete(true);
+    }
+    // Other actions (like delete) can be handled by parent component
+  };
+
+  // Filter menu options based on isDefault
+  const filteredMenuOptions = isDefault
+    ? menuOptions.filter(option => option.action !== 'delete')
+    : menuOptions;
 
   const getInitials = (name: string) => {
     return name
@@ -54,7 +82,10 @@ export function CompanyCard({
   };
 
   return (
-    <div className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[16px] hover:shadow-lg transition-shadow duration-200'>
+    <div
+      className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[16px] hover:shadow-lg transition-shadow duration-200 cursor-pointer'
+      onClick={handleCardClick}
+    >
       {/* Header with Avatar, User Info and Menu */}
       <div className='mb-4'>
         <Avatar className='w-[6.25rem] h-[6.25rem] rounded-none mt-[0.875rem] mb-10 mx-auto'>
@@ -75,13 +106,16 @@ export function CompanyCard({
               {name}
             </h3>
             <Dropdown
-              menuOptions={menuOptions}
+              menuOptions={filteredMenuOptions}
               onAction={handleMenuAction}
               trigger={
                 <Button
                   variant='ghost'
                   size='sm'
-                  className='h-8 w-8 p-0 flex-shrink-0'
+                  className='h-7 w-6 p-0 flex-shrink-0 -mr-2 mt-0.5'
+                  onClick={e => {
+                    e.stopPropagation(); // Prevent card click when clicking menu
+                  }}
                 >
                   <IconDotsVertical
                     className='!w-6 !h-6'
@@ -115,27 +149,44 @@ export function CompanyCard({
       </div>
 
       {/* Status Toggle */}
-      <div className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
-        <span className='text-[12px] font-medium text-[var(--text-dark)]'>
-          Enable
-        </span>
-        <Switch
-          checked={status}
-          onCheckedChange={handleToggle}
-          disabled={isToggling}
-          className='
-              h-4 w-9 
-              data-[state=checked]:bg-[var(--secondary)] 
-              data-[state=unchecked]:bg-gray-300
-              [&>span]:h-3 
-              [&>span]:w-3 
-              [&>span]:bg-white 
-              data-[state=checked]:[&>span]:border-green-400
-              [&>span]:transition-all
-              [&>span]:duration-200
-            '
-        />
-      </div>
+      {!isDefault && (
+        <div
+          className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'
+          onClick={e => {
+            e.stopPropagation(); // Prevent card click when clicking toggle
+          }}
+        >
+          <span className='text-[12px] font-medium text-[var(--text-dark)]'>
+            Enable
+          </span>
+          <Switch
+            checked={status}
+            onCheckedChange={handleToggle}
+            disabled={isToggling}
+            className='
+                h-4 w-9 
+                data-[state=checked]:bg-green-500 
+                data-[state=unchecked]:bg-gray-300
+                [&>span]:h-3 
+                [&>span]:w-3 
+                [&>span]:bg-white 
+                data-[state=checked]:[&>span]:border-green-400
+                [&>span]:transition-all
+                [&>span]:duration-200
+              '
+          />
+        </div>
+      )}
+      <ConfirmDeleteModal
+        open={showDelete}
+        title='Are you sure you want to delete?'
+        subtitle='This action cannot be undone.'
+        onCancel={() => setShowDelete(false)}
+        onDelete={async () => {
+          setShowDelete(false);
+          if (onDelete) await onDelete();
+        }}
+      />
     </div>
   );
 }
