@@ -11,12 +11,24 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/components/ui/use-toast';
+import { apiService, GetCompanyResponse } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
+import { extractApiErrorMessage, formatDate } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
 import { Add, Edit2, Trash } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
-import { UserCard } from '../../../../components/shared/cards/UserCard';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { UserCard } from '../../../../../components/shared/cards/UserCard';
+import { COMPANY_MESSAGES } from '../../company-messages';
+
+interface CompanyDetailsPageProps {
+  params: Promise<{
+    uuid: string;
+  }>;
+}
 
 const breadcrumbData: BreadcrumbItem[] = [
   { name: 'Company Management', href: '/company-management' },
@@ -147,12 +159,64 @@ const dummyUsers = [
   },
 ];
 
-const CompanyDetails = () => {
+const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
+  const resolvedParams = React.use(params);
   const [enabled, setEnabled] = useState(true);
   const [selectedTab, setSelectedTab] = useState('about');
   const [filter, setFilter] = useState('all');
+  const [company, setCompany] = useState<GetCompanyResponse['data'] | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const { showSuccessToast, showErrorToast } = useToast();
+  const { handleAuthError } = useAuth();
 
   const [users, setUsers] = useState(dummyUsers);
+
+  const isCompanyApiResponse = (obj: unknown): obj is GetCompanyResponse => {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'statusCode' in obj &&
+      'data' in obj &&
+      typeof (obj as GetCompanyResponse).data === 'object'
+    );
+  };
+
+  // Fetch company details
+  useEffect(() => {
+    const fetchCompanyDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getCompanyDetails(
+          resolvedParams.uuid
+        );
+
+        if (isCompanyApiResponse(response)) {
+          setCompany(response.data);
+          setEnabled(response.data.status === 'ACTIVE');
+        } else {
+          throw new Error('Invalid response format');
+        }
+      } catch (err: unknown) {
+        if (handleAuthError(err)) {
+          return;
+        }
+        const errorMessage = extractApiErrorMessage(
+          err,
+          COMPANY_MESSAGES.FETCH_DETAILS_ERROR
+        );
+        showErrorToast(errorMessage);
+        router.push('/company-management');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompanyDetails();
+  }, [resolvedParams.uuid, router, showErrorToast, handleAuthError]);
+
   const handleToggleStatus = (id: number) => {
     setUsers(
       users.map(user =>
@@ -183,11 +247,74 @@ const CompanyDetails = () => {
     'text-[var(--text-dark)] hover:bg-[var(--dark-background)] focus:bg-[var(--secondary)] cursor-pointer';
 
   const [isToggling, setIsToggling] = useState(false);
+
+  // Status toggle handler - same as listing page
   const handleToggle = async () => {
-    setIsToggling(true);
-    // onToggle();
-    setTimeout(() => setIsToggling(false), 300);
+    if (!company) return;
+
+    try {
+      setIsToggling(true);
+
+      // Prevent status changes for default companies
+      if (company.is_default) {
+        showErrorToast(COMPANY_MESSAGES.DEFAULT_COMPANY_STATUS_ERROR);
+        return;
+      }
+
+      const currentStatus = company.status;
+      const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+
+      await apiService.updateCompanyStatus(company.uuid, newStatus);
+
+      // Update local state
+      setCompany(prev => (prev ? { ...prev, status: newStatus } : null));
+      setEnabled(newStatus === 'ACTIVE');
+
+      showSuccessToast(
+        `${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS} Status changed to ${newStatus}.`
+      );
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        COMPANY_MESSAGES.STATUS_UPDATE_ERROR
+      );
+      showErrorToast(message);
+
+      // Revert local state on error
+      if (company) {
+        setEnabled(company.status === 'ACTIVE');
+      }
+    } finally {
+      setIsToggling(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center min-h-[400px]'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4'></div>
+          <p className='text-gray-600'>{COMPANY_MESSAGES.LOADING}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!company) {
+    return (
+      <div className='flex items-center justify-center min-h-[400px]'>
+        <div className='text-center'>
+          <p className='text-gray-600'>{COMPANY_MESSAGES.COMPANY_NOT_FOUND}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Breadcrumb */}
@@ -198,7 +325,11 @@ const CompanyDetails = () => {
           <div className='flex-0 w-[120px]'>
             <div className='w-[120px] h-[120px] p-3 rounded-[16px] border border-[var(--border-dark)] flex items-center justify-center'>
               <Image
-                src='/images/company-management/company-img-1.png'
+                src={
+                  company.image
+                    ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + company.image
+                    : '/images/company-management/company-img-1.png'
+                }
                 height={90}
                 width={90}
                 alt='company'
@@ -210,7 +341,7 @@ const CompanyDetails = () => {
             <div className='flex items-center gap-4 border-b border-[var(--border-dark)] pb-4 mb-4'>
               <div className='flex-1'>
                 <h1 className='text-[24px] font-bold text-[var(--text-dark)] leading-7'>
-                  Envision Construction
+                  {company.name}
                 </h1>
                 <p className='text-[16px] text-[var(--text-secondary)] mt-0.5'>
                   Construction Company
@@ -218,13 +349,17 @@ const CompanyDetails = () => {
               </div>
 
               <div className='flex items-center gap-4'>
-                <Button
-                  variant='outline'
-                  className='!text-[var(--text-dark)] px-6 h-[40px] rounded-full border-[#D0D5DD] text-[#344054] font-semibold !bg-opacity-20 hover:bg-white'
-                >
-                  <Edit2 size='28' color='currentColor' />
-                  <span className='text-[var(--text-dark)]'>Edit Details</span>
-                </Button>
+                <Link href={`/company-management/edit-company/${company.uuid}`}>
+                  <Button
+                    variant='outline'
+                    className='!text-[var(--text-dark)] px-6 h-[40px] rounded-full border-[#D0D5DD] text-[#344054] font-semibold !bg-opacity-20 hover:bg-white'
+                  >
+                    <Edit2 size='28' color='currentColor' />
+                    <span className='text-[var(--text-dark)]'>
+                      Edit Details
+                    </span>
+                  </Button>
+                </Link>
                 <Link
                   className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-1'
                   href={'/company-management/add-user'}
@@ -250,33 +385,32 @@ const CompanyDetails = () => {
                 <div>
                   <div className='text-[var(--text-secondary)]'>Created on</div>
                   <div className='font-medium text-[var(--text-dark)]'>
-                    30/08/2024
+                    {formatDate(company.created_at)}
                   </div>
                 </div>
                 <div>
                   <div className='text-[var(--text-secondary)]'>
-                    Last updated
+                    Subscription Ends
                   </div>
                   <div className='font-medium text-[var(--text-dark)]'>
-                    30/08/2024
+                    {formatDate(company.expiry_date)}
                   </div>
                 </div>
               </div>
               {/* Status Toggle */}
-              <div className='flex gap-3 items-center justify-between bg-[var(--border-light)] rounded-[30px] py-1 px-3'>
-                <span className='text-[12px] font-medium text-[var(--text-dark)] w-[100px]'>
-                  {enabled ? 'Enable' : 'Disable'}
-                </span>
-                <Switch
-                  checked={enabled}
-                  onCheckedChange={value => {
-                    setEnabled(value);
-                    handleToggle();
-                  }}
-                  disabled={isToggling}
-                  className={switchStyleSm}
-                />
-              </div>
+              {!company.is_default && (
+                <div className='flex gap-3 items-center justify-between bg-[var(--border-light)] rounded-[30px] py-1 px-3'>
+                  <span className='text-[12px] font-medium text-[var(--text-dark)] w-[100px]'>
+                    {enabled ? 'Enable' : 'Disable'}
+                  </span>
+                  <Switch
+                    checked={enabled}
+                    onCheckedChange={handleToggle}
+                    disabled={isToggling}
+                    className={switchStyleSm}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -314,16 +448,7 @@ const CompanyDetails = () => {
                 About
               </div>
               <div className='text-[14px] text-[var(--text-dark)] font-medium leading-6'>
-                Lorem ipsum dolor sit amet consecte tur adipiscing elit semper
-                dalar dolor elementum tempus hac.Lorem ipsum dolor sit amet
-                consecte tur adipiscing elit semper dalar dolor elementum tempus
-                hac.Lorem ipsum dolor sit amet consecte tur adipiscing elit
-                semper dalar dolor elementum tempus hac.Lorem ipsum dolor sit
-                amet consecte tur adipiscing elit semper dalar dolor elementum
-                tempus hac.Lorem ipsum dolor sit amet consecte tur adipiscing
-                elit semper dalar dolor elementum tempus hac.Lorem ipsum dolor
-                sit amet consecte tur adipiscing elit semper dalar dolor
-                elementum tempus hac.
+                {company.about || 'No description available.'}
               </div>
             </div>
             {/* Contact Info Row */}
@@ -333,21 +458,25 @@ const CompanyDetails = () => {
                   Email
                 </div>
                 <div className='text-[var(--text-dark)]'>
-                  envison.construction@example.com
+                  {company.email || 'N/A'}
                 </div>
               </div>
               <div>
                 <div className='font-medium text-[var(--text-secondary)] mb-1'>
                   Phone Number
                 </div>
-                <div className='text-[var(--text-dark)]'>+1 (239) 555-0108</div>
+                <div className='text-[var(--text-dark)]'>
+                  {company.phone_number || 'N/A'}
+                </div>
               </div>
               <div>
                 <div className='font-medium text-[var(--text-secondary)] mb-1'>
                   Address
                 </div>
                 <div className='text-[var(--text-dark)]'>
-                  3517 W. Gray St. Utica, Pennsylvania 57867
+                  {company.city && company.pincode
+                    ? `${company.city}, ${company.pincode}`
+                    : 'N/A'}
                 </div>
               </div>
               <div>
@@ -355,7 +484,7 @@ const CompanyDetails = () => {
                   Communication
                 </div>
                 <div className='text-[var(--text-dark)]'>
-                  Email, Text, in App Messages
+                  {company.preferred_communication_method || 'N/A'}
                 </div>
               </div>
               <div>
@@ -363,14 +492,24 @@ const CompanyDetails = () => {
                   Website
                 </div>
                 <div className='flex items-center gap-1 text-[var(--text-dark)]'>
-                  <span>envisionconstructions.com</span>
-                  <Link
-                    href='https://envisionconstructions.com'
-                    target='_blank'
-                    className='underline ml-1'
-                  >
-                    ↗
-                  </Link>
+                  {company.website ? (
+                    <>
+                      <span>{company.website}</span>
+                      <Link
+                        href={
+                          company.website.startsWith('http')
+                            ? company.website
+                            : `https://${company.website}`
+                        }
+                        target='_blank'
+                        className='underline ml-1'
+                      >
+                        ↗
+                      </Link>
+                    </>
+                  ) : (
+                    'N/A'
+                  )}
                 </div>
               </div>
             </div>

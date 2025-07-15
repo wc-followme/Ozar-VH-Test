@@ -61,6 +61,10 @@ export function CompanyCard({
     setTimeout(() => setIsToggling(false), 300);
   };
 
+  const handleCardClick = () => {
+    router.push(`/company-management/company-details/${companyUuid}`);
+  };
+
   const handleMenuAction = (action: string) => {
     if (action === 'edit') {
       router.push(`/company-management/edit-company/${companyUuid}`);
@@ -84,7 +88,10 @@ export function CompanyCard({
   };
 
   return (
-    <div className='bg-[var(--white-background)] rounded-[12px] border border-[var(--border-dark)] p-[16px] hover:shadow-lg transition-shadow duration-200'>
+    <div 
+      className='bg-[var(--white-background)] rounded-[12px] border border-[var(--border-dark)] p-[16px] hover:shadow-lg transition-shadow duration-200 cursor-pointer'
+      onClick={handleCardClick}
+    >
       {/* Header with Avatar, User Info and Menu */}
       <div className='mb-4'>
         <Avatar className='w-[6.25rem] h-[6.25rem] rounded-none mt-[0.875rem] mb-10 mx-auto'>
@@ -110,6 +117,9 @@ export function CompanyCard({
                   variant='ghost'
                   size='sm'
                   className='h-8 w-8 p-0 flex-shrink-0'
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card click when clicking menu
+                  }}
                 >
                   <IconDotsVertical
                     className='!w-6 !h-6'
@@ -127,7 +137,10 @@ export function CompanyCard({
                   return (
                     <DropdownMenuItem
                       key={index}
-                      onClick={() => handleMenuAction(option.action)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent card click when clicking menu item
+                        handleMenuAction(option.action);
+                      }}
                       className={cn(
                         'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2',
                         option.variant === 'destructive'
@@ -170,7 +183,12 @@ export function CompanyCard({
 
       {/* Status Toggle */}
       {!isDefault && (
-        <div className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
+        <div 
+          className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent card click when clicking toggle
+          }}
+        >
           <span className='text-[12px] font-medium text-[var(--text-dark)]'>
             Enable
           </span>
