@@ -37,6 +37,8 @@ export const CATEGORY_MESSAGES = {
   CREATE_BUTTON: 'Create',
   UPDATE_BUTTON: 'Update',
   CANCEL_BUTTON: 'Cancel',
+  CREATING_BUTTON: 'Creating...',
+  UPDATING_BUTTON: 'Updating...',
 
   // Form Labels
   CATEGORY_NAME_LABEL: 'Category Name',
@@ -55,6 +57,9 @@ export const CATEGORY_MESSAGES = {
 
   // Breadcrumbs
   BREADCRUMB_CATEGORIES: 'Categories',
+  CATEGORY_MANAGEMENT_BREADCRUMB: 'Category Management',
+  CREATE_CATEGORY_BREADCRUMB: 'Create Category',
+  EDIT_CATEGORY_BREADCRUMB: 'Edit Category',
 
   // Menu Options
   EDIT_MENU: 'Edit',

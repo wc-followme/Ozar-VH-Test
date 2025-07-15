@@ -1,6 +1,8 @@
 'use client';
 
 import { CategoryCard } from '@/components/shared/cards/CategoryCard';
+import FormErrorMessage from '@/components/shared/common/FormErrorMessage';
+import IconFieldWrapper from '@/components/shared/common/IconFieldWrapper';
 import SideSheet from '@/components/shared/common/SideSheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,13 +10,20 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
+import { iconOptions } from '@/constants/sidebar-items';
+import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService, Category, CreateCategoryRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
+import {
+  CreateCategoryFormData,
+  createCategorySchema,
+} from '@/lib/validations/category';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { AddCircle, Edit2, Trash } from 'iconsax-react';
 import { useCallback, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { CATEGORY_MESSAGES } from './category-messages';
-import { CategoryFormErrors } from './category-types';
 
 const menuOptions = [
   {
@@ -38,11 +47,23 @@ const CategoryManagement = () => {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
-  // Form state
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [icon, setIcon] = useState('fas fa-folder');
-  const [errors, setErrors] = useState<CategoryFormErrors>({});
+  // Form management with react-hook-form
+  const defaultIconOption = iconOptions[0];
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<CreateCategoryFormData>({
+    resolver: yupResolver(createCategorySchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      icon: defaultIconOption?.value ?? '',
+    },
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchCategories = useCallback(async () => {
     setLoading(true);
@@ -161,41 +182,38 @@ const CategoryManagement = () => {
     }
   };
 
-  const validate = (): boolean => {
-    const newErrors: CategoryFormErrors = {};
-    if (!name.trim()) newErrors.name = CATEGORY_MESSAGES.NAME_REQUIRED;
-    if (!description.trim())
-      newErrors.description = CATEGORY_MESSAGES.DESCRIPTION_REQUIRED;
-    if (!icon.trim()) newErrors.icon = CATEGORY_MESSAGES.ICON_REQUIRED;
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-
+  // Handle form submission
+  const onSubmit = async (data: CreateCategoryFormData) => {
+    setIsSubmitting(true);
     try {
-      const payload: CreateCategoryRequest = {
-        name: name.trim(),
-        description: description.trim(),
-        icon: icon.trim(),
-        is_default: false,
-        status: 'ACTIVE',
+      const categoryData: CreateCategoryRequest = {
+        name: data.name,
+        description: data.description,
+        icon: data.icon,
+        status: 'ACTIVE', // Default to ACTIVE when creating
+        is_default: false, // New categories are not default
       };
 
-      await apiService.createCategory(payload);
-      showSuccessToast(CATEGORY_MESSAGES.CREATE_SUCCESS);
+      const response = await apiService.createCategory(categoryData);
+      if (
+        response.statusCode === STATUS_CODES.OK ||
+        response.statusCode === STATUS_CODES.CREATED
+      ) {
+        showSuccessToast(CATEGORY_MESSAGES.CREATE_SUCCESS);
 
-      // Reset form and close modal
-      setName('');
-      setDescription('');
-      setIcon('fas fa-folder');
-      setErrors({});
-      setOpen(false);
+        // Reset form and close modal
+        reset({
+          name: '',
+          description: '',
+          icon: defaultIconOption?.value ?? '',
+        });
+        setOpen(false);
 
-      // Refresh categories list
-      fetchCategories();
+        // Refresh categories list
+        fetchCategories();
+      } else {
+        throw new Error(response.message || CATEGORY_MESSAGES.CREATE_ERROR);
+      }
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -207,19 +225,18 @@ const CategoryManagement = () => {
         CATEGORY_MESSAGES.CREATE_ERROR
       );
       showErrorToast(message);
+    } finally {
+      setIsSubmitting(false);
     }
-  };
-
-  const resetForm = () => {
-    setName('');
-    setDescription('');
-    setIcon('fas fa-folder');
-    setErrors({});
   };
 
   const handleClose = () => {
     setOpen(false);
-    resetForm();
+    reset({
+      name: '',
+      description: '',
+      icon: defaultIconOption?.value ?? '',
+    });
   };
 
   return (
@@ -276,52 +293,66 @@ const CategoryManagement = () => {
         size='400px'
       >
         <div className='space-y-6'>
-          <form onSubmit={handleSubmit} className='space-y-4'>
-            {/* Category Name */}
-            <div className='space-y-2'>
-              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
-              </Label>
-              <Input
-                placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
-                value={name}
-                onChange={e => setName(e.target.value)}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
-              />
-              {errors.name && (
-                <p className='text-red-500 text-sm'>{errors.name}</p>
-              )}
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+            {/* Icon & Category Name Row */}
+            <div className='grid grid-cols-1 md:grid-cols-5 gap-4 w-full'>
+              {/* Icon Selector */}
+              <div className='space-y-2 pt-1 md:col-span-1'>
+                <Controller
+                  name='icon'
+                  control={control}
+                  render={({ field }) => (
+                    <IconFieldWrapper
+                      label={CATEGORY_MESSAGES.ICON_LABEL}
+                      value={field.value}
+                      onChange={field.onChange}
+                      iconOptions={iconOptions}
+                      error={errors.icon?.message || ''}
+                    />
+                  )}
+                />
+              </div>
+              {/* Category Name */}
+              <div className='space-y-2 md:col-span-4'>
+                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                  {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
+                </Label>
+                <Controller
+                  name='name'
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
+                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                      disabled={isSubmitting}
+                    />
+                  )}
+                />
+                {errors.name && (
+                  <FormErrorMessage message={errors.name.message || ''} />
+                )}
+              </div>
             </div>
-
-            {/* Icon */}
-            <div className='space-y-2'>
-              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                {CATEGORY_MESSAGES.ICON_LABEL}
-              </Label>
-              <Input
-                placeholder={CATEGORY_MESSAGES.SELECT_ICON}
-                value={icon}
-                onChange={e => setIcon(e.target.value)}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
-              />
-              {errors.icon && (
-                <p className='text-red-500 text-sm'>{errors.icon}</p>
-              )}
-            </div>
-
             {/* Description */}
             <div className='space-y-2'>
               <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
                 {CATEGORY_MESSAGES.DESCRIPTION_LABEL}
               </Label>
-              <Textarea
-                placeholder={CATEGORY_MESSAGES.ENTER_DESCRIPTION}
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
+              <Controller
+                name='description'
+                control={control}
+                render={({ field }) => (
+                  <Textarea
+                    {...field}
+                    placeholder={CATEGORY_MESSAGES.ENTER_DESCRIPTION}
+                    className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                    disabled={isSubmitting}
+                  />
+                )}
               />
               {errors.description && (
-                <p className='text-red-500 text-sm'>{errors.description}</p>
+                <FormErrorMessage message={errors.description.message || ''} />
               )}
             </div>
 
@@ -332,14 +363,18 @@ const CategoryManagement = () => {
                 variant='outline'
                 className='h-[48px] px-8 rounded-full font-semibold text-[var(--text-dark)] border-2 border-[var(--border-dark)] bg-transparent'
                 onClick={handleClose}
+                disabled={isSubmitting}
               >
                 {CATEGORY_MESSAGES.CANCEL_BUTTON}
               </Button>
               <Button
                 type='submit'
                 className='h-[48px] px-12 bg-[#38B24D] hover:bg-[#2e9c41] rounded-full font-semibold text-white'
+                disabled={isSubmitting}
               >
-                {CATEGORY_MESSAGES.CREATE_BUTTON}
+                {isSubmitting
+                  ? CATEGORY_MESSAGES.CREATING_BUTTON
+                  : CATEGORY_MESSAGES.CREATE_BUTTON}
               </Button>
             </div>
           </form>
