@@ -3,8 +3,9 @@
 import ToolCard from '@/components/shared/cards/ToolCard';
 import SideSheet from '@/components/shared/common/SideSheet';
 import ToolForm from '@/components/shared/forms/ToolForm';
+import ToolCardSkeleton from '@/components/shared/skeleton/ToolCardSkeleton';
 import { AddCircle } from 'iconsax-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const dummyTools = [
   {
@@ -108,6 +109,7 @@ const dummyTools = [
 const ToolsManagement = () => {
   const [tools, setTools] = useState(dummyTools);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Form state
   const [toolName, setToolName] = useState('');
@@ -146,6 +148,12 @@ const ToolsManagement = () => {
     setPhoto(null);
     setErrors({});
   }
+
+  // Show skeletons for 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className='w-full'>
@@ -190,17 +198,21 @@ const ToolsManagement = () => {
         />
       </SideSheet>
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
-        {tools.map(tool => (
-          <ToolCard
-            key={tool.id}
-            image={tool.image}
-            name={tool.name}
-            brand={tool.brand}
-            quantity={tool.quantity}
-            videoCount={tool.videoCount}
-            onDelete={() => handleDelete(tool.id)}
-          />
-        ))}
+        {loading
+          ? Array.from({ length: 12 }).map((_, idx) => (
+              <ToolCardSkeleton key={idx} />
+            ))
+          : tools.map(tool => (
+              <ToolCard
+                key={tool.id}
+                image={tool.image}
+                name={tool.name}
+                brand={tool.brand}
+                quantity={tool.quantity}
+                videoCount={tool.videoCount}
+                onDelete={() => handleDelete(tool.id)}
+              />
+            ))}
       </div>
     </div>
   );
