@@ -1,3 +1,5 @@
+import { PAGINATION } from '@/constants/common';
+
 interface DeviceInfo {
   fcm_token?: string;
   device_id: string;
@@ -491,7 +493,7 @@ class ApiService {
   // Fetch roles with pagination, search, and name filter
   async fetchRoles({
     page = 1,
-    limit = 10,
+    limit = PAGINATION.DEFAULT_LIMIT,
     search = '',
     name = '',
   }: {
@@ -557,7 +559,7 @@ class ApiService {
   // User management API
   async fetchUsers({
     page = 1,
-    limit = 10,
+    limit = PAGINATION.DEFAULT_LIMIT,
     role_id = '',
     company_id = '',
     search = '',
@@ -632,7 +634,7 @@ class ApiService {
   // Fetch companies with pagination, status, and sortOrder
   async fetchCompanies({
     page = 1,
-    limit = 10,
+    limit = PAGINATION.DEFAULT_LIMIT,
     status = 'ACTIVE',
     sortOrder = 'ASC',
   }: {

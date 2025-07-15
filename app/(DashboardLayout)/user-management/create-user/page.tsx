@@ -4,6 +4,7 @@ import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
+import { PAGINATION } from '@/constants/common';
 import { apiService, CreateUserRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
@@ -43,7 +44,10 @@ export default function AddUserPage() {
     const fetchRoles = async () => {
       setLoadingRoles(true);
       try {
-        const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
+        const rolesRes = await apiService.fetchRoles({
+          page: 1,
+          limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+        });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
           roleList.map((role: Role) => ({ id: role.id, name: role.name }))

@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
+import { PAGINATION } from '@/constants/common';
 import {
   apiService,
   FetchUsersResponse,
@@ -165,7 +166,10 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
     try {
       // Fetch roles only on first load
       if (targetPage === 1) {
-        const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
+        const rolesRes = await apiService.fetchRoles({
+          page: 1,
+          limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+        });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
           roleList.map((role: Role) => ({ id: role.id, name: role.name }))
@@ -176,7 +180,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
       const searchParam = searchTerm.trim();
       const fetchParams: any = {
         page: targetPage,
-        limit: 20,
+        limit: PAGINATION.USERS_LIMIT,
         role_id,
         company_id: company.id, // Filter by current company
       };
@@ -187,7 +191,18 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
         await apiService.fetchUsers(fetchParams);
 
       const newUsers = usersRes.data;
-      setUsers(prev => (append ? [...prev, ...newUsers] : newUsers));
+      setUsers(prev => {
+        if (append) {
+          // Filter out duplicates when appending to prevent duplicate keys
+          const existingUuids = new Set(prev.map(user => user.uuid));
+          const uniqueNewUsers = newUsers.filter(
+            user => !existingUuids.has(user.uuid)
+          );
+          return [...prev, ...uniqueNewUsers];
+        } else {
+          return newUsers;
+        }
+      });
       setPage(targetPage);
       setHasMore(usersRes.pagination.page < usersRes.pagination.totalPages);
     } catch (err: unknown) {
@@ -584,7 +599,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
                   {filteredUsers.map(user => (
                     <UserCard
-                      key={user.id}
+                      key={user.uuid} // Use uuid instead of id for unique keys
                       name={user.name}
                       role={user.role?.name || ''}
                       phone={user.phone_number}

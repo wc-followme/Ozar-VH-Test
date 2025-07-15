@@ -2,6 +2,7 @@
 
 import { CompanyCard } from '@/components/shared/cards/CompanyCard';
 import { useToast } from '@/components/ui/use-toast';
+import { PAGINATION } from '@/constants/common';
 import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
@@ -9,7 +10,6 @@ import { AddCircle, Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { COMPANY_MESSAGES } from './company-messages';
-import { FetchCompaniesParams } from './types';
 
 const menuOptions = [
   {
@@ -57,14 +57,13 @@ export default function CompanyManagement() {
   const fetchCompanies = async (targetPage = 1, append = false) => {
     setLoading(true);
     try {
-      const params: FetchCompaniesParams = {
+      const res: FetchCompaniesResponse = await apiService.fetchCompanies({
         page: targetPage,
-        limit: 10,
+        limit: PAGINATION.DEFAULT_LIMIT,
         status: 'ACTIVE',
         sortOrder: 'ASC',
-      };
-
-      const res = await apiService.fetchCompanies(params);
+        sortBy: 'created_at',
+      });
 
       if (isCompanyApiResponse(res)) {
         const newCompanies = res.data.data;

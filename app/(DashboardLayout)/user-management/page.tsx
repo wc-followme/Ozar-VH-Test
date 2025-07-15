@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
+import { PAGINATION } from '@/constants/common';
 import { apiService, FetchUsersResponse, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { Edit2, Trash } from 'iconsax-react';
@@ -46,13 +47,16 @@ export default function UserManagement() {
         !loading &&
         hasMore
       ) {
-        fetchUsers(page + 1, true);
+        setPage(prevPage => {
+          const nextPage = prevPage + 1;
+          fetchUsers(nextPage, true);
+          return nextPage;
+        });
       }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, hasMore, page, filter]);
+  }, [loading, hasMore]); // Removed page and filter from dependencies
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -71,7 +75,10 @@ export default function UserManagement() {
     try {
       // Fetch roles only on first load
       if (targetPage === 1) {
-        const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
+        const rolesRes = await apiService.fetchRoles({
+          page: 1,
+          limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+        });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
           roleList.map((role: Role) => ({ id: role.id, name: role.name }))
@@ -80,12 +87,25 @@ export default function UserManagement() {
       const role_id = filter !== 'all' ? filter : '';
       const usersRes: FetchUsersResponse = await apiService.fetchUsers({
         page: targetPage,
-        limit: 20,
+        limit: PAGINATION.USERS_LIMIT,
         role_id,
       });
       const newUsers = usersRes.data;
-      setUsers(prev => (append ? [...prev, ...newUsers] : newUsers));
-      setPage(targetPage);
+
+      setUsers(prev => {
+        if (append) {
+          // Filter out duplicates when appending to prevent duplicate keys
+          const existingUuids = new Set(prev.map(user => user.uuid));
+          const uniqueNewUsers = newUsers.filter(
+            user => !existingUuids.has(user.uuid)
+          );
+          return [...prev, ...uniqueNewUsers];
+        } else {
+          return newUsers;
+        }
+      });
+
+      // Don't call setPage here as it's managed in the scroll handler
       setHasMore(usersRes.pagination.page < usersRes.pagination.totalPages);
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
@@ -200,7 +220,7 @@ export default function UserManagement() {
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
           {users.map(user => (
             <UserCard
-              key={user.id}
+              key={user.uuid} // Use uuid instead of id for unique keys
               name={user.name}
               role={user.role?.name || ''}
               phone={user.phone_number}

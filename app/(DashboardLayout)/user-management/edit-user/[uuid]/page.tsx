@@ -5,6 +5,7 @@ import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
+import { PAGINATION } from '@/constants/common';
 import { apiService, UpdateUserRequest, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
@@ -61,7 +62,10 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         // Fetch user details and roles in parallel
         const [userRes, rolesRes] = await Promise.all([
           apiService.getUserDetails(resolvedParams.uuid),
-          apiService.fetchRoles({ page: 1, limit: 50 }),
+          apiService.fetchRoles({
+            page: 1,
+            limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+          }),
         ]);
 
         // Set user data
