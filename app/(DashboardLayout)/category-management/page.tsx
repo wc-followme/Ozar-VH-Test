@@ -14,7 +14,7 @@ import { iconOptions } from '@/constants/sidebar-items';
 import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService, Category, CreateCategoryRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, formatDate } from '@/lib/utils';
+import { extractApiErrorMessage } from '@/lib/utils';
 import {
   CreateCategoryFormData,
   createCategorySchema,
@@ -113,46 +113,6 @@ const CategoryManagement = () => {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
-
-  // Status toggle handler
-  const handleToggleStatus = async (
-    id: number,
-    currentStatus: 'ACTIVE' | 'INACTIVE'
-  ) => {
-    try {
-      const category = categories.find(c => c.id === id);
-      if (!category || !category.uuid)
-        throw new Error(CATEGORY_MESSAGES.CATEGORY_NOT_FOUND_ERROR);
-
-      // Prevent status changes for default categories
-      if (category.is_default) {
-        showErrorToast(CATEGORY_MESSAGES.DEFAULT_CATEGORY_STATUS_ERROR);
-        return;
-      }
-
-      const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-      await apiService.updateCategoryStatus(category.uuid, newStatus);
-
-      setCategories(categories =>
-        categories.map(c => (c.id === id ? { ...c, status: newStatus } : c))
-      );
-
-      showSuccessToast(
-        `${CATEGORY_MESSAGES.STATUS_UPDATE_SUCCESS} Status changed to ${newStatus}.`
-      );
-    } catch (err: unknown) {
-      // Handle auth errors first (will redirect to login if 401)
-      if (handleAuthError(err)) {
-        return; // Don't show toast if it's an auth error
-      }
-
-      const message = extractApiErrorMessage(
-        err,
-        CATEGORY_MESSAGES.STATUS_UPDATE_ERROR
-      );
-      showErrorToast(message);
-    }
-  };
 
   // Delete handler
   const handleDeleteCategory = async (uuid: string) => {
@@ -267,21 +227,27 @@ const CategoryManagement = () => {
         </div>
       ) : (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
-          {categories.map(category => (
-            <CategoryCard
-              key={category.id}
-              name={category.name}
-              description={category.description}
-              icon={category.icon}
-              createdOn={formatDate(category.created_at)}
-              status={category.status === 'ACTIVE'}
-              onToggle={() => handleToggleStatus(category.id, category.status)}
-              menuOptions={menuOptions}
-              isDefault={category.is_default}
-              categoryUuid={category.uuid}
-              onDelete={() => handleDeleteCategory(category.uuid)}
-            />
-          ))}
+          {categories.map((category, index) => {
+            const iconOption = iconOptions.find(
+              opt => opt.value === category.icon
+            ) || {
+              icon: () => null,
+              color: '#00a8bf',
+            };
+            return (
+              <CategoryCard
+                key={category.id || index}
+                name={category.name}
+                description={category.description}
+                iconSrc={iconOption.icon}
+                iconColor={iconOption.color}
+                iconBgColor={iconOption.color + '26'}
+                menuOptions={menuOptions}
+                categoryUuid={category.uuid}
+                onDelete={() => handleDeleteCategory(category.uuid)}
+              />
+            );
+          })}
         </div>
       )}
 
@@ -294,45 +260,43 @@ const CategoryManagement = () => {
       >
         <div className='space-y-6'>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-            {/* Icon & Category Name Row */}
-            <div className='grid grid-cols-1 md:grid-cols-5 gap-4 w-full'>
-              {/* Icon Selector */}
-              <div className='space-y-2 pt-1 md:col-span-1'>
-                <Controller
-                  name='icon'
-                  control={control}
-                  render={({ field }) => (
-                    <IconFieldWrapper
-                      label={CATEGORY_MESSAGES.ICON_LABEL}
-                      value={field.value}
-                      onChange={field.onChange}
-                      iconOptions={iconOptions}
-                      error={errors.icon?.message || ''}
-                    />
-                  )}
-                />
-              </div>
-              {/* Category Name */}
-              <div className='space-y-2 md:col-span-4'>
-                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                  {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
-                </Label>
-                <Controller
-                  name='name'
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                      disabled={isSubmitting}
-                    />
-                  )}
-                />
-                {errors.name && (
-                  <FormErrorMessage message={errors.name.message || ''} />
+            {/* Icon Selector */}
+            <div className='space-y-2'>
+              <Controller
+                name='icon'
+                control={control}
+                render={({ field }) => (
+                  <IconFieldWrapper
+                    label={CATEGORY_MESSAGES.ICON_LABEL}
+                    value={field.value}
+                    onChange={field.onChange}
+                    iconOptions={iconOptions}
+                    error={errors.icon?.message || ''}
+                  />
                 )}
-              </div>
+              />
+            </div>
+
+            {/* Category Name */}
+            <div className='space-y-2'>
+              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
+              </Label>
+              <Controller
+                name='name'
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
+                    className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                    disabled={isSubmitting}
+                  />
+                )}
+              />
+              {errors.name && (
+                <FormErrorMessage message={errors.name.message || ''} />
+              )}
             </div>
             {/* Description */}
             <div className='space-y-2'>

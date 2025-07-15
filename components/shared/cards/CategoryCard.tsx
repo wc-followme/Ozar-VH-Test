@@ -8,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
@@ -29,12 +28,10 @@ interface MenuOption {
 interface CategoryCardProps {
   name: string;
   description: string;
-  icon: string;
-  createdOn: string;
-  status: boolean;
-  onToggle: () => void;
+  iconSrc: React.ComponentType<{ size?: number; color?: string }>;
+  iconColor?: string;
+  iconBgColor: string;
   menuOptions: MenuOption[];
-  isDefault?: boolean;
   categoryUuid: string;
   onDelete?: () => void;
 }
@@ -42,12 +39,10 @@ interface CategoryCardProps {
 export function CategoryCard({
   name,
   description,
-  icon,
-  createdOn,
-  status,
-  onToggle,
+  iconSrc,
+  iconColor,
+  iconBgColor,
   menuOptions,
-  isDefault = false,
   categoryUuid,
   onDelete,
 }: CategoryCardProps) {
@@ -79,9 +74,13 @@ export function CategoryCard({
       <Card className='flex flex-col items-start gap-4 p-6 bg-[var(--card-background)] h-full rounded-[24px] border border-[var(--border-dark)] hover:shadow-lg transition-shadow duration-200'>
         <div className='flex items-start justify-between w-full'>
           <div
-            className={`flex items-center justify-center w-[60px] h-[60px] rounded-[16px] mb-2 bg-[var(--secondary)] bg-opacity-10`}
+            className={`flex items-center justify-center w-[60px] h-[60px] rounded-[16px] mb-2`}
+            style={{ background: iconBgColor }}
           >
-            <i className={cn(icon, 'text-2xl text-[var(--secondary)]')} />
+            {React.createElement(iconSrc, {
+              size: 30,
+              color: iconColor || '#000000',
+            })}
           </div>
 
           <DropdownMenu>
@@ -136,26 +135,6 @@ export function CategoryCard({
               {description}
             </p>
           </div>
-
-          {!isDefault && (
-            <div className='flex w-full items-center justify-end px-4 py-2 bg-[var(--border-light)] mt-auto rounded-[30px]'>
-              <Switch
-                checked={status}
-                onCheckedChange={onToggle}
-                className='
-                  h-4 w-9 
-                  data-[state=checked]:bg-[var(--secondary)] 
-                  data-[state=unchecked]:bg-gray-300
-                  [&>span]:h-3 
-                  [&>span]:w-3 
-                  [&>span]:bg-white 
-                  data-[state=checked]:[&>span]:border-green-400
-                  [&>span]:transition-all
-                  [&>span]:duration-200
-                '
-              />
-            </div>
-          )}
         </CardContent>
       </Card>
 
