@@ -89,7 +89,7 @@ export function CompanyCard({
 
   return (
     <div 
-      className='bg-[var(--white-background)] rounded-[12px] border border-[var(--border-dark)] p-[16px] hover:shadow-lg transition-shadow duration-200 cursor-pointer'
+      className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[16px] hover:shadow-lg transition-shadow duration-200 cursor-pointer'
       onClick={handleCardClick}
     >
       {/* Header with Avatar, User Info and Menu */}
@@ -130,7 +130,7 @@ export function CompanyCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align='end'
-                className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+                className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
               >
                 {filteredMenuOptions.map((option, index) => {
                   const Icon: any = option.icon; // ensure Icon is a capitalized component
@@ -142,10 +142,10 @@ export function CompanyCard({
                         handleMenuAction(option.action);
                       }}
                       className={cn(
-                        'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2',
+                        'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]',
                         option.variant === 'destructive'
                           ? 'text-red-600 hover:bg-red-50'
-                          : 'hover:bg-gray-100'
+                          : ''
                       )}
                     >
                       <Icon

@@ -170,7 +170,7 @@ export default function UserManagement() {
   const menuOptions: MenuOption[] = [
     { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' },
     {
-      label: 'Delete',
+      label: 'Archive',
       action: 'delete',
       icon: Trash,
       variant: 'destructive',
@@ -178,7 +178,7 @@ export default function UserManagement() {
   ];
 
   return (
-    <div className='w-full p-6 overflow-y-auto'>
+    <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
         <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
@@ -217,7 +217,7 @@ export default function UserManagement() {
           {USER_MESSAGES.NO_USERS_FOUND}
         </div>
       ) : (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
           {users.map(user => (
             <UserCard
               key={user.uuid} // Use uuid instead of id for unique keys

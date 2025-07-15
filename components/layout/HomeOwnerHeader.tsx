@@ -66,10 +66,10 @@ export function HomeOwnerHeader() {
                     key={index}
                     onClick={() => handleMenuAction(option.action)}
                     className={cn(
-                      'text-base p-3 rounded-md cursor-pointer text-[var(--text-dark)] transition-colors flex items-center gap-2',
+                      'text-base p-3 rounded-md cursor-pointer text-[var(--text-dark)] transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]',
                       option.variant === 'destructive'
                         ? 'text-red-600 hover:bg-red-50'
-                        : 'hover:bg-gray-100'
+                        : ''
                     )}
                   >
                     <Icon

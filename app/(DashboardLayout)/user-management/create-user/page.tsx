@@ -13,13 +13,11 @@ import { extractApiErrorMessage } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+
+import ComingSoon from '../../../../components/shared/common/ComingSoon';
 import { Role, RoleApiResponse, UserFormData } from '../types';
 import { USER_MESSAGES } from '../user-messages';
 
-const breadcrumbData: BreadcrumbItem[] = [
-  { name: USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB, href: '/user-management' },
-  { name: USER_MESSAGES.ADD_USER_BREADCRUMB }, // current page
-];
 
 export default function AddUserPage() {
   const [selectedTab, setSelectedTab] = useState('info');
@@ -153,6 +151,13 @@ export default function AddUserPage() {
     }
   };
 
+  const breadcrumbData: BreadcrumbItem[] = [
+    {
+      name: USER_MESSAGES.USER_MANAGEMENT_BREADCRUMB,
+      href: '/user-management',
+    },
+    { name: USER_MESSAGES.ADD_USER_BREADCRUMB },
+  ];
   return (
     <div className=''>
       <div className=''>
@@ -160,7 +165,7 @@ export default function AddUserPage() {
         <Breadcrumb items={breadcrumbData} className='mb-6 mt-2' />
 
         {/* Main Content */}
-        <div className='bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
+        <div className='bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
           <Tabs
             value={selectedTab}
             onValueChange={setSelectedTab}
@@ -169,13 +174,13 @@ export default function AddUserPage() {
             <TabsList className='grid w-full max-w-[328px] grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal'>
               <TabsTrigger
                 value='info'
-                className='rounded-md px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
                 {USER_MESSAGES.INFO_TAB}
               </TabsTrigger>
               <TabsTrigger
                 value='permissions'
-                className='rounded-md px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
                 {USER_MESSAGES.PERMISSIONS_TAB}
               </TabsTrigger>
@@ -214,9 +219,7 @@ export default function AddUserPage() {
             </TabsContent>
 
             <TabsContent value='permissions' className='pt-8'>
-              <div className='text-center py-10 text-gray-500'>
-                Permissions management coming soon...
-              </div>
+              <ComingSoon />
             </TabsContent>
           </Tabs>
         </div>

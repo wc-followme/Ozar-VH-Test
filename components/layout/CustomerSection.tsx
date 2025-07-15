@@ -7,7 +7,7 @@ import Image from 'next/image';
 
 export function CustomerSection() {
   return (
-    <div className='bg-[var(--background)] rounded-[30px] p-5 w-full'>
+    <div className='bg-[#F5F7FA] rounded-[30px] p-5 w-full'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center space-x-4'>
           <div className='flex -space-x-2'>
@@ -23,10 +23,10 @@ export function CustomerSection() {
             ))}
           </div>
           <div>
-            <p className='font-semibold text-[--text] text-[18px]'>
+            <p className='font-semibold text-[#2d2d2d] text-[18px]'>
               Join with 20k+ Users!
             </p>
-            <p className='text-[var(--text-secondary)] text-[18px]'>
+            <p className='text-[#818181] text-[18px]'>
               Let&apos;s see our happy customers
             </p>
           </div>
@@ -34,7 +34,7 @@ export function CustomerSection() {
         <Button
           variant='outline'
           size='icon'
-          className='border border-black h-[54px] rounded-[30px] w-[72px] flex items-center justify-center text-black bg-transparent'
+          className='border border-black h-[54px] rounded-[30px] w-[72px] flex items-center justify-center text-black hover:text-black bg-transparent'
         >
           <IconArrowRight className='-rotate-45' size={60} />
         </Button>

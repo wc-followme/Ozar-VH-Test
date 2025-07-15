@@ -44,10 +44,10 @@ export default function LoginPageContent() {
   };
 
   return (
-    <section className='min-h-screen'>
+    <section className='min-h-screen bg-[#FFFFFF]'>
       <div className='flex flex-col min-h-screen lg:flex-row mx-auto py-[38px] px-[30px] gap-[24px]'>
         <div className='flex-1 max-w-[676px] flex flex-col items-center justify-center bg-white gap-[24px]'>
-          <div className='w-full space-y-8 flex flex-column items-center justify-center flex-1 w-full bg-[var(--background)] rounded-[30px]'>
+          <div className='w-full space-y-8 flex flex-column items-center justify-center flex-1 bg-[#F5F7FA] rounded-[30px]'>
             <div className='max-w-[412px] w-full px-4'>
               {/* Logo */}
               <Image
@@ -60,7 +60,7 @@ export default function LoginPageContent() {
 
               {/* Heading */}
               <div className='text-center space-y-2 mb-[34px]'>
-                <h1 className='text-3xl lg:text-[30px] font-bold text-[var(--text)] leading-[1] mb-6 leading-tight'>
+                <h1 className='text-3xl lg:text-[30px] font-bold text-[#2D2D2D] mb-6 leading-tight'>
                   Join us to start turning your vision into reality!
                 </h1>
                 <p className='text-[var(--text-secondary)] text-[18px]'>

@@ -79,7 +79,7 @@ export function UserCard({
   };
 
   return (
-    <div className='bg-[var(--white-background)] rounded-[12px] border border-[var(--border-dark)] p-[10px] hover:shadow-lg transition-shadow duration-200'>
+    <div className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[10px] hover:shadow-lg transition-shadow duration-200'>
       {/* Header with Avatar, User Info and Menu */}
       <div className='flex items-start gap-4 mb-2'>
         <Avatar className='w-20 h-20 rounded-[10px]'>
@@ -134,7 +134,7 @@ export function UserCard({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align='end'
-            className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+            className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
           >
             {menuOptions.map((option, index) => {
               const Icon = option.icon; // ensure Icon is a capitalized component
@@ -143,9 +143,9 @@ export function UserCard({
                   key={index}
                   onClick={() => handleMenuAction(option.action)}
                   className={cn(
-                    'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2',
+                    'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]',
                     option.variant === 'destructive'
-                      ? 'text-red-600 hover:bg-red-50'
+                      ? 'hover:bg-red-50'
                       : 'hover:bg-gray-100'
                   )}
                   disabled={!!disableActions}
@@ -170,7 +170,7 @@ export function UserCard({
           disabled={isToggling || disableActions}
           className='
               h-4 w-9 
-              data-[state=checked]:bg-green-500 
+              data-[state=checked]:bg-[var(--secondary)] 
               data-[state=unchecked]:bg-gray-300
               [&>span]:h-3 
               [&>span]:w-3 
@@ -183,7 +183,7 @@ export function UserCard({
       </div>
       <ConfirmDeleteModal
         open={showDelete}
-        title={`Are you sure you want to delete?`}
+        title={`Are you sure you want to Archive?`}
         subtitle={`This action cannot be undone.`}
         onCancel={() => setShowDelete(false)}
         onDelete={async () => {

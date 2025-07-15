@@ -162,7 +162,7 @@ export default function CompanyManagement() {
   };
 
   return (
-    <div className='w-full p-6 overflow-y-auto'>
+    <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
         <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
@@ -191,7 +191,7 @@ export default function CompanyManagement() {
           {COMPANY_MESSAGES.NO_COMPANIES_FOUND}
         </div>
       ) : (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
           {companies.map(company => (
             <CompanyCard
               key={company.id}

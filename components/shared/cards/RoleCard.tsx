@@ -61,7 +61,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
   };
 
   return (
-    <Card className='flex flex-col items-start gap-4 p-6 bg-[var(--card-background)] rounded-[24px] border border-[var(--border-dark)] hover:shadow-lg transition-shadow duration-200'>
+    <Card className='flex flex-col items-start gap-4 p-6 bg-[var(--card-background)] h-full rounded-[24px] border border-[var(--border-dark)] hover:shadow-lg transition-shadow duration-200'>
       <div className='flex items-start justify-between w-full'>
         <div
           className={`flex items-center justify-center w-[60px] h-[60px] rounded-[16px] mb-2`}
@@ -90,7 +90,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
 
           <DropdownMenuContent
             align='end'
-            className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+            className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
           >
             {menuOptions.map((option, index) => {
               const IconComponent = option.icon; // ensure Icon is a capitalized component
@@ -99,10 +99,10 @@ export const RoleCard: React.FC<RoleCardProps> = ({
                   key={index}
                   onClick={() => handleMenuAction(option.action)}
                   className={cn(
-                    'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2',
+                    'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]',
                     option.variant === 'destructive'
                       ? 'text-red-600 hover:bg-red-50'
-                      : 'hover:bg-gray-100'
+                      : ''
                   )}
                 >
                   <IconComponent
@@ -118,7 +118,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
         </DropdownMenu>
       </div>
 
-      <CardContent className='flex flex-col items-start gap-4 p-0 w-full'>
+      <CardContent className='flex flex-col items-start gap-4 p-0 w-full flex-1'>
         <div className='flex flex-col gap-2 w-full'>
           <h3 className='text-base font-bold text-[var(--text)]'>{title}</h3>
 
@@ -127,7 +127,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
           </p>
         </div>
 
-        <div className='flex w-full items-center justify-between px-4 py-2 bg-[var(--border-light)] rounded-[30px]'>
+        <div className='flex w-full items-center justify-between px-4 py-2 bg-[var(--border-light)] mt-auto rounded-[30px]'>
           <span className='text-xs font-medium text-[var(--text)]'>
             Permissions
           </span>

@@ -17,7 +17,7 @@ interface PhotoUploadFieldProps {
 const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
   photo,
   onPhotoChange,
-  onDeletePhoto,
+  // onDeletePhoto,
   label = 'Upload Photo or Drag and Drop',
   text,
   className = '',

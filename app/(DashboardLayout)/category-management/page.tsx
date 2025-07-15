@@ -7,18 +7,14 @@ import { Interior } from '@/components/icons/Interior';
 import { ToolsIcon } from '@/components/icons/ToolsIcon';
 import { WrenchIcon } from '@/components/icons/WrenchIcon';
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
-import IconFieldWrapper from '@/components/shared/common/IconFieldWrapper';
 import SideSheet from '@/components/shared/common/SideSheet';
-import { Button } from '@/components/ui/button';
+import CategoryForm from '@/components/shared/forms/CategoryForm';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Edit2, Hammer, Trash, Wrench } from 'lucide-react';
 import { useState } from 'react';
@@ -102,7 +98,7 @@ const menuOptions = [
   { id: 1, label: 'Edit', action: 'edit', icon: Edit2 },
   {
     id: 2,
-    label: 'Delete',
+    label: 'Archive',
     action: 'delete',
     icon: Trash,
     variant: 'destructive',
@@ -113,8 +109,15 @@ const CategoryManagement = () => {
   const [open, setOpen] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState('star');
   const [showDeleteIdx, setShowDeleteIdx] = useState<number | null>(null);
+  const [categoryName, setCategoryName] = useState('');
+  const [description, setDescription] = useState('');
+  const [errors] = useState<{
+    icon?: string;
+    categoryName?: string;
+    description?: string;
+  }>({});
   return (
-    <section className='flex flex-col w-full items-start gap-8 p-6 overflow-y-auto'>
+    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
         <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
           Category Management
@@ -132,69 +135,20 @@ const CategoryManagement = () => {
         onOpenChange={setOpen}
         size='600px'
       >
-        <div className='bg-[var(--white-background)] p-[0px] w-full'>
-          <form className='space-y-6' onSubmit={e => e.preventDefault()}>
-            {/* Icon & Category Name Row */}
-            <div className='grid grid-cols-1 md:grid-cols-5 gap-4 w-full'>
-              {/* Icon Selector */}
-              <div className='space-y-2 pt-1 md:col-span-1'>
-                <IconFieldWrapper
-                  label='Icon'
-                  value={selectedIcon}
-                  onChange={setSelectedIcon}
-                  iconOptions={iconOptions}
-                  error={selectedIcon === '' ? 'Please select an icon' : ''} // Optional error
-                />
-
-                {/* Error message placeholder */}
-                {/* <FormErrorMessage message={errors.icon} /> */}
-              </div>
-              {/* Category Name */}
-              <div className='space-y-2 md:col-span-4'>
-                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                  Category Name
-                </Label>
-                <Input
-                  placeholder='Enter Category Name'
-                  className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                />
-                {/* Error message placeholder */}
-                {/* <FormErrorMessage message={errors.categoryName} /> */}
-              </div>
-            </div>
-            {/* Description */}
-            <div className='space-y-2'>
-              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                Description
-              </Label>
-              <Textarea
-                placeholder='Enter Description'
-                className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-              />
-              {/* Error message placeholder */}
-              {/* <FormErrorMessage message={errors.description} /> */}
-            </div>
-            {/* Actions */}
-            <div className='flex gap-4 pt-2'>
-              <Button
-                type='button'
-                variant='outline'
-                className='h-[48px] px-8 rounded-full font-semibold text-[var(--text-dark)] border-2 border-[var(--border-dark)] bg-transparent'
-                onClick={() => setOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type='submit'
-                className='h-[48px] px-12 bg-[#38B24D] hover:bg-[#2e9c41] rounded-full font-semibold text-white'
-              >
-                Create
-              </Button>
-            </div>
-          </form>
-        </div>
+        <CategoryForm
+          selectedIcon={selectedIcon}
+          setSelectedIcon={setSelectedIcon}
+          iconOptions={iconOptions}
+          errors={errors}
+          categoryName={categoryName}
+          setCategoryName={setCategoryName}
+          description={description}
+          setDescription={setDescription}
+          onClose={() => setOpen(false)}
+          onSubmit={e => e.preventDefault()}
+        />
       </SideSheet>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full'>
+      <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
         {categories.map((cat, idx) => {
           const Icon = cat.icon;
 
@@ -246,7 +200,7 @@ const CategoryManagement = () => {
                               setShowDeleteIdx(idx);
                             }
                           }}
-                          className={`text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 ${option.variant === 'destructive' ? ' hover:bg-red-50' : 'hover:bg-gray-100'}`}
+                          className={`text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]${option.variant === 'destructive' ? ' hover:bg-red-50' : ''}`}
                         >
                           <MenuIcon size='18' color='var(--text-dark)' />
                           <span>{option.label}</span>
@@ -257,7 +211,7 @@ const CategoryManagement = () => {
                 </DropdownMenu>
                 <ConfirmDeleteModal
                   open={showDeleteIdx === idx}
-                  title={`Are you sure you want to delete "${cat.title}"?`}
+                  title={`Are you sure you want to Archive "${cat.title}"?`}
                   subtitle={`This action cannot be undone.`}
                   onCancel={() => setShowDeleteIdx(null)}
                   onDelete={() => {

@@ -1,14 +1,15 @@
 'use client';
 import { ModeToggle } from '@/components/mode-toggle';
+import ChangePasswordForm from '@/components/shared/forms/ChangePasswordForm';
 import { Button } from '@/components/ui/button';
-import { UserOctagon } from 'iconsax-react';
+import { useAuth } from '@/lib/auth-context';
+import { HambergerMenu, Key, UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '../../lib/utils';
-import { Notification } from '../icons/Notification';
 import { Search } from '../icons/Search';
 import { SignoutIcon } from '../icons/SignoutIcon';
-import { useAuth } from '@/lib/auth-context';
+import SideSheet from '../shared/common/SideSheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,38 +17,83 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Input } from '../ui/input';
+import { SidebarMobile } from './SidebarMobile';
 type MenuOption = {
   label: string;
   action: string;
   icon: React.ElementType;
-  variant?: 'default' | 'destructive';
 };
 const menuOptions = [
   { label: 'View Profile', action: 'edit', icon: UserOctagon },
+  { label: 'Change Password', action: 'changePassword', icon: Key },
   { label: 'Logout', action: 'delete', icon: SignoutIcon },
 ];
 export function Header() {
   const { logout } = useAuth();
+
+  // Add scroll direction state
+  const [showHeader, setShowHeader] = useState(true);
+  const lastScrollY = useRef(0);
+  const [sideSheetOpen, setSideSheetOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
+        // Scrolling down
+        setShowHeader(false);
+      } else {
+        // Scrolling up
+        setShowHeader(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleMenuAction = (action: string) => {
     if (action === 'delete') {
       logout();
+    } else if (action === 'changePassword') {
+      setChangePasswordOpen(true);
     }
     return action;
   };
   return (
-    <header className='bg-[var(--white-background)] px-6 py-3'>
-      <div className=' flex h-14 items-center justify-between'>
-        <div className='flex items-center space-x-4'>
+    <header
+      className={cn(
+        'bg-[var(--white-background)] px-6 py-3 sticky top-0 z-50 transition-transform ease-in-out duration-200',
+        showHeader ? 'translate-y-0' : '-translate-y-full'
+      )}
+    >
+      <div className='flex h-14 items-center gap-3'>
+        <div className='block lg:hidden'>
+          <Button
+            onClick={() => setSideSheetOpen(true)}
+            variant='ghost'
+            size='icon'
+          >
+            <HambergerMenu
+              size='64'
+              color='var(--text-dark)'
+              className='!h-7 !w-7'
+            />
+          </Button>
+          <SidebarMobile open={sideSheetOpen} onOpenChange={setSideSheetOpen} />
+        </div>
+        <div className='flex items-center space-x-4 mr-auto'>
           <h1 className='text-2xl font-bold'>Virtual Homes</h1>
         </div>
         <div className='flex items-center gap-6'>
-          <div className='flex items-center border-2 border-[var(--border-dark)] rounded-[20px] overflow-hidden w-[443px] focus-within:border-green-500'>
+          <div className='flex items-center border-2 border-[var(--border-dark)] rounded-[20px] overflow-hidden w-[280px] xl:w-[443px] focus-within:border-green-500'>
             {/* Search Input */}
             <Input
               id='Search'
               type='Search'
               placeholder='What are you looking for?'
-              className='pl-4 h-12 border-2 text-[16px] border-0 focus:border-green-500 focus:ring-green-500 bg-transparent rounded-[10px] placeholder-[#C0C6CD] !placeholder-[var(--text-placeholder)]'
+              className='pl-4 h-12 text-[16px] border-0 focus:border-green-500 focus:ring-green-500 bg-transparent rounded-[10px] placeholder-[#C0C6CD] !placeholder-[var(--text-placeholder)]'
               required
             />
             {/* Type Selector */}
@@ -62,9 +108,9 @@ export function Header() {
             </Button>
           </div>
           <ModeToggle />
-          <Link href='/'>
+          {/* <Link href='/'>
             <Notification />
-          </Link>
+          </Link> */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -86,17 +132,13 @@ export function Header() {
               align='end'
               className='bg-[var(--card-background)] border border-[var(--border-dark)] min-w-[185px] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px] p-[10px]'
             >
-              {menuOptions.map((option: MenuOption, index: number) => {
-                const Icon = option.icon; // ensure Icon is a capitalized component
-                return (
+              {menuOptions.map(
+                ({ icon: Icon, label, action }: MenuOption, index: number) => (
                   <DropdownMenuItem
                     key={index}
-                    onClick={() => handleMenuAction(option.action)}
+                    onClick={() => handleMenuAction(action)}
                     className={cn(
-                      'text-base p-3 rounded-md cursor-pointer text-[var(--text-dark)] transition-colors flex items-center gap-2',
-                      option.variant === 'destructive'
-                        ? 'text-red-600 hover:bg-red-50'
-                        : 'hover:bg-gray-100'
+                      'text-base p-3 rounded-md cursor-pointer text-[var(--text-dark)] transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]'
                     )}
                   >
                     <Icon
@@ -105,14 +147,22 @@ export function Header() {
                       variant='Outline'
                       className='!h-6 !w-6'
                     />
-                    <span>{option.label}</span>
+                    <span>{label}</span>
                   </DropdownMenuItem>
-                );
-              })}
+                )
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+      <SideSheet
+        title='Change Password'
+        open={changePasswordOpen}
+        onOpenChange={setChangePasswordOpen}
+        size='600px'
+      >
+        <ChangePasswordForm onCancel={() => setChangePasswordOpen(false)} />
+      </SideSheet>
     </header>
   );
 }

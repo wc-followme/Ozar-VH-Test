@@ -29,6 +29,7 @@ import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
 import { useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
+import SelectField from '../common/SelectField';
 
 interface UserInfoFormProps {
   roles: Role[];
@@ -189,35 +190,22 @@ export function UserInfoForm({
     <form className='space-y-6' onSubmit={handleSubmit} noValidate>
       {/* Role Dropdown */}
       <div className='space-y-2'>
-        <Label
-          htmlFor='role'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
-          {USER_MESSAGES.ROLE_LABEL}
-        </Label>
-        <Select
+        <SelectField
+          label={USER_MESSAGES.ROLE_LABEL}
           value={roleId}
           onValueChange={setRoleId}
-          disabled={loadingRoles || false}
-        >
-          <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
-            <SelectValue
-              placeholder={
-                loadingRoles
-                  ? USER_MESSAGES.LOADING_ROLES
-                  : USER_MESSAGES.SELECT_ROLE
-              }
-            />
-          </SelectTrigger>
-          <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-            {roles.map(role => (
-              <SelectItem key={role.id} value={String(role.id)}>
-                {role.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <FormErrorMessage message={errors.roleCategory || ''} />
+          options={roles.map(role => ({
+            value: String(role.id),
+            label: role.name,
+          }))}
+          placeholder={
+            loadingRoles
+              ? USER_MESSAGES.LOADING_ROLES
+              : USER_MESSAGES.SELECT_ROLE
+          }
+          error={errors.roleCategory || ''}
+          className=''
+        />
       </div>
       {/* First Row - Full Name, Designation, Date of Joining */}
       <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
@@ -233,7 +221,12 @@ export function UserInfoForm({
             placeholder={USER_MESSAGES.ENTER_FULL_NAME}
             value={fullName}
             onChange={e => setFullName(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.fullName
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.fullName || ''} />
         </div>
@@ -249,7 +242,12 @@ export function UserInfoForm({
             placeholder={USER_MESSAGES.ENTER_JOB_TITLE}
             value={designation}
             onChange={e => setDesignation(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.designation
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.designation || ''} />
         </div>
@@ -265,8 +263,11 @@ export function UserInfoForm({
               <Button
                 variant='outline'
                 className={cn(
-                  'h-12 w-full pl-3 text-left font-normal border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
-                  !date && 'text-muted-foreground'
+                  'h-12 w-full pl-3 text-left font-normal border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                  !date && 'text-muted-foreground',
+                  errors.date
+                    ? 'border-[var(--warning)]'
+                    : 'border-[var(--border-dark)]'
                 )}
               >
                 {date ? (
@@ -277,7 +278,10 @@ export function UserInfoForm({
                 <Calendar1 className='ml-auto h-4 w-4 opacity-50' />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className='w-auto p-0' align='start'>
+            <PopoverContent
+              className='w-auto p-0 bg-[var(--card-background)]'
+              align='start'
+            >
               <CalendarComponent
                 mode='single'
                 selected={date}
@@ -307,7 +311,12 @@ export function UserInfoForm({
             placeholder={USER_MESSAGES.ENTER_EMAIL}
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.email
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.email || ''} />
         </div>
@@ -333,7 +342,12 @@ export function UserInfoForm({
             }
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.password
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.password || ''} />
         </div>
@@ -348,9 +362,10 @@ export function UserInfoForm({
             <Select value={country} onValueChange={setCountry}>
               <SelectTrigger
                 className={cn(
-                  'w-24 h-12 rounded-l-[10px] rounded-r-none border-2 border-r-0 border-[var(--border-dark)]',
-                  'focus:border-green-500 focus:ring-green-500',
-                  'bg-[var(--white-background)]'
+                  'w-24 h-12 rounded-l-[10px] rounded-r-none border-2 border-r-0 bg-[var(--white-background)]',
+                  errors.phone
+                    ? 'border-[var(--warning)]'
+                    : 'border-[var(--border-dark)]'
                 )}
               >
                 <SelectValue />
@@ -372,45 +387,31 @@ export function UserInfoForm({
               value={phone}
               onChange={e => setPhone(e.target.value)}
               className={cn(
-                'h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 border-[var(--border-dark)] !placeholder-[var(--text-placeholder)]',
-                'focus:border-green-500 focus:ring-green-500',
-                'bg-[var(--white-background)]'
+                'h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 bg-[var(--white-background)] !placeholder-[var(--text-placeholder)]',
+                errors.phone
+                  ? 'border-[var(--warning)]'
+                  : 'border-[var(--border-dark)]'
               )}
             />
           </div>
           <FormErrorMessage message={errors.phone || ''} />
         </div>
         <div className='space-y-2'>
-          <Label
-            htmlFor='communication'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
-            {USER_MESSAGES.COMMUNICATION_LABEL}
-          </Label>
-          <Select value={communication} onValueChange={setCommunication}>
-            <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
-              <SelectValue
-                placeholder={USER_MESSAGES.SELECT_COMMUNICATION}
-                className='[&>span]:text-[var(--text-placeholder)]'
-              />
-            </SelectTrigger>
-            <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-              <SelectItem value='email'>
-                {USER_MESSAGES.EMAIL_OPTION}
-              </SelectItem>
-              <SelectItem value='phone'>
-                {USER_MESSAGES.PHONE_OPTION}
-              </SelectItem>
-              <SelectItem value='sms'>{USER_MESSAGES.SMS_OPTION}</SelectItem>
-              <SelectItem value='slack'>
-                {USER_MESSAGES.SLACK_OPTION}
-              </SelectItem>
-              <SelectItem value='teams'>
-                {USER_MESSAGES.TEAMS_OPTION}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <FormErrorMessage message={errors.communication || ''} />
+          <SelectField
+            label={USER_MESSAGES.COMMUNICATION_LABEL}
+            value={communication}
+            onValueChange={setCommunication}
+            options={[
+              { value: 'email', label: USER_MESSAGES.EMAIL_OPTION },
+              { value: 'phone', label: USER_MESSAGES.PHONE_OPTION },
+              { value: 'sms', label: USER_MESSAGES.SMS_OPTION },
+              { value: 'slack', label: USER_MESSAGES.SLACK_OPTION },
+              { value: 'teams', label: USER_MESSAGES.TEAMS_OPTION },
+            ]}
+            placeholder={USER_MESSAGES.SELECT_COMMUNICATION}
+            error={errors.communication || ''}
+            className=''
+          />
         </div>
       </div>
       {/* Third Row - Address */}
@@ -426,7 +427,12 @@ export function UserInfoForm({
           placeholder={USER_MESSAGES.ENTER_ADDRESS}
           value={address}
           onChange={e => setAddress(e.target.value)}
-          className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+          className={cn(
+            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            errors.address
+              ? 'border-[var(--warning)]'
+              : 'border-[var(--border-dark)]'
+          )}
         />
         <FormErrorMessage message={errors.address || ''} />
       </div>
@@ -444,7 +450,12 @@ export function UserInfoForm({
             placeholder={USER_MESSAGES.ENTER_CITY}
             value={city}
             onChange={e => setCity(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.city
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.city || ''} />
         </div>
@@ -460,7 +471,12 @@ export function UserInfoForm({
             placeholder={USER_MESSAGES.ENTER_PIN_CODE}
             value={pinCode}
             onChange={e => setPinCode(e.target.value)}
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className={cn(
+              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              errors.pinCode
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
           />
           <FormErrorMessage message={errors.pinCode || ''} />
         </div>
