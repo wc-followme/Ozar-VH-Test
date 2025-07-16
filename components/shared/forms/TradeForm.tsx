@@ -47,10 +47,7 @@ export default function TradeForm({
   return (
     <form onSubmit={handleSubmit} className='space-y-6 w-full max-w-xl'>
       <div className='space-y-2'>
-        <Label
-          htmlFor='category'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='category' className='field-label'>
           Category
         </Label>
         <MultiSelect
@@ -65,10 +62,7 @@ export default function TradeForm({
         />
       </div>
       <div className='space-y-2'>
-        <Label
-          htmlFor='tradeName'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='tradeName' className='field-label'>
           Trade Name
         </Label>
         <Input
@@ -77,10 +71,10 @@ export default function TradeForm({
           onChange={e => setTradeName(e.target.value)}
           placeholder='Enter Trade Name'
           className={cn(
-            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            'input-field',
             errors.tradeName
-              ? 'border-[var(--warning)]'
-              : 'border-[var(--border-dark)]'
+              ? '!border-[var(--warning)]'
+              : '!border-[var(--border-dark)]'
           )}
         />
         <FormErrorMessage message={errors.tradeName || ''} />

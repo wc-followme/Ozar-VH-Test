@@ -58,10 +58,7 @@ export function CreateJobForm() {
           {/* Full Name Input */}
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div className='space-y-2 col-span-2'>
-              <Label
-                htmlFor='full-name'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='full-name' className='fled-label'>
                 New to Us / Already with Us
               </Label>
               <Input
@@ -71,10 +68,7 @@ export function CreateJobForm() {
               />
             </div>
             <div className='space-y-2'>
-              <Label
-                htmlFor='full-name'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='full-name' className='fled-label'>
                 Email
               </Label>
               <Input
@@ -84,10 +78,7 @@ export function CreateJobForm() {
               />
             </div>
             <div className='space-y-2'>
-              <Label
-                htmlFor='full-name'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='full-name' className='fled-label'>
                 Phone Number
               </Label>
               <Input
@@ -105,10 +96,7 @@ export function CreateJobForm() {
 
           {/* Select Boxes Section */}
           <div className='space-y-4'>
-            <Label
-              htmlFor='full-name'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='full-name' className='fled-label'>
               Select Boxes
             </Label>
             <div className='grid gap-4 grid-cols-3 md:grid-cols-3'>
@@ -126,10 +114,7 @@ export function CreateJobForm() {
 
           {/* Link Input */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='full-name'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='full-name' className='fled-label'>
               Link
             </Label>
             <Input

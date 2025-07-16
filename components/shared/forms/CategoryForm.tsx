@@ -52,15 +52,13 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           </div>
           {/* Category Name */}
           <div className='space-y-2 md:col-span-4'>
-            <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-              Category Name
-            </Label>
+            <Label className='field-label'>Category Name</Label>
             <Input
               placeholder='Enter Category Name'
               value={categoryName}
               onChange={e => setCategoryName(e.target.value)}
               className={cn(
-                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                'input-field',
                 errors.categoryName
                   ? 'border-[var(--warning)]'
                   : 'border-[var(--border-dark)]'
@@ -72,15 +70,13 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         </div>
         {/* Description */}
         <div className='space-y-2'>
-          <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-            Description
-          </Label>
+          <Label className='field-label'>Description</Label>
           <Textarea
             placeholder='Enter Description'
             value={description}
             onChange={e => setDescription(e.target.value)}
             className={cn(
-              'min-h-[80px] border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'min-h-[80px] input-field',
               errors.description
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'

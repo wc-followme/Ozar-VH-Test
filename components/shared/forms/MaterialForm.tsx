@@ -50,10 +50,7 @@ export default function MaterialForm({
   return (
     <form onSubmit={handleSubmit} className='space-y-6 w-full max-w-xl'>
       <div className='space-y-2'>
-        <Label
-          htmlFor='category'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='category' className='fleld-label'>
           Service
         </Label>
         <MultiSelect
@@ -68,10 +65,7 @@ export default function MaterialForm({
         />
       </div>
       <div className='space-y-2'>
-        <Label
-          htmlFor='materialName'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='materialName' className='field-label'>
           Material Name
         </Label>
         <Input
@@ -80,10 +74,10 @@ export default function MaterialForm({
           onChange={e => setMaterialName(e.target.value)}
           placeholder='Enter Material Name'
           className={cn(
-            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            'input-field',
             errors.materialName
-              ? 'border-[var(--warning)]'
-              : 'border-[var(--border-dark)]'
+              ? '!border-[var(--warning)]'
+              : '!border-[var(--border-dark)]'
           )}
         />
         <FormErrorMessage message={errors.materialName || ''} />

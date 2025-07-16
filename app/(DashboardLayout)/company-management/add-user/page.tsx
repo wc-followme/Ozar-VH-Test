@@ -25,6 +25,7 @@ import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import ComingSoon from '../../../../components/shared/common/ComingSoon';
 
 const breadcrumbData: BreadcrumbItem[] = [
   { name: 'Company Management', href: '/company-management' },
@@ -344,8 +345,7 @@ export default function AddCompanyUserPage() {
           <TabsContent value='settings' className='pt-2 pb-8'>
             {/* <CompanyManagementAddUser /> */}
             <div className='min-h-[550px] text-center flex items-center justify-center'>
-              {' '}
-              Coming soon...
+              <ComingSoon />
             </div>
           </TabsContent>
         </Tabs>

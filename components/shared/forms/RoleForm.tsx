@@ -84,7 +84,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
 
           {/* Role Name input */}
           <div className='flex flex-col w-[300px] items-start gap-2'>
-            <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+            <Label className='field-label'>
               {ROLE_MESSAGES.ROLE_NAME_LABEL}
             </Label>
             <Controller
@@ -112,7 +112,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
 
           {/* Description input */}
           <div className='flex flex-col items-start gap-2 flex-1'>
-            <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+            <Label className='field-label'>
               {ROLE_MESSAGES.DESCRIPTION_LABEL}
             </Label>
             <Controller
@@ -122,11 +122,10 @@ export const RoleForm: React.FC<RoleFormProps> = ({
                 <Input
                   {...field}
                   className={cn(
-                    'h-12 border-2',
                     errors.description
-                      ? 'border-[var(--warning)]'
-                      : 'border-[var(--border-dark)]',
-                    'focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                      ? '!border-[var(--warning)]'
+                      : '!border-[var(--border-dark)]',
+                    'input-field'
                   )}
                   placeholder={ROLE_MESSAGES.DESCRIPTION_PLACEHOLDER}
                   disabled={isSubmitting}

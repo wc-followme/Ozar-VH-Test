@@ -210,10 +210,7 @@ export function UserInfoForm({
       {/* First Row - Full Name, Designation, Date of Joining */}
       <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
         <div className='space-y-2'>
-          <Label
-            htmlFor='full-name'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='full-name' className='field-label'>
             {USER_MESSAGES.FULL_NAME_LABEL}
           </Label>
           <Input
@@ -222,7 +219,7 @@ export function UserInfoForm({
             value={fullName}
             onChange={e => setFullName(e.target.value)}
             className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'input-field',
               errors.fullName
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'
@@ -231,10 +228,7 @@ export function UserInfoForm({
           <FormErrorMessage message={errors.fullName || ''} />
         </div>
         <div className='space-y-2'>
-          <Label
-            htmlFor='designation'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='designation' className='field-label'>
             {USER_MESSAGES.DESIGNATION_LABEL}
           </Label>
           <Input
@@ -243,7 +237,7 @@ export function UserInfoForm({
             value={designation}
             onChange={e => setDesignation(e.target.value)}
             className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'input-field',
               errors.designation
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'
@@ -252,10 +246,7 @@ export function UserInfoForm({
           <FormErrorMessage message={errors.designation || ''} />
         </div>
         <div className='space-y-2'>
-          <Label
-            htmlFor='date'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='date' className='field-label'>
             {USER_MESSAGES.DATE_OF_JOINING_LABEL}
           </Label>
           <Popover>
@@ -299,10 +290,7 @@ export function UserInfoForm({
       {/* Second Row - Email, Password, Phone, Communication */}
       <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
         <div className='space-y-2'>
-          <Label
-            htmlFor='email'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='email' className='field-label'>
             {USER_MESSAGES.EMAIL_LABEL}
           </Label>
           <Input
@@ -312,7 +300,7 @@ export function UserInfoForm({
             value={email}
             onChange={e => setEmail(e.target.value)}
             className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'input-field',
               errors.email
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'
@@ -321,10 +309,7 @@ export function UserInfoForm({
           <FormErrorMessage message={errors.email || ''} />
         </div>
         <div className='space-y-2'>
-          <Label
-            htmlFor='password'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='password' className='field-label'>
             {USER_MESSAGES.PASSWORD_LABEL}{' '}
             {isEditMode && (
               <span className='text-sm text-gray-500'>
@@ -343,7 +328,7 @@ export function UserInfoForm({
             value={password}
             onChange={e => setPassword(e.target.value)}
             className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'input-field',
               errors.password
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'
@@ -352,10 +337,7 @@ export function UserInfoForm({
           <FormErrorMessage message={errors.password || ''} />
         </div>
         <div className='space-y-2'>
-          <Label
-            htmlFor='phone'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='phone' className='field-label'>
             {USER_MESSAGES.PHONE_LABEL}
           </Label>
           <div className='flex'>
@@ -416,10 +398,7 @@ export function UserInfoForm({
       </div>
       {/* Third Row - Address */}
       <div className='space-y-2'>
-        <Label
-          htmlFor='address'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='address' className='field-label'>
           {USER_MESSAGES.ADDRESS_LABEL}
         </Label>
         <Input
@@ -428,7 +407,7 @@ export function UserInfoForm({
           value={address}
           onChange={e => setAddress(e.target.value)}
           className={cn(
-            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            'input-field',
             errors.address
               ? 'border-[var(--warning)]'
               : 'border-[var(--border-dark)]'
@@ -439,10 +418,7 @@ export function UserInfoForm({
       {/* Fourth Row - City, Pin Code */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <div className='space-y-2'>
-          <Label
-            htmlFor='city'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='city' className='field-label'>
             {USER_MESSAGES.CITY_LABEL}
           </Label>
           <Input
@@ -451,7 +427,7 @@ export function UserInfoForm({
             value={city}
             onChange={e => setCity(e.target.value)}
             className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'input-field',
               errors.city
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'
@@ -460,10 +436,7 @@ export function UserInfoForm({
           <FormErrorMessage message={errors.city || ''} />
         </div>
         <div className='space-y-2'>
-          <Label
-            htmlFor='pin-code'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='pin-code' className='field-label'>
             {USER_MESSAGES.PIN_CODE_LABEL}
           </Label>
           <Input
@@ -472,7 +445,7 @@ export function UserInfoForm({
             value={pinCode}
             onChange={e => setPinCode(e.target.value)}
             className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'input-field',
               errors.pinCode
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'

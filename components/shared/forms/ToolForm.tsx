@@ -82,10 +82,7 @@ const ToolForm: React.FC<ToolFormProps> = ({
         />
         {/* Tool Name */}
         <div className='space-y-2'>
-          <Label
-            htmlFor='tool-name'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='tool-name' className='field-label'>
             Tool Name
           </Label>
           <Input
@@ -94,7 +91,7 @@ const ToolForm: React.FC<ToolFormProps> = ({
             value={toolName}
             onChange={e => setToolName(e.target.value)}
             className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'input-field',
               errors.toolName
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'
@@ -104,10 +101,7 @@ const ToolForm: React.FC<ToolFormProps> = ({
         </div>
         {/* Brand Name */}
         <div className='space-y-2'>
-          <Label
-            htmlFor='company-name'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='company-name' className='field-label'>
             Brand Name
           </Label>
           <Input
@@ -116,7 +110,7 @@ const ToolForm: React.FC<ToolFormProps> = ({
             value={companyName}
             onChange={e => setCompanyName(e.target.value)}
             className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'input-field',
               errors.companyName
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'
@@ -126,10 +120,7 @@ const ToolForm: React.FC<ToolFormProps> = ({
         </div>
         {/* Quantity */}
         <div className='space-y-2'>
-          <Label
-            htmlFor='quantity'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='quantity' className='field-label'>
             Quantity
           </Label>
           <Input
@@ -140,7 +131,7 @@ const ToolForm: React.FC<ToolFormProps> = ({
             value={quantity}
             onChange={e => setQuantity(e.target.value)}
             className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'input-field',
               errors.quantity
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'

@@ -52,10 +52,7 @@ export default function ServiceForm({
   return (
     <form onSubmit={handleSubmit} className='space-y-6 w-full max-w-xl'>
       <div className='space-y-2'>
-        <Label
-          htmlFor='trades'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='trades' className='field-label'>
           Trade
         </Label>
         <MultiSelect
@@ -68,10 +65,7 @@ export default function ServiceForm({
         />
       </div>
       <div className='space-y-2'>
-        <Label
-          htmlFor='serviceName'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='serviceName' className='field-label'>
           Service Name
         </Label>
         <Input
@@ -80,10 +74,10 @@ export default function ServiceForm({
           onChange={e => setServiceName(e.target.value)}
           placeholder='Enter Service Name'
           className={cn(
-            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            'input-field',
             errors.serviceName
-              ? 'border-[var(--warning)]'
-              : 'border-[var(--border-dark)]'
+              ? '!border-[var(--warning)]'
+              : '!border-[var(--border-dark)]'
           )}
         />
         <FormErrorMessage message={errors.serviceName || ''} />

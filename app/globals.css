@@ -79,6 +79,12 @@ body {
   .page-title {
     @apply text-2xl font-medium text-[var(--text-dark)];
   }
+  .field-label {
+    @apply text-[14px] font-semibold text-[var(--text-dark)] leading-[1];
+  }
+  .input-field {
+    @apply h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] focus:border-green-500 focus:ring-green-500;
+  }
 }
 @layer base {
   * {

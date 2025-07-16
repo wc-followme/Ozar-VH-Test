@@ -35,11 +35,9 @@ const IconFieldWrapper: React.FC<IconFieldWrapperProps> = ({
 
   return (
     <div className='flex flex-col items-start gap-2'>
-      <label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-        {label}
-      </label>
+      <label className='field-label'>{label}</label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
+        <SelectTrigger className='input-field'>
           <SelectValue>
             <div
               className='flex w-8 h-8 items-center justify-center rounded-[10px]'

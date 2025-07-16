@@ -173,10 +173,7 @@ export function CompanyInfoForm({
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           {/* Company Name */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='company-name'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='company-name' className='field-label'>
               {COMPANY_MESSAGES.COMPANY_NAME_LABEL}
             </Label>
             <Input
@@ -184,17 +181,14 @@ export function CompanyInfoForm({
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder={COMPANY_MESSAGES.ENTER_COMPANY_NAME}
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              className='input-field'
             />
             <FormErrorMessage message={errors.name || ''} />
           </div>
 
           {/* Tagline */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='tagline'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='tagline' className='field-label'>
               {COMPANY_MESSAGES.TAGLINE_LABEL}
             </Label>
             <Input
@@ -202,17 +196,14 @@ export function CompanyInfoForm({
               value={tagline}
               onChange={e => setTagline(e.target.value)}
               placeholder={COMPANY_MESSAGES.ENTER_TAGLINE}
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              className='input-field'
             />
             <FormErrorMessage message={errors.tagline || ''} />
           </div>
 
           {/* Email */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='email'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='email' className='field-label'>
               {COMPANY_MESSAGES.EMAIL_LABEL}
             </Label>
             <Input
@@ -221,17 +212,14 @@ export function CompanyInfoForm({
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder={COMPANY_MESSAGES.ENTER_EMAIL}
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              className='input-field'
             />
             <FormErrorMessage message={errors.email || ''} />
           </div>
 
           {/* Phone Number */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='phone'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='phone' className='field-label'>
               {COMPANY_MESSAGES.PHONE_LABEL}
             </Label>
             <div className='flex gap-2'>
@@ -239,7 +227,7 @@ export function CompanyInfoForm({
                 value={phoneCountryCode}
                 onValueChange={setPhoneCountryCode}
               >
-                <SelectTrigger className='w-[120px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
+                <SelectTrigger className='w-[120px] input-field'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
@@ -255,7 +243,7 @@ export function CompanyInfoForm({
                 value={phoneNumber}
                 onChange={e => setPhoneNumber(e.target.value)}
                 placeholder={COMPANY_MESSAGES.ENTER_PHONE}
-                className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                className='flex-1 input-field'
               />
             </div>
             <FormErrorMessage message={errors.phone_number || ''} />
@@ -263,10 +251,7 @@ export function CompanyInfoForm({
 
           {/* Website */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='website'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='website' className='field-label'>
               {COMPANY_MESSAGES.WEBSITE_LABEL}
             </Label>
             <Input
@@ -275,14 +260,14 @@ export function CompanyInfoForm({
               value={website}
               onChange={e => setWebsite(e.target.value)}
               placeholder={COMPANY_MESSAGES.ENTER_WEBSITE}
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              className='input-field'
             />
             <FormErrorMessage message={errors.website || ''} />
           </div>
 
           {/* Expiry Date */}
           <div className='space-y-2'>
-            <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+            <Label className='field-label'>
               {COMPANY_MESSAGES.EXPIRY_DATE_LABEL}
             </Label>
             <Popover>
@@ -319,10 +304,7 @@ export function CompanyInfoForm({
 
           {/* City */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='city'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='city' className='field-label'>
               {COMPANY_MESSAGES.CITY_LABEL}
             </Label>
             <Input
@@ -330,17 +312,14 @@ export function CompanyInfoForm({
               value={city}
               onChange={e => setCity(e.target.value)}
               placeholder={COMPANY_MESSAGES.ENTER_CITY}
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              className='input-field'
             />
             <FormErrorMessage message={errors.city || ''} />
           </div>
 
           {/* Pin Code */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='pincode'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='pincode' className='field-label'>
               {COMPANY_MESSAGES.PINCODE_LABEL}
             </Label>
             <Input
@@ -348,14 +327,14 @@ export function CompanyInfoForm({
               value={pincode}
               onChange={e => setPincode(e.target.value)}
               placeholder={COMPANY_MESSAGES.ENTER_PINCODE}
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              className='input-field'
             />
             <FormErrorMessage message={errors.pincode || ''} />
           </div>
 
           {/* Preferred Communication */}
           <div className='space-y-2'>
-            <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+            <Label className='field-label'>
               {COMPANY_MESSAGES.PREFERRED_COMMUNICATION_LABEL}
             </Label>
             <Select
@@ -393,10 +372,7 @@ export function CompanyInfoForm({
 
         {/* About - Full Width */}
         <div className='space-y-2 mt-4'>
-          <Label
-            htmlFor='about'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='about' className='field-label'>
             {COMPANY_MESSAGES.ABOUT_LABEL}
           </Label>
           <Textarea
@@ -405,17 +381,14 @@ export function CompanyInfoForm({
             onChange={e => setAbout(e.target.value)}
             placeholder={COMPANY_MESSAGES.ENTER_ABOUT}
             rows={3}
-            className='border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className='input-field'
           />
           <FormErrorMessage message={errors.about || ''} />
         </div>
 
         {/* Communication - Full Width */}
         <div className='space-y-2 mt-4'>
-          <Label
-            htmlFor='communication'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='communication' className='field-label'>
             {COMPANY_MESSAGES.COMMUNICATION_LABEL}
           </Label>
           <Textarea
@@ -424,17 +397,14 @@ export function CompanyInfoForm({
             onChange={e => setCommunication(e.target.value)}
             placeholder={COMPANY_MESSAGES.ENTER_COMMUNICATION}
             rows={3}
-            className='border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className='input-field'
           />
           <FormErrorMessage message={errors.communication || ''} />
         </div>
 
         {/* Projects - Full Width */}
         <div className='space-y-2 mt-4'>
-          <Label
-            htmlFor='projects'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='projects' className='field-label'>
             {COMPANY_MESSAGES.PROJECTS_LABEL}
           </Label>
           <Textarea
@@ -443,7 +413,7 @@ export function CompanyInfoForm({
             onChange={e => setProjects(e.target.value)}
             placeholder={COMPANY_MESSAGES.ENTER_PROJECTS}
             rows={3}
-            className='border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+            className='input-field'
           />
           <FormErrorMessage message={errors.projects || ''} />
         </div>

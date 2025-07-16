@@ -61,10 +61,7 @@ export default function ChangePasswordForm({
         Update your password to keep your account secure.
       </p>
       <div className='mb-4 space-y-2'>
-        <Label
-          htmlFor='currentPassword'
-          className='text-[14px] font-semibold text-[var(--text-dark)] mb-1'
-        >
+        <Label htmlFor='currentPassword' className='field-label mb-1'>
           Current Password
         </Label>
         <Input
@@ -74,7 +71,7 @@ export default function ChangePasswordForm({
           value={currentPassword}
           onChange={e => setCurrentPassword(e.target.value)}
           className={cn(
-            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            'input-field',
             errors.currentPassword
               ? 'border-[var(--warning)]'
               : 'border-[var(--border-dark)]'
@@ -83,10 +80,7 @@ export default function ChangePasswordForm({
         <FormErrorMessage message={errors.currentPassword || ''} />
       </div>
       <div className='mb-4 space-y-2'>
-        <Label
-          htmlFor='newPassword'
-          className='text-[14px] font-semibold text-[var(--text-dark)] mb-1'
-        >
+        <Label htmlFor='newPassword' className='field-label mb-1'>
           New Password
         </Label>
         <Input
@@ -109,10 +103,7 @@ export default function ChangePasswordForm({
         <FormErrorMessage message={errors.newPassword || ''} />
       </div>
       <div className='mb-8 space-y-2'>
-        <Label
-          htmlFor='confirmPassword'
-          className='text-[14px] font-semibold text-[var(--text-dark)] mb-1'
-        >
+        <Label htmlFor='confirmPassword' className='field-label mb-1'>
           Confirm New Password
         </Label>
         <Input

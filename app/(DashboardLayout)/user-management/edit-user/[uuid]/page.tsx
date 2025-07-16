@@ -12,6 +12,7 @@ import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import ComingSoon from '../../../../../components/shared/common/ComingSoon';
 import { Role, RoleApiResponse, UserFormData } from '../../types';
 import { USER_MESSAGES } from '../../user-messages';
 
@@ -284,7 +285,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
 
             <TabsContent value='permissions' className='pt-8'>
               <div className='text-center py-10 text-gray-500'>
-                Permissions management coming soon...
+                <ComingSoon />
               </div>
             </TabsContent>
           </Tabs>
