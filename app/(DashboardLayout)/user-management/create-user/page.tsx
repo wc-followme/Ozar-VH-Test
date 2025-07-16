@@ -334,33 +334,38 @@ export default function AddUserPage() {
 
             <TabsContent value='permissions' className='pt-8'>
               <div className='flex flex-col gap-4'>
-                {accordions.map((accordion, idx) => (
-                  <CompanyManagementAddUser
-                    key={accordion.title + idx}
-                    title={accordion.title}
-                    badgeLabel={accordion.badgeLabel}
-                    stripes={
-                      Array.isArray(accordion.stripes) &&
-                      Array.isArray(
-                        ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes
-                      )
-                        ? ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes.map(
-                            (stripe, sIdx) => ({
-                              title: stripe.title,
-                              description: stripe.description,
-                              checked:
-                                typeof accordion.stripes?.[sIdx] === 'boolean'
-                                  ? accordion.stripes[sIdx]
-                                  : false,
-                              onToggle: () => handleToggle(idx, sIdx),
-                            })
-                          )
-                        : []
-                    }
-                    open={openAccordionIdx === idx}
-                    onOpenChange={open => setOpenAccordionIdx(open ? idx : -1)}
-                  />
-                ))}
+                {accordions.map((accordion, idx) => {
+                  const { title, badgeLabel, stripes } = accordion;
+                  return (
+                    <CompanyManagementAddUser
+                      key={title + idx}
+                      title={title}
+                      badgeLabel={badgeLabel}
+                      stripes={
+                        Array.isArray(stripes) &&
+                        Array.isArray(
+                          ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes
+                        )
+                          ? ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes.map(
+                              (stripe, sIdx) => ({
+                                title: stripe.title,
+                                description: stripe.description,
+                                checked:
+                                  typeof stripes?.[sIdx] === 'boolean'
+                                    ? stripes[sIdx]
+                                    : false,
+                                onToggle: () => handleToggle(idx, sIdx),
+                              })
+                            )
+                          : []
+                      }
+                      open={openAccordionIdx === idx}
+                      onOpenChange={open =>
+                        setOpenAccordionIdx(open ? idx : -1)
+                      }
+                    />
+                  );
+                })}
               </div>
               <div className='flex justify-end gap-6 mt-8'>
                 <Link

@@ -36,15 +36,8 @@ const AccessControlAccordion: React.FC<AccessControlAccordionProps> = ({
   open = false,
   onOpenChange,
 }) => {
-  const accordionValue = open ? 'roles' : '';
-  const handleAccordionChange = (value: string) => {
-    if (onOpenChange) {
-      onOpenChange(value === 'roles');
-    }
-  };
-
-  // Determine badge color based on access level
-  let badgeColorClass = 'bg-[var(--secondary)]';
+  // Badge color logic
+  let badgeColorClass = 'bg-[var(--secondary)] hover:bg-[var(--secondary)]';
   if (badgeLabel.toLowerCase() === 'full access') {
     badgeColorClass = 'bg-[var(--secondary)] hover:bg-[var(--secondary)]';
   } else if (badgeLabel.toLowerCase() === 'limited access') {
@@ -52,6 +45,13 @@ const AccessControlAccordion: React.FC<AccessControlAccordionProps> = ({
   } else if (badgeLabel.toLowerCase() === 'restricted') {
     badgeColorClass = 'bg-[var(--warning)] hover:bg-[var(--warning)]';
   }
+
+  const accordionValue = open ? 'roles' : '';
+  const handleAccordionChange = (value: string) => {
+    if (onOpenChange) {
+      onOpenChange(value === 'roles');
+    }
+  };
 
   return (
     <Accordion
@@ -77,27 +77,31 @@ const AccessControlAccordion: React.FC<AccessControlAccordionProps> = ({
         </AccordionTrigger>
         <AccordionContent className='border-0 bg-[var(--background)] px-6 py-4'>
           <div className='flex flex-col gap-4'>
-            {stripes.map((stripe, idx) => (
-              <div
-                key={stripe.title + idx}
-                className='flex items-center gap-4 justify-between rounded-[10px] bg-[var(--white-background)] p-4 shadow-sm'
-              >
-                <div>
-                  <div className='font-medium text-base text-[var(--text-dark)] mb-2'>
-                    {stripe.title}
+            {stripes.map((stripe, idx) => {
+              const { title, description, checked, onToggle, disabled } =
+                stripe;
+              return (
+                <div
+                  key={title + idx}
+                  className='flex items-center gap-4 justify-between rounded-[10px] bg-[var(--white-background)] p-4 shadow-sm'
+                >
+                  <div>
+                    <div className='font-medium text-base text-[var(--text-dark)] mb-2'>
+                      {title}
+                    </div>
+                    <div className='text-sm text-[var(--text-secondary)]'>
+                      {description}
+                    </div>
                   </div>
-                  <div className='text-sm text-[var(--text-secondary)]'>
-                    {stripe.description}
-                  </div>
+                  <Switch
+                    checked={checked}
+                    onCheckedChange={onToggle}
+                    className={switchStyleMd}
+                    disabled={disabled}
+                  />
                 </div>
-                <Switch
-                  checked={stripe.checked}
-                  onCheckedChange={stripe.onToggle}
-                  className={switchStyleMd}
-                  disabled={stripe.disabled}
-                />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </AccordionContent>
       </AccordionItem>
