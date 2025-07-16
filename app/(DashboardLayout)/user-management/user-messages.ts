@@ -115,3 +115,27 @@ export const USER_MESSAGES = {
   DELETE_CONFIRM_TITLE: 'Are you sure you want to archive?',
   DELETE_CONFIRM_SUBTITLE: 'This action cannot be undone.',
 };
+
+export const CHANGE_PASSWORD_MESSAGES = {
+  CURRENT_PASSWORD_LABEL: 'Current Password',
+  CURRENT_PASSWORD_PLACEHOLDER: 'Enter Current Password',
+  CURRENT_PASSWORD_REQUIRED: 'Current password is required.',
+  NEW_PASSWORD_LABEL: 'New Password',
+  NEW_PASSWORD_PLACEHOLDER: 'Enter New Password',
+  NEW_PASSWORD_REQUIRED: 'New password is required.',
+  NEW_PASSWORD_MIN: 'Password must be at least 8 characters.',
+  NEW_PASSWORD_HELP:
+    'Use at least 8 characters, with uppercase, lowercase, numbers, and symbols.',
+  NEW_PASSWORD_COMPLEXITY:
+    'Use at least 8 characters, with uppercase, lowercase, numbers, and symbols.',
+  CONFIRM_PASSWORD_LABEL: 'Confirm New Password',
+  CONFIRM_PASSWORD_PLACEHOLDER: 'Enter Confirm Password',
+  CONFIRM_PASSWORD_REQUIRED: 'Please confirm your new password.',
+  PASSWORDS_DO_NOT_MATCH: 'Passwords do not match.',
+  SUBTITLE: 'Update your password to keep your account secure.',
+  BUTTON: 'Change Password',
+  SUPPORT_TEXT: 'Having trouble?',
+  SUPPORT_LINK: 'Contact support',
+  CHANGE_PASSWORD_SUCCESS: 'Password has been updated successfully.',
+  CHANGE_PASSWORD_ERROR: 'Failed to change password.',
+};
