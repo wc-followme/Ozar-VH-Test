@@ -144,7 +144,7 @@ export interface CreateUserRequest {
   role_id: number;
   name: string;
   email: string;
-  password: string;
+  password?: string; // Optional - will be generated on backend if not provided
   country_code: string;
   phone_number: string;
   profile_picture_url?: string;
