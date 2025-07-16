@@ -1,9 +1,9 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { IconDotsVertical } from '@tabler/icons-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
@@ -48,6 +48,7 @@ export function CompanyCard({
   const [isToggling, setIsToggling] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const router = useRouter();
+  const [isPlaceholder, setIsPlaceholder] = useState(!image);
 
   const handleToggle = async () => {
     setIsToggling(true);
@@ -83,23 +84,34 @@ export function CompanyCard({
 
   return (
     <div
-      className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[16px] hover:shadow-lg transition-shadow duration-200 cursor-pointer'
+      className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] hover:shadow-lg px-4 py-[18px] transition-shadow duration-200 cursor-pointer'
       onClick={handleCardClick}
     >
       {/* Header with Avatar, User Info and Menu */}
-      <div className='mb-4'>
-        <Avatar className='w-[6.25rem] h-[6.25rem] rounded-none mt-[0.875rem] mb-10 mx-auto'>
-          <AvatarImage
-            src={image}
-            alt={name}
-            className='rounded-none object-cover'
-          />
-          <AvatarFallback className='bg-gray-100 text-gray-600 font-medium rounded-[10px]'>
-            {getInitials(name)}
-          </AvatarFallback>
-        </Avatar>
-
-        <div className='flex-1 min-w-0'>
+      <div className=''>
+        <Image
+          src={image || '/images/img-placeholder-md.png'}
+          alt={name}
+          className={`rounded-none object-contain w-auto max-w-full h-auto max-h-full ${isPlaceholder ? ' rounded-xl' : ''}`}
+          width={100}
+          height={188}
+          onError={e => {
+            const target = e.target as HTMLImageElement;
+            if (target.src !== '/images/img-placeholder-md.png') {
+              target.src = '/images/img-placeholder-md.png';
+              setIsPlaceholder(true);
+            }
+          }}
+          onLoad={e => {
+            const target = e.target as HTMLImageElement;
+            if (target.src.includes('img-placeholder-md.png')) {
+              setIsPlaceholder(true);
+            } else {
+              setIsPlaceholder(false);
+            }
+          }}
+        />
+        <div className='flex-1 min-w-0 pt-[18px]'>
           {/* User Info */}
           <div className='flex items-center justify-between mb-3'>
             <h3 className='font-bold text-[var(--text)] truncate text-base'>
@@ -146,24 +158,22 @@ export function CompanyCard({
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Status Toggle */}
-      {!isDefault && (
-        <div
-          className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'
-          onClick={e => {
-            e.stopPropagation(); // Prevent card click when clicking toggle
-          }}
-        >
-          <span className='text-[12px] font-medium text-[var(--text-dark)]'>
-            Enable
-          </span>
-          <Switch
-            checked={status}
-            onCheckedChange={handleToggle}
-            disabled={isToggling}
-            className='
+        {/* Status Toggle */}
+        {!isDefault && (
+          <div
+            className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3 mt-4'
+            onClick={e => {
+              e.stopPropagation(); // Prevent card click when clicking toggle
+            }}
+          >
+            <span className='text-[12px] font-medium text-[var(--text-dark)]'>
+              Enable
+            </span>
+            <Switch
+              checked={status}
+              onCheckedChange={handleToggle}
+              disabled={isToggling}
+              className='
                 h-4 w-9 
                 data-[state=checked]:bg-green-500 
                 data-[state=unchecked]:bg-gray-300
@@ -174,9 +184,11 @@ export function CompanyCard({
                 [&>span]:transition-all
                 [&>span]:duration-200
               '
-          />
-        </div>
-      )}
+            />
+          </div>
+        )}
+      </div>
+
       <ConfirmDeleteModal
         open={showDelete}
         title='Are you sure you want to archive?'

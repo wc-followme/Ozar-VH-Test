@@ -26,7 +26,7 @@ import {
 import { COUNTRY_CODES } from '@/constants/common';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { Calendar1 } from 'iconsax-react';
+import { Calendar } from 'iconsax-react';
 import { useCallback, useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
 import SelectField from '../common/SelectField';
@@ -74,7 +74,7 @@ export function UserInfoForm({
       if (initialData.role_id) {
         setRoleId(String(initialData.role_id));
       }
-      
+
       // Set other fields
       setFullName(initialData.name || '');
       setDesignation(initialData.designation || '');
@@ -109,15 +109,15 @@ export function UserInfoForm({
       if (initialData.preferred_communication_method) {
         setCommunication(initialData.preferred_communication_method);
       }
-      
+
       setAddress(initialData.address || '');
       setCity(initialData.city || '');
       setPinCode(initialData.pincode || '');
-      
+
       if (initialData.date_of_joining) {
         setDate(new Date(initialData.date_of_joining));
       }
-      
+
       setIsInitialized(true);
     }
   }, [isEditMode, initialData, isInitialized]);
@@ -142,7 +142,7 @@ export function UserInfoForm({
           initializeForm();
         }
       }, 1000);
-      
+
       return () => clearTimeout(timer);
     }
     return undefined;
@@ -157,9 +157,10 @@ export function UserInfoForm({
     if (!date) newErrors.date = USER_MESSAGES.DATE_REQUIRED;
     if (!email) newErrors.email = USER_MESSAGES.EMAIL_REQUIRED;
     if (!phone) newErrors.phone = USER_MESSAGES.PHONE_REQUIRED;
-    // Password is only required for create mode
-    if (!isEditMode && !password)
-      newErrors.password = USER_MESSAGES.PASSWORD_REQUIRED;
+    // Password validation - only in edit mode and only if it's provided
+    if (isEditMode && password && password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters long';
+    }
     if (!communication)
       newErrors.communication = USER_MESSAGES.COMMUNICATION_REQUIRED;
     if (!address) newErrors.address = USER_MESSAGES.ADDRESS_REQUIRED;
@@ -195,9 +196,9 @@ export function UserInfoForm({
         payload.date_of_joining = date.toISOString().split('T')[0];
       }
 
-      // Add password only if provided or required (for create mode)
-      if (!isEditMode || password) {
-        payload.password = password || 'password123';
+      // Add password only if provided (edit mode only)
+      if (isEditMode && password) {
+        payload.password = password;
       }
 
       onSubmit(payload);
@@ -229,9 +230,7 @@ export function UserInfoForm({
   if (isEditMode && !isInitialized && initialData) {
     return (
       <div className='flex items-center justify-center py-8'>
-        <div className='text-center text-gray-500'>
-          {USER_MESSAGES.LOADING}
-        </div>
+        <div className='text-center text-gray-500'>{USER_MESSAGES.LOADING}</div>
       </div>
     );
   }
@@ -316,7 +315,7 @@ export function UserInfoForm({
                 ) : (
                   <span>{USER_MESSAGES.SELECT_DATE}</span>
                 )}
-                <Calendar1 className='ml-auto h-4 w-4 opacity-50' />
+                <Calendar className='ml-auto !h-6 !w-6' color='#24338C' />
               </Button>
             </PopoverTrigger>
             <PopoverContent
@@ -337,8 +336,15 @@ export function UserInfoForm({
           <FormErrorMessage message={errors.date || ''} />
         </div>
       </div>
-      {/* Second Row - Email, Password, Phone, Communication */}
-      <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
+      {/* Second Row - Email, Phone, Communication, Password (edit mode only) */}
+      <div
+        className={cn(
+          'grid grid-cols-1 gap-4',
+          isEditMode
+            ? 'md:grid-cols-2 xl:grid-cols-4'
+            : 'md:grid-cols-2 xl:grid-cols-3'
+        )}
+      >
         <div className='space-y-2'>
           <Label htmlFor='email' className='field-label'>
             {USER_MESSAGES.EMAIL_LABEL}
@@ -359,41 +365,16 @@ export function UserInfoForm({
           <FormErrorMessage message={errors.email || ''} />
         </div>
         <div className='space-y-2'>
-          <Label htmlFor='password' className='field-label'>
-            {USER_MESSAGES.PASSWORD_LABEL}{' '}
-            {isEditMode && (
-              <span className='text-sm text-gray-500'>
-                {USER_MESSAGES.PASSWORD_OPTIONAL_HINT}
-              </span>
-            )}
-          </Label>
-          <Input
-            id='password'
-            type='password'
-            placeholder={
-              isEditMode
-                ? USER_MESSAGES.ENTER_PASSWORD_OPTIONAL
-                : USER_MESSAGES.ENTER_PASSWORD
-            }
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className={cn(
-              'input-field',
-              errors.password
-                ? 'border-[var(--warning)]'
-                : 'border-[var(--border-dark)]'
-            )}
-          />
-          <FormErrorMessage message={errors.password || ''} />
-        </div>
-        <div className='space-y-2'>
-          <Label htmlFor='phone' className='field-label'>
+          <Label
+            htmlFor='phone'
+            className='text-[14px] font-semibold text-[var(--text-dark)]'
+          >
             {USER_MESSAGES.PHONE_LABEL}
           </Label>
           <div className='flex'>
-            <Select 
-              value={country} 
-              onValueChange={(value) => {
+            <Select
+              value={country}
+              onValueChange={value => {
                 setCountry(value);
               }}
             >
@@ -442,14 +423,37 @@ export function UserInfoForm({
               { value: 'email', label: USER_MESSAGES.EMAIL_OPTION },
               { value: 'phone', label: USER_MESSAGES.PHONE_OPTION },
               { value: 'sms', label: USER_MESSAGES.SMS_OPTION },
-              { value: 'slack', label: USER_MESSAGES.SLACK_OPTION },
-              { value: 'teams', label: USER_MESSAGES.TEAMS_OPTION },
             ]}
             placeholder={USER_MESSAGES.SELECT_COMMUNICATION}
             error={errors.communication || ''}
             className=''
           />
         </div>
+        {/* Password field - only shown in edit mode */}
+        {isEditMode && (
+          <div className='space-y-2'>
+            <Label htmlFor='password' className='field-label'>
+              {USER_MESSAGES.PASSWORD_LABEL}{' '}
+              <span className='text-sm text-gray-500'>
+                {USER_MESSAGES.PASSWORD_OPTIONAL_HINT}
+              </span>
+            </Label>
+            <Input
+              id='password'
+              type='password'
+              placeholder={USER_MESSAGES.ENTER_PASSWORD_OPTIONAL}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className={cn(
+                'input-field',
+                errors.password
+                  ? '!border-[var(--warning)]'
+                  : '!border-[var(--border-dark)]'
+              )}
+            />
+            <FormErrorMessage message={errors.password || ''} />
+          </div>
+        )}
       </div>
       {/* Third Row - Address */}
       <div className='space-y-2'>

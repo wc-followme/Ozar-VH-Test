@@ -129,6 +129,7 @@ export function Header() {
             }
             align='end'
             className='min-w-[185px] p-[10px]'
+            itemsClass='py-3'
           />
         </div>
       </div>

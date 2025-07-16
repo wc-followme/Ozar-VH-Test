@@ -19,6 +19,7 @@ interface DropdownProps {
   trigger: React.ReactNode;
   align?: 'start' | 'center' | 'end';
   className?: string;
+  itemsClass?: string;
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
@@ -27,6 +28,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   trigger,
   align = 'end',
   className,
+  itemsClass,
 }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild className='self-start'>
@@ -44,10 +46,18 @@ export const Dropdown: React.FC<DropdownProps> = ({
           key={index}
           onClick={() => onAction(action)}
           className={cn(
-            'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]'
+            'text-base p-[10px] rounded-md cursor-pointer transition-colors flex font-medium items-center gap-2 hover:!bg-[var(--select-option)]',
+            itemsClass,
+            index !== menuOptions.length - 1 &&
+              'border-b border-[var(--border-dark)]'
           )}
         >
-          <Icon size='18' color='var(--text-dark)' variant='Outline' />
+          <Icon
+            size='24'
+            color='var(--text-dark)'
+            className='!h-6 !w-6'
+            variant='Outline'
+          />
           <span>{label}</span>
         </DropdownMenuItem>
       ))}

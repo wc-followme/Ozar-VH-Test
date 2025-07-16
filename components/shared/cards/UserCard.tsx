@@ -6,9 +6,20 @@ import { Switch } from '@/components/ui/switch';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Call, Icon, Sms } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 import Dropdown from '../common/Dropdown';
+
+// Avatar color pairs (background and text)
+export const AVATAR_COLORS = [
+  { bg: '#1A57BF1A', color: '#24338C' }, // Orange
+  { bg: '#34AD4426', color: '#34AD44' }, // Green
+  { bg: '#00A8BF26', color: '#00A8BF' }, // Blue
+  { bg: '#90C91D26', color: '#90C91D' }, // Red
+  { bg: '#EBB40226', color: '#EBB402' }, // Bright Green
+  { bg: '#D4323226', color: '#D43232' }, // Teal
+  { bg: '#F58B1E1A', color: '#F58B1E' }, // Brown
+];
 
 interface MenuOption {
   label: string;
@@ -29,6 +40,7 @@ interface UserCardProps {
   onDelete?: () => void;
   disableActions?: boolean;
   userUuid: string;
+  avatarColor?: { bg: string; color: string };
 }
 
 export function UserCard({
@@ -43,11 +55,23 @@ export function UserCard({
   onDelete,
   disableActions,
   userUuid,
+  avatarColor,
 }: UserCardProps) {
   const [isToggling, setIsToggling] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [imgError, setImgError] = useState(false);
   const router = useRouter();
+
+  // Pick a random color if avatarColor is not provided
+  const randomAvatarColor = useMemo(() => {
+    if (avatarColor) return avatarColor;
+    if (AVATAR_COLORS && AVATAR_COLORS.length > 0) {
+      const idx = Math.floor(Math.random() * AVATAR_COLORS.length);
+      return AVATAR_COLORS[idx];
+    }
+    // fallback color
+    return { bg: '#ccc', color: '#222' };
+  }, [avatarColor]);
 
   const handleToggle = async () => {
     if (disableActions) return;
@@ -82,17 +106,31 @@ export function UserCard({
             <AvatarImage
               src={image}
               alt={name}
-              className='rounded-[10px] object-cover'
+              className='rounded-[10px] object-cover text-6 font-bold'
               onError={() => setImgError(true)}
+              style={{
+                background: randomAvatarColor?.bg ?? '#ccc',
+                color: randomAvatarColor?.color ?? '#222',
+              }}
             />
           ) : (
             <AvatarImage
               src='/img-placeholder-sm.png'
               alt='placeholder'
-              className='rounded-[10px] object-cover'
+              className='rounded-[10px] object-cover text-6 font-bold'
+              style={{
+                background: randomAvatarColor?.bg ?? '#ccc',
+                color: randomAvatarColor?.color ?? '#222',
+              }}
             />
           )}
-          <AvatarFallback className='bg-gray-100 text-gray-600 font-medium rounded-[10px]'>
+          <AvatarFallback
+            className='rounded-[10px] object-cover text-6 font-bold'
+            style={{
+              background: randomAvatarColor?.bg ?? '#ccc',
+              color: randomAvatarColor?.color ?? '#222',
+            }}
+          >
             {getInitials(name)}
           </AvatarFallback>
         </Avatar>

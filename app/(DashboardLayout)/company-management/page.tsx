@@ -159,7 +159,7 @@ export default function CompanyManagement() {
   };
 
   return (
-    <div className='w-full overflow-y-auto'>
+    <div className='w-full overflow-y-auto pb-4'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
         <h1 className='page-title'>

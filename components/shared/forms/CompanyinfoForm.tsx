@@ -382,7 +382,7 @@ export function CompanyInfoForm({
             <Label className='field-label'>
               {COMPANY_MESSAGES.PREFERRED_COMMUNICATION_LABEL}
             </Label>
-            <Select
+            <Select 
               value={preferredCommunication}
               onValueChange={(value) => {
                 setPreferredCommunication(value);
@@ -393,7 +393,7 @@ export function CompanyInfoForm({
                   placeholder={COMPANY_MESSAGES.SELECT_PREFERRED_COMMUNICATION}
                 />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className='bg-[var(--white-background)] border border-[var(--border-light)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
                 <SelectItem value='email'>
                   {COMPANY_MESSAGES.EMAIL_OPTION}
                 </SelectItem>
@@ -402,12 +402,6 @@ export function CompanyInfoForm({
                 </SelectItem>
                 <SelectItem value='sms'>
                   {COMPANY_MESSAGES.SMS_OPTION}
-                </SelectItem>
-                <SelectItem value='slack'>
-                  {COMPANY_MESSAGES.SLACK_OPTION}
-                </SelectItem>
-                <SelectItem value='teams'>
-                  {COMPANY_MESSAGES.TEAMS_OPTION}
                 </SelectItem>
               </SelectContent>
             </Select>

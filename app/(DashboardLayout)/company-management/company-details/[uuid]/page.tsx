@@ -22,7 +22,7 @@ import {
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
-import { Add, Edit2, Trash } from 'iconsax-react';
+import { Edit2, Trash } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -394,23 +394,27 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                 <Link href={`/company-management/edit-company/${company.uuid}`}>
                   <Button
                     variant='outline'
-                    className='!text-[var(--text-dark)] px-6 h-[40px] rounded-full border-[#D0D5DD] text-[#344054] font-semibold !bg-opacity-20 hover:bg-white'
+                    className='btn-secondary !h-9 text-[14px]'
                   >
-                    <Edit2 size='28' color='currentColor' />
+                    <Edit2
+                      size='28'
+                      color='currentColor'
+                      className='[&_path]:stroke-2'
+                    />
                     <span className='text-[var(--text-dark)]'>
                       Edit Details
                     </span>
                   </Button>
                 </Link>
                 <Link
-                  className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-1'
+                  className='btn-primary !h-9 text-base py-3'
                   href={'/company-management/add-user'}
                 >
-                  <Add
+                  {/* <Add
                     size='28'
                     color='#fff'
                     className='text-[var(--text-dark)]'
-                  />
+                  /> */}
                   <span>Add User</span>
                 </Link>
               </div>

@@ -13,11 +13,128 @@ import { extractApiErrorMessage } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import ComingSoon from '../../../../components/shared/common/ComingSoon';
+import Link from 'next/link';
+import CompanyManagementAddUser from '../../../../components/shared/CompanyManagementAddUser';
+import { Button } from '../../../../components/ui/button';
 import { Role, RoleApiResponse, UserFormData } from '../types';
 import { USER_MESSAGES } from '../user-messages';
 
+// Dummy data for access control accordions
+const ACCESS_CONTROL_ACCORDIONS_DATA = [
+  {
+    title: 'Roles Access Control',
+    badgeLabel: 'Full Access',
+    stripes: [
+      {
+        title: 'Browse Roles',
+        description:
+          'View the complete list of available roles and their basic information including role names, descriptions, and user counts.',
+      },
+      {
+        title: 'Configure & Modify Roles',
+        description:
+          "Modify or set up new roles with custom names, descriptions, and permission assignments tailored to your organization's needs.",
+      },
+      {
+        title: 'Archive & Restore Roles',
+        description:
+          'Remove roles that are no longer needed. System prevents deletion of roles with active users for data safety.',
+      },
+    ],
+  },
+  {
+    title: 'Users Access Control',
+    badgeLabel: 'Limited Access',
+    stripes: [
+      {
+        title: 'Browse Roles',
+        description:
+          'View the complete list of available roles and their basic information including role names, descriptions, and user counts.',
+      },
+      {
+        title: 'Configure & Modify Roles',
+        description:
+          "Modify or set up new roles with custom names, descriptions, and permission assignments tailored to your organization's needs.",
+      },
+      {
+        title: 'Archive & Restore Roles',
+        description:
+          'Remove roles that are no longer needed. System prevents deletion of roles with active users for data safety.',
+      },
+    ],
+  },
+  {
+    title: 'Company Management & Operations',
+    badgeLabel: 'Restricted',
+    stripes: [
+      {
+        title: 'Browse Roles',
+        description:
+          'View the complete list of available roles and their basic information including role names, descriptions, and user counts.',
+      },
+      {
+        title: 'Configure & Modify Roles',
+        description:
+          "Modify or set up new roles with custom names, descriptions, and permission assignments tailored to your organization's needs.",
+      },
+      {
+        title: 'Archive & Restore Roles',
+        description:
+          'Remove roles that are no longer needed. System prevents deletion of roles with active users for data safety.',
+      },
+    ],
+  },
+  {
+    title: 'Category Management & Service',
+    badgeLabel: 'Restricted',
+    stripes: [
+      {
+        title: 'Browse Roles',
+        description:
+          'View the complete list of available roles and their basic information including role names, descriptions, and user counts.',
+      },
+      {
+        title: 'Configure & Modify Roles',
+        description:
+          "Modify or set up new roles with custom names, descriptions, and permission assignments tailored to your organization's needs.",
+      },
+      {
+        title: 'Archive & Restore Roles',
+        description:
+          'Remove roles that are no longer needed. System prevents deletion of roles with active users for data safety.',
+      },
+    ],
+  },
+];
+
 export default function AddUserPage() {
+  // State for all accordions' switches
+  const [accordions, setAccordions] = useState(() =>
+    ACCESS_CONTROL_ACCORDIONS_DATA.map(acc => ({
+      ...acc,
+      stripes: acc.stripes.map(() => true), // all switches checked by default
+    }))
+  );
+
+  // State for which accordion is open
+  const [openAccordionIdx, setOpenAccordionIdx] = useState(0);
+
+  // Handler to toggle a switch
+  const handleToggle = (accordionIdx: number, stripeIdx: number) => {
+    setAccordions(prev =>
+      prev.map((acc, aIdx) =>
+        aIdx === accordionIdx
+          ? {
+              ...acc,
+              stripes: acc.stripes.map((checked: boolean, sIdx: number) =>
+                sIdx === stripeIdx ? !checked : checked
+              ),
+            }
+          : acc
+      )
+    );
+  };
+
   const [selectedTab, setSelectedTab] = useState('info');
   const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
@@ -110,9 +227,6 @@ export default function AddUserPage() {
     setFormLoading(true);
     try {
       // Ensure all required fields are provided for create operation
-      if (!data.password) {
-        throw new Error('Password is required for user creation');
-      }
       if (!data.date_of_joining) {
         throw new Error('Date of joining is required for user creation');
       }
@@ -121,7 +235,7 @@ export default function AddUserPage() {
         role_id: data.role_id,
         name: data.name,
         email: data.email,
-        password: data.password,
+        // Password will be generated on the backend
         country_code: data.country_code,
         phone_number: data.phone_number,
         date_of_joining: data.date_of_joining,
@@ -179,7 +293,7 @@ export default function AddUserPage() {
                 value='permissions'
                 className='px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
-                {USER_MESSAGES.PERMISSIONS_TAB}
+                {USER_MESSAGES.SETTINGS_TAB}
               </TabsTrigger>
             </TabsList>
 
@@ -217,7 +331,51 @@ export default function AddUserPage() {
             </TabsContent>
 
             <TabsContent value='permissions' className='pt-8'>
-              <ComingSoon />
+              <div className='flex flex-col gap-4'>
+                {accordions.map((accordion, idx) => {
+                  const { title, badgeLabel, stripes } = accordion;
+                  return (
+                    <CompanyManagementAddUser
+                      key={title + idx}
+                      title={title}
+                      badgeLabel={badgeLabel}
+                      stripes={
+                        Array.isArray(stripes) &&
+                        Array.isArray(
+                          ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes
+                        )
+                          ? ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes.map(
+                              (stripe, sIdx) => ({
+                                title: stripe.title,
+                                description: stripe.description,
+                                checked:
+                                  typeof stripes?.[sIdx] === 'boolean'
+                                    ? stripes[sIdx]
+                                    : false,
+                                onToggle: () => handleToggle(idx, sIdx),
+                              })
+                            )
+                          : []
+                      }
+                      open={openAccordionIdx === idx}
+                      onOpenChange={open =>
+                        setOpenAccordionIdx(open ? idx : -1)
+                      }
+                    />
+                  );
+                })}
+              </div>
+              <div className='flex justify-end gap-6 mt-8'>
+                <Link
+                  href={''}
+                  className='inline-flex items-center h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] hover:bg-gray-50 transition-colors'
+                >
+                  Cancel
+                </Link>
+                <Button className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'>
+                  Create
+                </Button>
+              </div>
             </TabsContent>
           </Tabs>
         </div>

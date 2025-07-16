@@ -1,8 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { apiService } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import React, { useState } from 'react';
+import {
+  ChangePasswordFormData,
+  changePasswordSchema,
+} from '@/lib/validations/auth';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Controller, useForm } from 'react-hook-form';
+import { CHANGE_PASSWORD_MESSAGES } from '../../../app/(DashboardLayout)/user-management/user-messages';
+import { showErrorToast, showSuccessToast } from '../../ui/use-toast';
 import FormErrorMessage from '../common/FormErrorMessage';
 
 interface ChangePasswordFormProps {
@@ -19,122 +27,133 @@ export default function ChangePasswordForm({
   onSubmit,
   loading,
 }: ChangePasswordFormProps) {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [errors, setErrors] = useState<{
-    currentPassword?: string;
-    newPassword?: string;
-    confirmPassword?: string;
-  }>({});
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<ChangePasswordFormData>({
+    resolver: yupResolver(changePasswordSchema),
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newErrors: typeof errors = {};
-    if (!currentPassword)
-      newErrors.currentPassword = 'Current password is required.';
-    if (!newPassword) newErrors.newPassword = 'New password is required.';
-    else if (newPassword.length < 8)
-      newErrors.newPassword = 'Password must be at least 8 characters.';
-    if (
-      newPassword &&
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(
-        newPassword
-      )
-    ) {
-      newErrors.newPassword =
-        'Use at least 8 characters, with uppercase, lowercase, numbers, and symbols.';
+  const onFormSubmit = async (data: ChangePasswordFormData) => {
+    if (onSubmit) {
+      onSubmit(data);
     }
-    if (!confirmPassword)
-      newErrors.confirmPassword = 'Please confirm your new password.';
-    else if (newPassword !== confirmPassword)
-      newErrors.confirmPassword = 'Passwords do not match.';
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0 && onSubmit) {
-      onSubmit({ currentPassword, newPassword, confirmPassword });
+    try {
+      await apiService.changePassword(data.currentPassword, data.newPassword);
+      showSuccessToast(CHANGE_PASSWORD_MESSAGES.CHANGE_PASSWORD_SUCCESS);
+      reset();
+    } catch (error: any) {
+      showErrorToast(
+        error?.message || CHANGE_PASSWORD_MESSAGES.CHANGE_PASSWORD_ERROR
+      );
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className='w-full mx-auto p-0'>
+    <form onSubmit={handleSubmit(onFormSubmit)} className='w-full mx-auto p-0'>
       <p className='text-[16px] text-[var(--text-secondary)] mb-8'>
-        Update your password to keep your account secure.
+        {CHANGE_PASSWORD_MESSAGES.SUBTITLE}
       </p>
       <div className='mb-4 space-y-2'>
         <Label htmlFor='currentPassword' className='field-label mb-1'>
-          Current Password
+          {CHANGE_PASSWORD_MESSAGES.CURRENT_PASSWORD_LABEL}
         </Label>
-        <Input
-          id='currentPassword'
-          type='password'
-          placeholder='Enter Current Password'
-          value={currentPassword}
-          onChange={e => setCurrentPassword(e.target.value)}
-          className={cn(
-            'input-field',
-            errors.currentPassword
-              ? 'border-[var(--warning)]'
-              : 'border-[var(--border-dark)]'
+        <Controller
+          name='currentPassword'
+          control={control}
+          render={({ field }) => (
+            <Input
+              id='currentPassword'
+              type='password'
+              placeholder={
+                CHANGE_PASSWORD_MESSAGES.CURRENT_PASSWORD_PLACEHOLDER
+              }
+              {...field}
+              className={cn(
+                'input-field',
+                errors.currentPassword
+                  ? '!border-[var(--warning)]'
+                  : '!border-[var(--border-dark)]'
+              )}
+            />
           )}
         />
-        <FormErrorMessage message={errors.currentPassword || ''} />
+        <FormErrorMessage message={errors.currentPassword?.message || ''} />
       </div>
       <div className='mb-4 space-y-2'>
         <Label htmlFor='newPassword' className='field-label mb-1'>
-          New Password
+          {CHANGE_PASSWORD_MESSAGES.NEW_PASSWORD_LABEL}
         </Label>
-        <Input
-          id='newPassword'
-          type='password'
-          placeholder='Enter New Password'
-          value={newPassword}
-          onChange={e => setNewPassword(e.target.value)}
-          className={cn(
-            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
-            errors.newPassword
-              ? 'border-[var(--warning)]'
-              : 'border-[var(--border-dark)]'
+        <Controller
+          name='newPassword'
+          control={control}
+          render={({ field }) => (
+            <Input
+              id='newPassword'
+              type='password'
+              placeholder={CHANGE_PASSWORD_MESSAGES.NEW_PASSWORD_PLACEHOLDER}
+              {...field}
+              className={cn(
+                'input-field',
+                errors.newPassword
+                  ? '!border-[var(--warning)]'
+                  : '!border-[var(--border-dark)]'
+              )}
+            />
           )}
         />
         <p className='text-xs text-[var(--text-secondary)] mt-1'>
-          Use at least 8 characters, with uppercase, lowercase, numbers, and
-          symbols.
+          {CHANGE_PASSWORD_MESSAGES.NEW_PASSWORD_HELP}
         </p>
-        <FormErrorMessage message={errors.newPassword || ''} />
+        <FormErrorMessage message={errors.newPassword?.message || ''} />
       </div>
       <div className='mb-8 space-y-2'>
         <Label htmlFor='confirmPassword' className='field-label mb-1'>
-          Confirm New Password
+          {CHANGE_PASSWORD_MESSAGES.CONFIRM_PASSWORD_LABEL}
         </Label>
-        <Input
-          id='confirmPassword'
-          type='password'
-          placeholder='Enter Confirm Password'
-          value={confirmPassword}
-          onChange={e => setConfirmPassword(e.target.value)}
-          className={cn(
-            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
-            errors.confirmPassword
-              ? 'border-[var(--warning)]'
-              : 'border-[var(--border-dark)]'
+        <Controller
+          name='confirmPassword'
+          control={control}
+          render={({ field }) => (
+            <Input
+              id='confirmPassword'
+              type='password'
+              placeholder={
+                CHANGE_PASSWORD_MESSAGES.CONFIRM_PASSWORD_PLACEHOLDER
+              }
+              {...field}
+              className={cn(
+                'input-field',
+                errors.confirmPassword
+                  ? '!border-[var(--warning)]'
+                  : '!border-[var(--border-dark)]'
+              )}
+            />
           )}
         />
-        <FormErrorMessage message={errors.confirmPassword || ''} />
+        <FormErrorMessage message={errors.confirmPassword?.message || ''} />
       </div>
       <Button
         type='submit'
         className='btn-primary !h-12 !px-12 w-full mb-8'
         disabled={loading}
       >
-        Change Password
+        {CHANGE_PASSWORD_MESSAGES.BUTTON}
       </Button>
       <div className='text-center text-[14px] text-[var(--text-secondary)] mt-2'>
-        Having trouble?{' '}
+        {CHANGE_PASSWORD_MESSAGES.SUPPORT_TEXT}{' '}
         <a
           href='#'
           className='font-semibold text-[var(--text-dark)] underline-none'
         >
-          Contact support
+          {CHANGE_PASSWORD_MESSAGES.SUPPORT_LINK}
         </a>
       </div>
     </form>
