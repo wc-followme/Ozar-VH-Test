@@ -1,16 +1,15 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 
@@ -28,35 +27,34 @@ interface MenuOption {
 interface CategoryCardProps {
   name: string;
   description: string;
-  icon: string;
-  createdOn: string;
-  status: boolean;
-  onToggle: () => void;
+  iconSrc: React.ComponentType<{ size?: number; color?: string }>;
+  iconColor?: string;
+  iconBgColor: string;
   menuOptions: MenuOption[];
-  isDefault?: boolean;
   categoryUuid: string;
   onDelete?: () => void;
+  onEdit?: () => void;
 }
 
 export function CategoryCard({
   name,
   description,
-  icon,
-  createdOn,
-  status,
-  onToggle,
+  iconSrc,
+  iconColor,
+  iconBgColor,
   menuOptions,
-  isDefault = false,
-  categoryUuid,
+  categoryUuid: _categoryUuid,
   onDelete,
+  onEdit,
 }: CategoryCardProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const router = useRouter();
 
   const handleMenuAction = (action: string) => {
     switch (action) {
       case 'edit':
-        router.push(`/category-management/edit-category/${categoryUuid}`);
+        if (onEdit) {
+          onEdit();
+        }
         break;
       case 'delete':
         setShowDeleteModal(true);
@@ -73,99 +71,80 @@ export function CategoryCard({
     setShowDeleteModal(false);
   };
 
-  const switchStyle =
-    'h-6 w-11 data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300 [&>span]:h-5 [&>span]:w-5 [&>span]:bg-white data-[state=checked]:[&>span]:border-green-400 [&>span]:transition-all [&>span]:duration-200 disabled:opacity-50';
-
   return (
     <>
-      <div className='bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-4 flex flex-col gap-4 transition-all hover:shadow-md'>
-        {/* Header */}
-        <div className='flex items-start justify-between'>
-          <div className='flex items-center gap-3'>
-            {/* Icon */}
-            <div className='w-12 h-12 rounded-lg bg-[var(--secondary)] bg-opacity-10 flex items-center justify-center'>
-              <i className={cn(icon, 'text-xl text-[var(--secondary)]')} />
-            </div>
-
-            {/* Category Info */}
-            <div className='flex-1'>
-              <h3 className='text-[var(--text-dark)] font-semibold text-lg leading-tight'>
-                {name}
-              </h3>
-              <p className='text-[var(--text-secondary)] text-sm mt-1 line-clamp-2'>
-                {description}
-              </p>
-            </div>
+      <Card className='flex flex-col items-start gap-4 p-6 bg-[var(--card-background)] h-full rounded-[24px] border border-[var(--border-dark)] hover:shadow-lg transition-shadow duration-200'>
+        <div className='flex items-start justify-between w-full'>
+          <div
+            className={`flex items-center justify-center w-[60px] h-[60px] rounded-[16px] mb-2`}
+            style={{ background: iconBgColor }}
+          >
+            {React.createElement(iconSrc, {
+              size: 30,
+              color: iconColor || '#000000',
+            })}
           </div>
 
-          {/* Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant='ghost'
                 size='sm'
-                className='h-8 w-8 p-0 hover:bg-gray-100'
+                className='h-8 w-8 p-0 flex-shrink-0'
               >
-                <IconDotsVertical className='h-4 w-4' />
+                <IconDotsVertical
+                  className='!w-6 !h-6'
+                  strokeWidth={2}
+                  color='var(--text)'
+                />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-40'>
-              {menuOptions.map(option => (
-                <DropdownMenuItem
-                  key={option.action}
-                  onClick={() => handleMenuAction(option.action)}
-                  className={cn(
-                    'cursor-pointer',
-                    option.variant === 'destructive' &&
-                      'text-red-600 focus:text-red-600 focus:bg-red-50'
-                  )}
-                >
-                  <option.icon
-                    size={16}
-                    color={
+
+            <DropdownMenuContent
+              align='end'
+              className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+            >
+              {menuOptions.map((option, index) => {
+                const IconComponent = option.icon;
+                return (
+                  <DropdownMenuItem
+                    key={index}
+                    onClick={() => handleMenuAction(option.action)}
+                    className={cn(
+                      'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]',
                       option.variant === 'destructive'
-                        ? '#dc2626'
-                        : 'currentColor'
-                    }
-                  />
-                  <span className='ml-2'>{option.label}</span>
-                </DropdownMenuItem>
-              ))}
+                        ? 'text-red-600 hover:bg-red-50'
+                        : ''
+                    )}
+                  >
+                    <IconComponent
+                      size='18'
+                      color='var(--text-dark)'
+                      variant='Outline'
+                    />
+                    <span>{option.label}</span>
+                  </DropdownMenuItem>
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
-        {/* Footer */}
-        <div className='flex items-center justify-between pt-2 border-t border-[var(--border-light)]'>
-          <div className='text-sm text-[var(--text-secondary)]'>
-            Created: {createdOn}
+        <CardContent className='flex flex-col items-start gap-4 p-0 w-full flex-1'>
+          <div className='flex flex-col gap-2 w-full'>
+            <h3 className='text-base font-bold text-[var(--text)]'>{name}</h3>
+            <p className='text-base text-[var(--text-secondary)] leading-tight'>
+              {description}
+            </p>
           </div>
-
-          <div className='flex items-center gap-2'>
-            <span className='text-sm text-[var(--text-secondary)]'>
-              {status ? 'Active' : 'Inactive'}
-            </span>
-            <Switch
-              checked={status}
-              onCheckedChange={onToggle}
-              className={switchStyle}
-              disabled={isDefault}
-            />
-          </div>
-        </div>
-
-        {isDefault && (
-          <div className='text-xs text-[var(--text-secondary)] bg-[var(--background)] rounded-md px-2 py-1 text-center'>
-            Default Category
-          </div>
-        )}
-      </div>
+        </CardContent>
+      </Card>
 
       <ConfirmDeleteModal
         open={showDeleteModal}
         onCancel={() => setShowDeleteModal(false)}
         onDelete={handleDelete}
-        title='Are you sure you want to delete?'
+        title='Are you sure you want to archive?'
         subtitle='This action cannot be undone.'
       />
     </>

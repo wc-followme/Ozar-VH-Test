@@ -1,6 +1,8 @@
 'use client';
 
 import { CategoryCard } from '@/components/shared/cards/CategoryCard';
+import FormErrorMessage from '@/components/shared/common/FormErrorMessage';
+import IconFieldWrapper from '@/components/shared/common/IconFieldWrapper';
 import SideSheet from '@/components/shared/common/SideSheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,13 +10,26 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
-import { apiService, Category, CreateCategoryRequest } from '@/lib/api';
+import { iconOptions } from '@/constants/sidebar-items';
+import { STATUS_CODES } from '@/constants/status-codes';
+import {
+  apiService,
+  Category,
+  CreateCategoryRequest,
+  GetCategoryResponse,
+  UpdateCategoryRequest,
+} from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, formatDate } from '@/lib/utils';
+import { extractApiErrorMessage } from '@/lib/utils';
+import {
+  CreateCategoryFormData,
+  createCategorySchema,
+} from '@/lib/validations/category';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Edit2, Trash } from 'iconsax-react';
 import { useCallback, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { CATEGORY_MESSAGES } from './category-messages';
-import { CategoryFormErrors } from './category-types';
 
 const menuOptions = [
   {
@@ -35,14 +50,28 @@ const CategoryManagement = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [open, setOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [isLoadingCategory, setIsLoadingCategory] = useState(false);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
-  // Form state
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [icon, setIcon] = useState('fas fa-folder');
-  const [errors, setErrors] = useState<CategoryFormErrors>({});
+  // Form management with react-hook-form
+  const defaultIconOption = iconOptions[0];
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<CreateCategoryFormData>({
+    resolver: yupResolver(createCategorySchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      icon: defaultIconOption?.value ?? '',
+    },
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchCategories = useCallback(async () => {
     setLoading(true);
@@ -93,46 +122,6 @@ const CategoryManagement = () => {
     fetchCategories();
   }, [fetchCategories]);
 
-  // Status toggle handler
-  const handleToggleStatus = async (
-    id: number,
-    currentStatus: 'ACTIVE' | 'INACTIVE'
-  ) => {
-    try {
-      const category = categories.find(c => c.id === id);
-      if (!category || !category.uuid)
-        throw new Error(CATEGORY_MESSAGES.CATEGORY_NOT_FOUND_ERROR);
-
-      // Prevent status changes for default categories
-      if (category.is_default) {
-        showErrorToast(CATEGORY_MESSAGES.DEFAULT_CATEGORY_STATUS_ERROR);
-        return;
-      }
-
-      const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-      await apiService.updateCategoryStatus(category.uuid, newStatus);
-
-      setCategories(categories =>
-        categories.map(c => (c.id === id ? { ...c, status: newStatus } : c))
-      );
-
-      showSuccessToast(
-        `${CATEGORY_MESSAGES.STATUS_UPDATE_SUCCESS} Status changed to ${newStatus}.`
-      );
-    } catch (err: unknown) {
-      // Handle auth errors first (will redirect to login if 401)
-      if (handleAuthError(err)) {
-        return; // Don't show toast if it's an auth error
-      }
-
-      const message = extractApiErrorMessage(
-        err,
-        CATEGORY_MESSAGES.STATUS_UPDATE_ERROR
-      );
-      showErrorToast(message);
-    }
-  };
-
   // Delete handler
   const handleDeleteCategory = async (uuid: string) => {
     try {
@@ -161,41 +150,30 @@ const CategoryManagement = () => {
     }
   };
 
-  const validate = (): boolean => {
-    const newErrors: CategoryFormErrors = {};
-    if (!name.trim()) newErrors.name = CATEGORY_MESSAGES.NAME_REQUIRED;
-    if (!description.trim())
-      newErrors.description = CATEGORY_MESSAGES.DESCRIPTION_REQUIRED;
-    if (!icon.trim()) newErrors.icon = CATEGORY_MESSAGES.ICON_REQUIRED;
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-
+  // Fetch category details for editing
+  const fetchCategoryDetails = async (uuid: string) => {
+    setIsLoadingCategory(true);
     try {
-      const payload: CreateCategoryRequest = {
-        name: name.trim(),
-        description: description.trim(),
-        icon: icon.trim(),
-        is_default: false,
-        status: 'ACTIVE',
-      };
+      const response: GetCategoryResponse =
+        await apiService.getCategoryDetails(uuid);
 
-      await apiService.createCategory(payload);
-      showSuccessToast(CATEGORY_MESSAGES.CREATE_SUCCESS);
+      if (response.statusCode === STATUS_CODES.OK && response.data) {
+        const category = response.data;
+        setEditingCategory(category);
 
-      // Reset form and close modal
-      setName('');
-      setDescription('');
-      setIcon('fas fa-folder');
-      setErrors({});
-      setOpen(false);
+        // Reset form with category data
+        reset({
+          name: category.name,
+          description: category.description,
+          icon: category.icon,
+        });
 
-      // Refresh categories list
-      fetchCategories();
+        setOpen(true);
+      } else {
+        throw new Error(
+          response.message || CATEGORY_MESSAGES.FETCH_DETAILS_ERROR
+        );
+      }
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -204,22 +182,116 @@ const CategoryManagement = () => {
 
       const message = extractApiErrorMessage(
         err,
-        CATEGORY_MESSAGES.CREATE_ERROR
+        CATEGORY_MESSAGES.FETCH_DETAILS_ERROR
       );
       showErrorToast(message);
+    } finally {
+      setIsLoadingCategory(false);
     }
   };
 
-  const resetForm = () => {
-    setName('');
-    setDescription('');
-    setIcon('fas fa-folder');
-    setErrors({});
+  // Handle edit category
+  const handleEditCategory = (uuid: string) => {
+    fetchCategoryDetails(uuid);
+  };
+
+  // Handle form submission
+  const onSubmit = async (data: CreateCategoryFormData) => {
+    setIsSubmitting(true);
+    try {
+      if (editingCategory) {
+        // Update existing category
+        const updateData: UpdateCategoryRequest = {
+          name: data.name,
+          description: data.description,
+          icon: data.icon,
+        };
+
+        const response = await apiService.updateCategory(
+          editingCategory.uuid,
+          updateData
+        );
+        if (
+          response.statusCode === STATUS_CODES.OK ||
+          response.statusCode === STATUS_CODES.CREATED
+        ) {
+          showSuccessToast(CATEGORY_MESSAGES.UPDATE_SUCCESS);
+
+          // Update the category in the list
+          setCategories(categories =>
+            categories.map(c =>
+              c.uuid === editingCategory.uuid ? { ...c, ...updateData } : c
+            )
+          );
+
+          // Reset form and close modal
+          reset({
+            name: '',
+            description: '',
+            icon: defaultIconOption?.value ?? '',
+          });
+          setEditingCategory(null);
+          setOpen(false);
+        } else {
+          throw new Error(response.message || CATEGORY_MESSAGES.UPDATE_ERROR);
+        }
+      } else {
+        // Create new category
+        const categoryData: CreateCategoryRequest = {
+          name: data.name,
+          description: data.description,
+          icon: data.icon,
+          status: 'ACTIVE', // Default to ACTIVE when creating
+          is_default: false, // New categories are not default
+        };
+
+        const response = await apiService.createCategory(categoryData);
+        if (
+          response.statusCode === STATUS_CODES.OK ||
+          response.statusCode === STATUS_CODES.CREATED
+        ) {
+          showSuccessToast(CATEGORY_MESSAGES.CREATE_SUCCESS);
+
+          // Reset form and close modal
+          reset({
+            name: '',
+            description: '',
+            icon: defaultIconOption?.value ?? '',
+          });
+          setOpen(false);
+
+          // Refresh categories list
+          fetchCategories();
+        } else {
+          throw new Error(response.message || CATEGORY_MESSAGES.CREATE_ERROR);
+        }
+      }
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        editingCategory
+          ? CATEGORY_MESSAGES.UPDATE_ERROR
+          : CATEGORY_MESSAGES.CREATE_ERROR
+      );
+      showErrorToast(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
     setOpen(false);
-    resetForm();
+    setEditingCategory(null);
+    reset({
+      name: '',
+      description: '',
+      icon: defaultIconOption?.value ?? '',
+    });
   };
 
   return (
@@ -242,96 +314,139 @@ const CategoryManagement = () => {
         </div>
       ) : (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
-          {categories.map(category => (
-            <CategoryCard
-              key={category.id}
-              name={category.name}
-              description={category.description}
-              icon={category.icon}
-              createdOn={formatDate(category.created_at)}
-              status={category.status === 'ACTIVE'}
-              onToggle={() => handleToggleStatus(category.id, category.status)}
-              menuOptions={menuOptions}
-              isDefault={category.is_default}
-              categoryUuid={category.uuid}
-              onDelete={() => handleDeleteCategory(category.uuid)}
-            />
-          ))}
+          {categories.map((category, index) => {
+            const iconOption = iconOptions.find(
+              opt => opt.value === category.icon
+            ) || {
+              icon: () => null,
+              color: '#00a8bf',
+            };
+            return (
+              <CategoryCard
+                key={category.id || index}
+                name={category.name}
+                description={category.description}
+                iconSrc={iconOption.icon}
+                iconColor={iconOption.color}
+                iconBgColor={iconOption.color + '26'}
+                menuOptions={menuOptions}
+                categoryUuid={category.uuid}
+                onDelete={() => handleDeleteCategory(category.uuid)}
+                onEdit={() => handleEditCategory(category.uuid)}
+              />
+            );
+          })}
         </div>
       )}
 
-      {/* Create Category Side Sheet */}
+      {/* Create/Edit Category Side Sheet */}
       <SideSheet
-        title={CATEGORY_MESSAGES.ADD_CATEGORY_TITLE}
+        title={
+          editingCategory
+            ? CATEGORY_MESSAGES.EDIT_CATEGORY_TITLE
+            : CATEGORY_MESSAGES.ADD_CATEGORY_TITLE
+        }
         open={open}
         onOpenChange={setOpen}
         size='600px'
       >
         <div className='space-y-6'>
-          <form onSubmit={handleSubmit} className='space-y-4'>
-            {/* Category Name */}
-            <div className='space-y-2'>
-              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
-              </Label>
-              <Input
-                placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
-                value={name}
-                onChange={e => setName(e.target.value)}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
-              />
-              {errors.name && (
-                <p className='text-red-500 text-sm'>{errors.name}</p>
-              )}
+          {isLoadingCategory ? (
+            <div className='text-center py-10'>
+              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4'></div>
+              <p className='text-gray-600'>{CATEGORY_MESSAGES.LOADING}</p>
             </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+              {/* Icon Selector */}
+              <div className='space-y-2'>
+                <Controller
+                  name='icon'
+                  control={control}
+                  render={({ field }) => (
+                    <IconFieldWrapper
+                      label={CATEGORY_MESSAGES.ICON_LABEL}
+                      value={field.value}
+                      onChange={field.onChange}
+                      iconOptions={iconOptions}
+                      error={errors.icon?.message || ''}
+                    />
+                  )}
+                />
+              </div>
 
-            {/* Icon */}
-            <div className='space-y-2'>
-              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                {CATEGORY_MESSAGES.ICON_LABEL}
-              </Label>
-              <Input
-                placeholder={CATEGORY_MESSAGES.SELECT_ICON}
-                value={icon}
-                onChange={e => setIcon(e.target.value)}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
-              />
-              {errors.icon && (
-                <p className='text-red-500 text-sm'>{errors.icon}</p>
-              )}
-            </div>
+              {/* Category Name */}
+              <div className='space-y-2'>
+                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                  {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
+                </Label>
+                <Controller
+                  name='name'
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
+                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                      disabled={isSubmitting}
+                    />
+                  )}
+                />
+                {errors.name && (
+                  <FormErrorMessage message={errors.name.message || ''} />
+                )}
+              </div>
+              {/* Description */}
+              <div className='space-y-2'>
+                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                  {CATEGORY_MESSAGES.DESCRIPTION_LABEL}
+                </Label>
+                <Controller
+                  name='description'
+                  control={control}
+                  render={({ field }) => (
+                    <Textarea
+                      {...field}
+                      placeholder={CATEGORY_MESSAGES.ENTER_DESCRIPTION}
+                      className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                      disabled={isSubmitting}
+                    />
+                  )}
+                />
+                {errors.description && (
+                  <FormErrorMessage
+                    message={errors.description.message || ''}
+                  />
+                )}
+              </div>
 
-            {/* Description */}
-            <div className='space-y-2'>
-              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                {CATEGORY_MESSAGES.DESCRIPTION_LABEL}
-              </Label>
-              <Textarea
-                placeholder={CATEGORY_MESSAGES.ENTER_DESCRIPTION}
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'
-              />
-              {errors.description && (
-                <p className='text-red-500 text-sm'>{errors.description}</p>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className='flex gap-4 pt-2'>
-              <Button
-                type='button'
-                variant='outline'
-                className='btn-secondary !px-8 !h-12'
-                onClick={handleClose}
-              >
-                {CATEGORY_MESSAGES.CANCEL_BUTTON}
-              </Button>
-              <Button type='submit' className='btn-primary !h-12 !px-12'>
-                {CATEGORY_MESSAGES.CREATE_BUTTON}
-              </Button>
-            </div>
-          </form>
+              {/* Actions */}
+              <div className='flex gap-4 pt-2'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='h-[48px] px-8 rounded-full font-semibold text-[var(--text-dark)] border-2 border-[var(--border-dark)] bg-transparent'
+                  onClick={handleClose}
+                  disabled={isSubmitting}
+                >
+                  {CATEGORY_MESSAGES.CANCEL_BUTTON}
+                </Button>
+                <Button
+                  type='submit'
+                  className='h-[48px] px-12 bg-[#38B24D] hover:bg-[#2e9c41] rounded-full font-semibold text-white'
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? editingCategory
+                      ? CATEGORY_MESSAGES.UPDATING_BUTTON
+                      : CATEGORY_MESSAGES.CREATING_BUTTON
+                    : editingCategory
+                      ? CATEGORY_MESSAGES.UPDATE_BUTTON
+                      : CATEGORY_MESSAGES.CREATE_BUTTON}
+                </Button>
+              </div>
+            </form>
+          )}
         </div>
       </SideSheet>
     </section>

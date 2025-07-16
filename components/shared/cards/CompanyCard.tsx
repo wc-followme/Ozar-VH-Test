@@ -179,7 +179,7 @@ export function CompanyCard({
       )}
       <ConfirmDeleteModal
         open={showDelete}
-        title='Are you sure you want to delete?'
+        title='Are you sure you want to archive?'
         subtitle='This action cannot be undone.'
         onCancel={() => setShowDelete(false)}
         onDelete={async () => {

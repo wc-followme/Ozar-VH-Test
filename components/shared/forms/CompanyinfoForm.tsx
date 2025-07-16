@@ -2,25 +2,25 @@
 
 import { COMPANY_MESSAGES } from '@/app/(DashboardLayout)/company-management/company-messages';
 import {
-  CompanyCreateFormData,
-  CompanyFormErrors,
-  CompanyInfoFormProps,
+    CompanyCreateFormData,
+    CompanyFormErrors,
+    CompanyInfoFormProps,
 } from '@/app/(DashboardLayout)/company-management/company-types';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from '@/components/ui/popover';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { COUNTRY_CODES } from '@/constants/common';
@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
 
 export function CompanyInfoForm({
@@ -54,12 +54,13 @@ export function CompanyInfoForm({
   const [city, setCity] = useState('');
   const [pincode, setPincode] = useState('');
   const [projects, setProjects] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const [errors, setErrors] = useState<CompanyFormErrors>({});
 
-  // Set initial data for edit mode
-  useEffect(() => {
-    if (isEditMode && initialData) {
+  // Initialize form with initial data
+  const initializeForm = useCallback(() => {
+    if (isEditMode && initialData && !isInitialized) {
       setName(initialData.name || '');
       setTagline(initialData.tagline || '');
       setAbout(initialData.about || '');
@@ -88,9 +89,12 @@ export function CompanyInfoForm({
 
       setCommunication(initialData.communication || '');
       setWebsite(initialData.website || '');
-      setPreferredCommunication(
-        initialData.preferred_communication_method || ''
-      );
+      
+      // Set preferred communication method
+      if (initialData.preferred_communication_method) {
+        setPreferredCommunication(initialData.preferred_communication_method);
+      }
+      
       setCity(initialData.city || '');
       setPincode(initialData.pincode || '');
       setProjects(initialData.projects || '');
@@ -98,8 +102,36 @@ export function CompanyInfoForm({
       if (initialData.expiry_date) {
         setExpiryDate(new Date(initialData.expiry_date));
       }
+      
+      setIsInitialized(true);
     }
-  }, [isEditMode, initialData]);
+  }, [isEditMode, initialData, isInitialized]);
+
+  // Initialize form when component mounts or when initialData changes
+  useEffect(() => {
+    initializeForm();
+  }, [initializeForm]);
+
+  // Re-initialize form when initialData becomes available
+  useEffect(() => {
+    if (initialData && !isInitialized) {
+      initializeForm();
+    }
+  }, [initialData, isInitialized, initializeForm]);
+
+  // Fallback initialization - if data is available but form not initialized after 1 second
+  useEffect(() => {
+    if (isEditMode && initialData && !isInitialized) {
+      const timer = setTimeout(() => {
+        if (!isInitialized) {
+          initializeForm();
+        }
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isEditMode, initialData, isInitialized, initializeForm]);
 
   const validate = (): boolean => {
     const newErrors: CompanyFormErrors = {};
@@ -165,6 +197,17 @@ export function CompanyInfoForm({
     router.push('/company-management');
   };
 
+  // Don't render form until data is loaded in edit mode
+  if (isEditMode && !isInitialized && initialData) {
+    return (
+      <div className='flex items-center justify-center py-8'>
+        <div className='text-center text-gray-500'>
+          {COMPANY_MESSAGES.LOADING}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className='space-y-6'>
       {/* Company Information */}
@@ -225,7 +268,9 @@ export function CompanyInfoForm({
             <div className='flex gap-2'>
               <Select
                 value={phoneCountryCode}
-                onValueChange={setPhoneCountryCode}
+                onValueChange={(value) => {
+                  setPhoneCountryCode(value);
+                }}
               >
                 <SelectTrigger className='w-[120px] input-field'>
                   <SelectValue />
@@ -339,7 +384,9 @@ export function CompanyInfoForm({
             </Label>
             <Select
               value={preferredCommunication}
-              onValueChange={setPreferredCommunication}
+              onValueChange={(value) => {
+                setPreferredCommunication(value);
+              }}
             >
               <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
                 <SelectValue

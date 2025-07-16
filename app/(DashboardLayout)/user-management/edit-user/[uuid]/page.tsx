@@ -270,6 +270,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                 {/* Right Column - Form Fields */}
                 <div className='flex-1'>
                   <UserInfoForm
+                    key={user?.uuid || 'loading'}
                     roles={roles}
                     loadingRoles={loadingRoles}
                     imageUrl={fileKey}
