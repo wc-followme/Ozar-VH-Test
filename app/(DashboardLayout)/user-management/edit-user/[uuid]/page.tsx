@@ -126,7 +126,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         fileName: generatedFileName,
         fileType: file.type,
         fileSize: file.size,
-        purpose: 'user',
+        purpose: 'profile-picture',
         customPath: '',
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
