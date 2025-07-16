@@ -2,11 +2,17 @@
 
 import { CategoryCard } from '@/components/shared/cards/CategoryCard';
 import FormErrorMessage from '@/components/shared/common/FormErrorMessage';
-import IconFieldWrapper from '@/components/shared/common/IconFieldWrapper';
 import SideSheet from '@/components/shared/common/SideSheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
@@ -366,42 +372,113 @@ const CategoryManagement = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-              {/* Icon Selector */}
-              <div className='space-y-2'>
-                <Controller
-                  name='icon'
-                  control={control}
-                  render={({ field }) => (
-                    <IconFieldWrapper
-                      label={CATEGORY_MESSAGES.ICON_LABEL}
-                      value={field.value}
-                      onChange={field.onChange}
-                      iconOptions={iconOptions}
-                      error={errors.icon?.message || ''}
-                    />
-                  )}
-                />
-              </div>
-
-              {/* Category Name */}
+              {/* Icon & Category Name */}
               <div className='space-y-2'>
                 <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+                  {CATEGORY_MESSAGES.ICON_LABEL} &{' '}
                   {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
                 </Label>
-                <Controller
-                  name='name'
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                      disabled={isSubmitting}
+                <div className='flex gap-3'>
+                  {/* Icon Selector */}
+                  <div className='w-[80px]'>
+                    <Controller
+                      name='icon'
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger className='h-12 px-3 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
+                            <SelectValue>
+                              <div
+                                className='flex w-8 h-8 items-center justify-center rounded-[10px]'
+                                style={{
+                                  backgroundColor: `${(() => {
+                                    const selectedIcon =
+                                      iconOptions.find(
+                                        opt => opt.value === field.value
+                                      ) || iconOptions[0];
+                                    return selectedIcon?.color ?? '';
+                                  })()}26`,
+                                }}
+                              >
+                                {(() => {
+                                  const selectedIcon =
+                                    iconOptions.find(
+                                      opt => opt.value === field.value
+                                    ) || iconOptions[0];
+                                  const IconComponent = selectedIcon?.icon;
+                                  return IconComponent ? (
+                                    <IconComponent
+                                      className='w-4 h-4'
+                                      style={{
+                                        color: selectedIcon?.color ?? '',
+                                      }}
+                                    />
+                                  ) : null;
+                                })()}
+                              </div>
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
+                            {iconOptions.map(option => {
+                              const IconComponent = option.icon;
+                              return (
+                                <SelectItem
+                                  key={option.value}
+                                  value={option.value}
+                                >
+                                  <div className='flex items-center gap-2'>
+                                    <div
+                                      className='flex w-6 h-6 items-center justify-center rounded-md'
+                                      style={{
+                                        backgroundColor: `${option.color}26`,
+                                      }}
+                                    >
+                                      <IconComponent
+                                        className='w-3 h-3'
+                                        style={{ color: option.color }}
+                                      />
+                                    </div>
+                                    <span className='text-sm'>
+                                      {option.label}
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      )}
                     />
-                  )}
-                />
-                {errors.name && (
-                  <FormErrorMessage message={errors.name.message || ''} />
+                  </div>
+
+                  {/* Category Name */}
+                  <div className='flex-1'>
+                    <Controller
+                      name='name'
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
+                          className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                          disabled={isSubmitting}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                {(errors.icon || errors.name) && (
+                  <div className='space-y-1'>
+                    {errors.icon && (
+                      <FormErrorMessage message={errors.icon.message || ''} />
+                    )}
+                    {errors.name && (
+                      <FormErrorMessage message={errors.name.message || ''} />
+                    )}
+                  </div>
                 )}
               </div>
               {/* Description */}
