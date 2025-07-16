@@ -32,7 +32,7 @@ const RoleManagement = () => {
   const [page, setPage] = useState(1);
   const [limit] = useState(PAGINATION.DEFAULT_LIMIT); // Use common constant
   const [search] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [name] = useState('');
   const [hasMore, setHasMore] = useState(true);
   const [showNoMoreMessage, setShowNoMoreMessage] = useState(false);
@@ -144,46 +144,56 @@ const RoleManagement = () => {
           className='border border-gray-300 rounded-lg px-4 py-2 w-64'
         />
       </div> */}
-      {/* Roles Grid */}
-      <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
-        {roles.length === 0 && !loading ? (
-          <div className='col-span-4 text-center py-8'>
-            {ROLE_MESSAGES.NO_ROLES_FOUND}
-          </div>
-        ) : (
-          roles.map((role, index) => {
-            const iconOption = iconOptions.find(
-              opt => opt.value === role.icon
-            ) || {
-              icon: () => null,
-              color: '#00a8bf',
-            };
-            return (
-              <div key={role.id || index}>
-                <RoleCard
-                  menuOptions={menuOptions}
-                  iconSrc={iconOption.icon}
-                  iconBgColor={iconOption.color + '26'}
-                  title={role.name}
-                  description={role.description}
-                  permissionCount={role.total_permissions || 0}
-                  iconColor={iconOption.color}
-                  onEdit={() => handleEditRole(role.uuid)}
-                  onDelete={() => handleDeleteRole(role.uuid)}
-                />
+      {/* Initial Loading State */}
+      {roles.length === 0 && loading ? (
+        <LoadingComponent variant='fullscreen' />
+      ) : (
+        <>
+          {/* Roles Grid */}
+          <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
+            {roles.length === 0 && !loading ? (
+              <div className='col-span-4 text-center py-8'>
+                {ROLE_MESSAGES.NO_ROLES_FOUND}
               </div>
-            );
-          })
-        )}
-      </div>
+            ) : (
+              roles.map((role, index) => {
+                const iconOption = iconOptions.find(
+                  opt => opt.value === role.icon
+                ) || {
+                  icon: () => null,
+                  color: '#00a8bf',
+                };
+                return (
+                  <div key={role.id || index}>
+                    <RoleCard
+                      menuOptions={menuOptions}
+                      iconSrc={iconOption.icon}
+                      iconBgColor={iconOption.color + '26'}
+                      title={role.name}
+                      description={role.description}
+                      permissionCount={role.total_permissions || 0}
+                      iconColor={iconOption.color}
+                      onEdit={() => handleEditRole(role.uuid)}
+                      onDelete={() => handleDeleteRole(role.uuid)}
+                    />
+                  </div>
+                );
+              })
+            )}
+          </div>
 
-      {/* Sentinel element for infinite scroll */}
-      {roles.length > 0 && <div ref={sentinelRef} className='w-full h-4'></div>}
+          {/* Sentinel element for infinite scroll */}
+          {roles.length > 0 && (
+            <div ref={sentinelRef} className='w-full h-4'></div>
+          )}
 
-      {loading && (
-        <div className='w-full text-center py-4'>
-          <LoadingComponent variant='fullscreen' size='sm' />
-        </div>
+          {/* Pagination Loading - only show when we have roles and are loading more */}
+          {loading && roles.length > 0 && (
+            <div className='w-full text-center py-4'>
+              <LoadingComponent variant='inline' size='sm' />
+            </div>
+          )}
+        </>
       )}
       {showNoMoreMessage && (
         <div className='w-full text-center py-4 text-gray-400'>
