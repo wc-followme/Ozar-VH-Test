@@ -27,7 +27,7 @@ import { COUNTRY_CODES } from '@/constants/common';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
 import SelectField from '../common/SelectField';
 
@@ -65,11 +65,17 @@ export function UserInfoForm({
   const [pinCode, setPinCode] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Prefill form with initial data in edit mode
-  useEffect(() => {
-    if (isEditMode && initialData) {
-      setRoleId(String(initialData.role_id || ''));
+  // Initialize form with initial data
+  const initializeForm = useCallback(() => {
+    if (isEditMode && initialData && !isInitialized) {
+      // Set role ID
+      if (initialData.role_id) {
+        setRoleId(String(initialData.role_id));
+      }
+      
+      // Set other fields
       setFullName(initialData.name || '');
       setDesignation(initialData.designation || '');
       setEmail(initialData.email || '');
@@ -99,15 +105,48 @@ export function UserInfoForm({
         }
       }
 
-      setCommunication(initialData.preferred_communication_method || '');
+      // Set communication method
+      if (initialData.preferred_communication_method) {
+        setCommunication(initialData.preferred_communication_method);
+      }
+      
       setAddress(initialData.address || '');
       setCity(initialData.city || '');
       setPinCode(initialData.pincode || '');
+      
       if (initialData.date_of_joining) {
         setDate(new Date(initialData.date_of_joining));
       }
+      
+      setIsInitialized(true);
     }
-  }, [isEditMode, initialData]);
+  }, [isEditMode, initialData, isInitialized]);
+
+  // Initialize form when component mounts or when initialData changes
+  useEffect(() => {
+    initializeForm();
+  }, [initializeForm]);
+
+  // Re-initialize form when initialData becomes available
+  useEffect(() => {
+    if (initialData && !isInitialized) {
+      initializeForm();
+    }
+  }, [initialData, isInitialized, initializeForm]);
+
+  // Fallback initialization - if data is available but form not initialized after 1 second
+  useEffect(() => {
+    if (isEditMode && initialData && !isInitialized) {
+      const timer = setTimeout(() => {
+        if (!isInitialized) {
+          initializeForm();
+        }
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isEditMode, initialData, isInitialized, initializeForm]);
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
@@ -185,6 +224,17 @@ export function UserInfoForm({
       setErrors({});
     }
   };
+
+  // Don't render form until data is loaded in edit mode
+  if (isEditMode && !isInitialized && initialData) {
+    return (
+      <div className='flex items-center justify-center py-8'>
+        <div className='text-center text-gray-500'>
+          {USER_MESSAGES.LOADING}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form className='space-y-6' onSubmit={handleSubmit} noValidate>
@@ -359,7 +409,12 @@ export function UserInfoForm({
             {USER_MESSAGES.PHONE_LABEL}
           </Label>
           <div className='flex'>
-            <Select value={country} onValueChange={setCountry}>
+            <Select 
+              value={country} 
+              onValueChange={(value) => {
+                setCountry(value);
+              }}
+            >
               <SelectTrigger
                 className={cn(
                   'w-24 h-12 rounded-l-[10px] rounded-r-none border-2 border-r-0 bg-[var(--white-background)]',

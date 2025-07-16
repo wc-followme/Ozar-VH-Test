@@ -5,9 +5,9 @@ import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { CompanyInfoForm } from '@/components/shared/forms/CompanyinfoForm';
 import { useToast } from '@/components/ui/use-toast';
 import {
-  apiService,
-  GetCompanyResponse,
-  UpdateCompanyRequest,
+    apiService,
+    GetCompanyResponse,
+    UpdateCompanyRequest,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
@@ -262,6 +262,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
           <div className='flex-1 bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
             {getInitialData() && (
               <CompanyInfoForm
+                key={company?.uuid || 'loading'}
                 imageUrl={fileKey}
                 onSubmit={handleUpdateCompany}
                 loading={formLoading}

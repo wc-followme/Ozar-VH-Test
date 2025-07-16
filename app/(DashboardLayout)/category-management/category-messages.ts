@@ -37,6 +37,8 @@ export const CATEGORY_MESSAGES = {
   CREATE_BUTTON: 'Create',
   UPDATE_BUTTON: 'Update',
   CANCEL_BUTTON: 'Cancel',
+  CREATING_BUTTON: 'Creating...',
+  UPDATING_BUTTON: 'Updating...',
 
   // Form Labels
   CATEGORY_NAME_LABEL: 'Category Name',
@@ -55,12 +57,15 @@ export const CATEGORY_MESSAGES = {
 
   // Breadcrumbs
   BREADCRUMB_CATEGORIES: 'Categories',
+  CATEGORY_MANAGEMENT_BREADCRUMB: 'Category Management',
+  CREATE_CATEGORY_BREADCRUMB: 'Create Category',
+  EDIT_CATEGORY_BREADCRUMB: 'Edit Category',
 
   // Menu Options
   EDIT_MENU: 'Edit',
-  DELETE_MENU: 'Delete',
+  DELETE_MENU: 'Archive',
 
   // Confirm Modal Messages
-  DELETE_CONFIRM_TITLE: 'Are you sure you want to delete?',
+  DELETE_CONFIRM_TITLE: 'Are you sure you want to archive?',
   DELETE_CONFIRM_SUBTITLE: 'This action cannot be undone.',
 };

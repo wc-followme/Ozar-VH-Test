@@ -17,7 +17,6 @@ const nextConfig = {
   // 🚀 Security and performance headers
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
 
   // 🚀 Experimental features for enterprise
   experimental: {

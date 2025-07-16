@@ -183,7 +183,7 @@ export function UserCard({
       </div>
       <ConfirmDeleteModal
         open={showDelete}
-        title={`Are you sure you want to Archive?`}
+        title={`Are you sure you want to archive?`}
         subtitle={`This action cannot be undone.`}
         onCancel={() => setShowDelete(false)}
         onDelete={async () => {
