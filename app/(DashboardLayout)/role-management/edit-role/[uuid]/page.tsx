@@ -2,16 +2,25 @@
 
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
-import { RoleForm } from '@/components/shared/forms/RoleForm';
 import { useToast } from '@/components/ui/use-toast';
 import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
 import { extractApiErrorMessage } from '@/lib/utils';
 import { CreateRoleFormData } from '@/lib/validations/role';
+import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ROLE_MESSAGES } from '../../role-messages';
 import type { ApiResponse, Role, UpdateRoleRequest } from '../../types';
+
+// Dynamic import for better performance
+const RoleForm = dynamic(
+  () => import('@/components/shared/forms/RoleForm').then(mod => ({ default: mod.RoleForm })),
+  {
+    loading: () => <LoadingComponent variant="inline" />,
+    ssr: false,
+  }
+);
 
 const breadcrumbData: BreadcrumbItem[] = [
   { name: ROLE_MESSAGES.ROLE_MANAGEMENT_BREADCRUMB, href: '/role-management' },

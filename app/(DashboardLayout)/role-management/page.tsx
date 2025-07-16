@@ -36,6 +36,7 @@ const RoleManagement = () => {
   const [name] = useState('');
   const [hasMore, setHasMore] = useState(true);
   const [showNoMoreMessage, setShowNoMoreMessage] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
   const router = useRouter();
 
@@ -103,10 +104,22 @@ const RoleManagement = () => {
     }
   };
 
-  // Handler for editing a role
-  const handleEditRole = (uuid: string) => {
+  // Handler for editing a role with loading state
+  const handleEditRole = useCallback((uuid: string) => {
+    setIsNavigating(true);
     router.push(`/role-management/edit-role/${uuid}`);
-  };
+  }, [router]);
+
+  // Handler for create role navigation with loading state
+  const handleCreateRole = useCallback(() => {
+    setIsNavigating(true);
+    router.push('/role-management/create-role');
+  }, [router]);
+
+  // Show navigation loading state
+  if (isNavigating) {
+    return <LoadingComponent variant="fullscreen" text="Loading form..." />;
+  }
 
   return (
     <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
@@ -114,36 +127,14 @@ const RoleManagement = () => {
         <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
           {ROLE_MESSAGES.PAGE_TITLE}
         </h2>
-        <Link
-          href={'/role-management/create-role'}
+        <button
+          onClick={handleCreateRole}
           className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
         >
           {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
-        </Link>
+        </button>
       </header>
-      {/* Commented out for now as we are not using it */}
-      {/* <div className='w-full flex items-center gap-4 mb-4'>
-        <input
-          type='text'
-          placeholder='Search roles...'
-          value={search}
-          onChange={e => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          className='border border-gray-300 rounded-lg px-4 py-2 w-64'
-        />
-        <input
-          type='text'
-          placeholder='Filter by name...'
-          value={name}
-          onChange={e => {
-            setName(e.target.value);
-            setPage(1);
-          }}
-          className='border border-gray-300 rounded-lg px-4 py-2 w-64'
-        />
-      </div> */}
+
       {/* Initial Loading State */}
       {roles.length === 0 && loading ? (
         <LoadingComponent variant='fullscreen' />
