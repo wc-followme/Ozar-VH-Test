@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import { CHANGE_PASSWORD_MESSAGES } from '../../app/(DashboardLayout)/user-management/user-messages';
 
 // Login form validation schema
 export const loginSchema = yup.object({
@@ -56,3 +57,26 @@ export const validateLoginData = async (
     };
   }
 };
+
+export const changePasswordSchema = yup.object({
+  currentPassword: yup
+    .string()
+    .required(CHANGE_PASSWORD_MESSAGES.CURRENT_PASSWORD_REQUIRED),
+  newPassword: yup
+    .string()
+    .required(CHANGE_PASSWORD_MESSAGES.NEW_PASSWORD_REQUIRED)
+    .min(8, CHANGE_PASSWORD_MESSAGES.NEW_PASSWORD_MIN)
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/,
+      CHANGE_PASSWORD_MESSAGES.NEW_PASSWORD_COMPLEXITY
+    ),
+  confirmPassword: yup
+    .string()
+    .required(CHANGE_PASSWORD_MESSAGES.CONFIRM_PASSWORD_REQUIRED)
+    .oneOf(
+      [yup.ref('newPassword')],
+      CHANGE_PASSWORD_MESSAGES.PASSWORDS_DO_NOT_MATCH
+    ),
+});
+
+export type ChangePasswordFormData = yup.InferType<typeof changePasswordSchema>;

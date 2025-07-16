@@ -112,7 +112,7 @@ export function CompanyCard({
               {name}
             </h3>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild className='-mr-2'>
                 <Button
                   variant='ghost'
                   size='sm'
