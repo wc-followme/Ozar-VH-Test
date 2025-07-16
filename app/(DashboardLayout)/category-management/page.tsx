@@ -2,6 +2,7 @@
 
 import { CategoryCard } from '@/components/shared/cards/CategoryCard';
 import FormErrorMessage from '@/components/shared/common/FormErrorMessage';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import SideSheet from '@/components/shared/common/SideSheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -321,7 +322,7 @@ const CategoryManagement = () => {
 
       {/* Categories Grid */}
       {loading ? (
-        <div className='text-center py-10'>{CATEGORY_MESSAGES.LOADING}</div>
+        <LoadingComponent variant='fullscreen' />
       ) : categories.length === 0 ? (
         <div className='text-center py-10 text-gray-500'>
           {CATEGORY_MESSAGES.NO_CATEGORIES_FOUND}
@@ -366,10 +367,7 @@ const CategoryManagement = () => {
       >
         <div className='space-y-6'>
           {isLoadingCategory ? (
-            <div className='text-center py-10'>
-              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4'></div>
-              <p className='text-gray-600'>{CATEGORY_MESSAGES.LOADING}</p>
-            </div>
+            <LoadingComponent variant='fullscreen' size='sm' />
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
               {/* Icon & Category Name */}

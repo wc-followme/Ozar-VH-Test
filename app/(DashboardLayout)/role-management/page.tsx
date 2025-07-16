@@ -1,6 +1,7 @@
 'use client';
 
 import { RoleCard } from '@/components/shared/cards/RoleCard';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import { APP_CONFIG, PAGINATION } from '@/constants/common';
 import { iconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
@@ -180,7 +181,9 @@ const RoleManagement = () => {
       {roles.length > 0 && <div ref={sentinelRef} className='w-full h-4'></div>}
 
       {loading && (
-        <div className='w-full text-center py-4'>{ROLE_MESSAGES.LOADING}</div>
+        <div className='w-full text-center py-4'>
+          <LoadingComponent variant='fullscreen' size='sm' />
+        </div>
       )}
       {showNoMoreMessage && (
         <div className='w-full text-center py-4 text-gray-400'>

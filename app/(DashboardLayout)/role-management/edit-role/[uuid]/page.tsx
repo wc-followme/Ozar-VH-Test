@@ -1,6 +1,7 @@
 'use client';
 
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import { RoleForm } from '@/components/shared/forms/RoleForm';
 import { useToast } from '@/components/ui/use-toast';
 import { STATUS_CODES } from '@/constants/status-codes';
@@ -98,7 +99,7 @@ const EditRolePage = () => {
     }
   };
 
-  if (loading) return <div className='p-8'>{ROLE_MESSAGES.LOADING}</div>;
+  if (loading) return <LoadingComponent variant='fullscreen' />;
   if (error) return <div className='p-8 text-red-500'>{error}</div>;
 
   if (!initialValues) return null;

@@ -1,6 +1,7 @@
 'use client';
 
 import { CompanyCard } from '@/components/shared/cards/CompanyCard';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
@@ -182,7 +183,7 @@ export default function CompanyManagement() {
 
       {/* Company Grid */}
       {loading && companies.length === 0 ? (
-        <div className='text-center py-10'>{COMPANY_MESSAGES.LOADING}</div>
+        <LoadingComponent variant='fullscreen' />
       ) : companies.length === 0 ? (
         <div className='text-center py-10 text-gray-500'>
           {COMPANY_MESSAGES.NO_COMPANIES_FOUND}
@@ -212,7 +213,13 @@ export default function CompanyManagement() {
       )}
 
       {loading && companies.length > 0 && (
-        <div className='text-center py-4'>{COMPANY_MESSAGES.LOADING_MORE}</div>
+        <div className='text-center py-4'>
+          <LoadingComponent
+            variant='inline'
+            size='sm'
+            text={COMPANY_MESSAGES.LOADING_MORE}
+          />
+        </div>
       )}
     </div>
   );

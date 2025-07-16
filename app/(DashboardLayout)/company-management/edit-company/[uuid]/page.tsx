@@ -1,13 +1,14 @@
 'use client';
 
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { CompanyInfoForm } from '@/components/shared/forms/CompanyinfoForm';
 import { useToast } from '@/components/ui/use-toast';
 import {
-    apiService,
-    GetCompanyResponse,
-    UpdateCompanyRequest,
+  apiService,
+  GetCompanyResponse,
+  UpdateCompanyRequest,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
@@ -203,14 +204,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
   };
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4'></div>
-          <p className='text-gray-600'>{COMPANY_MESSAGES.LOADING}</p>
-        </div>
-      </div>
-    );
+    return <LoadingComponent variant='page' />;
   }
 
   if (!company) {

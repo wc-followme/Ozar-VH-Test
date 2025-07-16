@@ -1,6 +1,7 @@
 'use client';
 
 import { UserCard } from '@/components/shared/cards/UserCard';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -211,7 +212,7 @@ export default function UserManagement() {
       </div>
       {/* User Grid */}
       {loading && users.length === 0 ? (
-        <div className='text-center py-10'>{USER_MESSAGES.LOADING}</div>
+        <LoadingComponent variant="inline" />
       ) : users.length === 0 ? (
         <div className='text-center py-10 text-gray-500'>
           {USER_MESSAGES.NO_USERS_FOUND}
@@ -244,7 +245,9 @@ export default function UserManagement() {
         </div>
       )}
       {loading && users.length > 0 && (
-        <div className='text-center py-4'>{USER_MESSAGES.LOADING_MORE}</div>
+        <div className='text-center py-4'>
+          <LoadingComponent variant="inline" size="sm" text={USER_MESSAGES.LOADING_MORE} />
+        </div>
       )}
     </div>
   );

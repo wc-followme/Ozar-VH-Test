@@ -1,6 +1,7 @@
 'use client';
 
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -189,11 +190,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   };
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-screen'>
-        <div className='text-center'>{USER_MESSAGES.LOADING}</div>
-      </div>
-    );
+    return <LoadingComponent variant='fullscreen' />;
   }
 
   if (!user) {

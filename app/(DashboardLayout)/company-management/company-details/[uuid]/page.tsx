@@ -1,6 +1,7 @@
 'use client';
 import { Search } from '@/components/icons/Search';
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -331,14 +332,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
   };
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4'></div>
-          <p className='text-gray-600'>{COMPANY_MESSAGES.LOADING}</p>
-        </div>
-      </div>
-    );
+    return <LoadingComponent variant='page' />;
   }
 
   if (!company) {
@@ -592,7 +586,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
             <div className='mt-6'>
               {/* User Grid */}
               {usersLoading && users.length === 0 ? (
-                <div className='text-center py-10'>{USER_MESSAGES.LOADING}</div>
+                <LoadingComponent variant='inline' />
               ) : users.length === 0 ? (
                 <div className='text-center py-10 text-gray-500'>
                   {USER_MESSAGES.NO_USERS_FOUND}
@@ -629,7 +623,11 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
               )}
               {usersLoading && users.length > 0 && (
                 <div className='text-center py-4'>
-                  {USER_MESSAGES.LOADING_MORE}
+                  <LoadingComponent
+                    variant='inline'
+                    size='sm'
+                    text={USER_MESSAGES.LOADING_MORE}
+                  />
                 </div>
               )}
             </div>

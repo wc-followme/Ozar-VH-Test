@@ -29,6 +29,7 @@ import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
 import { useCallback, useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
+import LoadingComponent from '../common/LoadingComponent';
 import SelectField from '../common/SelectField';
 
 interface UserInfoFormProps {
@@ -228,11 +229,7 @@ export function UserInfoForm({
 
   // Don't render form until data is loaded in edit mode
   if (isEditMode && !isInitialized && initialData) {
-    return (
-      <div className='flex items-center justify-center py-8'>
-        <div className='text-center text-gray-500'>{USER_MESSAGES.LOADING}</div>
-      </div>
-    );
+    return <LoadingComponent variant='fullscreen' size='sm' />;
   }
 
   return (
