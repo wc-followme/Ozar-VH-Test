@@ -46,11 +46,11 @@ const AccessControlAccordion: React.FC<AccessControlAccordionProps> = ({
   // Determine badge color based on access level
   let badgeColorClass = 'bg-[var(--secondary)]';
   if (badgeLabel.toLowerCase() === 'full access') {
-    badgeColorClass = 'bg-[var(--secondary)]';
+    badgeColorClass = 'bg-[var(--secondary)] hover:bg-[var(--secondary)]';
   } else if (badgeLabel.toLowerCase() === 'limited access') {
-    badgeColorClass = 'bg-[var(--bg-limited)]';
+    badgeColorClass = 'bg-[var(--bg-limited)] hover:bg-[var(--bg-limited)]';
   } else if (badgeLabel.toLowerCase() === 'restricted') {
-    badgeColorClass = 'bg-[var(--warning)]';
+    badgeColorClass = 'bg-[var(--warning)] hover:bg-[var(--warning)]';
   }
 
   return (
