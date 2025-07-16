@@ -850,6 +850,18 @@ class ApiService {
     });
   }
 
+  // Change password API
+  async changePassword(
+    current_password: string,
+    new_password: string
+  ): Promise<any> {
+    return this.makeRequest('/auth/change-password', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify({ current_password, new_password }),
+    });
+  }
+
   // Removed testConnection and all debug code
 }
 
