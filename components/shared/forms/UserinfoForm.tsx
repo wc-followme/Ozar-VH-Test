@@ -27,7 +27,7 @@ import { COUNTRY_CODES } from '@/constants/common';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
 import LoadingComponent from '../common/LoadingComponent';
 import SelectField from '../common/SelectField';
@@ -43,7 +43,7 @@ interface UserInfoFormProps {
   isEditMode?: boolean;
 }
 
-export function UserInfoForm({
+export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(({
   roles,
   loadingRoles,
   imageUrl,
@@ -52,7 +52,7 @@ export function UserInfoForm({
   loading,
   initialData,
   isEditMode,
-}: UserInfoFormProps) {
+}) => {
   const [date, setDate] = useState<Date>();
   const [roleId, setRoleId] = useState('');
   const [fullName, setFullName] = useState('');
@@ -171,7 +171,7 @@ export function UserInfoForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validate()) {
       const payload: UserFormData = {
@@ -204,9 +204,9 @@ export function UserInfoForm({
 
       onSubmit(payload);
     }
-  };
+  }, [validate, roleId, fullName, email, country, phone, designation, communication, address, city, pinCode, imageUrl, date, isEditMode, password, onSubmit]);
 
-  const handleCancel = (): void => {
+  const handleCancel = useCallback((): void => {
     if (onCancel) {
       onCancel();
     } else {
@@ -225,7 +225,7 @@ export function UserInfoForm({
       setPassword('');
       setErrors({});
     }
-  };
+  }, [onCancel]);
 
   // Don't render form until data is loaded in edit mode
   if (isEditMode && !isInitialized && initialData) {
@@ -554,4 +554,6 @@ export function UserInfoForm({
       </div>
     </form>
   );
-}
+});
+
+UserInfoForm.displayName = 'UserInfoForm';

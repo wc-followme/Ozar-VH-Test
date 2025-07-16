@@ -26,7 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
 import { Add, Edit2, Trash } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { UserCard } from '../../../../../components/shared/cards/UserCard';
 import {
@@ -50,8 +50,16 @@ const breadcrumbData: BreadcrumbItem[] = [
 
 const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
   const resolvedParams = React.use(params);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { showSuccessToast, showErrorToast } = useToast();
+  const { handleAuthError } = useAuth();
+
+  // Get initial tab from URL parameter, default to 'about'
+  const initialTab = searchParams.get('tab') || 'about';
+  
   const [enabled, setEnabled] = useState(true);
-  const [selectedTab, setSelectedTab] = useState('about');
+  const [selectedTab, setSelectedTab] = useState(initialTab);
   const [filter, setFilter] = useState('all');
   const [company, setCompany] = useState<GetCompanyResponse['data'] | null>(
     null
@@ -65,10 +73,6 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const router = useRouter();
-  const { showSuccessToast, showErrorToast } = useToast();
-  const { handleAuthError } = useAuth();
 
   const isCompanyApiResponse = (obj: unknown): obj is GetCompanyResponse => {
     return (
@@ -398,7 +402,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                 </Link>
                 <Link
                   className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-1'
-                  href={'/company-management/add-user'}
+                  href={`/company-management/add-user?company_id=${company.uuid}`}
                 >
                   <Add
                     size='28'

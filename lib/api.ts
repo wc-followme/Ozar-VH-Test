@@ -154,6 +154,7 @@ export interface CreateUserRequest {
   address: string;
   city: string;
   pincode: string;
+  company_id?: number; // Optional - for creating users within a specific company (numeric ID)
 }
 
 export interface CreateUserResponse {

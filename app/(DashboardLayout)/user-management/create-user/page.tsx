@@ -1,8 +1,8 @@
 'use client';
 
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
-import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
@@ -10,6 +10,7 @@ import { apiService, CreateUserRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -18,6 +19,18 @@ import CompanyManagementAddUser from '../../../../components/shared/CompanyManag
 import { Button } from '../../../../components/ui/button';
 import { Role, RoleApiResponse, UserFormData } from '../types';
 import { USER_MESSAGES } from '../user-messages';
+
+// Dynamic import for better performance
+const UserInfoForm = dynamic(
+  () =>
+    import('@/components/shared/forms/UserinfoForm').then(mod => ({
+      default: mod.UserInfoForm,
+    })),
+  {
+    loading: () => <LoadingComponent variant='inline' />,
+    ssr: false,
+  }
+);
 
 // Dummy data for access control accordions
 const ACCESS_CONTROL_ACCORDIONS_DATA = [

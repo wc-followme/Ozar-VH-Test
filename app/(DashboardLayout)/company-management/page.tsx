@@ -8,7 +8,7 @@ import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
 import { AddCircle, Edit2, Trash } from 'iconsax-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { COMPANY_MESSAGES } from './company-messages';
 
@@ -32,8 +32,10 @@ export default function CompanyManagement() {
   const [loading, setLoading] = useState<boolean>(true);
   const [_page, _setPage] = useState<number>(1);
   const [_hasMore, _setHasMore] = useState<boolean>(true);
+  const [isNavigating, setIsNavigating] = useState(false);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+  const router = useRouter();
 
   // Fetch companies
   useEffect(() => {
@@ -91,6 +93,12 @@ export default function CompanyManagement() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handler for create company navigation with loading state
+  const handleCreateCompany = () => {
+    setIsNavigating(true);
+    router.push('/company-management/add-company');
   };
 
   // Status toggle handler - updated to actually call API
@@ -159,6 +167,11 @@ export default function CompanyManagement() {
     }
   };
 
+  // Show navigation loading state
+  if (isNavigating) {
+    return <LoadingComponent variant='fullscreen' text='Loading form...' />;
+  }
+
   return (
     <div className='w-full overflow-y-auto'>
       {/* Header */}
@@ -167,9 +180,9 @@ export default function CompanyManagement() {
           {COMPANY_MESSAGES.COMPANY_MANAGEMENT_TITLE}
         </h1>
         <div className='flex items-center gap-4'>
-          <Link
+          <button
+            onClick={handleCreateCompany}
             className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-2'
-            href={'/company-management/add-company'}
           >
             <AddCircle
               size='32'
@@ -177,39 +190,44 @@ export default function CompanyManagement() {
               className='!w-[1.375rem] !h-[1.375rem]'
             />
             <span>{COMPANY_MESSAGES.ADD_COMPANY_BUTTON}</span>
-          </Link>
+          </button>
         </div>
       </div>
 
-      {/* Company Grid */}
-      {loading && companies.length === 0 ? (
+      {/* Initial Loading State */}
+      {companies.length === 0 && loading ? (
         <LoadingComponent variant='fullscreen' />
-      ) : companies.length === 0 ? (
-        <div className='text-center py-10 text-gray-500'>
-          {COMPANY_MESSAGES.NO_COMPANIES_FOUND}
-        </div>
       ) : (
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
-          {companies.map(company => (
-            <CompanyCard
-              key={company.id}
-              name={company.name}
-              createdOn={formatDate(company.created_at)}
-              subsEnd={formatDate(company.expiry_date)}
-              image={
-                company.image
-                  ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + company.image
-                  : ''
-              }
-              status={company.status === 'ACTIVE'}
-              onToggle={() => handleToggleStatus(company.id, company.status)}
-              menuOptions={menuOptions}
-              isDefault={company.is_default}
-              companyUuid={company.uuid}
-              onDelete={() => handleDeleteCompany(company.uuid)}
-            />
-          ))}
-        </div>
+        <>
+          {/* Company Grid */}
+          {companies.length === 0 && !loading ? (
+            <div className='text-center py-10 text-gray-500'>
+              {COMPANY_MESSAGES.NO_COMPANIES_FOUND}
+            </div>
+          ) : (
+            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
+              {companies.map(company => (
+                <CompanyCard
+                  key={company.id}
+                  name={company.name}
+                  createdOn={formatDate(company.created_at)}
+                  subsEnd={formatDate(company.expiry_date)}
+                  image={
+                    company.image
+                      ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + company.image
+                      : ''
+                  }
+                  status={company.status === 'ACTIVE'}
+                  onToggle={() => handleToggleStatus(company.id, company.status)}
+                  menuOptions={menuOptions}
+                  isDefault={company.is_default}
+                  companyUuid={company.uuid}
+                  onDelete={() => handleDeleteCompany(company.uuid)}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {loading && companies.length > 0 && (
