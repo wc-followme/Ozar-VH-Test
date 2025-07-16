@@ -92,7 +92,7 @@ export const USER_MESSAGES = {
   // Tab Labels
   INFO_TAB: 'Info',
   PERMISSIONS_TAB: 'Permissions',
-
+  SETTINGS_TAB: 'Settings',
   // Photo Upload
   UPLOAD_PHOTO_LABEL: 'Upload Photo or Drag and Drop',
   UPLOAD_PHOTO_TEXT: 'Supported formats: JPG, PNG, GIF. Max size: 5MB.',
