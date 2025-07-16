@@ -227,9 +227,6 @@ export default function AddUserPage() {
     setFormLoading(true);
     try {
       // Ensure all required fields are provided for create operation
-      if (!data.password) {
-        throw new Error('Password is required for user creation');
-      }
       if (!data.date_of_joining) {
         throw new Error('Date of joining is required for user creation');
       }
@@ -238,7 +235,7 @@ export default function AddUserPage() {
         role_id: data.role_id,
         name: data.name,
         email: data.email,
-        password: data.password,
+        // Password will be generated on the backend
         country_code: data.country_code,
         phone_number: data.phone_number,
         date_of_joining: data.date_of_joining,
