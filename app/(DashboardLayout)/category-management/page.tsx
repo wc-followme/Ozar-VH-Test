@@ -422,32 +422,31 @@ const CategoryManagement = () => {
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                            {iconOptions.map(option => {
-                              const IconComponent = option.icon;
-                              return (
-                                <SelectItem
-                                  key={option.value}
-                                  value={option.value}
-                                >
+                            {iconOptions.map(
+                              ({
+                                value,
+                                color,
+                                label,
+                                icon: IconComponent,
+                              }) => (
+                                <SelectItem key={value} value={value}>
                                   <div className='flex items-center gap-2'>
                                     <div
                                       className='flex w-6 h-6 items-center justify-center rounded-md'
                                       style={{
-                                        backgroundColor: `${option.color}26`,
+                                        backgroundColor: `${color}26`,
                                       }}
                                     >
                                       <IconComponent
                                         className='w-3 h-3'
-                                        style={{ color: option.color }}
+                                        style={{ color }}
                                       />
                                     </div>
-                                    <span className='text-sm'>
-                                      {option.label}
-                                    </span>
+                                    <span className='text-sm'>{label}</span>
                                   </div>
                                 </SelectItem>
-                              );
-                            })}
+                              )
+                            )}
                           </SelectContent>
                         </Select>
                       )}
