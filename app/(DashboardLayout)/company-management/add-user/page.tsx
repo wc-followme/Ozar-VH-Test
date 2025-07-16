@@ -23,7 +23,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar1 } from 'iconsax-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -49,7 +48,6 @@ export default function AddCompanyUserPage() {
   };
   const handleUploadClick = () => {
     // Implement upload logic
-    console.log('Upload clicked');
   };
 
   return (
@@ -327,12 +325,14 @@ export default function AddCompanyUserPage() {
             </div>
             {/* Action Buttons */}
             <div className='flex justify-end gap-6 mt-8'>
-              <Link
-                href={'/company-details'}
-                className='inline-flex items-center h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)]'
+              <Button
+                type='button'
+                variant='outline'
+                className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)]'
+                onClick={() => router.back()}
               >
                 Cancel
-              </Link>
+              </Button>
               <Button
                 className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
                 onClick={handleCreateClick}

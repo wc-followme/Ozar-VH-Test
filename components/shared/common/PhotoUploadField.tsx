@@ -10,15 +10,19 @@ interface PhotoUploadFieldProps {
   label?: string;
   text?: JSX.Element | string;
   className?: string;
+  uploading?: boolean;
+  existingImageUrl?: string;
 }
 
 const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
   photo,
   onPhotoChange,
-  // onDeletePhoto,
+  onDeletePhoto,
   label = 'Upload Photo or Drag and Drop',
   text,
   className = '',
+  uploading = false,
+  existingImageUrl,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -65,6 +69,19 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
                 {photo.name}
               </div>
             </div>
+          ) : existingImageUrl ? (
+            <div className='w-full h-full flex flex-col items-center justify-center'>
+              <Image
+                src={existingImageUrl}
+                alt='Current Image'
+                className='rounded-lg max-w-full max-h-32 object-cover'
+                width={120}
+                height={120}
+              />
+              <div className='mt-2 text-sm text-center text-[var(--text-dark)]'>
+                Current Image
+              </div>
+            </div>
           ) : (
             <>
               <GalleryAdd size='32' color='#00A8BF' variant='Outline' />
@@ -84,14 +101,30 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
             </div>
           )} */}
         </div>
-        {photo && (
-          <button
-            type='button'
-            className='w-full mt-2 px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)]/90 transition-colors text-sm font-medium'
-            onClick={handleClick}
-          >
-            Change Photo
-          </button>
+        {(photo || existingImageUrl) && (
+          <div className='flex gap-2 mt-2'>
+            <button
+              type='button'
+              className='flex-1 px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)]/90 transition-colors text-sm font-medium'
+              onClick={handleClick}
+              disabled={uploading}
+            >
+              {uploading ? 'Uploading...' : 'Change Photo'}
+            </button>
+            {onDeletePhoto && (
+              <button
+                type='button'
+                className='px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium'
+                onClick={e => {
+                  e.stopPropagation();
+                  onDeletePhoto();
+                }}
+                disabled={uploading}
+              >
+                Remove
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -10,11 +10,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
+import { PAGINATION } from '@/constants/common';
 import { apiService, FetchUsersResponse, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { extractApiErrorMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MenuOption, Role, RoleApiResponse } from './types';
 import { USER_MESSAGES } from './user-messages';
 
@@ -23,36 +25,10 @@ export default function UserManagement() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(1);
+  const [_page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
-
-  // Fetch roles and first page of users
-  useEffect(() => {
-    setPage(1);
-    setHasMore(true);
-    setUsers([]);
-    fetchUsers(1, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
-
-  // Infinite scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >=
-          document.body.offsetHeight - 200 &&
-        !loading &&
-        hasMore
-      ) {
-        fetchUsers(page + 1, true);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, hasMore, page, filter]);
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -66,42 +42,88 @@ export default function UserManagement() {
     );
   };
 
-  const fetchUsers = async (targetPage = 1, append = false) => {
-    setLoading(true);
-    try {
-      // Fetch roles only on first load
-      if (targetPage === 1) {
-        const rolesRes = await apiService.fetchRoles({ page: 1, limit: 50 });
-        const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
-        setRoles(
-          roleList.map((role: Role) => ({ id: role.id, name: role.name }))
-        );
-      }
-      const role_id = filter !== 'all' ? filter : '';
-      const usersRes: FetchUsersResponse = await apiService.fetchUsers({
-        page: targetPage,
-        limit: 20,
-        role_id,
-      });
-      const newUsers = usersRes.data;
-      setUsers(prev => (append ? [...prev, ...newUsers] : newUsers));
-      setPage(targetPage);
-      setHasMore(usersRes.pagination.page < usersRes.pagination.totalPages);
-    } catch (err: unknown) {
-      // Handle auth errors first (will redirect to login if 401)
-      if (handleAuthError(err)) {
-        return; // Don't show toast if it's an auth error
-      }
+  const fetchUsers = useCallback(
+    async (targetPage = 1, append = false) => {
+      setLoading(true);
+      try {
+        // Fetch roles only on first load
+        if (targetPage === 1) {
+          const rolesRes = await apiService.fetchRoles({
+            page: 1,
+            limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+          });
+          const roleList = isRoleApiResponse(rolesRes)
+            ? rolesRes.data.data
+            : [];
+          setRoles(
+            roleList.map((role: Role) => ({ id: role.id, name: role.name }))
+          );
+        }
+        const role_id = filter !== 'all' ? filter : '';
+        const usersRes: FetchUsersResponse = await apiService.fetchUsers({
+          page: targetPage,
+          limit: PAGINATION.USERS_LIMIT,
+          role_id,
+        });
+        const newUsers = usersRes.data;
 
-      const message =
-        err instanceof Error ? err.message : USER_MESSAGES.FETCH_ERROR;
-      showErrorToast(message);
-      if (!append) setUsers([]);
-      setHasMore(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setUsers(prev => {
+          if (append) {
+            // Filter out duplicates when appending to prevent duplicate keys
+            const existingUuids = new Set(prev.map(user => user.uuid));
+            const uniqueNewUsers = newUsers.filter(
+              user => !existingUuids.has(user.uuid)
+            );
+            return [...prev, ...uniqueNewUsers];
+          } else {
+            return newUsers;
+          }
+        });
+
+        setPage(targetPage);
+        setHasMore(usersRes.pagination.page < usersRes.pagination.totalPages);
+      } catch (err: unknown) {
+        if (handleAuthError(err)) {
+          return;
+        }
+        const message = extractApiErrorMessage(err, USER_MESSAGES.FETCH_ERROR);
+        showErrorToast(message);
+        if (!append) setUsers([]);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filter, handleAuthError, showErrorToast]
+  );
+
+  // Fetch roles and first page of users
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+    setUsers([]);
+    fetchUsers(1, false);
+  }, [fetchUsers]);
+
+  // Infinite scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >=
+          document.body.offsetHeight - 200 &&
+        !loading &&
+        hasMore
+      ) {
+        setPage(prevPage => {
+          const nextPage = prevPage + 1;
+          fetchUsers(nextPage, true);
+          return nextPage;
+        });
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loading, hasMore, fetchUsers]); // Added fetchUsers to dependencies
 
   // Status toggle handler
   const handleToggleStatus = async (id: number, currentStatus: boolean) => {
@@ -114,9 +136,7 @@ export default function UserManagement() {
       setUsers(users =>
         users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
       );
-      showSuccessToast(
-        `${USER_MESSAGES.STATUS_UPDATE_SUCCESS} to ${newStatus}.`
-      );
+      showSuccessToast(`${USER_MESSAGES.STATUS_UPDATE_SUCCESS}`);
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -200,7 +220,7 @@ export default function UserManagement() {
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
           {users.map(user => (
             <UserCard
-              key={user.id}
+              key={user.uuid} // Use uuid instead of id for unique keys
               name={user.name}
               role={user.role?.name || ''}
               phone={user.phone_number}

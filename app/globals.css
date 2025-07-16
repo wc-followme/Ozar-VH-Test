@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@import '@radix-ui/themes/styles.css';
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -34,7 +34,7 @@ body {
     --dark-background: #e8eaed;
     --hover-bg: #3bc44e;
     --select-option: #e8eaed;
-
+    --bg-limited: #f58b1e;
     /* Shadcn/ui variables needed for toast components */
     --foreground: 0 0% 10%;
     --border: 0 0% 90%;
@@ -64,7 +64,7 @@ body {
     --dark-background: #040612;
     --hover-bg: #3bc44e;
     --select-option: #3bc44e;
-
+    --bg-limited: #f58b1e;
     /* Shadcn/ui variables for dark theme */
     --foreground: 0 0% 98%;
     --border: 0 0% 20%;

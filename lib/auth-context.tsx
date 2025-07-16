@@ -129,11 +129,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Transform login user data to match User interface
         const userData: User = {
           id: loginUserData.id,
-          uuid: '', // Login response doesn't include UUID, will be set later if needed
+          uuid: '', // Login response doesn't include UUID
           role_id: loginUserData.role_id,
-          company_id: '', // Login response doesn't include company_id
+          company_id: '', // Not provided in login response
           name: `${loginUserData.first_name} ${loginUserData.last_name}`.trim(),
           email: loginUserData.email,
+          country_code: '', // Not provided in login response
           phone_number: loginUserData.phone_number,
           profile_picture_url: loginUserData.profile_image || '',
           status: loginUserData.status,
@@ -141,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           updated_at: loginUserData.updated_at,
           role: {
             id: loginUserData.role_id,
-            name: '', // Login response doesn't include role name
+            name: '', // Not provided in login response
           },
           company: {
             id: '',

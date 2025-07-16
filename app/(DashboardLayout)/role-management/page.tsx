@@ -1,6 +1,7 @@
 'use client';
 
 import { RoleCard } from '@/components/shared/cards/RoleCard';
+import { APP_CONFIG, PAGINATION } from '@/constants/common';
 import { iconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
 import { Edit2, Trash } from 'iconsax-react';
@@ -28,11 +29,12 @@ const menuOptions: MenuOption[] = [
 const RoleManagement = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10); // Show 10 records by default
+  const [limit] = useState(PAGINATION.DEFAULT_LIMIT); // Use common constant
   const [search] = useState('');
   const [loading, setLoading] = useState(false);
   const [name] = useState('');
   const [hasMore, setHasMore] = useState(true);
+  const [showNoMoreMessage, setShowNoMoreMessage] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
   const router = useRouter();
 
@@ -60,23 +62,34 @@ const RoleManagement = () => {
   };
 
   useEffect(() => {
+    // Reset no more message when parameters change
+    setShowNoMoreMessage(false);
     fetchRoles(page > 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, limit, search, name]);
 
-  // Infinite scroll logic
-  const lastRoleRef = useCallback(
+  // Infinite scroll logic with sentinel element
+  const sentinelRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (loading) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new window.IntersectionObserver(entries => {
-        if (entries[0] && entries[0].isIntersecting && hasMore) {
-          setPage(prev => prev + 1);
+        if (entries[0] && entries[0].isIntersecting) {
+          if (hasMore && roles.length > 0) {
+            setPage(prev => prev + 1);
+          } else if (!hasMore && roles.length > 0) {
+            // User tried to scroll but no more data - show message
+            setShowNoMoreMessage(true);
+            // Hide message after configured timeout
+            setTimeout(() => {
+              setShowNoMoreMessage(false);
+            }, APP_CONFIG.TOAST_AUTO_HIDE_MS);
+          }
         }
       });
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore]
+    [loading, hasMore, roles.length]
   );
 
   // Handler for deleting a role
@@ -144,13 +157,8 @@ const RoleManagement = () => {
               icon: () => null,
               color: '#00a8bf',
             };
-            // Attach ref to last item for infinite scroll
-            const isLast = index === roles.length - 1;
             return (
-              <div
-                key={role.id || index}
-                ref={isLast ? lastRoleRef : undefined}
-              >
+              <div key={role.id || index}>
                 <RoleCard
                   menuOptions={menuOptions}
                   iconSrc={iconOption.icon}
@@ -167,10 +175,14 @@ const RoleManagement = () => {
           })
         )}
       </div>
+
+      {/* Sentinel element for infinite scroll */}
+      {roles.length > 0 && <div ref={sentinelRef} className='w-full h-4'></div>}
+
       {loading && (
         <div className='w-full text-center py-4'>{ROLE_MESSAGES.LOADING}</div>
       )}
-      {!hasMore && roles.length > 0 && (
+      {showNoMoreMessage && (
         <div className='w-full text-center py-4 text-gray-400'>
           {ROLE_MESSAGES.NO_MORE_ROLES}
         </div>

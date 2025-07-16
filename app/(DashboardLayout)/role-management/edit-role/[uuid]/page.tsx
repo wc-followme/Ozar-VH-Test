@@ -1,13 +1,21 @@
 'use client';
+
+import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import { RoleForm } from '@/components/shared/forms/RoleForm';
 import { useToast } from '@/components/ui/use-toast';
 import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
-import type { CreateRoleFormData } from '@/lib/validations/role';
+import { extractApiErrorMessage } from '@/lib/utils';
+import { CreateRoleFormData } from '@/lib/validations/role';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ROLE_MESSAGES } from '../../role-messages';
-import type { ApiError, ApiResponse, Role } from '../../types';
+import type { ApiResponse, Role, UpdateRoleRequest } from '../../types';
+
+const breadcrumbData: BreadcrumbItem[] = [
+  { name: ROLE_MESSAGES.ROLE_MANAGEMENT_BREADCRUMB, href: '/role-management' },
+  { name: ROLE_MESSAGES.EDIT_ROLE_BREADCRUMB }, // current page
+];
 
 const EditRolePage = () => {
   const router = useRouter();
@@ -37,8 +45,8 @@ const EditRolePage = () => {
             icon: data.icon || '',
           });
         }
-      } catch {
-        setError(ROLE_MESSAGES.LOAD_ERROR);
+      } catch (err: unknown) {
+        setError(extractApiErrorMessage(err));
       } finally {
         setLoading(false);
       }
@@ -51,7 +59,7 @@ const EditRolePage = () => {
     try {
       const response = (await apiService.updateRoleDetails(
         uuid,
-        data
+        data as UpdateRoleRequest
       )) as ApiResponse;
       if (
         response.statusCode === STATUS_CODES.OK ||
@@ -64,34 +72,28 @@ const EditRolePage = () => {
       }
     } catch (err: unknown) {
       let errorMessage = ROLE_MESSAGES.UPDATE_ERROR;
-      const apiError = err as ApiError;
+      const apiError = err as any; // Using any for flexibility with different error structures
 
-      if (apiError.response) {
-        const apiErrorData = apiError.response.data;
-        if (apiErrorData.status === STATUS_CODES.BAD_REQUEST) {
-          errorMessage = ROLE_MESSAGES.INVALID_DATA;
-        } else if (apiErrorData.status === STATUS_CODES.UNAUTHORIZED) {
-          errorMessage = ROLE_MESSAGES.UNAUTHORIZED;
-        } else if (apiErrorData.status === STATUS_CODES.CONFLICT) {
-          errorMessage = ROLE_MESSAGES.DUPLICATE_ROLE;
-        } else if (apiErrorData.status === STATUS_CODES.UNPROCESSABLE_ENTITY) {
-          if (apiErrorData.errors) {
-            const errorMessages = Object.values(apiErrorData.errors).flat();
-            errorMessage = errorMessages.join(', ');
-          } else {
-            errorMessage =
-              apiErrorData.message || ROLE_MESSAGES.VALIDATION_ERROR;
-          }
-        } else if (apiErrorData.status === STATUS_CODES.NETWORK_ERROR) {
-          errorMessage = ROLE_MESSAGES.NETWORK_ERROR;
-        } else if (apiErrorData.message) {
-          errorMessage = apiErrorData.message;
+      if (apiError.statusCode === STATUS_CODES.BAD_REQUEST) {
+        errorMessage = ROLE_MESSAGES.INVALID_DATA;
+      } else if (apiError.statusCode === STATUS_CODES.UNAUTHORIZED) {
+        errorMessage = ROLE_MESSAGES.UNAUTHORIZED;
+      } else if (apiError.statusCode === STATUS_CODES.CONFLICT) {
+        errorMessage = ROLE_MESSAGES.DUPLICATE_ROLE;
+      } else if (apiError.statusCode === STATUS_CODES.UNPROCESSABLE_ENTITY) {
+        if (apiError.errors) {
+          const errorMessages = Object.values(apiError.errors).flat();
+          errorMessage = errorMessages.join(', ');
+        } else {
+          errorMessage = apiError.message || ROLE_MESSAGES.VALIDATION_ERROR;
         }
+      } else if (apiError.statusCode === STATUS_CODES.NETWORK_ERROR) {
+        errorMessage = ROLE_MESSAGES.NETWORK_ERROR;
       } else if (apiError.message) {
         errorMessage = apiError.message;
       }
+
       showErrorToast(errorMessage);
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -103,19 +105,9 @@ const EditRolePage = () => {
 
   return (
     <div className='flex flex-col gap-8 p-6 flex-1 w-full'>
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-2'>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            {ROLE_MESSAGES.ROLE_MANAGEMENT_BREADCRUMB}
-          </span>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal'>
-            /
-          </span>
-          <span className='text-[var(--text-dark)] text-[14px] font-normal text-[var(--primary)]'>
-            {ROLE_MESSAGES.EDIT_ROLE_BREADCRUMB}
-          </span>
-        </div>
-      </div>
+      {/* Breadcrumb */}
+      <Breadcrumb items={breadcrumbData} className='mb-2' />
+
       <RoleForm
         mode='edit'
         isSubmitting={isSubmitting}

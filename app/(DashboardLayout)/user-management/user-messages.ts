@@ -4,7 +4,7 @@ export const USER_MESSAGES = {
   CREATE_SUCCESS: 'User created successfully.',
   UPDATE_SUCCESS: 'User updated successfully.',
   DELETE_SUCCESS: 'User deleted successfully.',
-  STATUS_UPDATE_SUCCESS: 'User status updated.',
+  STATUS_UPDATE_SUCCESS: 'User status updated successfully.',
 
   // Error Messages
   CREATE_ERROR: 'Failed to create user.',
@@ -92,7 +92,7 @@ export const USER_MESSAGES = {
   // Tab Labels
   INFO_TAB: 'Info',
   PERMISSIONS_TAB: 'Permissions',
-
+  SETTINGS_TAB: 'Settings',
   // Photo Upload
   UPLOAD_PHOTO_LABEL: 'Upload Photo or Drag and Drop',
   UPLOAD_PHOTO_TEXT: 'Supported formats: JPG, PNG, GIF. Max size: 5MB.',
@@ -112,6 +112,6 @@ export const USER_MESSAGES = {
   INVALID_DATA: 'Invalid user data. Please check your input.',
 
   // Confirm Modal Messages
-  DELETE_CONFIRM_TITLE: 'Are you sure you want to delete?',
+  DELETE_CONFIRM_TITLE: 'Are you sure you want to archive?',
   DELETE_CONFIRM_SUBTITLE: 'This action cannot be undone.',
 };

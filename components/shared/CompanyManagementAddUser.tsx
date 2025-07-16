@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Accordion,
   AccordionContent,
@@ -5,146 +7,102 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import Link from 'next/link';
-import { useState } from 'react';
+import React from 'react';
 
 const switchStyleMd =
   'h-6 w-11 data-[state=checked]:bg-[var(--secondary)] data-[state=unchecked]:bg-gray-300 [&>span]:h-[18px] [&>span]:w-[18px] [&>span]:bg-white data-[state=checked]:[&>span]:border-green-400 [&>span]:transition-all [&>span]:duration-200';
 
-const CompanyManagementAddUser = () => {
-  const [accordionValue, setAccordionValue] = useState('roles');
+export interface AccessStripe {
+  title: string;
+  description: string;
+  checked: boolean;
+  onToggle: (checked: boolean) => void;
+  disabled?: boolean;
+}
+
+export interface AccessControlAccordionProps {
+  title: string;
+  badgeLabel: string;
+  stripes: AccessStripe[];
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+const AccessControlAccordion: React.FC<AccessControlAccordionProps> = ({
+  title,
+  badgeLabel,
+  stripes,
+  open = false,
+  onOpenChange,
+}) => {
+  const accordionValue = open ? 'roles' : '';
+  const handleAccordionChange = (value: string) => {
+    if (onOpenChange) {
+      onOpenChange(value === 'roles');
+    }
+  };
+
+  // Determine badge color based on access level
+  let badgeColorClass = 'bg-[var(--secondary)]';
+  if (badgeLabel.toLowerCase() === 'full access') {
+    badgeColorClass = 'bg-[var(--secondary)]';
+  } else if (badgeLabel.toLowerCase() === 'limited access') {
+    badgeColorClass = 'bg-[var(--bg-limited)]';
+  } else if (badgeLabel.toLowerCase() === 'restricted') {
+    badgeColorClass = 'bg-[var(--warning)]';
+  }
+
   return (
-    <div className=''>
-      <div className='rounded-2xl border border-[var(--border-dark)] bg-[var(--white-background)]'>
-        <Accordion
-          type='single'
-          collapsible
-          value={accordionValue}
-          onValueChange={setAccordionValue}
-          className=''
-        >
-          {/* Roles Access Control */}
-          <AccordionItem value='roles' className='border-0 !hover:no-underline'>
-            <AccordionTrigger className='px-6 py-4 flex items-center justify-normal gap-4 bbg-[var(--white-background)] rounded-2xl !hover:no-underline [&>svg]:ml-auto'>
-              <span className='text-base font-semibold !no-underline'>
-                Roles Access Control
-              </span>
-              <Badge className='bg-[var(--secondary)] hover:bg-[var(--secondary)] text-white px-3 py-1 rounded-full text-sm font-semibold leading-tight'>
-                Full Access
-              </Badge>
-            </AccordionTrigger>
-            <AccordionContent className='bg-[#F8FAFB] px-6 pb-6 pt-2 rounded-b-2xl'>
-              <div className='space-y-4'>
-                {/* Browse Roles */}
-                <div className='flex items-center justify-between rounded-[10px] bg-[var(--white-background)] px-6 py-4 shadow-sm'>
-                  <div>
-                    <div className='font-medium text-base text-[var(--text-dark)] mb-2.5'>
-                      Browse Roles
-                    </div>
-                    <div className='text-sm text-[var(--text-secondary)]'>
-                      View the complete list of available roles and their basic
-                      information including role names, descriptions, and user
-                      counts.
-                    </div>
+    <Accordion
+      type='single'
+      collapsible
+      value={accordionValue}
+      onValueChange={handleAccordionChange}
+      className=''
+    >
+      <AccordionItem
+        value='roles'
+        className='border border-[var(--border-dark)] !hover:no-underline rounded-[20px] overflow-hidden'
+      >
+        <AccordionTrigger className='border-0 px-6 py-5 flex items-center justify-normal gap-4 bg-[var(--white-background)] hover:!no-underline [&>svg]:ml-auto'>
+          <span className='text-base font-bold text-[var(--text-dark)] !no-underline'>
+            {title}
+          </span>
+          <Badge
+            className={`${badgeColorClass} text-white px-3 py-1 rounded-full text-sm font-medium leading-tight`}
+          >
+            {badgeLabel}
+          </Badge>
+        </AccordionTrigger>
+        <AccordionContent className='border-0 bg-[var(--background)] px-6 py-4'>
+          <div className='flex flex-col gap-4'>
+            {stripes.map((stripe, idx) => (
+              <div
+                key={stripe.title + idx}
+                className='flex items-center gap-4 justify-between rounded-[10px] bg-[var(--white-background)] p-4 shadow-sm'
+              >
+                <div>
+                  <div className='font-medium text-base text-[var(--text-dark)] mb-2'>
+                    {stripe.title}
                   </div>
-                  <Switch defaultChecked className={switchStyleMd} />
-                </div>
-                {/* Configure & Modify Roles */}
-                <div className='flex items-center justify-between rounded-[10px] bg-[var(--white-background)] px-6 py-4 shadow-sm'>
-                  <div>
-                    <div className='font-medium text-base text-[var(--text-dark)] mb-2.5'>
-                      Configure & Modify Roles
-                    </div>
-                    <div className='text-sm text-[var(--text-secondary)]'>
-                      Modify or set up new roles with custom names,
-                      descriptions, and permission assignments tailored to your
-                      organization&apos;s needs.
-                    </div>
+                  <div className='text-sm text-[var(--text-secondary)]'>
+                    {stripe.description}
                   </div>
-                  <Switch defaultChecked className={switchStyleMd} />
                 </div>
-                {/* Archive & Restore Roles */}
-                <div className='flex items-center justify-between rounded-[10px] bg-[var(--white-background)] px-6 py-4 shadow-sm'>
-                  <div>
-                    <div className='font-medium text-base text-[var(--text-dark)] mb-2.5'>
-                      Archive & Restore Roles
-                    </div>
-                    <div className='text-sm text-[var(--text-secondary)]'>
-                      Remove roles that are no longer needed. System prevents
-                      deletion of roles with active users for data safety.
-                    </div>
-                  </div>
-                  <Switch defaultChecked className={switchStyleMd} />
-                </div>
+                <Switch
+                  checked={stripe.checked}
+                  onCheckedChange={stripe.onToggle}
+                  className={switchStyleMd}
+                  disabled={stripe.disabled}
+                />
               </div>
-            </AccordionContent>
-          </AccordionItem>
-          {/* Users Access Control */}
-          <AccordionItem value='users' className='border-0'>
-            <AccordionTrigger className='px-6 py-4 flex items-center justify-normal gap-5 bg-[var(--white-background)] rounded-2xl [&>svg]:ml-auto'>
-              <span className='text-base text-[var(--text-dark)] font-bold'>
-                Users Access Control
-              </span>
-              <Badge className='bg-[#F58B1E] hover:bg-[#F58B1E] text-white px-3 py-1 rounded-full text-sm font-semibold leading-tight'>
-                Limited Access
-              </Badge>
-            </AccordionTrigger>
-            <AccordionContent className='bg-[#F8FAFB] px-6 pb-6 pt-2 rounded-b-2xl'>
-              <div className='text-[var(--text-secondary)] text-sm'>
-                Dummy content for Users Access Control.
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-          {/* Company Management & Operations */}
-          <AccordionItem value='company' className='border-0'>
-            <AccordionTrigger className='px-6 py-4 flex items-center justify-normal gap-5 bg-[var(--white-background)] rounded-2xl [&>svg]:ml-auto'>
-              <span className='text-base text-[var(--text-dark)] font-bold'>
-                Company Management & Operations
-              </span>
-              <Badge className='bg-[var(--warning)] hover:bg-[var(--warning)] text-white px-3 py-1 rounded-full text-sm font-semibold leading-tight'>
-                Restricted
-              </Badge>
-            </AccordionTrigger>
-            <AccordionContent className='bg-[#F8FAFB] px-6 pb-6 pt-2 rounded-b-2xl'>
-              <div className='text-[var(--text-secondary)] text-sm'>
-                Dummy content for Company Management & Operations.
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-          {/* Category Management & Service */}
-          <AccordionItem value='category' className='border-0'>
-            <AccordionTrigger className='px-6 py-4 flex items-center justify-normal gap-5 bg-[var(--white-background)] rounded-2xl [&>svg]:ml-auto'>
-              <span className='text-base text-[var(--text-dark)] font-bold'>
-                Category Management & Service
-              </span>
-              <Badge className='bg-[var(--warning)] hover:bg-[var(--warning)] text-white px-3 py-1 rounded-full text-sm font-semibold leading-tight'>
-                Restricted
-              </Badge>
-            </AccordionTrigger>
-            <AccordionContent className='bg-[#F8FAFB] px-6 pb-6 pt-2 rounded-b-2xl'>
-              <div className='text-[var(--text-secondary)] text-sm'>
-                Dummy content for Category Management & Service.
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
-      {/* Action Buttons */}
-      <div className='flex justify-end gap-6 mt-8'>
-        <Link
-          href={'/company-details'}
-          className='inline-flex items-center h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)]'
-        >
-          Cancel
-        </Link>
-        <Button className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'>
-          Save
-        </Button>
-      </div>
-    </div>
+            ))}
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 };
 
-export default CompanyManagementAddUser;
+export default AccessControlAccordion;
