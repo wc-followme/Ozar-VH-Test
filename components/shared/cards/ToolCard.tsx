@@ -26,18 +26,20 @@ export default function ToolCard({
 }: ToolCardProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   return (
     <div className='bg-[var(--card-background)] hover:shadow-lg rounded-2xl p-2.5 flex flex-col border border-[var(--border-dark)] min-h-[6.25rem] relative transition-all'>
       <div className='flex gap-3'>
         <Image
-          src={image}
+          src={!image || imgError ? '/images/img-placeholder-sm.png' : image}
           alt={name}
           width={80}
           height={80}
           className='w-20 h-20 rounded-[0.625rem] object-cover'
           unoptimized
           priority
+          onError={() => setImgError(true)}
         />
         <div className='flex flex-col flex-1 min-w-0 -mt-0.5'>
           <div className='font-bold text-base text-[var(--text-dark)] truncate pr-7'>
