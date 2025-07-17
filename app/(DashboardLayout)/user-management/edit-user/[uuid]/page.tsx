@@ -57,10 +57,76 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   // State for which accordion is open
   const [openAccordionIdx, setOpenAccordionIdx] = useState(0);
 
+  // Function to generate JSON from accordions state
+  const generatePermissionsJson = (accordionsData: any[]) => {
+    const permissionsMap: { [key: string]: { [key: string]: boolean } } = {
+      roles: { view: false, edit: false, archive: false },
+      users: { view: false, create: false, customize: false, archive: false },
+      companies: { view: false, assign_user: false, archive: false },
+      categories: { view: false, edit: false, archive: false },
+      trades: { view: false, edit: false, archive: false },
+      services: { view: false, edit: false, archive: false },
+      materials: { view: false, edit: false, archive: false },
+      tools: { view: false, edit: false, archive: false, history: false },
+      jobs: { edit: false, archive: false },
+    };
+
+    // Map accordion indices to permission keys
+    const accordionToPermissionMap = [
+      'roles', // 0: Roles Access Control Settings
+      'users', // 1: Users Access Control Settings
+      'companies', // 2: Company Management & Operations Settings
+      'categories', // 3: Category Management Settings
+      'trades', // 4: Trade Management Settings
+      'services', // 5: Service Management Settings
+      'materials', // 6: Material Management Settings
+      'tools', // 7: Tools Management Settings
+      'jobs', // 8: Job Creation & Basic Job Setup Settings
+    ];
+
+    // Map stripe indices to permission keys for each accordion
+    const stripeToPermissionMap = [
+      ['view', 'edit', 'archive'], // roles
+      ['view', 'create', 'customize', 'archive'], // users
+      ['view', 'assign_user', 'archive'], // companies
+      ['view', 'edit', 'archive'], // categories
+      ['view', 'edit', 'archive'], // trades
+      ['view', 'edit', 'archive'], // services
+      ['view', 'edit', 'archive'], // materials
+      ['view', 'edit', 'archive', 'history'], // tools
+      ['edit', 'archive'], // jobs
+    ];
+
+    accordionsData.forEach((accordion, accordionIdx) => {
+      const permissionKey = accordionToPermissionMap[accordionIdx];
+      if (permissionKey && permissionsMap[permissionKey]) {
+        accordion.stripes.forEach((isChecked: boolean, stripeIdx: number) => {
+          const permissionName =
+            stripeToPermissionMap[accordionIdx]?.[stripeIdx];
+          if (permissionName && permissionsMap[permissionKey]) {
+            permissionsMap[permissionKey][permissionName] = isChecked;
+          }
+        });
+      }
+    });
+
+    return permissionsMap;
+  };
+
+  // Function to save permissions to localStorage
+  const savePermissionsToLocalStorage = (permissions: any) => {
+    try {
+      localStorage.setItem('userPermissions', JSON.stringify(permissions));
+      console.log('Permissions saved to localStorage:', permissions);
+    } catch (error) {
+      console.error('Error saving permissions to localStorage:', error);
+    }
+  };
+
   // Handler to toggle a switch
   const handleToggle = (accordionIdx: number, stripeIdx: number) => {
-    setAccordions(prev =>
-      prev.map((acc, aIdx) =>
+    setAccordions(prev => {
+      const newAccordions = prev.map((acc, aIdx) =>
         aIdx === accordionIdx
           ? {
               ...acc,
@@ -69,8 +135,14 @@ export default function EditUserPage({ params }: EditUserPageProps) {
               ),
             }
           : acc
-      )
-    );
+      );
+
+      // Generate and save JSON to localStorage after each toggle
+      const permissionsJson = generatePermissionsJson(newAccordions);
+      savePermissionsToLocalStorage(permissionsJson);
+
+      return newAccordions;
+    });
   };
 
   const [selectedTab, setSelectedTab] = useState('info');
@@ -101,6 +173,78 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       Array.isArray((obj as RoleApiResponse).data.data)
     );
   };
+
+  // Load permissions from localStorage and initialize
+  useEffect(() => {
+    try {
+      const savedPermissions = localStorage.getItem('userPermissions');
+      if (savedPermissions) {
+        const parsedPermissions = JSON.parse(savedPermissions);
+        console.log('Loaded permissions from localStorage:', parsedPermissions);
+
+        // Update accordions state based on saved permissions
+        const updatedAccordions = ACCESS_CONTROL_ACCORDIONS_DATA.map(
+          (acc, accordionIdx) => {
+            const permissionKey = [
+              'roles',
+              'users',
+              'companies',
+              'categories',
+              'trades',
+              'services',
+              'materials',
+              'tools',
+              'jobs',
+            ][accordionIdx];
+            const permissions = parsedPermissions[permissionKey];
+
+            if (permissions) {
+                             const updatedStripes = acc.stripes.map((_, stripeIdx) => {
+                 const permissionNames = [
+                   ['view', 'edit', 'archive'], // roles
+                   ['view', 'create', 'customize', 'archive'], // users
+                   ['view', 'assign_user', 'archive'], // companies
+                   ['view', 'edit', 'archive'], // categories
+                   ['view', 'edit', 'archive'], // trades
+                   ['view', 'edit', 'archive'], // services
+                   ['view', 'edit', 'archive'], // materials
+                   ['view', 'edit', 'archive', 'history'], // tools
+                   ['edit', 'archive'], // jobs
+                 ][accordionIdx];
+
+                 const permissionName = permissionNames?.[stripeIdx];
+                 if (permissionName && typeof permissionName === 'string' && permissions) {
+                   return (permissions as any)[permissionName] || false;
+                 }
+                 return false;
+               });
+
+              return {
+                ...acc,
+                stripes: updatedStripes,
+              };
+            }
+
+            return {
+              ...acc,
+              stripes: acc.stripes.map(() => true), // default to true if no saved permissions
+            };
+          }
+        );
+
+        setAccordions(updatedAccordions);
+      } else {
+        // Initialize with default permissions if none exist
+        const defaultPermissions = generatePermissionsJson(accordions);
+        savePermissionsToLocalStorage(defaultPermissions);
+      }
+    } catch (error) {
+      console.error('Error loading permissions from localStorage:', error);
+      // Initialize with default permissions if error occurs
+      const defaultPermissions = generatePermissionsJson(accordions);
+      savePermissionsToLocalStorage(defaultPermissions);
+    }
+  }, []); // Run only once on component mount
 
   // Fetch user details and roles
   useEffect(() => {
