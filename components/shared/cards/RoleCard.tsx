@@ -31,6 +31,16 @@ export interface RoleCardProps {
   onDelete?: () => void;
 }
 
+// Utility to detect if a component supports className prop
+function isClassNameIcon(Component: any) {
+  // Heuristic: if the component's propTypes or defaultProps include className, or if it's a function with className in its argument
+  // This is a best-effort guess for local icons
+  return (
+    (Component && Component.length === 1) ||
+    (Component && Component.toString().includes('className'))
+  );
+}
+
 export const RoleCard: React.FC<RoleCardProps> = ({
   iconSrc,
   iconBgColor,
@@ -61,10 +71,21 @@ export const RoleCard: React.FC<RoleCardProps> = ({
           className={`flex items-center justify-center w-[60px] h-[60px] rounded-[16px] mb-2`}
           style={{ color: iconColor, background: iconBgColor }}
         >
-          {React.createElement(iconSrc, {
-            size: 30,
-            color: iconColor || '#000000',
-          })}
+          {(() => {
+            // Heuristic: local icons expect className, external expect size/color
+            const isLocalIcon = iconSrc && iconSrc.length === 1;
+            if (isLocalIcon) {
+              return React.createElement(iconSrc as any, {
+                className: 'w-[30px] h-[30px]',
+                style: { color: iconColor || '#000000' },
+              });
+            } else {
+              return React.createElement(iconSrc, {
+                size: 30,
+                color: iconColor || '#000000',
+              });
+            }
+          })()}
         </div>
 
         <Dropdown

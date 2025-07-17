@@ -8,12 +8,12 @@ import {
 import React from 'react';
 import FormErrorMessage from './FormErrorMessage';
 
-interface IconOption {
+export type IconOption = {
   value: string;
   label: string;
   icon: React.ElementType;
   color: string;
-}
+};
 
 interface IconFieldWrapperProps {
   label: string;
@@ -43,31 +43,28 @@ const IconFieldWrapper: React.FC<IconFieldWrapperProps> = ({
               className='flex w-8 h-8 items-center justify-center rounded-[10px]'
               style={{
                 backgroundColor: `${getSelectedIconOption()?.color ?? ''}26`,
+                color: getSelectedIconOption()?.color ?? '',
               }}
             >
               {(() => {
                 const IconComponent = getSelectedIconOption()?.icon;
                 return IconComponent ? (
-                  <IconComponent
-                    className='w-4 h-4'
-                    style={{ color: getSelectedIconOption()?.color ?? '' }}
-                  />
+                  <IconComponent className='w-5 h-6' />
                 ) : null;
               })()}
             </div>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-          {iconOptions.map(({ icon: IconComponent, value, color, label }) => (
-            <SelectItem key={value} value={value}>
+        <SelectContent className='bg-[var(--white-background)] min-w-fit border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
+          {iconOptions.map(({ icon: IconComponent, value, color }) => (
+            <SelectItem key={value} value={value} className='cursor-pointer'>
               <div className='flex items-center gap-2'>
                 <div
-                  className='flex w-6 h-6 items-center justify-center rounded-md'
-                  style={{ backgroundColor: `${color}26` }}
+                  className='flex w-8 h-8 items-center justify-center rounded-md'
+                  style={{ backgroundColor: `${color}26`, color }}
                 >
-                  <IconComponent className='w-3 h-3' style={{ color: color }} />
+                  <IconComponent className='w-5 h-5' />
                 </div>
-                <span className='text-sm'>{label}</span>
               </div>
             </SelectItem>
           ))}

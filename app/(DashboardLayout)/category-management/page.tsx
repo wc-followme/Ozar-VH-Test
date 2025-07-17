@@ -1,23 +1,12 @@
 'use client';
 
 import { CategoryCard } from '@/components/shared/cards/CategoryCard';
-import FormErrorMessage from '@/components/shared/common/FormErrorMessage';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import SideSheet from '@/components/shared/common/SideSheet';
+import CategoryForm from '@/components/shared/forms/CategoryForm';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
-import { iconOptions } from '@/constants/sidebar-items';
 import { STATUS_CODES } from '@/constants/status-codes';
 import {
   apiService,
@@ -35,7 +24,8 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Edit2, Trash } from 'iconsax-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { catIconOptions } from '../../../constants/sidebar-items';
 import { CATEGORY_MESSAGES } from './category-messages';
 
 const CategoryManagement = () => {
@@ -67,12 +57,14 @@ const CategoryManagement = () => {
   );
 
   // Form management with react-hook-form
-  const defaultIconOption = useMemo(() => iconOptions[0], []);
+  const defaultIconOption = useMemo(() => catIconOptions[0], []);
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm<CreateCategoryFormData>({
     resolver: yupResolver(createCategorySchema),
     defaultValues: {
@@ -306,7 +298,7 @@ const CategoryManagement = () => {
   };
 
   return (
-    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
+    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto pb-8'>
       <header className='flex items-center justify-between w-full'>
         <h2 className='page-title'>
           {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
@@ -328,7 +320,7 @@ const CategoryManagement = () => {
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
               {categories.map((category, index) => {
-                const iconOption = iconOptions.find(
+                const iconOption = catIconOptions.find(
                   opt => opt.value === category.icon
                 ) || {
                   icon: () => null,
@@ -339,7 +331,17 @@ const CategoryManagement = () => {
                     key={category.id || index}
                     name={category.name}
                     description={category.description}
-                    iconSrc={iconOption.icon}
+                    iconSrc={props => {
+                      const Icon = iconOption.icon;
+                      // Map size prop to Tailwind class, and color to a text color class
+                      const sizeClass = props.size
+                        ? `w-[${props.size}px] h-[${props.size}px]`
+                        : 'w-6 h-6';
+                      const colorClass = props.color
+                        ? `text-[${props.color}]`
+                        : '';
+                      return <Icon className={`${sizeClass} ${colorClass}`} />;
+                    }}
                     iconColor={iconOption.color}
                     iconBgColor={iconOption.color + '26'}
                     menuOptions={menuOptions}
@@ -369,167 +371,27 @@ const CategoryManagement = () => {
           {isLoadingCategory ? (
             <LoadingComponent variant='fullscreen' size='sm' />
           ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-              {/* Icon & Category Name */}
-              <div className='space-y-2'>
-                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                  {CATEGORY_MESSAGES.ICON_LABEL} &{' '}
-                  {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
-                </Label>
-                <div className='flex gap-3'>
-                  {/* Icon Selector */}
-                  <div className='w-[80px]'>
-                    <Controller
-                      name='icon'
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger className='h-12 px-3 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
-                            <SelectValue>
-                              <div
-                                className='flex w-8 h-8 items-center justify-center rounded-[10px]'
-                                style={{
-                                  backgroundColor: `${(() => {
-                                    const selectedIcon =
-                                      iconOptions.find(
-                                        opt => opt.value === field.value
-                                      ) || iconOptions[0];
-                                    return selectedIcon?.color ?? '';
-                                  })()}26`,
-                                }}
-                              >
-                                {(() => {
-                                  const selectedIcon =
-                                    iconOptions.find(
-                                      opt => opt.value === field.value
-                                    ) || iconOptions[0];
-                                  const IconComponent = selectedIcon?.icon;
-                                  return IconComponent ? (
-                                    <IconComponent
-                                      className='w-4 h-4'
-                                      style={{
-                                        color: selectedIcon?.color ?? '',
-                                      }}
-                                    />
-                                  ) : null;
-                                })()}
-                              </div>
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                            {iconOptions.map(
-                              ({
-                                value,
-                                color,
-                                label,
-                                icon: IconComponent,
-                              }) => (
-                                <SelectItem key={value} value={value}>
-                                  <div className='flex items-center gap-2'>
-                                    <div
-                                      className='flex w-6 h-6 items-center justify-center rounded-md'
-                                      style={{
-                                        backgroundColor: `${color}26`,
-                                      }}
-                                    >
-                                      <IconComponent
-                                        className='w-3 h-3'
-                                        style={{ color }}
-                                      />
-                                    </div>
-                                    <span className='text-sm'>
-                                      {label} sdfsd
-                                    </span>
-                                  </div>
-                                </SelectItem>
-                              )
-                            )}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-
-                  {/* Category Name */}
-                  <div className='flex-1'>
-                    <Controller
-                      name='name'
-                      control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
-                          className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                          disabled={isSubmitting}
-                        />
-                      )}
-                    />
-                  </div>
-                </div>
-                {(errors.icon || errors.name) && (
-                  <div className='space-y-1'>
-                    {errors.icon && (
-                      <FormErrorMessage message={errors.icon.message || ''} />
-                    )}
-                    {errors.name && (
-                      <FormErrorMessage message={errors.name.message || ''} />
-                    )}
-                  </div>
-                )}
-              </div>
-              {/* Description */}
-              <div className='space-y-2'>
-                <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                  {CATEGORY_MESSAGES.DESCRIPTION_LABEL}
-                </Label>
-                <Controller
-                  name='description'
-                  control={control}
-                  render={({ field }) => (
-                    <Textarea
-                      {...field}
-                      placeholder={CATEGORY_MESSAGES.ENTER_DESCRIPTION}
-                      className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                      disabled={isSubmitting}
-                    />
-                  )}
-                />
-                {errors.description && (
-                  <FormErrorMessage
-                    message={errors.description.message || ''}
-                  />
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className='flex gap-4 pt-2'>
-                <Button
-                  type='button'
-                  variant='outline'
-                  className='btn-secondary !h-12 !px-8'
-                  onClick={handleClose}
-                  disabled={isSubmitting}
-                >
-                  {CATEGORY_MESSAGES.CANCEL_BUTTON}
-                </Button>
-                <Button
-                  type='submit'
-                  className='btn-primary !h-12 !px-12'
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting
-                    ? editingCategory
-                      ? CATEGORY_MESSAGES.UPDATING_BUTTON
-                      : CATEGORY_MESSAGES.CREATING_BUTTON
-                    : editingCategory
-                      ? CATEGORY_MESSAGES.UPDATE_BUTTON
-                      : CATEGORY_MESSAGES.CREATE_BUTTON}
-                </Button>
-              </div>
-            </form>
+            <CategoryForm
+              control={control}
+              isSubmitting={isSubmitting}
+              editingCategory={editingCategory}
+              handleClose={handleClose}
+              CATEGORY_MESSAGES={CATEGORY_MESSAGES}
+              iconOptions={catIconOptions}
+              errors={{
+                icon: errors.icon?.message || '',
+                categoryName: errors.name?.message || '',
+                description: errors.description?.message || '',
+              }}
+              selectedIcon={watch('icon')}
+              setSelectedIcon={val => setValue('icon', val)}
+              categoryName={watch('name')}
+              setCategoryName={val => setValue('name', val)}
+              description={watch('description')}
+              setDescription={val => setValue('description', val)}
+              onClose={handleClose}
+              onSubmit={handleSubmit(onSubmit)}
+            />
           )}
         </div>
       </SideSheet>

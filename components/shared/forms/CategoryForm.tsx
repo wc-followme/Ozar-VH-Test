@@ -1,20 +1,26 @@
+import FormErrorMessage from '@/components/shared/common/FormErrorMessage';
 import IconFieldWrapper from '@/components/shared/common/IconFieldWrapper';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
 import React from 'react';
+import { Controller } from 'react-hook-form';
 
 interface CategoryFormProps {
-  selectedIcon: string;
-  setSelectedIcon: (icon: string) => void;
+  control: any;
+  isSubmitting: boolean;
+  editingCategory: any;
+  handleClose: () => void;
+  CATEGORY_MESSAGES: any;
   iconOptions: any[];
   errors: {
     icon?: string;
     categoryName?: string;
     description?: string;
   };
+  selectedIcon: string;
+  setSelectedIcon: (icon: string) => void;
   categoryName: string;
   setCategoryName: (name: string) => void;
   description: string;
@@ -24,10 +30,15 @@ interface CategoryFormProps {
 }
 
 const CategoryForm: React.FC<CategoryFormProps> = ({
-  selectedIcon,
-  setSelectedIcon,
+  control,
+  isSubmitting,
+  editingCategory,
+  handleClose,
+  CATEGORY_MESSAGES,
   iconOptions,
   errors,
+  selectedIcon,
+  setSelectedIcon,
   categoryName,
   setCategoryName,
   description,
@@ -37,53 +48,68 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 }) => {
   return (
     <div className='p-[0px] w-full'>
-      <form className='space-y-6' onSubmit={onSubmit}>
-        {/* Icon & Category Name Row */}
-        <div className='grid grid-cols-1 md:grid-cols-5 gap-4 w-full'>
-          {/* Icon Selector */}
-          <div className='space-y-2 pt-1 md:col-span-1'>
-            <IconFieldWrapper
-              label='Icon'
-              value={selectedIcon}
-              onChange={setSelectedIcon}
-              iconOptions={iconOptions}
-              error={errors.icon || ''}
-            />
+      <form onSubmit={onSubmit} className='space-y-4'>
+        {/* Icon & Category Name */}
+        <div className='space-y-2'>
+          <div className='flex gap-3'>
+            {/* Icon Selector */}
+            <div className='w-[80px]'>
+              <IconFieldWrapper
+                label={CATEGORY_MESSAGES.ICON_LABEL}
+                value={selectedIcon}
+                onChange={setSelectedIcon}
+                iconOptions={iconOptions}
+                error={errors.icon || ''}
+              />
+            </div>
+            {/* Category Name */}
+            <div className='flex-1 flex flex-col gap-1'>
+              <Label className='field-label mb-1'>
+                {CATEGORY_MESSAGES.CATEGORY_NAME_LABEL}
+              </Label>
+              <Controller
+                name='name'
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
+                    className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                    disabled={isSubmitting}
+                  />
+                )}
+              />
+            </div>
           </div>
-          {/* Category Name */}
-          <div className='space-y-2 md:col-span-4'>
-            <Label className='field-label'>Category Name</Label>
-            <Input
-              placeholder='Enter Category Name'
-              value={categoryName}
-              onChange={e => setCategoryName(e.target.value)}
-              className={cn(
-                'input-field',
-                errors.categoryName
-                  ? 'border-[var(--warning)]'
-                  : 'border-[var(--border-dark)]'
+          {(errors.icon || errors.categoryName) && (
+            <div className='space-y-1'>
+              {errors.icon && <FormErrorMessage message={errors.icon} />}
+              {errors.categoryName && (
+                <FormErrorMessage message={errors.categoryName} />
               )}
-            />
-            {/* Error message placeholder */}
-            {/* <FormErrorMessage message={errors.categoryName} /> */}
-          </div>
+            </div>
+          )}
         </div>
         {/* Description */}
         <div className='space-y-2'>
-          <Label className='field-label'>Description</Label>
-          <Textarea
-            placeholder='Enter Description'
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            className={cn(
-              'min-h-[80px] input-field',
-              errors.description
-                ? 'border-[var(--warning)]'
-                : 'border-[var(--border-dark)]'
+          <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+            {CATEGORY_MESSAGES.DESCRIPTION_LABEL}
+          </Label>
+          <Controller
+            name='description'
+            control={control}
+            render={({ field }) => (
+              <Textarea
+                {...field}
+                placeholder={CATEGORY_MESSAGES.ENTER_DESCRIPTION}
+                className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                disabled={isSubmitting}
+              />
             )}
           />
-          {/* Error message placeholder */}
-          {/* <FormErrorMessage message={errors.description} /> */}
+          {errors.description && (
+            <FormErrorMessage message={errors.description} />
+          )}
         </div>
         {/* Actions */}
         <div className='flex gap-4 pt-2'>
@@ -91,12 +117,23 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             type='button'
             variant='outline'
             className='btn-secondary !h-12 !px-8'
-            onClick={onClose}
+            onClick={handleClose}
+            disabled={isSubmitting}
           >
-            Cancel
+            {CATEGORY_MESSAGES.CANCEL_BUTTON}
           </Button>
-          <Button type='submit' className='btn-primary !h-12 !px-12'>
-            Create
+          <Button
+            type='submit'
+            className='btn-primary !h-12 !px-12'
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? editingCategory
+                ? CATEGORY_MESSAGES.UPDATING_BUTTON
+                : CATEGORY_MESSAGES.CREATING_BUTTON
+              : editingCategory
+                ? CATEGORY_MESSAGES.UPDATE_BUTTON
+                : CATEGORY_MESSAGES.CREATE_BUTTON}
           </Button>
         </div>
       </form>
