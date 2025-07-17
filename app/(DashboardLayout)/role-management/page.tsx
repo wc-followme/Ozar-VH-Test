@@ -50,7 +50,7 @@ const RoleManagement = () => {
         const res = (await apiService.fetchRoles(params)) as RoleApiResponse;
         const data = res.data || { data: [], total: 0 };
         const newRoles = data.data;
-
+        
         setRoles(prev => {
           if (append) {
             // Filter out duplicates when appending to prevent duplicate keys
@@ -63,7 +63,7 @@ const RoleManagement = () => {
             return newRoles;
           }
         });
-
+        
         const total = data.total;
         setPage(targetPage);
         setHasMore(targetPage * limit < total);
@@ -94,16 +94,14 @@ const RoleManagement = () => {
         !loading &&
         hasMore
       ) {
-        setPage(prevPage => {
-          const nextPage = prevPage + 1;
-          fetchRoles(nextPage, true);
-          return nextPage;
-        });
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchRoles(nextPage, true);
       }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [loading, hasMore, fetchRoles]);
+  }, [loading, hasMore, fetchRoles, page]);
 
   // Handler for deleting a role
   const handleDeleteRole = async (uuid: string) => {
