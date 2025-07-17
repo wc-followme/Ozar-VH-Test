@@ -46,17 +46,17 @@ export function Sidebar() {
 
           {/* Sidebar Links */}
           <ul className='py-2 [&>li+li]:mt-0.5 flex-1 overflow-auto '>
-            {sidebarItems.map((item, index) => (
+            {sidebarItems.map(({ title, href, icon: Icon }, index) => (
               <li key={index}>
                 <Link
-                  href={item.href}
+                  href={href}
                   className={cn(
                     'flex items-center flex-nowrap w-full px-[18px] rounded-[16px] h-[60px] text-[var(--text-dark)] transition-colors hover:bg-[var(--primary)] group',
-                    pathname === item.href && 'bg-[var(--primary)] text-white'
+                    pathname === href && 'bg-[var(--primary)] text-white'
                   )}
                 >
                   <div className='stroke-[var(--text)] group-hover:text-white'>
-                    <item.icon size='24' color='currentcolor' />
+                    <Icon size='24' color='currentcolor' />
                   </div>
                   <span
                     className={cn(
@@ -66,7 +66,7 @@ export function Sidebar() {
                         : 'opacity-0 max-w-0'
                     )}
                   >
-                    {item.title}
+                    {title}
                   </span>
                 </Link>
               </li>

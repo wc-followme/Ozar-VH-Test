@@ -188,10 +188,19 @@ export default function UserManagement() {
               <SelectValue placeholder={USER_MESSAGES.ALL_USERS} />
             </SelectTrigger>
             <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-              <SelectItem value='all'>{USER_MESSAGES.ALL_USERS}</SelectItem>
-              {roles.map(role => (
-                <SelectItem key={role.id} value={String(role.id)}>
-                  {role.name}
+              <SelectItem
+                value='all'
+                className='text-[var(--text-dark)] hover:bg-[var(--select-option)] focus:bg-[var(--select-option)] cursor-pointer rounded-[5px]'
+              >
+                {USER_MESSAGES.ALL_USERS}
+              </SelectItem>
+              {roles.map(({ id, name }) => (
+                <SelectItem
+                  key={id}
+                  value={String(id)}
+                  className='text-[var(--text-dark)] hover:bg-[var(--select-option)] focus:bg-[var(--select-option)] cursor-pointer rounded-[5px]'
+                >
+                  {name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -212,29 +221,38 @@ export default function UserManagement() {
         </div>
       ) : (
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
-          {users.map(user => (
-            <UserCard
-              key={user.uuid} // Use uuid instead of id for unique keys
-              name={user.name}
-              role={user.role?.name || ''}
-              phone={user.phone_number}
-              email={user.email}
-              image={
-                user.profile_picture_url
-                  ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
-                    user.profile_picture_url
-                  : ''
-              }
-              status={user.status === 'ACTIVE'}
-              onToggle={() =>
-                handleToggleStatus(user.id, user.status === 'ACTIVE')
-              }
-              menuOptions={menuOptions}
-              onDelete={() => handleDeleteUser(user.uuid)}
-              disableActions={loading}
-              userUuid={user.uuid}
-            />
-          ))}
+          {users.map(
+            ({
+              uuid,
+              name,
+              role,
+              phone_number,
+              email,
+              profile_picture_url,
+              status,
+              id,
+            }) => (
+              <UserCard
+                key={uuid} // Use uuid instead of id for unique keys
+                name={name}
+                role={role?.name || ''}
+                phone={phone_number}
+                email={email}
+                image={
+                  profile_picture_url
+                    ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+                      profile_picture_url
+                    : ''
+                }
+                status={status === 'ACTIVE'}
+                onToggle={() => handleToggleStatus(id, status === 'ACTIVE')}
+                menuOptions={menuOptions}
+                onDelete={() => handleDeleteUser(uuid)}
+                disableActions={loading}
+                userUuid={uuid}
+              />
+            )
+          )}
         </div>
       )}
       {loading && users.length > 0 && (

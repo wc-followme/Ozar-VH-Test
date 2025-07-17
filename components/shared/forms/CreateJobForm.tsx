@@ -100,13 +100,13 @@ export function CreateJobForm() {
               Select Boxes
             </Label>
             <div className='grid gap-4 grid-cols-3 md:grid-cols-3'>
-              {selectBoxOptions.map(option => (
+              {selectBoxOptions.map(({ id, title, description, status }) => (
                 <SelectBoxCard
-                  key={option.id}
-                  id={option.id}
-                  title={option.title}
-                  description={option.description}
-                  status={option.status}
+                  key={id}
+                  id={id}
+                  title={title}
+                  description={description}
+                  status={status}
                 />
               ))}
             </div>

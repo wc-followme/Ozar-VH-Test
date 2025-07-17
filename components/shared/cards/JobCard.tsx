@@ -50,7 +50,7 @@ export function JobCard({ job }: JobCardProps) {
 
   return (
     <Card
-      className='border-1 border-[var(--border-dark)] shadow-sm hover:shadow-md bg-[var(--card-background)] transition-shadow duration-200 rounded-[16px] overflow-hidden cursor-pointer'
+      className='border-1 border-[var(--border-dark)] shadow-sm hover:shadow-xl bg-[var(--card-background)] transition-shadow duration-200 rounded-[16px] overflow-hidden cursor-pointer'
       onClick={handleCardClick}
     >
       <CardContent className='p-0'>

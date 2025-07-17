@@ -21,25 +21,25 @@ export function SidebarMobile({ open, onOpenChange }: SidebarMobileProps) {
         <SheetTitle className='hidden'></SheetTitle>
         <nav className='py-3'>
           <ul className='py-2 [&>li+li]:mt-0.5'>
-            {sidebarItems.map((item, index) => (
+            {sidebarItems.map(({ title, href, icon: Icon }, index) => (
               <li key={index}>
                 <Link
-                  href={item.href}
+                  href={href}
                   className={cn(
                     'flex items-center flex-nowrap w-full px-[8px] rounded-[8px] h-[48px] text-[var(--text-dark)] transition-colors hover:bg-[var(--primary)] group',
-                    pathname === item.href && 'bg-[var(--primary)] text-white'
+                    pathname === href && 'bg-[var(--primary)] text-white'
                   )}
                   onClick={() => onOpenChange(false)}
                 >
                   <div className='stroke-[var(--text)] group-hover:text-white'>
-                    <item.icon size='24' color='currentcolor' />
+                    <Icon size='24' color='currentcolor' />
                   </div>
                   <span
                     className={cn(
                       'overflow-hidden text-nowrap transition-all duration-300 group-hover:text-white ml-2 max-w-[180px] opacity-100'
                     )}
                   >
-                    {item.title}
+                    {title}
                   </span>
                 </Link>
               </li>

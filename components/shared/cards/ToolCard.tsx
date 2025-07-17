@@ -1,7 +1,7 @@
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import SideSheet from '@/components/shared/common/SideSheet';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { Edit2, Trash } from 'lucide-react';
+import { Edit2, Trash } from 'iconsax-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { Badge } from '../../ui/badge';

@@ -21,6 +21,7 @@ interface MenuOption {
     size?: string | number;
     color?: string;
     variant?: 'Linear' | 'Outline' | 'Broken' | 'Bold' | 'Bulk' | 'TwoTone';
+    className?: string;
   }>;
 }
 
@@ -104,28 +105,29 @@ export function CategoryCard({
               align='end'
               className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
             >
-              {menuOptions.map((option, index) => {
-                const IconComponent = option.icon;
-                return (
-                  <DropdownMenuItem
-                    key={index}
-                    onClick={() => handleMenuAction(option.action)}
-                    className={cn(
-                      'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]',
-                      option.variant === 'destructive'
-                        ? 'text-red-600 hover:bg-red-50'
-                        : ''
-                    )}
-                  >
-                    <IconComponent
-                      size='18'
-                      color='var(--text-dark)'
-                      variant='Outline'
-                    />
-                    <span>{option.label}</span>
-                  </DropdownMenuItem>
-                );
-              })}
+              {menuOptions.map(
+                ({ icon: IconComponent, action, label }, index) => {
+                  return (
+                    <DropdownMenuItem
+                      key={index}
+                      onClick={() => handleMenuAction(action)}
+                      className={cn(
+                        'text-base p-[10px] rounded-md cursor-pointer transition-colors flex font-medium items-center gap-2 hover:!bg-[var(--select-option)]',
+                        index !== menuOptions.length - 1 &&
+                          'border-b border-[var(--border-dark)]'
+                      )}
+                    >
+                      <IconComponent
+                        size='24'
+                        color='var(--text-dark)'
+                        className='!h-6 !w-6'
+                        variant='Outline'
+                      />
+                      <span>{label}</span>
+                    </DropdownMenuItem>
+                  );
+                }
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

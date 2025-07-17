@@ -154,13 +154,13 @@ export default function ServiceManagementPage() {
       </div>
       {/* Service Grid */}
       <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 xl:gap-6'>
-        {services.map((service, idx) => (
+        {services.map(({ initials, initialsBg, serviceName, trade }, idx) => (
           <InfoCard
-            key={service.initials + '-' + idx}
-            initials={service.initials}
-            initialsBg={service.initialsBg}
-            tradeName={service.serviceName}
-            category={service.trade}
+            key={initials + '-' + idx}
+            initials={initials}
+            initialsBg={initialsBg}
+            tradeName={serviceName}
+            category={trade}
             menuOptions={menuOptions}
             onMenuAction={action => handleMenuAction(action, idx)}
           />

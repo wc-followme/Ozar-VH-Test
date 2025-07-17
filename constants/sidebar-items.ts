@@ -10,13 +10,13 @@ import { Trade } from './../components/icons/Trade';
 // Common icon options for roles and other modules
 import {
   BarChart,
-  CircleUserIcon,
   Database,
   FileText,
   Settings,
   Shield,
   Users,
 } from 'lucide-react';
+import { CircleUsersStarIcon } from '../components/icons/CircleUsersStarIcon';
 import { Service } from '../components/icons/Service';
 
 type SidebarItem = {
@@ -44,7 +44,7 @@ export const sidebarItems: SidebarItem[] = [
   {
     title: 'User Management',
     href: '/user-management',
-    icon: CircleUserIcon,
+    icon: CircleUsersStarIcon,
   },
   {
     title: 'Company Management',

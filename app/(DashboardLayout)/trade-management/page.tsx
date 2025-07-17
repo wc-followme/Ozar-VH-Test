@@ -151,13 +151,13 @@ export default function TradeManagementPage() {
           ? Array.from({ length: 10 }).map((_, idx) => (
               <TradeCardSkeleton key={idx} />
             ))
-          : trades.map((trade, idx) => (
+          : trades.map(({ initials, initialsBg, tradeName, category }, idx) => (
               <InfoCard
-                key={trade.initials + '-' + idx}
-                initials={trade.initials}
-                initialsBg={trade.initialsBg}
-                tradeName={trade.tradeName}
-                category={trade.category}
+                key={initials + '-' + idx}
+                initials={initials}
+                initialsBg={initialsBg}
+                tradeName={tradeName}
+                category={category}
                 menuOptions={menuOptions}
                 onMenuAction={action => handleMenuAction(action, idx)}
               />

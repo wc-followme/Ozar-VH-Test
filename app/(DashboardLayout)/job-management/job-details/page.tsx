@@ -69,10 +69,10 @@ export default function JobDetailsPage() {
         {/* 3-dots menu */}
         <div className='ml-auto mt-2 md:mt-0'>
           <Dropdown
-            menuOptions={dropdownMenuItems.map(item => ({
-              icon: item.icon,
-              label: item.label,
-              action: item.label,
+            menuOptions={dropdownMenuItems.map(({ icon, label }) => ({
+              icon,
+              label,
+              action: label,
             }))}
             onAction={action => {
               const item = dropdownMenuItems.find(i => i.label === action);

@@ -68,28 +68,29 @@ export function StepProjectType({
         estimates.
       </p>
       <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
-        {PROJECT_TYPES.map(type => {
-          const Icon = type.icon;
-          return (
-            <div
-              key={type.key}
-              className={`flex flex-col items-start border border-[var(--border-dark)] rounded-2xl bg-[var(--card-background)]  p-6 cursor-pointer transition-all duration-150 hover:shadow-md ${selectedType === type.key ? 'border-green-500 shadow-green-100' : ''}`}
-              onClick={() => setSelectedType(type.key)}
-            >
+        {PROJECT_TYPES.map(
+          ({ icon: Icon, key, bgColor, iconColor, title, desc }) => {
+            return (
               <div
-                className={`w-10 h-10 rounded-[16px] ${type.bgColor} ${type.iconColor} flex items-center justify-center mb-4`}
+                key={key}
+                className={`flex flex-col items-start border border-[var(--border-dark)] rounded-2xl bg-[var(--card-background)]  p-6 cursor-pointer transition-all duration-150 hover:shadow-md ${selectedType === key ? 'border-green-500 shadow-green-100' : ''}`}
+                onClick={() => setSelectedType(key)}
               >
-                <Icon className={`w-5 h-5 `} color='currentcolor' />
+                <div
+                  className={`w-10 h-10 rounded-[16px] ${bgColor} ${iconColor} flex items-center justify-center mb-4`}
+                >
+                  <Icon className={`w-5 h-5 `} color='currentcolor' />
+                </div>
+                <div className='font-bold text-base mb-1 text-[var(--text-dark)]'>
+                  {title}
+                </div>
+                <div className='text-[var(--text-secondary)] text-base'>
+                  {desc}
+                </div>
               </div>
-              <div className='font-bold text-base mb-1 text-[var(--text-dark)]'>
-                {type.title}
-              </div>
-              <div className='text-[var(--text-secondary)] text-base'>
-                {type.desc}
-              </div>
-            </div>
-          );
-        })}
+            );
+          }
+        )}
       </div>
       <div className='flex w-full justify-between mt-6'>
         <button

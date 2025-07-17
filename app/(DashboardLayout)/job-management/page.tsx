@@ -123,6 +123,7 @@ export default function JobManagement() {
   const [isOpen, setIsOpen] = useState(false);
   const stats = [
     {
+      id: 'active-projects',
       icon: FlagHookIcon,
       value: '24',
       label: 'Active Projects',
@@ -130,6 +131,7 @@ export default function JobManagement() {
       bgColor: 'bg-[#EBB4021A]',
     },
     {
+      id: 'completed',
       icon: IconFlag,
       value: '18',
       label: 'Completed',
@@ -137,6 +139,7 @@ export default function JobManagement() {
       bgColor: 'bg-[#1A57BF1A]',
     },
     {
+      id: 'revenue',
       icon: DollarSign,
       value: '$2.4M',
       label: 'Revenue',
@@ -144,6 +147,7 @@ export default function JobManagement() {
       bgColor: 'bg-[#31A31D1A]',
     },
     {
+      id: 'team-member',
       icon: Profile2User,
       value: '32',
       label: 'Team Member',
@@ -157,8 +161,15 @@ export default function JobManagement() {
       <div className=''>
         {/* Stats Cards */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-8'>
-          {stats.map((stat, index) => (
-            <StatsCard key={index} {...stat} />
+          {stats.map(({ id, icon, value, label, iconColor, bgColor }) => (
+            <StatsCard
+              key={id}
+              icon={icon}
+              value={value}
+              label={label}
+              iconColor={iconColor}
+              bgColor={bgColor}
+            />
           ))}
         </div>
 
@@ -227,8 +238,8 @@ export default function JobManagement() {
             </div>
             <TabsContent value='info' className='pt-8'>
               <div className='grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
-                {mockJobs.map(job => (
-                  <JobCard key={job.id} job={job} />
+                {mockJobs.map(({ id, ...jobProps }) => (
+                  <JobCard key={id} job={{ id, ...jobProps }} />
                 ))}
               </div>
             </TabsContent>

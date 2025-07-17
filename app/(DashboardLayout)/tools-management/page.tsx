@@ -187,15 +187,15 @@ const ToolsManagement = () => {
           ? Array.from({ length: 12 }).map((_, idx) => (
               <ToolCardSkeleton key={idx} />
             ))
-          : tools.map(tool => (
+          : tools.map(({ id, image, name, brand, quantity, videoCount }) => (
               <ToolCard
-                key={tool.id}
-                image={tool.image}
-                name={tool.name}
-                brand={tool.brand}
-                quantity={tool.quantity}
-                videoCount={tool.videoCount}
-                onDelete={() => handleDelete(tool.id)}
+                key={id}
+                image={image}
+                name={name}
+                brand={brand}
+                quantity={quantity}
+                videoCount={videoCount}
+                onDelete={() => handleDelete(id)}
               />
             ))}
       </div>

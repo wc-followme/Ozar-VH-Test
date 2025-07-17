@@ -243,9 +243,9 @@ export function UserInfoForm({
           label={USER_MESSAGES.ROLE_LABEL}
           value={roleId}
           onValueChange={setRoleId}
-          options={roles.map(role => ({
-            value: String(role.id),
-            label: role.name,
+          options={roles.map(({ id, name }) => ({
+            value: String(id),
+            label: name,
           }))}
           placeholder={
             loadingRoles
