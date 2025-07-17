@@ -1,10 +1,10 @@
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import React, { useEffect, useState } from 'react';
 import FormErrorMessage from './FormErrorMessage';
@@ -12,6 +12,7 @@ import FormErrorMessage from './FormErrorMessage';
 interface Option {
   value: string;
   label: string;
+  disabled?: boolean;
 }
 
 interface SelectFieldProps {
@@ -68,6 +69,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
             <SelectItem
               key={opt.value}
               value={opt.value}
+              disabled={opt.disabled ?? false}
               className={`${selectItemStyle} ${optionClassName}`}
             >
               {opt.label}
