@@ -73,14 +73,10 @@ export function UserCard({
     ) {
       // Use the first character of the name to pick a color deterministically
       const trimmed = name.trim();
-      const firstChar = trimmed.length > 0 ? trimmed[0]?.toUpperCase() : '';
+      const firstChar = trimmed.length > 0 ? trimmed[0] : '';
       if (!firstChar) return { bg: '#ccc', color: '#222' };
       const charCode = firstChar.charCodeAt(0);
-      // Map A-Z to 0-25, fallback for non-letters
-      const idx =
-        charCode >= 65 && charCode <= 90
-          ? (charCode - 65) % colorArray.length
-          : charCode % colorArray.length;
+      const idx = charCode % colorArray.length;
       return colorArray[idx] ?? { bg: '#ccc', color: '#222' };
     }
     // fallback color
@@ -152,11 +148,11 @@ export function UserCard({
         <div className='flex-1 min-w-0'>
           {/* User Info */}
           <div className='flex items-start'>
-            <div className='mb-1 flex-1'>
+            <div className='mb-1.5 flex-1'>
               <h3 className='font-bold text-[var(--text)] truncate text-base'>
                 {name}
               </h3>
-              <p className='text-[12px] font-medium text-[var(--text-dark)]'>
+              <p className='text-xs font-medium text-[var(--text-dark)]'>
                 {role}
               </p>
             </div>
@@ -182,13 +178,22 @@ export function UserCard({
           </div>
 
           {/* Contact Info */}
-          <div className='space-y-1'>
-            <div className='flex items-center gap-2 text-[12px] font-medium text-[var(--text-secondary)]'>
-              <Call size='18' color='var(--text-dark)' />
+          <div className='space-y-0.5'>
+            <div className='flex items-center gap-1 text-xs font-medium text-[var(--text-secondary)]'>
+              <Call
+                size='13'
+                color='var(--text-dark)'
+                className='flex-shrink-0'
+              />
               <span className='truncate'>{phone}</span>
             </div>
-            <div className='flex items-center gap-2 text-[12px] font-medium text-[#818181]'>
-              <Sms size='18' color='var(--text-dark)' variant='Outline' />
+            <div className='flex items-center gap-2 text-xs font-medium text-[#818181]'>
+              <Sms
+                size='13'
+                color='var(--text-dark)'
+                variant='Outline'
+                className='flex-shrink-0'
+              />
               <span className='truncate'>{email}</span>
             </div>
           </div>
@@ -197,7 +202,7 @@ export function UserCard({
 
       {/* Status Toggle */}
       <div className='flex items-center mt-auto justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
-        <span className='text-[12px] font-medium text-[var(--text-dark)]'>
+        <span className='text-xs font-medium text-[var(--text-dark)]'>
           Enable
         </span>
         <Switch

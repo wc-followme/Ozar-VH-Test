@@ -156,7 +156,7 @@ const ToolsManagement = () => {
       <div className='flex items-center justify-between mb-8'>
         <h2 className='page-title'>Tools Management</h2>
         <button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
-          <span>Add Tool</span>
+          <span>Create Tool</span>
         </button>
       </div>
       <SideSheet
