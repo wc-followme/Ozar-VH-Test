@@ -2,13 +2,12 @@
 
 import { RoleCard } from '@/components/shared/cards/RoleCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
-import { APP_CONFIG, PAGINATION } from '@/constants/common';
+import { PAGINATION } from '@/constants/common';
 import { iconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
 import { Edit2, Trash } from 'iconsax-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ROLE_MESSAGES } from './role-messages';
 import type { FetchRolesParams, Role, RoleApiResponse } from './types';
 
@@ -35,64 +34,76 @@ const RoleManagement = () => {
   const [loading, setLoading] = useState(true);
   const [name] = useState('');
   const [hasMore, setHasMore] = useState(true);
-  const [showNoMoreMessage, setShowNoMoreMessage] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
-  const observer = useRef<IntersectionObserver | null>(null);
   const router = useRouter();
 
-  const fetchRoles = async (append = false) => {
-    setLoading(true);
-    try {
-      const params: FetchRolesParams = {
-        page,
-        limit,
-        search,
-        name,
-      };
-      const res = (await apiService.fetchRoles(params)) as RoleApiResponse;
-      const data = res.data || { data: [], total: 0 };
-      const newRoles = data.data;
-      setRoles(prev => (append ? [...prev, ...newRoles] : newRoles));
-      const total = data.total;
-      setHasMore(page * limit < total);
-    } catch {
-      if (!append) setRoles([]);
-      setHasMore(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchRoles = useCallback(
+    async (targetPage = 1, append = false) => {
+      setLoading(true);
+      try {
+        const params: FetchRolesParams = {
+          page: targetPage,
+          limit,
+          search,
+          name,
+        };
+        const res = (await apiService.fetchRoles(params)) as RoleApiResponse;
+        const data = res.data || { data: [], total: 0 };
+        const newRoles = data.data;
 
-  useEffect(() => {
-    // Reset no more message when parameters change
-    setShowNoMoreMessage(false);
-    fetchRoles(page > 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit, search, name]);
-
-  // Infinite scroll logic with sentinel element
-  const sentinelRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new window.IntersectionObserver(entries => {
-        if (entries[0] && entries[0].isIntersecting) {
-          if (hasMore && roles.length > 0) {
-            setPage(prev => prev + 1);
-          } else if (!hasMore && roles.length > 0) {
-            // User tried to scroll but no more data - show message
-            setShowNoMoreMessage(true);
-            // Hide message after configured timeout
-            setTimeout(() => {
-              setShowNoMoreMessage(false);
-            }, APP_CONFIG.TOAST_AUTO_HIDE_MS);
+        setRoles(prev => {
+          if (append) {
+            // Filter out duplicates when appending to prevent duplicate keys
+            const existingUuids = new Set(prev.map(role => role.uuid));
+            const uniqueNewRoles = newRoles.filter(
+              role => !existingUuids.has(role.uuid)
+            );
+            return [...prev, ...uniqueNewRoles];
+          } else {
+            return newRoles;
           }
-        }
-      });
-      if (node) observer.current.observe(node);
+        });
+
+        const total = data.total;
+        setPage(targetPage);
+        setHasMore(targetPage * limit < total);
+      } catch {
+        if (!append) setRoles([]);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
     },
-    [loading, hasMore, roles.length]
+    [limit, search, name]
   );
+
+  // Fetch first page of roles
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+    setRoles([]);
+    fetchRoles(1, false);
+  }, [fetchRoles]);
+
+  // Infinite scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >=
+          document.body.offsetHeight - 200 &&
+        !loading &&
+        hasMore
+      ) {
+        setPage(prevPage => {
+          const nextPage = prevPage + 1;
+          fetchRoles(nextPage, true);
+          return nextPage;
+        });
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loading, hasMore, fetchRoles]);
 
   // Handler for deleting a role
   const handleDeleteRole = async (uuid: string) => {
@@ -105,10 +116,13 @@ const RoleManagement = () => {
   };
 
   // Handler for editing a role with loading state
-  const handleEditRole = useCallback((uuid: string) => {
-    setIsNavigating(true);
-    router.push(`/role-management/edit-role/${uuid}`);
-  }, [router]);
+  const handleEditRole = useCallback(
+    (uuid: string) => {
+      setIsNavigating(true);
+      router.push(`/role-management/edit-role/${uuid}`);
+    },
+    [router]
+  );
 
   // Handler for create role navigation with loading state
   const handleCreateRole = useCallback(() => {
@@ -118,7 +132,7 @@ const RoleManagement = () => {
 
   // Show navigation loading state
   if (isNavigating) {
-    return <LoadingComponent variant="fullscreen" text="Loading form..." />;
+    return <LoadingComponent variant='fullscreen' text='Loading form...' />;
   }
 
   return (
@@ -155,7 +169,7 @@ const RoleManagement = () => {
                   color: '#00a8bf',
                 };
                 return (
-                  <div key={role.id || index}>
+                  <div key={role.uuid || index}>
                     <RoleCard
                       menuOptions={menuOptions}
                       iconSrc={iconOption.icon}
@@ -172,23 +186,17 @@ const RoleManagement = () => {
               })
             )}
           </div>
-
-          {/* Sentinel element for infinite scroll */}
-          {roles.length > 0 && (
-            <div ref={sentinelRef} className='w-full h-4'></div>
-          )}
-
-          {/* Pagination Loading - only show when we have roles and are loading more */}
-          {loading && roles.length > 0 && (
-            <div className='w-full text-center py-4'>
-              <LoadingComponent variant='inline' size='sm' />
-            </div>
-          )}
         </>
       )}
-      {showNoMoreMessage && (
-        <div className='w-full text-center py-4 text-gray-400'>
-          {ROLE_MESSAGES.NO_MORE_ROLES}
+
+      {/* Loading more roles */}
+      {loading && roles.length > 0 && (
+        <div className='w-full text-center py-4'>
+          <LoadingComponent
+            variant='inline'
+            size='sm'
+            text={ROLE_MESSAGES.LOADING_ROLES}
+          />
         </div>
       )}
     </section>
