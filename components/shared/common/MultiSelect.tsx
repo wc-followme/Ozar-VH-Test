@@ -72,13 +72,13 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                 <span className='text-gray-400'>{placeholder}</span>
               )}
               {displayTags.map(tag => {
-                const opt = options.find(o => o.value === tag);
+                const { label } = options.find(o => o.value === tag) || {};
                 return (
                   <span
                     key={tag}
                     className='bg-[#00A8BF26] text-[var(--text-dark)] rounded-full px-3 py-1 text-sm font-medium'
                   >
-                    {opt ? opt.label : tag}
+                    {label || tag}
                   </span>
                 );
               })}
@@ -92,17 +92,17 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-full bg-[var(--card-background)] min-w-[var(--radix-popover-trigger-width)] p-2 rounded-[12px] border border-[var(--border-dark)]'>
-          {options.map(opt => (
+          {options.map(({ value: optValue, label: optLabel }) => (
             <label
-              key={opt.value}
+              key={optValue}
               className='flex items-center gap-3 py-2 px-2 cursor-pointer text-[var(--text-dark)] text-base border-b border-[var(--border-dark)] last-of-type:border-b-0'
             >
               <Checkbox
-                checked={value.includes(opt.value)}
-                onCheckedChange={() => handleToggle(opt.value)}
+                checked={value.includes(optValue)}
+                onCheckedChange={() => handleToggle(optValue)}
                 className='rounded-[6px] border-2 border-[#BFBFBF] data-[state=checked]:bg-[--primary] data-[state=checked]:border-[--primary] data-[state=checked]:text-white text-white w-6 h-6 flex items-base justify-center mt-0.5'
               />
-              <span>{opt.label}</span>
+              <span>{optLabel}</span>
             </label>
           ))}
         </PopoverContent>

@@ -315,7 +315,7 @@ export default function AddUserPage() {
             </TabsList>
 
             <TabsContent value='info' className='pt-8'>
-              <div className='flex items-start gap-6'>
+              <div className='flex flex-col lg:flex-row items-start gap-6'>
                 {/* Left Column - Upload Photo */}
                 <div className='w-[250px] flex-shrink-0 relative'>
                   <PhotoUploadField
@@ -323,7 +323,8 @@ export default function AddUserPage() {
                     onPhotoChange={handlePhotoChange}
                     onDeletePhoto={handleDeletePhoto}
                     label={USER_MESSAGES.UPLOAD_PHOTO_LABEL}
-                    text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
+                    // text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
+                    className='h-[250px]'
                   />
                   {uploading && (
                     <div className='text-xs mt-2'>
@@ -333,7 +334,7 @@ export default function AddUserPage() {
                 </div>
 
                 {/* Right Column - Form Fields */}
-                <div className='flex-1'>
+                <div className='w-full lg:flex-1'>
                   <UserInfoForm
                     roles={roles}
                     loadingRoles={loadingRoles}

@@ -105,29 +105,26 @@ export default function MaterialManagementPage() {
     <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
-        <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
-          Material Management
-        </h1>
-        <Button
-          className='bg-[var(--secondary)] hover:bg-green-600 rounded-full px-6 h-10 font-semibold text-white'
-          onClick={() => setSideSheetOpen(true)}
-        >
+        <h2 className='page-title'>Material Management</h2>
+        <Button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
           Create Material
         </Button>
       </div>
       {/* Material Grid */}
       <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 xl:gap-6'>
-        {materials.map((material, idx) => (
-          <InfoCard
-            key={material.initials + '-' + idx}
-            initials={material.initials}
-            initialsBg={material.initialsBg}
-            tradeName={material.materialName}
-            category={material.category}
-            menuOptions={menuOptions}
-            onMenuAction={action => handleMenuAction(action, idx)}
-          />
-        ))}
+        {materials.map(
+          ({ initials, initialsBg, materialName, category }, idx) => (
+            <InfoCard
+              key={initials + '-' + idx}
+              initials={initials}
+              initialsBg={initialsBg}
+              tradeName={materialName}
+              category={category}
+              menuOptions={menuOptions}
+              onMenuAction={action => handleMenuAction(action, idx)}
+            />
+          )
+        )}
       </div>
       <ConfirmDeleteModal
         open={modalOpen}

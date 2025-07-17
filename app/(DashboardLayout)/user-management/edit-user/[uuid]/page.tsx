@@ -13,6 +13,7 @@ import { extractApiErrorMessage } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import ComingSoon from '../../../../../components/shared/common/ComingSoon';
 import { Role, RoleApiResponse, UserFormData } from '../../types';
 import { USER_MESSAGES } from '../../user-messages';
 
@@ -226,11 +227,11 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         <Breadcrumb items={breadcrumbData} className='mb-5' />
 
         {/* Header */}
-        <div className='flex items-center justify-between mb-6'>
+        {/* <div className='flex items-center justify-between mb-6'>
           <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
             {USER_MESSAGES.EDIT_USER_TITLE}
           </h1>
-        </div>
+        </div> */}
 
         {/* Main Content */}
         <div className='bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
@@ -242,13 +243,13 @@ export default function EditUserPage({ params }: EditUserPageProps) {
             <TabsList className='grid w-full max-w-[328px] grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal'>
               <TabsTrigger
                 value='info'
-                className='rounded-md px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
                 {USER_MESSAGES.INFO_TAB}
               </TabsTrigger>
               <TabsTrigger
                 value='permissions'
-                className='rounded-md px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
                 {USER_MESSAGES.PERMISSIONS_TAB}
               </TabsTrigger>
@@ -263,13 +264,14 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                     onPhotoChange={handlePhotoChange}
                     onDeletePhoto={handleDeletePhoto}
                     label={USER_MESSAGES.UPLOAD_PHOTO_LABEL}
-                    text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
+                    // text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
                     uploading={uploading}
                     existingImageUrl={
                       fileKey && !photoFile
                         ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
                         : ''
                     }
+                    className='h-[250px]'
                   />
                   {uploading && (
                     <div className='text-xs mt-2'>
@@ -297,7 +299,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
 
             <TabsContent value='permissions' className='pt-8'>
               <div className='text-center py-10 text-gray-500'>
-                Permissions management coming soon...
+                <ComingSoon />
               </div>
             </TabsContent>
           </Tabs>

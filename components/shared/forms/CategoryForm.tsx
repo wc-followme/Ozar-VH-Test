@@ -1,0 +1,107 @@
+import IconFieldWrapper from '@/components/shared/common/IconFieldWrapper';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
+import React from 'react';
+
+interface CategoryFormProps {
+  selectedIcon: string;
+  setSelectedIcon: (icon: string) => void;
+  iconOptions: any[];
+  errors: {
+    icon?: string;
+    categoryName?: string;
+    description?: string;
+  };
+  categoryName: string;
+  setCategoryName: (name: string) => void;
+  description: string;
+  setDescription: (desc: string) => void;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+}
+
+const CategoryForm: React.FC<CategoryFormProps> = ({
+  selectedIcon,
+  setSelectedIcon,
+  iconOptions,
+  errors,
+  categoryName,
+  setCategoryName,
+  description,
+  setDescription,
+  onClose,
+  onSubmit,
+}) => {
+  return (
+    <div className='p-[0px] w-full'>
+      <form className='space-y-6' onSubmit={onSubmit}>
+        {/* Icon & Category Name Row */}
+        <div className='grid grid-cols-1 md:grid-cols-5 gap-4 w-full'>
+          {/* Icon Selector */}
+          <div className='space-y-2 pt-1 md:col-span-1'>
+            <IconFieldWrapper
+              label='Icon'
+              value={selectedIcon}
+              onChange={setSelectedIcon}
+              iconOptions={iconOptions}
+              error={errors.icon || ''}
+            />
+          </div>
+          {/* Category Name */}
+          <div className='space-y-2 md:col-span-4'>
+            <Label className='field-label'>Category Name</Label>
+            <Input
+              placeholder='Enter Category Name'
+              value={categoryName}
+              onChange={e => setCategoryName(e.target.value)}
+              className={cn(
+                'input-field',
+                errors.categoryName
+                  ? 'border-[var(--warning)]'
+                  : 'border-[var(--border-dark)]'
+              )}
+            />
+            {/* Error message placeholder */}
+            {/* <FormErrorMessage message={errors.categoryName} /> */}
+          </div>
+        </div>
+        {/* Description */}
+        <div className='space-y-2'>
+          <Label className='field-label'>Description</Label>
+          <Textarea
+            placeholder='Enter Description'
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            className={cn(
+              'min-h-[80px] input-field',
+              errors.description
+                ? 'border-[var(--warning)]'
+                : 'border-[var(--border-dark)]'
+            )}
+          />
+          {/* Error message placeholder */}
+          {/* <FormErrorMessage message={errors.description} /> */}
+        </div>
+        {/* Actions */}
+        <div className='flex gap-4 pt-2'>
+          <Button
+            type='button'
+            variant='outline'
+            className='btn-secondary !h-12 !px-8'
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+          <Button type='submit' className='btn-primary !h-12 !px-12'>
+            Create
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default CategoryForm;

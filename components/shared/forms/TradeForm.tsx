@@ -47,10 +47,7 @@ export default function TradeForm({
   return (
     <form onSubmit={handleSubmit} className='space-y-6 w-full max-w-xl'>
       <div className='space-y-2'>
-        <Label
-          htmlFor='category'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='category' className='field-label'>
           Category
         </Label>
         <MultiSelect
@@ -65,10 +62,7 @@ export default function TradeForm({
         />
       </div>
       <div className='space-y-2'>
-        <Label
-          htmlFor='tradeName'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='tradeName' className='field-label'>
           Trade Name
         </Label>
         <Input
@@ -77,10 +71,10 @@ export default function TradeForm({
           onChange={e => setTradeName(e.target.value)}
           placeholder='Enter Trade Name'
           className={cn(
-            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            'input-field',
             errors.tradeName
-              ? 'border-[var(--warning)]'
-              : 'border-[var(--border-dark)]'
+              ? '!border-[var(--warning)]'
+              : '!border-[var(--border-dark)]'
           )}
         />
         <FormErrorMessage message={errors.tradeName || ''} />
@@ -89,7 +83,7 @@ export default function TradeForm({
         <Button
           type='button'
           variant='outline'
-          className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
+          className='btn-secondary !px-8 !h-12'
           onClick={onCancel}
           disabled={loading}
         >
@@ -97,7 +91,7 @@ export default function TradeForm({
         </Button>
         <Button
           type='submit'
-          className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'
+          className='btn-primary !h-12 !px-12'
           disabled={loading}
         >
           {loading ? 'Creating...' : 'Create'}

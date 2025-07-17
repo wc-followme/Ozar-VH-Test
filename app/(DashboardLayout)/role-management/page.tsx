@@ -50,7 +50,7 @@ const RoleManagement = () => {
         const res = (await apiService.fetchRoles(params)) as RoleApiResponse;
         const data = res.data || { data: [], total: 0 };
         const newRoles = data.data;
-        
+
         setRoles(prev => {
           if (append) {
             // Filter out duplicates when appending to prevent duplicate keys
@@ -63,7 +63,7 @@ const RoleManagement = () => {
             return newRoles;
           }
         });
-        
+
         const total = data.total;
         setPage(targetPage);
         setHasMore(targetPage * limit < total);

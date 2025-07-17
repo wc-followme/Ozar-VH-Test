@@ -65,14 +65,13 @@ const SelectField: React.FC<SelectFieldProps> = ({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent className={selectContentStyle}>
-          {options.map(opt => (
+          {options.map(({ value, label }) => (
             <SelectItem
-              key={opt.value}
-              value={opt.value}
-              disabled={opt.disabled ?? false}
+              key={value}
+              value={value}
               className={`${selectItemStyle} ${optionClassName}`}
             >
-              {opt.label}
+              {label}
             </SelectItem>
           ))}
         </SelectContent>

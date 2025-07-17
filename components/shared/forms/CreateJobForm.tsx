@@ -58,10 +58,7 @@ export function CreateJobForm() {
           {/* Full Name Input */}
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div className='space-y-2 col-span-2'>
-              <Label
-                htmlFor='full-name'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='full-name' className='fled-label'>
                 New to Us / Already with Us
               </Label>
               <Input
@@ -71,10 +68,7 @@ export function CreateJobForm() {
               />
             </div>
             <div className='space-y-2'>
-              <Label
-                htmlFor='full-name'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='full-name' className='fled-label'>
                 Email
               </Label>
               <Input
@@ -84,10 +78,7 @@ export function CreateJobForm() {
               />
             </div>
             <div className='space-y-2'>
-              <Label
-                htmlFor='full-name'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='full-name' className='fled-label'>
                 Phone Number
               </Label>
               <Input
@@ -105,20 +96,17 @@ export function CreateJobForm() {
 
           {/* Select Boxes Section */}
           <div className='space-y-4'>
-            <Label
-              htmlFor='full-name'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='full-name' className='fled-label'>
               Select Boxes
             </Label>
             <div className='grid gap-4 grid-cols-3 md:grid-cols-3'>
-              {selectBoxOptions.map(option => (
+              {selectBoxOptions.map(({ id, title, description, status }) => (
                 <SelectBoxCard
-                  key={option.id}
-                  id={option.id}
-                  title={option.title}
-                  description={option.description}
-                  status={option.status}
+                  key={id}
+                  id={id}
+                  title={title}
+                  description={description}
+                  status={status}
                 />
               ))}
             </div>
@@ -126,10 +114,7 @@ export function CreateJobForm() {
 
           {/* Link Input */}
           <div className='space-y-2'>
-            <Label
-              htmlFor='full-name'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='full-name' className='fled-label'>
               Link
             </Label>
             <Input
@@ -141,13 +126,8 @@ export function CreateJobForm() {
 
           {/* Submit Button */}
           <div className='pt-4 flex items-center gap-3'>
-            <Button className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'>
-              Continue Estimate
-            </Button>
-            <Button
-              type='submit'
-              className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
-            >
+            <Button className='btn-secondary !h-12'>Continue Estimate</Button>
+            <Button type='submit' className='btn-primary !h-12'>
               Create Job
             </Button>
           </div>

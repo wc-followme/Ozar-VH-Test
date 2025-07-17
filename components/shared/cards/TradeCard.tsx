@@ -1,13 +1,8 @@
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
-import React, { useState } from 'react';
+import React from 'react';
+import Dropdown from '../common/Dropdown';
 
 interface MenuOption {
   label: string;
@@ -33,8 +28,6 @@ export const TradeCard: React.FC<TradeCardProps> = ({
   menuOptions = [],
   onMenuAction,
 }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-
   return (
     <div className='bg-white rounded-[12px] border border-[var(--border-dark)] w-full p-[10px] flex items-center gap-4 min-h-[64px] hover:shadow-md transition-shadow duration-200'>
       {/* Initials */}
@@ -57,8 +50,14 @@ export const TradeCard: React.FC<TradeCardProps> = ({
       </div>
       {/* Menu Button */}
       {menuOptions.length > 0 && (
-        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-          <DropdownMenuTrigger asChild className='self-start'>
+        <Dropdown
+          menuOptions={
+            menuOptions.filter(
+              (opt): opt is Required<MenuOption> => !!opt.icon
+            ) as import('../common/Dropdown').DropdownOption[]
+          }
+          onAction={onMenuAction ?? (() => {})}
+          trigger={
             <Button variant='ghost' size='icon' className='h-8 w-8 p-0'>
               <IconDotsVertical
                 className='!w-6 !h-6'
@@ -66,28 +65,9 @@ export const TradeCard: React.FC<TradeCardProps> = ({
                 color='var(--text)'
               />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align='end'
-            className='bg-white border border-[var(--border-dark)] rounded-[8px]'
-          >
-            {menuOptions.map((option, idx) => {
-              const Icon = option.icon;
-              return (
-                <DropdownMenuItem
-                  key={idx}
-                  onClick={() => onMenuAction && onMenuAction(option.action)}
-                  className={cn(
-                    'text-sm px-3 py-2 rounded-md cursor-pointer flex items-center gap-2 hover:!bg-[var(--select-option)]'
-                  )}
-                >
-                  {Icon && <Icon size={18} color='var(--text-dark)' />}
-                  <span>{option.label}</span>
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          }
+          align='end'
+        />
       )}
     </div>
   );

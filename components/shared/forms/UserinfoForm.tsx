@@ -26,7 +26,7 @@ import {
 import { COUNTRY_CODES } from '@/constants/common';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { Calendar1 } from 'iconsax-react';
+import { Calendar } from 'iconsax-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
 import LoadingComponent from '../common/LoadingComponent';
@@ -261,13 +261,9 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
             label={USER_MESSAGES.ROLE_LABEL}
             value={roleId}
             onValueChange={setRoleId}
-            options={roles.map(role => ({
-              value: String(role.id),
-              label:
-                role.status === 'INACTIVE'
-                  ? `${role.name} (Deactivated)`
-                  : role.name,
-              disabled: role.status === 'INACTIVE',
+            options={roles.map(({ id, name }) => ({
+              value: String(id),
+              label: name,
             }))}
             placeholder={
               loadingRoles
@@ -281,10 +277,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
         {/* First Row - Full Name, Designation, Date of Joining */}
         <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
           <div className='space-y-2'>
-            <Label
-              htmlFor='full-name'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='full-name' className='field-label'>
               {USER_MESSAGES.FULL_NAME_LABEL}
             </Label>
             <Input
@@ -293,7 +286,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
               value={fullName}
               onChange={e => setFullName(e.target.value)}
               className={cn(
-                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                'input-field',
                 errors.fullName
                   ? 'border-[var(--warning)]'
                   : 'border-[var(--border-dark)]'
@@ -302,10 +295,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
             <FormErrorMessage message={errors.fullName || ''} />
           </div>
           <div className='space-y-2'>
-            <Label
-              htmlFor='designation'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='designation' className='field-label'>
               {USER_MESSAGES.DESIGNATION_LABEL}
             </Label>
             <Input
@@ -314,7 +304,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
               value={designation}
               onChange={e => setDesignation(e.target.value)}
               className={cn(
-                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                'input-field',
                 errors.designation
                   ? 'border-[var(--warning)]'
                   : 'border-[var(--border-dark)]'
@@ -323,10 +313,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
             <FormErrorMessage message={errors.designation || ''} />
           </div>
           <div className='space-y-2'>
-            <Label
-              htmlFor='date'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='date' className='field-label'>
               {USER_MESSAGES.DATE_OF_JOINING_LABEL}
             </Label>
             <Popover>
@@ -346,7 +333,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
                   ) : (
                     <span>{USER_MESSAGES.SELECT_DATE}</span>
                   )}
-                  <Calendar1 className='ml-auto h-4 w-4 opacity-50' />
+                  <Calendar className='ml-auto !h-6 !w-6' color='#24338C' />
                 </Button>
               </PopoverTrigger>
               <PopoverContent
@@ -377,10 +364,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
           )}
         >
           <div className='space-y-2'>
-            <Label
-              htmlFor='email'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='email' className='field-label'>
               {USER_MESSAGES.EMAIL_LABEL}
             </Label>
             <Input
@@ -390,7 +374,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
               value={email}
               onChange={e => setEmail(e.target.value)}
               className={cn(
-                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                'input-field',
                 errors.email
                   ? 'border-[var(--warning)]'
                   : 'border-[var(--border-dark)]'
@@ -466,10 +450,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
           {/* Password field - only shown in edit mode */}
           {isEditMode && (
             <div className='space-y-2'>
-              <Label
-                htmlFor='password'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='password' className='field-label'>
                 {USER_MESSAGES.PASSWORD_LABEL}{' '}
                 <span className='text-sm text-gray-500'>
                   {USER_MESSAGES.PASSWORD_OPTIONAL_HINT}
@@ -482,10 +463,10 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 className={cn(
-                  'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                  'input-field',
                   errors.password
-                    ? 'border-[var(--warning)]'
-                    : 'border-[var(--border-dark)]'
+                    ? '!border-[var(--warning)]'
+                    : '!border-[var(--border-dark)]'
                 )}
               />
               <FormErrorMessage message={errors.password || ''} />
@@ -494,10 +475,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
         </div>
         {/* Third Row - Address */}
         <div className='space-y-2'>
-          <Label
-            htmlFor='address'
-            className='text-[14px] font-semibold text-[var(--text-dark)]'
-          >
+          <Label htmlFor='address' className='field-label'>
             {USER_MESSAGES.ADDRESS_LABEL}
           </Label>
           <Input
@@ -506,7 +484,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
             value={address}
             onChange={e => setAddress(e.target.value)}
             className={cn(
-              'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+              'input-field',
               errors.address
                 ? 'border-[var(--warning)]'
                 : 'border-[var(--border-dark)]'
@@ -517,10 +495,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
         {/* Fourth Row - City, Pin Code */}
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div className='space-y-2'>
-            <Label
-              htmlFor='city'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='city' className='field-label'>
               {USER_MESSAGES.CITY_LABEL}
             </Label>
             <Input
@@ -529,7 +504,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
               value={city}
               onChange={e => setCity(e.target.value)}
               className={cn(
-                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                'input-field',
                 errors.city
                   ? 'border-[var(--warning)]'
                   : 'border-[var(--border-dark)]'
@@ -538,10 +513,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
             <FormErrorMessage message={errors.city || ''} />
           </div>
           <div className='space-y-2'>
-            <Label
-              htmlFor='pin-code'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+            <Label htmlFor='pin-code' className='field-label'>
               {USER_MESSAGES.PIN_CODE_LABEL}
             </Label>
             <Input
@@ -550,7 +522,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
               value={pinCode}
               onChange={e => setPinCode(e.target.value)}
               className={cn(
-                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                'input-field',
                 errors.pinCode
                   ? 'border-[var(--warning)]'
                   : 'border-[var(--border-dark)]'
@@ -562,14 +534,14 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
         <div className='pt-4 flex items-center justify-end gap-3'>
           <Button
             type='button'
-            className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
+            className='btn-secondary !h-12 !px-8'
             onClick={handleCancel}
           >
             {USER_MESSAGES.CANCEL_BUTTON}
           </Button>
           <Button
             type='submit'
-            className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
+            className='btn-primary !h-12 !px-12'
             disabled={loading}
           >
             {isEditMode

@@ -68,19 +68,12 @@ export function StepGeneralInfo({
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {/* Your Name (full width) */}
           <div className='flex flex-col gap-2 col-span-1 md:col-span-2'>
-            <label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-              Your Name
-            </label>
-            <Input
-              placeholder='Enter your full name'
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-            />
+            <label className='field-label'>Your Name</label>
+            <Input placeholder='Enter your full name' className='input-field' />
           </div>
           {/* Project Start Date */}
           <div className='flex flex-col gap-2'>
-            <label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-              Project Start Date
-            </label>
+            <label className='field-label'>Project Start Date</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -110,9 +103,7 @@ export function StepGeneralInfo({
           </div>
           {/* Project Finish Date */}
           <div className='flex flex-col gap-2'>
-            <label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-              Project Finish Date
-            </label>
+            <label className='field-label'>Project Finish Date</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -143,9 +134,7 @@ export function StepGeneralInfo({
           {/* Email(s) */}
           <div className='flex flex-col gap-2'>
             <div className='flex items-center justify-between'>
-              <label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                Email
-              </label>
+              <label className='field-label'>Email</label>
               <button
                 type='button'
                 className='text-green-600 text-xs font-semibold'
@@ -159,7 +148,7 @@ export function StepGeneralInfo({
                 key={idx}
                 type='email'
                 placeholder='Enter your email'
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] mb-2'
+                className='input-field mb-2'
                 value={email}
                 onChange={e => handleEmailChange(idx, e.target.value)}
               />
@@ -168,9 +157,7 @@ export function StepGeneralInfo({
           {/* Phone(s) */}
           <div className='flex flex-col gap-2'>
             <div className='flex items-center justify-between'>
-              <label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-                Phone Number
-              </label>
+              <label className='field-label'>Phone Number</label>
               <button
                 type='button'
                 className='text-green-600 text-xs font-semibold'
@@ -183,7 +170,7 @@ export function StepGeneralInfo({
               <Input
                 key={idx}
                 placeholder='Enter your number'
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] mb-2'
+                className='input-field mb-2'
                 value={phone}
                 onChange={e => handlePhoneChange(idx, e.target.value)}
               />
@@ -191,21 +178,14 @@ export function StepGeneralInfo({
           </div>
           {/* Your Budget */}
           <div className='flex flex-col gap-2'>
-            <label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-              Your Budget
-            </label>
-            <Input
-              placeholder='Enter your Budget'
-              className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-            />
+            <label className='field-label'>Your Budget</label>
+            <Input placeholder='Enter your Budget' className='input-field' />
           </div>
           {/* Preferred Contractor */}
           <div className='flex flex-col gap-2'>
-            <label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-              Preferred Contractor
-            </label>
+            <label className='field-label'>Preferred Contractor</label>
             <Select value={contractor} onValueChange={setContractor}>
-              <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
+              <SelectTrigger className='input-field'>
                 <SelectValue placeholder='Any' />
               </SelectTrigger>
               <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
@@ -218,20 +198,12 @@ export function StepGeneralInfo({
         </div>
         {/* Address */}
         <div className='flex flex-col gap-2'>
-          <label className='text-[14px] font-semibold text-[var(--text-dark)]'>
-            Address
-          </label>
-          <Input
-            placeholder='Enter your address'
-            className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-          />
+          <label className='field-label'>Address</label>
+          <Input placeholder='Enter your address' className='input-field' />
         </div>
         {/* Next Step Button */}
         <div className='flex justify-end mt-4'>
-          <Button
-            type='submit'
-            className='bg-[var(--secondary)] hover:bg-green-600 text-white px-10 py-6 rounded-full font-semibold'
-          >
+          <Button type='submit' className='btn-primary !h-12 !px-12'>
             Next Step
           </Button>
         </div>

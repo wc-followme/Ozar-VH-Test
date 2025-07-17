@@ -4,6 +4,7 @@ import { Calendar, Gallery, Location, MessageNotif, Sms } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import { CurvedBgIcon } from '../../icons/CurvedBgIcon';
 
 interface JobCardProps {
@@ -21,6 +22,10 @@ interface JobCardProps {
 }
 
 export function JobCard({ job }: JobCardProps) {
+  const [imgSrc, setImgSrc] = useState(
+    job.image || '/images/img-placeholder-md.png'
+  );
+
   const getProgressColor = (progress: number) => {
     if (progress >= 90) return 'bg-[var(--secondary)]';
     if (progress >= 70) return 'bg-blue-500';
@@ -45,17 +50,18 @@ export function JobCard({ job }: JobCardProps) {
 
   return (
     <Card
-      className='border-1 border-[#E8EAED] shadow-sm hover:shadow-md bg-[var(--card-background)] transition-shadow duration-200 rounded-[16px] overflow-hidden cursor-pointer'
+      className='border-1 border-[var(--border-dark)] shadow-sm hover:shadow-xl bg-[var(--card-background)] transition-shadow duration-200 rounded-[16px] overflow-hidden cursor-pointer'
       onClick={handleCardClick}
     >
       <CardContent className='p-0'>
         <div className='relative'>
           <Image
-            src={job.image}
+            src={imgSrc}
             alt={job.title}
             width={400}
             height={200}
             className='w-full h-48 object-cover rounded-t-lg'
+            onError={() => setImgSrc('/images/img-placeholder-md.png')}
           />
           <Badge
             className={`absolute top-3 left-3 text-[12px]  font-medium gap-1 p-1 rounded-[30px] text-[#2D2D2D] border-0 bg-white`}
@@ -98,20 +104,26 @@ export function JobCard({ job }: JobCardProps) {
           <div className='space-y-2'>
             <div className='flex items-center gap-2 text-sm text-[var(--text-dark)] font-normal'>
               <Sms size='22' color='#EBB402' className='flex-shrink-0' />
-              <span>{job.email}</span>
+              <span className='overflow-hidden text-ellipsis whitespace-nowrap'>
+                {job.email}
+              </span>
             </div>
             <div className='flex items-center gap-2 text-sm text-[var(--text-dark)] font-normal'>
               <Location size='22' color='#34AD44' className='flex-shrink-0' />
-              <span>{job.address}</span>
+              <span className='overflow-hidden text-ellipsis whitespace-nowrap'>
+                {job.address}
+              </span>
             </div>
             <div className='flex items-center'>
               <div className='flex items-center gap-1 text-sm text-[var(--text-dark)] font-normal'>
                 <Calendar size='22' color='#24338C' className='flex-shrink-0' />
-                <span>{job.startDate}</span>
+                <span className='overflow-hidden text-ellipsis whitespace-nowrap'>
+                  {job.startDate}
+                </span>
               </div>
               <Badge
                 variant='outline'
-                className='text-xs ml-auto px-3 py-[3px] text-[12px] font-medium text-[#2D2D2D] bg-[#F4F5F6] border-0'
+                className='text-xs ml-auto px-3 py-[3px] text-[12px] font-medium text-[#2D2D2D] bg-[#F4F5F6] border-0 overflow-hidden text-ellipsis whitespace-nowrap'
               >
                 {job.daysLeft} Days left
               </Badge>

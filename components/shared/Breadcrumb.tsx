@@ -24,7 +24,7 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
       )}
     >
       <ol className='inline-flex items-center space-x-1'>
-        {items.map((item, index) => {
+        {items.map(({ name, href }, index) => {
           const isLast = index === items.length - 1;
 
           return (
@@ -33,14 +33,14 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
                 <ArrowRight2 size='16' color='var(--text-secondary)' />
               )}
 
-              {isLast || !item.href ? (
-                <span className='text-[var(--primary)]'>{item.name}</span>
+              {isLast || !href ? (
+                <span className='text-[var(--primary)]'>{name}</span>
               ) : (
                 <Link
-                  href={item.href}
+                  href={href}
                   className='text-[var(--text-dark)] hover:underline hover:text-foreground transition-colors'
                 >
-                  {item.name}
+                  {name}
                 </Link>
               )}
             </li>
