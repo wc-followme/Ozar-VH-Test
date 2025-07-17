@@ -11,9 +11,11 @@ import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import ComingSoon from '../../../../../components/shared/common/ComingSoon';
+import CompanyManagementAddUser from '../../../../../components/shared/CompanyManagementAddUser';
+import { Button } from '../../../../../components/ui/button';
 import { Role, RoleApiResponse, UserFormData } from '../../types';
 import { USER_MESSAGES } from '../../user-messages';
 
@@ -29,6 +31,204 @@ const UserInfoForm = dynamic(
   }
 );
 
+// Dummy data for access control accordions
+const ACCESS_CONTROL_ACCORDIONS_DATA = [
+  {
+    title: 'Roles Access Control Settings',
+    badgeLabel: 'Full Access',
+    stripes: [
+      {
+        title: 'Browse Roles Setting',
+        description:
+          'View complete list of available roles and their basic information',
+      },
+      {
+        title: 'Configure & Modify Roles Setting',
+        description:
+          'Modify or set up new roles with custom names, descriptions, and setting assignments',
+      },
+      {
+        title: 'Archive & Restore Roles Setting',
+        description:
+          'Remove roles that are no longer needed with data safety controls',
+      },
+    ],
+  },
+  {
+    title: 'Users Access Control Settings',
+    badgeLabel: 'Limited Access',
+    stripes: [
+      {
+        title: 'View User List & Details Setting',
+        description:
+          'Access complete user list and detailed individual user information',
+      },
+      {
+        title: 'Create & Assign User Setting',
+        description:
+          'Create new accounts, edit user information, and manage user settings',
+      },
+      {
+        title: 'Manage Custom Settings to User Setting',
+        description:
+          'Assign and edit specific settings to individual users that override role-based settings',
+      },
+      {
+        title: 'Archive & Restore Users Setting',
+        description:
+          'Remove users that are no longer needed with data safety controls',
+      },
+    ],
+  },
+  {
+    title: 'Company Management & Operations Settings',
+    badgeLabel: 'Restricted',
+    stripes: [
+      {
+        title: 'Company Listing & Details Setting',
+        description:
+          'View complete company list and access detailed company information, including company users',
+      },
+      {
+        title: 'Company User Assignment Setting',
+        description:
+          'Add employees to companies and manage user setting',
+      },
+      {
+        title: 'Archive & Restore Company Setting',
+        description:
+          'Remove companies that are no longer needed with data safety controls',
+      },
+    ],
+  },
+  {
+    title: 'Category Management Settings',
+    badgeLabel: 'Restricted',
+    stripes: [
+      {
+        title: 'Browse Category Setting',
+        description:
+          'View complete service categories list and access category details',
+      },
+      {
+        title: 'Create & Modify Category Setting',
+        description:
+          'Create new service categories and manage categories',
+      },
+      {
+        title: 'Archive & Restore Category Setting',
+        description:
+          'Remove categories that are no longer needed with data safety controls',
+      },
+    ],
+  },
+  {
+    title: 'Trade Management Settings',
+    badgeLabel: 'Restricted',
+    stripes: [
+      {
+        title: 'Browse Trade Setting',
+        description:
+          'View complete trades list and access trade details',
+      },
+      {
+        title: 'Create & Modify Trade Setting',
+        description:
+          'Create new trades and manage trade categories',
+      },
+      {
+        title: 'Archive & Restore Trade Setting',
+        description:
+          'Remove trade classifications that are no longer needed with data safety controls',
+      },
+    ],
+  },
+  {
+    title: 'Service Management Settings',
+    badgeLabel: 'Restricted',
+    stripes: [
+      {
+        title: 'Browse Service Setting',
+        description:
+          'View complete services list and access service details',
+      },
+      {
+        title: 'Create & Modify Service Setting',
+        description:
+          'Create new services and manage services',
+      },
+      {
+        title: 'Archive & Restore Service Setting',
+        description:
+          'Remove services that are no longer offered with data safety controls',
+      },
+    ],
+  },
+  {
+    title: 'Material Management Settings',
+    badgeLabel: 'Restricted',
+    stripes: [
+      {
+        title: 'Browse Material Setting',
+        description:
+          'View complete materials list and access material details including specifications',
+      },
+      {
+        title: 'Create & Modify Material Setting',
+        description:
+          'Create new material entries and manage material',
+      },
+      {
+        title: 'Archive & Restore Material Setting',
+        description:
+          'Remove materials that are no longer used with data safety controls',
+      },
+    ],
+  },
+  {
+    title: 'Tools Management Settings',
+    badgeLabel: 'Restricted',
+    stripes: [
+      {
+        title: 'Browse Tools Setting',
+        description:
+          'View complete tools list and access tool details including specifications',
+      },
+      {
+        title: 'Create & Modify Tools Setting',
+        description:
+          'Create new tool entries and manage tool specifications',
+      },
+      {
+        title: 'Archive & Restore Tools Setting',
+        description:
+          'Remove tools that are no longer in service with data safety controls',
+      },
+      {
+        title: 'Access Tool History Setting',
+        description:
+          'View comprehensive tool history including usage logs and maintenance records',
+      },
+    ],
+  },
+  {
+    title: 'Job Creation & Basic Job Setup Settings',
+    badgeLabel: 'Restricted',
+    stripes: [
+      {
+        title: 'Create & Modify Job Setting',
+        description:
+          'Create new jobs and manage job details',
+      },
+      {
+        title: 'Archive & Restore Job Setting',
+        description:
+          'Remove jobs that are no longer active with data safety controls',
+      },
+    ],
+  },
+];
+
 interface EditUserPageProps {
   params: Promise<{
     uuid: string;
@@ -42,6 +242,34 @@ const breadcrumbData: BreadcrumbItem[] = [
 
 export default function EditUserPage({ params }: EditUserPageProps) {
   const resolvedParams = React.use(params);
+
+  // State for all accordions' switches
+  const [accordions, setAccordions] = useState(() =>
+    ACCESS_CONTROL_ACCORDIONS_DATA.map(acc => ({
+      ...acc,
+      stripes: acc.stripes.map(() => true), // all switches checked by default
+    }))
+  );
+
+  // State for which accordion is open
+  const [openAccordionIdx, setOpenAccordionIdx] = useState(0);
+
+  // Handler to toggle a switch
+  const handleToggle = (accordionIdx: number, stripeIdx: number) => {
+    setAccordions(prev =>
+      prev.map((acc, aIdx) =>
+        aIdx === accordionIdx
+          ? {
+              ...acc,
+              stripes: acc.stripes.map((checked: boolean, sIdx: number) =>
+                sIdx === stripeIdx ? !checked : checked
+              ),
+            }
+          : acc
+      )
+    );
+  };
+
   const [selectedTab, setSelectedTab] = useState('info');
   const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
@@ -149,7 +377,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
-    } catch (err: unknown) {
+    } catch {
       showErrorToast(USER_MESSAGES.UPLOAD_ERROR);
       setPhotoFile(null);
       setFileKey('');
@@ -298,8 +526,50 @@ export default function EditUserPage({ params }: EditUserPageProps) {
             </TabsContent>
 
             <TabsContent value='permissions' className='pt-8'>
-              <div className='text-center py-10 text-gray-500'>
-                <ComingSoon />
+              <div className='flex flex-col gap-4'>
+                {accordions.map((accordion, idx) => {
+                  const { title, badgeLabel, stripes } = accordion;
+                  return (
+                    <CompanyManagementAddUser
+                      key={title + idx}
+                      title={title}
+                      badgeLabel={badgeLabel}
+                      stripes={
+                        Array.isArray(stripes) &&
+                        Array.isArray(
+                          ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes
+                        )
+                          ? ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes.map(
+                              (stripe, sIdx) => ({
+                                title: stripe.title,
+                                description: stripe.description,
+                                checked:
+                                  typeof stripes?.[sIdx] === 'boolean'
+                                    ? stripes[sIdx]
+                                    : false,
+                                onToggle: () => handleToggle(idx, sIdx),
+                              })
+                            )
+                          : []
+                      }
+                      open={openAccordionIdx === idx}
+                      onOpenChange={open =>
+                        setOpenAccordionIdx(open ? idx : -1)
+                      }
+                    />
+                  );
+                })}
+              </div>
+              <div className='flex justify-end gap-6 mt-8'>
+                <Link
+                  href={''}
+                  className='inline-flex items-center h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] hover:bg-gray-50 transition-colors'
+                >
+                  Cancel
+                </Link>
+                <Button className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'>
+                  Update
+                </Button>
               </div>
             </TabsContent>
           </Tabs>
