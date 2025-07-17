@@ -82,6 +82,7 @@ const CategoryManagement = () => {
       const res = await apiService.fetchCategories({
         page: 1,
         limit: PAGINATION.DEFAULT_LIMIT,
+        status: 'ACTIVE', // Only fetch active categories
       });
 
       // Handle different possible response structures

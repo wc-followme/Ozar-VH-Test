@@ -12,6 +12,7 @@ import FormErrorMessage from './FormErrorMessage';
 interface Option {
   value: string;
   label: string;
+  disabled?: boolean;
 }
 
 interface SelectFieldProps {
@@ -64,10 +65,11 @@ const SelectField: React.FC<SelectFieldProps> = ({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent className={selectContentStyle}>
-          {options.map(({ value, label }) => (
+          {options.map(({ value, label, disabled }) => (
             <SelectItem
               key={value}
               value={value}
+              disabled={disabled ?? false}
               className={`${selectItemStyle} ${optionClassName}`}
             >
               {label}
