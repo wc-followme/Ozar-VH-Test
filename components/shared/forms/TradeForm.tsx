@@ -1,3 +1,8 @@
+import { TRADE_MESSAGES } from '@/app/(DashboardLayout)/trade-management/trade-messages';
+import {
+  Category,
+  TradeFormProps,
+} from '@/app/(DashboardLayout)/trade-management/trade-types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,20 +12,9 @@ import { tradeFormSchema, TradeFormSchema } from '@/lib/validations/trade';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { showErrorToast, showSuccessToast } from '../../ui/use-toast';
 import FormErrorMessage from '../common/FormErrorMessage';
 import MultiSelect from '../common/MultiSelect';
-
-interface Category {
-  id: number;
-  name: string;
-  status: string;
-}
-
-interface TradeFormProps {
-  onSubmit: (data: { tradeName: string; category: string }) => void;
-  loading?: boolean;
-  onCancel?: () => void;
-}
 
 interface TradeFormData {
   tradeName: string;
@@ -28,12 +22,25 @@ interface TradeFormData {
 }
 
 export default function TradeForm({
-  onSubmit,
   loading,
   onCancel,
+  initialTradeUuid,
 }: TradeFormProps) {
   const [categoriesOption, setCategoriesOption] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<TradeFormSchema>({
+    resolver: yupResolver(tradeFormSchema),
+    defaultValues: {
+      tradeName: '',
+      categories: [],
+    },
+  });
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -49,29 +56,84 @@ export default function TradeForm({
         setLoadingCategories(false);
       }
     };
-
     fetchCategories();
   }, []);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<TradeFormSchema>({
-    resolver: yupResolver(tradeFormSchema),
-    defaultValues: {
-      tradeName: '',
-      categories: [],
-    },
-  });
+  useEffect(() => {
+    if (!initialTradeUuid || loadingCategories) return;
 
-  const onFormSubmit = (data: TradeFormSchema) => {
-    onSubmit({
-      tradeName: data.tradeName,
-      category: data.categories.join(', '),
-    });
-    reset();
+    const fetchTrade = async () => {
+      try {
+        const response = await apiService.getTradeDetails(initialTradeUuid);
+        if (response.statusCode === 200 && response.data) {
+          const tradeData = response.data;
+
+          // Extract category IDs from categories array
+          const categoryIds = Array.isArray(tradeData.categories)
+            ? tradeData.categories.map((category: any) =>
+                category?.id ? String(category.id) : null
+              )
+            : [];
+
+          reset({
+            tradeName: tradeData.name || '',
+            categories: categoryIds,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch trade details:', error);
+        // Optionally show error toast
+      }
+    };
+    fetchTrade();
+  }, [initialTradeUuid, reset, loadingCategories, categoriesOption]);
+
+  const onFormSubmit = async (data: TradeFormSchema) => {
+    const { tradeName, categories } = data;
+    try {
+      const payload = {
+        name: tradeName,
+        description: '', // You can add a description field to the form if needed
+        is_default: false,
+        is_active: true,
+        status: 'ACTIVE',
+        category_ids: categories.join(','),
+      };
+
+      if (initialTradeUuid) {
+        // Update existing trade
+        const response = await apiService.updateTrade(
+          initialTradeUuid,
+          payload
+        );
+        const { message } = response;
+        showSuccessToast(message || TRADE_MESSAGES.UPDATE_SUCCESS);
+      } else {
+        // Create new trade
+        const response = await apiService.createTrade(payload);
+        const { message } = response;
+        showSuccessToast(message || TRADE_MESSAGES.CREATE_SUCCESS);
+      }
+
+      reset();
+      if (onCancel) {
+        onCancel();
+      }
+    } catch (error: unknown) {
+      const action = initialTradeUuid ? 'update' : 'create';
+      const errorMessage = initialTradeUuid
+        ? TRADE_MESSAGES.UPDATE_ERROR
+        : TRADE_MESSAGES.CREATE_ERROR;
+
+      showErrorToast(
+        typeof error === 'object' &&
+          error &&
+          'message' in error &&
+          typeof (error as any).message === 'string'
+          ? (error as any).message
+          : errorMessage
+      );
+    }
   };
 
   return (
@@ -84,16 +146,16 @@ export default function TradeForm({
           htmlFor='category'
           className='text-[14px] font-semibold text-[var(--text-dark)]'
         >
-          Category
+          {TRADE_MESSAGES.CATEGORY_LABEL}
         </Label>
         <Controller
           name='categories'
           control={control}
-          render={({ field }) =>
-            loadingCategories ? (
+          render={({ field }) => {
+            return loadingCategories ? (
               <Input
                 disabled
-                placeholder='Loading categories...'
+                placeholder={TRADE_MESSAGES.LOADING_CATEGORIES}
                 className='h-12 w-full border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
               />
             ) : (
@@ -109,21 +171,20 @@ export default function TradeForm({
                     : []
                 }
                 onChange={field.onChange}
-                placeholder='Select Category'
+                placeholder={TRADE_MESSAGES.SELECT_CATEGORY}
                 error={errors.categories?.message as string}
                 name='category'
               />
-            )
-          }
+            );
+          }}
         />
-        <FormErrorMessage message={errors.categories?.message as string} />
       </div>
       <div className='space-y-2'>
         <Label
           htmlFor='tradeName'
           className='text-[14px] font-semibold text-[var(--text-dark)]'
         >
-          Trade Name
+          {TRADE_MESSAGES.TRADE_NAME_LABEL}
         </Label>
         <Controller
           name='tradeName'
@@ -132,7 +193,7 @@ export default function TradeForm({
             <Input
               id='tradeName'
               {...field}
-              placeholder='Enter Trade Name'
+              placeholder={TRADE_MESSAGES.ENTER_TRADE_NAME}
               className={cn(
                 'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
                 errors.tradeName
@@ -152,14 +213,20 @@ export default function TradeForm({
           onClick={onCancel}
           disabled={loading}
         >
-          Cancel
+          {TRADE_MESSAGES.CANCEL_BUTTON}
         </Button>
         <Button
           type='submit'
           className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'
           disabled={loading}
         >
-          {loading ? 'Creating...' : 'Create'}
+          {loading
+            ? initialTradeUuid
+              ? TRADE_MESSAGES.UPDATING_BUTTON
+              : TRADE_MESSAGES.CREATING_BUTTON
+            : initialTradeUuid
+              ? TRADE_MESSAGES.UPDATE_BUTTON
+              : TRADE_MESSAGES.CREATE_BUTTON}
         </Button>
       </div>
     </form>

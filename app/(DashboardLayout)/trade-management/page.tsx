@@ -7,8 +7,10 @@ import TradeCardSkeleton from '@/components/shared/skeleton/TradeCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { Edit2, Trash } from 'iconsax-react';
 import React, { useState } from 'react';
+import { TRADE_MESSAGES } from './trade-messages';
+import { DummyTrade } from './trade-types';
 
-const dummyTrades = [
+const dummyTrades: DummyTrade[] = [
   {
     initials: 'PL',
     initialsBg: 'bg-blue-100 text-blue-700',
@@ -77,18 +79,31 @@ const menuOptions: {
   icon: React.ElementType;
   variant?: 'default' | 'destructive';
 }[] = [
-  { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' },
-  { label: 'Archive', action: 'delete', icon: Trash, variant: 'destructive' },
+  {
+    label: TRADE_MESSAGES.EDIT_MENU,
+    action: 'edit',
+    icon: Edit2,
+    variant: 'default',
+  },
+  {
+    label: TRADE_MESSAGES.DELETE_MENU,
+    action: 'delete',
+    icon: Trash,
+    variant: 'destructive',
+  },
 ];
 
 export default function TradeManagementPage() {
-  const [trades, setTrades] = useState(dummyTrades);
+  const [trades, setTrades] = useState<DummyTrade[]>(dummyTrades);
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [deleteTradeName, setDeleteTradeName] = useState<string>('');
   const [modalOpen, setModalOpen] = useState(false);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingSkeleton, setLoadingSkeleton] = useState(true);
+  const [editingTradeUuid, setEditingTradeUuid] = useState<string | undefined>(
+    undefined
+  );
 
   // Show skeletons for 3 seconds on mount
   React.useEffect(() => {
@@ -98,7 +113,10 @@ export default function TradeManagementPage() {
 
   const handleMenuAction = (action: string, idx: number) => {
     if (action === 'edit') {
-      alert('Edit Called');
+      // For demo purposes, use a hardcoded UUID when editing
+      // In real implementation, this would come from the trade data
+      setEditingTradeUuid('e7222d63-34c1-4177-aa2b-d0e71558b4b1');
+      setSideSheetOpen(true);
     }
     if (action === 'delete') {
       setDeleteIdx(idx);
@@ -141,13 +159,13 @@ export default function TradeManagementPage() {
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
         <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
-          Trade Management
+          {TRADE_MESSAGES.TRADE_MANAGEMENT_TITLE}
         </h1>
         <Button
           className='bg-[var(--secondary)] hover:bg-green-600 rounded-full px-6 h-10 font-semibold text-white'
           onClick={() => setSideSheetOpen(true)}
         >
-          Create Trade
+          {TRADE_MESSAGES.ADD_TRADE_BUTTON}
         </Button>
       </div>
       {/* Trade Grid */}
@@ -170,21 +188,37 @@ export default function TradeManagementPage() {
       </div>
       <ConfirmDeleteModal
         open={modalOpen}
-        title={'Archive Trade'}
-        subtitle={`Are you sure you want to Archive "${deleteTradeName}"? This action cannot be undone.`}
+        title={TRADE_MESSAGES.DELETE_CONFIRM_TITLE}
+        subtitle={TRADE_MESSAGES.DELETE_CONFIRM_SUBTITLE.replace(
+          '{name}',
+          deleteTradeName
+        )}
         onCancel={() => setModalOpen(false)}
         onDelete={handleDelete}
       />
       <SideSheet
-        title='Create Trade'
+        title={
+          editingTradeUuid
+            ? TRADE_MESSAGES.EDIT_TRADE_TITLE
+            : TRADE_MESSAGES.ADD_TRADE_TITLE
+        }
         open={sideSheetOpen}
-        onOpenChange={setSideSheetOpen}
+        onOpenChange={open => {
+          setSideSheetOpen(open);
+          if (!open) {
+            setEditingTradeUuid(undefined);
+          }
+        }}
         size='600px'
       >
         <TradeForm
           onSubmit={handleCreateTrade}
           loading={loading}
-          onCancel={() => setSideSheetOpen(false)}
+          onCancel={() => {
+            setSideSheetOpen(false);
+            setEditingTradeUuid(undefined);
+          }}
+          initialTradeUuid={editingTradeUuid}
         />
       </SideSheet>
     </div>

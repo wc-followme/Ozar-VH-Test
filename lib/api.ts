@@ -902,6 +902,49 @@ class ApiService {
     });
   }
 
+  // Create trade
+  async createTrade(payload: {
+    name: string;
+    description: string;
+    is_default: boolean;
+    is_active: boolean;
+    status: string;
+    category_ids: string;
+  }): Promise<any> {
+    return this.makeRequest('/trades', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Get trade details by UUID
+  async getTradeDetails(uuid: string): Promise<any> {
+    return this.makeRequest(`/trades/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update trade
+  async updateTrade(
+    uuid: string,
+    payload: {
+      name: string;
+      description: string;
+      is_default: boolean;
+      is_active: boolean;
+      status: string;
+      category_ids: string;
+    }
+  ): Promise<any> {
+    return this.makeRequest(`/trades/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Removed testConnection and all debug code
 }
 
