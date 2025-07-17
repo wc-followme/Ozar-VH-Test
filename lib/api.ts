@@ -850,6 +850,14 @@ class ApiService {
     });
   }
 
+  // Get categories dropdown
+  async getCategoriesDropdown(): Promise<any> {
+    return this.makeRequest('/categories/dropdown', {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   // Change password API
   async changePassword(
     current_password: string,
@@ -859,6 +867,38 @@ class ApiService {
       method: 'POST',
       headers: this.getRoleHeaders(),
       body: JSON.stringify({ current_password, new_password }),
+    });
+  }
+
+  // Fetch trades with filters
+  async fetchTrades({
+    page = 1,
+    limit = 10,
+    name = '',
+    description = '',
+    is_active = true,
+    status = 'ACTIVE',
+    category_id = '',
+  }: {
+    page?: number;
+    limit?: number;
+    name?: string;
+    description?: string;
+    is_active?: boolean;
+    status?: string;
+    category_id?: string | number;
+  }): Promise<any> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (name) params.append('name', name);
+    if (description) params.append('description', description);
+    if (is_active !== undefined) params.append('is_active', String(is_active));
+    if (status) params.append('status', status);
+    if (category_id) params.append('category_id', String(category_id));
+    return this.makeRequest(`/trades?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
     });
   }
 
