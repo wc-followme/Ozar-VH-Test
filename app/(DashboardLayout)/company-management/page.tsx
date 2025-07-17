@@ -6,7 +6,11 @@ import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, formatDate } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  extractApiSuccessMessage,
+  formatDate,
+} from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -118,13 +122,21 @@ export default function CompanyManagement() {
       }
 
       const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-      await apiService.updateCompanyStatus(company.uuid, newStatus);
-
-      setCompanies(companies =>
-        companies.map(c => (c.id === id ? { ...c, status: newStatus } : c))
+      const response = await apiService.updateCompanyStatus(
+        company.uuid,
+        newStatus
       );
-
-      showSuccessToast(`${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS}`);
+      setCompanies(companies =>
+        companies.map(c =>
+          c.uuid === company.uuid ? { ...c, status: newStatus } : c
+        )
+      );
+      showSuccessToast(
+        extractApiSuccessMessage(
+          response,
+          COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS
+        )
+      );
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -150,9 +162,11 @@ export default function CompanyManagement() {
         return;
       }
 
-      await apiService.deleteCompany(uuid);
+      const response = await apiService.deleteCompany(uuid);
       setCompanies(companies => companies.filter(c => c.uuid !== uuid));
-      showSuccessToast(COMPANY_MESSAGES.DELETE_SUCCESS);
+      showSuccessToast(
+        extractApiSuccessMessage(response, COMPANY_MESSAGES.DELETE_SUCCESS)
+      );
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {

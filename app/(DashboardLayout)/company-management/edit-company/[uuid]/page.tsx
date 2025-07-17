@@ -11,7 +11,7 @@ import {
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -174,7 +174,9 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
       );
 
       if (response.statusCode === 200) {
-        showSuccessToast(COMPANY_MESSAGES.UPDATE_SUCCESS);
+        showSuccessToast(
+          extractApiSuccessMessage(response, COMPANY_MESSAGES.UPDATE_SUCCESS)
+        );
         router.push('/company-management');
       } else {
         throw new Error(response.message || COMPANY_MESSAGES.UPDATE_ERROR);

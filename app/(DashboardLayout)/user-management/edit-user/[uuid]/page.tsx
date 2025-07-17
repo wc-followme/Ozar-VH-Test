@@ -9,7 +9,7 @@ import { PAGINATION } from '@/constants/common';
 import { apiService, UpdateUserRequest, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -410,8 +410,13 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         payload.date_of_joining = data.date_of_joining;
       }
 
-      await apiService.updateUser(resolvedParams.uuid, payload);
-      showSuccessToast(USER_MESSAGES.UPDATE_SUCCESS);
+      const response = await apiService.updateUser(
+        resolvedParams.uuid,
+        payload
+      );
+      showSuccessToast(
+        extractApiSuccessMessage(response, USER_MESSAGES.UPDATE_SUCCESS)
+      );
       router.push('/user-management');
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)

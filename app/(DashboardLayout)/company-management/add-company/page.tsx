@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { apiService, CreateCompanyRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -98,8 +98,8 @@ export default function AddCompanyPage() {
         payload.expiry_date = data.expiry_date;
       }
 
-      await apiService.createCompany(payload);
-      showSuccessToast(COMPANY_MESSAGES.CREATE_SUCCESS);
+      const response = await apiService.createCompany(payload);
+      showSuccessToast(extractApiSuccessMessage(response, COMPANY_MESSAGES.CREATE_SUCCESS));
       router.push('/company-management');
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)

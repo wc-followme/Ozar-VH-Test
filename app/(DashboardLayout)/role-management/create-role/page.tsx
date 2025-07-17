@@ -5,7 +5,7 @@ import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import { useToast } from '@/components/ui/use-toast';
 import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import { CreateRoleFormData } from '@/lib/validations/role';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -50,7 +50,9 @@ const CreateRole = () => {
         response.statusCode === STATUS_CODES.OK ||
         response.statusCode === STATUS_CODES.CREATED
       ) {
-        showSuccessToast(ROLE_MESSAGES.CREATE_SUCCESS);
+        showSuccessToast(
+          extractApiSuccessMessage(response, ROLE_MESSAGES.CREATE_SUCCESS)
+        );
         router.push('/role-management');
       } else {
         throw new Error(response.message || ROLE_MESSAGES.CREATE_ERROR);

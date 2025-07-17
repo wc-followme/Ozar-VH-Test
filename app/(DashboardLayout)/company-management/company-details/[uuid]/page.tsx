@@ -21,7 +21,11 @@ import {
   User,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, formatDate } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  extractApiSuccessMessage,
+  formatDate,
+} from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
 import { Edit2, Trash } from 'iconsax-react';
 import Image from 'next/image';
@@ -234,11 +238,13 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
       if (!user || !user.uuid)
         throw new Error(USER_MESSAGES.USER_NOT_FOUND_ERROR);
       const newStatus = currentStatus ? 'INACTIVE' : 'ACTIVE';
-      await apiService.updateUserStatus(user.uuid, newStatus);
+      const response = await apiService.updateUserStatus(user.uuid, newStatus);
       setUsers(users =>
         users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
       );
-      showSuccessToast(`${USER_MESSAGES.STATUS_UPDATE_SUCCESS}`);
+      showSuccessToast(
+        extractApiSuccessMessage(response, USER_MESSAGES.STATUS_UPDATE_SUCCESS)
+      );
     } catch (err: unknown) {
       if (handleAuthError(err)) {
         return;
@@ -255,9 +261,11 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
   // User delete handler - same as user-management page
   const handleDeleteUser = async (uuid: string) => {
     try {
-      await apiService.deleteUser(uuid);
+      const response = await apiService.deleteUser(uuid);
       setUsers(users => users.filter(user => user.uuid !== uuid));
-      showSuccessToast(USER_MESSAGES.DELETE_SUCCESS);
+      showSuccessToast(
+        extractApiSuccessMessage(response, USER_MESSAGES.DELETE_SUCCESS)
+      );
     } catch (err: unknown) {
       if (handleAuthError(err)) {
         return;
@@ -310,13 +318,21 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
       const currentStatus = company.status;
       const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
 
-      await apiService.updateCompanyStatus(company.uuid, newStatus);
+      const response = await apiService.updateCompanyStatus(
+        company.uuid,
+        newStatus
+      );
 
       // Update local state
       setCompany(prev => (prev ? { ...prev, status: newStatus } : null));
       setEnabled(newStatus === 'ACTIVE');
 
-      showSuccessToast(`${COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS}`);
+      showSuccessToast(
+        extractApiSuccessMessage(
+          response,
+          COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS
+        )
+      );
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {

@@ -9,7 +9,7 @@ import { PAGINATION } from '@/constants/common';
 import { apiService, CreateUserRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -365,8 +365,8 @@ export default function AddUserPage() {
         pincode: data.pincode,
         profile_picture_url: fileKey,
       };
-      await apiService.createUser(payload);
-      showSuccessToast(USER_MESSAGES.CREATE_SUCCESS);
+      const response = await apiService.createUser(payload);
+      showSuccessToast(extractApiSuccessMessage(response, USER_MESSAGES.CREATE_SUCCESS));
       router.push('/user-management');
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)

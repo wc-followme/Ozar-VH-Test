@@ -15,6 +15,15 @@ export function extractApiErrorMessage(
   return fallback;
 }
 
+// Extracts success message from API response
+export function extractApiSuccessMessage(
+  response: any,
+  fallback = 'Operation completed successfully.'
+) {
+  if (response?.message) return response.message;
+  return fallback;
+}
+
 // Formats a date string to DD/MM/YYYY format (e.g., "30/08/2024")
 // This is the standard date format used across all modules
 export function formatDate(dateString: string): string {
