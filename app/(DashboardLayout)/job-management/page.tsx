@@ -1,6 +1,6 @@
 'use client';
 import { IconFlag } from '@tabler/icons-react';
-import { Add, Profile2User } from 'iconsax-react';
+import { Profile2User } from 'iconsax-react';
 import { DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { FlagHookIcon } from '../../../components/icons/FalgHookIcon';
@@ -123,6 +123,7 @@ export default function JobManagement() {
   const [isOpen, setIsOpen] = useState(false);
   const stats = [
     {
+      id: 'active-projects',
       icon: FlagHookIcon,
       value: '24',
       label: 'Active Projects',
@@ -130,6 +131,7 @@ export default function JobManagement() {
       bgColor: 'bg-[#EBB4021A]',
     },
     {
+      id: 'completed',
       icon: IconFlag,
       value: '18',
       label: 'Completed',
@@ -137,6 +139,7 @@ export default function JobManagement() {
       bgColor: 'bg-[#1A57BF1A]',
     },
     {
+      id: 'revenue',
       icon: DollarSign,
       value: '$2.4M',
       label: 'Revenue',
@@ -144,6 +147,7 @@ export default function JobManagement() {
       bgColor: 'bg-[#31A31D1A]',
     },
     {
+      id: 'team-member',
       icon: Profile2User,
       value: '32',
       label: 'Team Member',
@@ -157,8 +161,15 @@ export default function JobManagement() {
       <div className=''>
         {/* Stats Cards */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-8'>
-          {stats.map((stat, index) => (
-            <StatsCard key={index} {...stat} />
+          {stats.map(({ id, icon, value, label, iconColor, bgColor }) => (
+            <StatsCard
+              key={id}
+              icon={icon}
+              value={value}
+              label={label}
+              iconColor={iconColor}
+              bgColor={bgColor}
+            />
           ))}
         </div>
 
@@ -176,7 +187,7 @@ export default function JobManagement() {
                   className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Need Attention{' '}
-                  <Badge className='py-[4px] px-[6px] text-sm font-medium bg-[#6B77BF] rounded-[8px]'>
+                  <Badge className='py-[4px] px-[6px] text-sm font-medium bg-sidebarpurple rounded-lg'>
                     8
                   </Badge>
                 </TabsTrigger>
@@ -185,7 +196,7 @@ export default function JobManagement() {
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   New Leads
-                  <Badge className='py-[4px] px-[6px] text-sm text-[#90C91D] font-medium bg-transparent rounded-[8px]'>
+                  <Badge className='py-[4px] px-[6px] text-sm text-limebrand font-medium bg-transparent rounded-lg'>
                     8
                   </Badge>
                 </TabsTrigger>
@@ -194,7 +205,7 @@ export default function JobManagement() {
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Ongoing Job
-                  <Badge className='py-[4px] px-[6px] text-sm text-[#EBB402] font-medium bg-transparent rounded-[8px]'>
+                  <Badge className='py-[4px] px-[6px] text-sm text-yellowbrand font-medium bg-transparent rounded-lg'>
                     8
                   </Badge>
                 </TabsTrigger>
@@ -203,7 +214,7 @@ export default function JobManagement() {
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Waiting on Client
-                  <Badge className='py-[4px] px-[6px] text-sm font-medium text-[#EBB402] bg-transparent rounded-[8px]'>
+                  <Badge className='py-[4px] px-[6px] text-sm font-medium text-yellowbrand bg-transparent rounded-lg'>
                     8
                   </Badge>
                 </TabsTrigger>
@@ -212,23 +223,23 @@ export default function JobManagement() {
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Archive
-                  <Badge className='py-[4px] px-[6px] text-sm font-medium bg-transparent text-[#818181] rounded-[8px]'>
+                  <Badge className='py-[4px] px-[6px] text-sm font-medium bg-transparent text-graybrand rounded-lg'>
                     8
                   </Badge>
                 </TabsTrigger>
               </TabsList>
               <Button
-                className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] gap-1 rounded-full font-semibold text-white ml-auto'
+                variant='ghost'
+                className='btn-primary !h-[48px] ml-auto hover:text-white'
                 onClick={() => setIsOpen(true)}
               >
-                <Add size='52' color='#fff' className='!h-5 !w-5' />
                 Create Job
               </Button>
             </div>
             <TabsContent value='info' className='pt-8'>
               <div className='grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
-                {mockJobs.map(job => (
-                  <JobCard key={job.id} job={job} />
+                {mockJobs.map(({ id, ...jobProps }) => (
+                  <JobCard key={id} job={{ id, ...jobProps }} />
                 ))}
               </div>
             </TabsContent>

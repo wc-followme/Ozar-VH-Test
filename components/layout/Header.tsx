@@ -5,24 +5,16 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import { HambergerMenu, Key, UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
-import React, { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '../../lib/utils';
 import { Search } from '../icons/Search';
 import { SignoutIcon } from '../icons/SignoutIcon';
+import Dropdown from '../shared/common/Dropdown';
 import SideSheet from '../shared/common/SideSheet';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
 import { Input } from '../ui/input';
 import { SidebarMobile } from './SidebarMobile';
-type MenuOption = {
-  label: string;
-  action: string;
-  icon: React.ElementType;
-};
+
 const menuOptions = [
   { label: 'View Profile', action: 'edit', icon: UserOctagon },
   { label: 'Change Password', action: 'changePassword', icon: Key },
@@ -84,7 +76,9 @@ export function Header() {
           <SidebarMobile open={sideSheetOpen} onOpenChange={setSideSheetOpen} />
         </div>
         <div className='flex items-center space-x-4 mr-auto'>
-          <h1 className='text-2xl font-bold'>Virtual Homes</h1>
+          <Link href='/' className='text-2xl font-bold'>
+            Virtual Homes
+          </Link>
         </div>
         <div className='flex items-center gap-6'>
           <div className='flex items-center border-2 border-[var(--border-dark)] rounded-[20px] overflow-hidden w-[280px] xl:w-[443px] focus-within:border-green-500'>
@@ -111,12 +105,14 @@ export function Header() {
           {/* <Link href='/'>
             <Notification />
           </Link> */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Dropdown
+            menuOptions={menuOptions}
+            onAction={handleMenuAction}
+            trigger={
               <Button
                 variant='ghost'
                 size='sm'
-                className='h-8 w-8 p-0 flex-shrink-0'
+                className='h-8 w-8 p-0 flex-shrink-0 self-center'
               >
                 <Image
                   src={'/images/profile.jpg'}
@@ -126,33 +122,11 @@ export function Header() {
                   className='h-full w-full rounded-full'
                 />
               </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent
-              align='end'
-              className='bg-[var(--card-background)] border border-[var(--border-dark)] min-w-[185px] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px] p-[10px]'
-            >
-              {menuOptions.map(
-                ({ icon: Icon, label, action }: MenuOption, index: number) => (
-                  <DropdownMenuItem
-                    key={index}
-                    onClick={() => handleMenuAction(action)}
-                    className={cn(
-                      'text-base p-3 rounded-md cursor-pointer text-[var(--text-dark)] transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]'
-                    )}
-                  >
-                    <Icon
-                      size='40'
-                      color='currentcolor'
-                      variant='Outline'
-                      className='!h-6 !w-6'
-                    />
-                    <span>{label}</span>
-                  </DropdownMenuItem>
-                )
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            }
+            align='end'
+            className='min-w-[185px] p-[10px]'
+            itemsClass='py-3'
+          />
         </div>
       </div>
       <SideSheet

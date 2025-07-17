@@ -140,13 +140,8 @@ export default function TradeManagementPage() {
     <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
-        <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
-          Trade Management
-        </h1>
-        <Button
-          className='bg-[var(--secondary)] hover:bg-green-600 rounded-full px-6 h-10 font-semibold text-white'
-          onClick={() => setSideSheetOpen(true)}
-        >
+        <h2 className='page-title'>Trade Management</h2>
+        <Button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
           Create Trade
         </Button>
       </div>
@@ -156,13 +151,13 @@ export default function TradeManagementPage() {
           ? Array.from({ length: 10 }).map((_, idx) => (
               <TradeCardSkeleton key={idx} />
             ))
-          : trades.map((trade, idx) => (
+          : trades.map(({ initials, initialsBg, tradeName, category }, idx) => (
               <InfoCard
-                key={trade.initials + '-' + idx}
-                initials={trade.initials}
-                initialsBg={trade.initialsBg}
-                tradeName={trade.tradeName}
-                category={trade.category}
+                key={initials + '-' + idx}
+                initials={initials}
+                initialsBg={initialsBg}
+                tradeName={tradeName}
+                category={category}
                 menuOptions={menuOptions}
                 onMenuAction={action => handleMenuAction(action, idx)}
               />

@@ -23,7 +23,7 @@ import {
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
-import { Add, Edit2, Trash } from 'iconsax-react';
+import { Edit2, Trash } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -392,9 +392,13 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                 <Link href={`/company-management/edit-company/${company.uuid}`}>
                   <Button
                     variant='outline'
-                    className='!text-[var(--text-dark)] px-6 h-[40px] rounded-full border-[#D0D5DD] text-[#344054] font-semibold !bg-opacity-20 hover:bg-white'
+                    className='btn-secondary !h-9 text-[14px]'
                   >
-                    <Edit2 size='28' color='currentColor' />
+                    <Edit2
+                      size='28'
+                      color='currentColor'
+                      className='[&_path]:stroke-2'
+                    />
                     <span className='text-[var(--text-dark)]'>
                       Edit Details
                     </span>
@@ -404,18 +408,18 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                   className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-1'
                   href={`/company-management/add-user?company_id=${company.uuid}`}
                 >
-                  <Add
+                  {/* <Add
                     size='28'
                     color='#fff'
                     className='text-[var(--text-dark)]'
-                  />
+                  /> */}
                   <span>Add User</span>
                 </Link>
               </div>
             </div>
             {/* Info Row */}
             <div className='flex gap-4'>
-              <div className='flex gap-14 text-[14px] text-[#667085] flex-1 leading-tight'>
+              <div className='flex gap-14 text-[14px] flex-1 leading-tight'>
                 <div>
                   <div className='text-[var(--text-secondary)]'>Industry</div>
                   <div className='font-medium text-[var(--text-dark)]'>
@@ -492,7 +496,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
               </div>
             </div>
             {/* Contact Info Row */}
-            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-6 flex gap-8 text-[14px] text-[#667085]'>
+            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-6 flex gap-8 text-[14px]'>
               <div>
                 <div className='font-medium text-[var(--text-secondary)] mb-1'>
                   Email

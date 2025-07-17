@@ -1,10 +1,10 @@
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import React, { useEffect, useState } from 'react';
 import FormErrorMessage from './FormErrorMessage';
@@ -64,13 +64,13 @@ const SelectField: React.FC<SelectFieldProps> = ({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent className={selectContentStyle}>
-          {options.map(opt => (
+          {options.map(({ value, label }) => (
             <SelectItem
-              key={opt.value}
-              value={opt.value}
+              key={value}
+              value={value}
               className={`${selectItemStyle} ${optionClassName}`}
             >
-              {opt.label}
+              {label}
             </SelectItem>
           ))}
         </SelectContent>

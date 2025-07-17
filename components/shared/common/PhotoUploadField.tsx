@@ -51,9 +51,9 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
         style={{ display: 'none' }}
         onChange={handleChange}
       />
-      <div className='mb-2'>
+      <div className='mb-2 h-full w-full'>
         <div
-          className='w-full min-h-[9.375rem] rounded-xl border-2 border-dashed border-cyanwave-main bg-cyanwave-light flex flex-col items-center justify-center cursor-pointer relative py-10'
+          className='w-full h-full px-4 min-h-[9.375rem] rounded-xl border-2 border-dashed border-cyanwave-main bg-cyanwave-light flex flex-col items-center justify-center cursor-pointer relative py-10'
           onClick={handleClick}
         >
           {photo ? (

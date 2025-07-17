@@ -1,16 +1,11 @@
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import SideSheet from '@/components/shared/common/SideSheet';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { Edit2, Trash } from 'lucide-react';
+import { Edit2, Trash } from 'iconsax-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { Badge } from '../../ui/badge';
+import Dropdown from '../common/Dropdown';
 
 interface ToolCardProps {
   image: string;
@@ -69,8 +64,16 @@ export default function ToolCard({
           </div>
         </div>
         <div className='absolute top-2.5 right-2'>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Dropdown
+            menuOptions={[
+              { label: 'Edit', action: 'edit', icon: Edit2 },
+              { label: 'Archive', action: 'archive', icon: Trash },
+            ]}
+            onAction={action => {
+              if (action === 'edit') alert('Edit clicked');
+              if (action === 'archive') setShowDelete(true);
+            }}
+            trigger={
               <button className='h-8 w-8 p-0 flex items-center justify-center rounded-full'>
                 <IconDotsVertical
                   className='!w-6 !h-6'
@@ -78,27 +81,9 @@ export default function ToolCard({
                   color='var(--text-dark)'
                 />
               </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align='end'
-              className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
-            >
-              <DropdownMenuItem
-                onClick={() => alert('Edit clicked')}
-                className='text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]'
-              >
-                <Edit2 size={18} color='var(--text-dark)' />
-                <span>Edit</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setShowDelete(true)}
-                className='text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]'
-              >
-                <Trash size={18} color='var(--text-dark)' />
-                <span>Archive</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            }
+            align='end'
+          />
           <ConfirmDeleteModal
             open={showDelete}
             title={`Are you sure you want to archive "${name}"?`}

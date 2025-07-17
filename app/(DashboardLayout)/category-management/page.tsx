@@ -33,7 +33,7 @@ import {
   createCategorySchema,
 } from '@/lib/validations/category';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { AddCircle, Edit2, Trash } from 'iconsax-react';
+import { Edit2, Trash } from 'iconsax-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { CATEGORY_MESSAGES } from './category-messages';
@@ -306,20 +306,12 @@ const CategoryManagement = () => {
   };
 
   return (
-    <section className='flex flex-col w-full items-start gap-8 p-6 overflow-y-auto'>
+    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
-        <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
+        <h2 className='page-title'>
           {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
         </h2>
-        <Button
-          onClick={() => setOpen(true)}
-          className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
-        >
-          <AddCircle
-            size='32'
-            color='currentColor'
-            className='!w-[1.375rem] !h-[1.375rem]'
-          />
+        <Button onClick={() => setOpen(true)} className='btn-primary'>
           {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
         </Button>
       </header>
@@ -371,7 +363,7 @@ const CategoryManagement = () => {
         }
         open={open}
         onOpenChange={setOpen}
-        size='400px'
+        size='600px'
       >
         <div className='space-y-6'>
           {isLoadingCategory ? (
@@ -515,7 +507,7 @@ const CategoryManagement = () => {
                 <Button
                   type='button'
                   variant='outline'
-                  className='h-[48px] px-8 rounded-full font-semibold text-[var(--text-dark)] border-2 border-[var(--border-dark)] bg-transparent'
+                  className='btn-secondary !h-12 !px-8'
                   onClick={handleClose}
                   disabled={isSubmitting}
                 >
@@ -523,7 +515,7 @@ const CategoryManagement = () => {
                 </Button>
                 <Button
                   type='submit'
-                  className='h-[48px] px-12 bg-[#38B24D] hover:bg-[#2e9c41] rounded-full font-semibold text-white'
+                  className='btn-primary !h-12 !px-12'
                   disabled={isSubmitting}
                 >
                   {isSubmitting

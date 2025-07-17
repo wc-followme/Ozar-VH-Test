@@ -194,26 +194,33 @@ export default function UserManagement() {
     <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
-        <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
-          {USER_MESSAGES.USER_MANAGEMENT_TITLE}
-        </h1>
+        <h2 className='page-title'>{USER_MESSAGES.USER_MANAGEMENT_TITLE}</h2>
         <div className='flex items-center gap-4'>
           <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger className='w-40 bg-[var(--white-background)] rounded-[30px] border-2 border-[var(--border-dark)] h-[42px]'>
               <SelectValue placeholder={USER_MESSAGES.ALL_USERS} />
             </SelectTrigger>
             <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-              <SelectItem value='all'>{USER_MESSAGES.ALL_USERS}</SelectItem>
-              {roles.map(role => (
-                <SelectItem key={role.id} value={String(role.id)}>
-                  {role.name}
+              <SelectItem
+                value='all'
+                className='text-[var(--text-dark)] hover:bg-[var(--select-option)] focus:bg-[var(--select-option)] cursor-pointer rounded-[5px]'
+              >
+                {USER_MESSAGES.ALL_USERS}
+              </SelectItem>
+              {roles.map(({ id, name }) => (
+                <SelectItem
+                  key={id}
+                  value={String(id)}
+                  className='text-[var(--text-dark)] hover:bg-[var(--select-option)] focus:bg-[var(--select-option)] cursor-pointer rounded-[5px]'
+                >
+                  {name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           <button
             onClick={handleCreateUser}
-            className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
+            className='btn-primary'
             disabled={loading}
           >
             {USER_MESSAGES.ADD_ADMIN_USER_BUTTON}

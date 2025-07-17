@@ -7,7 +7,7 @@ import { PAGINATION } from '@/constants/common';
 import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, formatDate } from '@/lib/utils';
-import { AddCircle, Edit2, Trash } from 'iconsax-react';
+import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { COMPANY_MESSAGES } from './company-messages';
@@ -173,10 +173,10 @@ export default function CompanyManagement() {
   }
 
   return (
-    <div className='w-full overflow-y-auto'>
+    <div className='w-full overflow-y-auto pb-4'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
-        <h1 className='text-2xl font-medium text-[var(--text-dark)]'>
+        <h1 className='page-title'>
           {COMPANY_MESSAGES.COMPANY_MANAGEMENT_TITLE}
         </h1>
         <div className='flex items-center gap-4'>
@@ -184,11 +184,6 @@ export default function CompanyManagement() {
             onClick={handleCreateCompany}
             className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-2'
           >
-            <AddCircle
-              size='32'
-              color='currentColor'
-              className='!w-[1.375rem] !h-[1.375rem]'
-            />
             <span>{COMPANY_MESSAGES.ADD_COMPANY_BUTTON}</span>
           </button>
         </div>

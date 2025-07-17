@@ -31,7 +31,7 @@ export const CATEGORY_MESSAGES = {
   NO_CATEGORIES_FOUND: 'No categories found.',
 
   // Button Labels
-  ADD_CATEGORY_BUTTON: 'Add Category',
+  ADD_CATEGORY_BUTTON: 'Create Category',
   EDIT_CATEGORY_BUTTON: 'Edit Category',
   DELETE_CATEGORY_BUTTON: 'Delete Category',
   CREATE_BUTTON: 'Create',
