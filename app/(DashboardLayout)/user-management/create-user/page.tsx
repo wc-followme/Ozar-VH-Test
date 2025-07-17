@@ -185,10 +185,10 @@ export default function AddUserPage() {
         });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
-          roleList.map((role: Role) => ({
-            id: role.id,
-            name: role.name,
-            status: role.status || 'ACTIVE',
+          roleList.map(({ id, name, status }: Role) => ({
+            id,
+            name,
+            status: status || 'ACTIVE',
           }))
         );
       } catch (err: unknown) {
