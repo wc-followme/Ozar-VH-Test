@@ -333,6 +333,11 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
           COMPANY_MESSAGES.STATUS_UPDATE_SUCCESS
         )
       );
+
+      // If company is archived (status changed to INACTIVE), redirect to company listing
+      if (newStatus === 'INACTIVE') {
+        router.push('/company-management');
+      }
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {

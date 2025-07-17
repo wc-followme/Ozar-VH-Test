@@ -44,7 +44,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
       {menuOptions.map(({ icon: Icon, label, action }, index) => (
         <DropdownMenuItem
           key={index}
-          onClick={() => onAction(action)}
+          onClick={e => {
+            e.stopPropagation();
+            onAction(action);
+          }}
           className={cn(
             'text-base p-[10px] rounded-md cursor-pointer transition-colors flex font-medium items-center gap-2 hover:!bg-[var(--select-option)]',
             itemsClass,

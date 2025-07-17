@@ -167,6 +167,8 @@ export default function CompanyManagement() {
       showSuccessToast(
         extractApiSuccessMessage(response, COMPANY_MESSAGES.DELETE_SUCCESS)
       );
+      // Redirect to company listing page after successful archive
+      router.push('/company-management');
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
