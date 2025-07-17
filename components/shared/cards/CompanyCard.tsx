@@ -81,28 +81,29 @@ export function CompanyCard({
     >
       {/* Header with Avatar, User Info and Menu */}
       <div className=''>
-        <Image
-          src={image || '/images/img-placeholder-md.png'}
-          alt={name}
-          className={`rounded-none object-contain w-auto max-w-full h-auto max-h-full ${isPlaceholder ? ' rounded-xl' : ''}`}
-          width={100}
-          height={188}
-          onError={e => {
-            const target = e.target as HTMLImageElement;
-            if (target.src !== '/images/img-placeholder-md.png') {
-              target.src = '/images/img-placeholder-md.png';
-              setIsPlaceholder(true);
-            }
-          }}
-          onLoad={e => {
-            const target = e.target as HTMLImageElement;
-            if (target.src.includes('img-placeholder-md.png')) {
-              setIsPlaceholder(true);
-            } else {
-              setIsPlaceholder(false);
-            }
-          }}
-        />
+        <div className='relative w-full aspect-[1.87/1] h-[188px]'>
+          <Image
+            src={image || '/images/img-placeholder-md.png'}
+            alt={name}
+            fill
+            className={`${isPlaceholder ? 'object-cover rounded-xl' : 'object-contain'}`}
+            onError={e => {
+              const target = e.target as HTMLImageElement;
+              if (target.src !== '/images/img-placeholder-md.png') {
+                target.src = '/images/img-placeholder-md.png';
+                setIsPlaceholder(true);
+              }
+            }}
+            onLoad={e => {
+              const target = e.target as HTMLImageElement;
+              if (target.src.includes('img-placeholder-md.png')) {
+                setIsPlaceholder(true);
+              } else {
+                setIsPlaceholder(false);
+              }
+            }}
+          />
+        </div>
         <div className='flex-1 min-w-0 pt-[18px]'>
           {/* User Info */}
           <div className='flex items-center justify-between mb-3'>

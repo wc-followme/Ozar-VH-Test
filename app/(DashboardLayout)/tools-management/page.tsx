@@ -73,7 +73,7 @@ const dummyTools = [
   },
   {
     id: 9,
-    image: '/images/tools-management/tools-img-1.png',
+    image: '',
     name: 'Tool Name',
     brand: 'Brand name',
     quantity: 100,

@@ -235,9 +235,6 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
       <div className='flex items-center justify-between'>
         <div>
           <Breadcrumb items={breadcrumbData} className='mb-2' />
-          <h1 className='text-2xl font-bold text-[var(--text)]'>
-            {COMPANY_MESSAGES.EDIT_COMPANY_TITLE}
-          </h1>
         </div>
       </div>
 
