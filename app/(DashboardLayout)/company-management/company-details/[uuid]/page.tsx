@@ -57,7 +57,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
 
   // Get initial tab from URL parameter, default to 'about'
   const initialTab = searchParams.get('tab') || 'about';
-  
+
   const [enabled, setEnabled] = useState(true);
   const [selectedTab, setSelectedTab] = useState(initialTab);
   const [filter, setFilter] = useState('all');
@@ -597,32 +597,40 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                 </div>
               ) : (
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
-                  {filteredUsers.map(user => (
-                    <UserCard
-                      key={user.uuid} // Use uuid instead of id for unique keys
-                      name={user.name}
-                      role={user.role?.name || ''}
-                      phone={user.phone_number}
-                      email={user.email}
-                      image={
-                        user.profile_picture_url
-                          ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
-                            user.profile_picture_url
-                          : ''
-                      }
-                      status={user.status === 'ACTIVE'}
-                      onToggle={() =>
-                        handleUserToggleStatus(
-                          user.id,
-                          user.status === 'ACTIVE'
-                        )
-                      }
-                      onDelete={() => handleDeleteUser(user.uuid)}
-                      menuOptions={menuOptions}
-                      userUuid={user.uuid}
-                      disableActions={usersLoading}
-                    />
-                  ))}
+                  {filteredUsers.map(
+                    ({
+                      uuid,
+                      name,
+                      role,
+                      phone_number,
+                      email,
+                      profile_picture_url,
+                      status,
+                      id,
+                    }) => (
+                      <UserCard
+                        key={uuid} // Use uuid instead of id for unique keys
+                        name={name}
+                        role={role?.name || ''}
+                        phone={phone_number}
+                        email={email}
+                        image={
+                          profile_picture_url
+                            ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+                              profile_picture_url
+                            : ''
+                        }
+                        status={status === 'ACTIVE'}
+                        onToggle={() =>
+                          handleUserToggleStatus(id, status === 'ACTIVE')
+                        }
+                        onDelete={() => handleDeleteUser(uuid)}
+                        menuOptions={menuOptions}
+                        userUuid={uuid}
+                        disableActions={usersLoading}
+                      />
+                    )
+                  )}
                 </div>
               )}
               {usersLoading && users.length > 0 && (

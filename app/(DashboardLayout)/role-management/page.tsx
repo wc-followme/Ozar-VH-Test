@@ -161,29 +161,31 @@ const RoleManagement = () => {
                 {ROLE_MESSAGES.NO_ROLES_FOUND}
               </div>
             ) : (
-              roles.map((role, index) => {
-                const iconOption = iconOptions.find(
-                  opt => opt.value === role.icon
-                ) || {
-                  icon: () => null,
-                  color: '#00a8bf',
-                };
-                return (
-                  <div key={role.uuid || index}>
-                    <RoleCard
-                      menuOptions={menuOptions}
-                      iconSrc={iconOption.icon}
-                      iconBgColor={iconOption.color + '26'}
-                      title={role.name}
-                      description={role.description}
-                      permissionCount={role.total_permissions || 0}
-                      iconColor={iconOption.color}
-                      onEdit={() => handleEditRole(role.uuid)}
-                      onDelete={() => handleDeleteRole(role.uuid)}
-                    />
-                  </div>
-                );
-              })
+              roles.map(
+                ({ uuid, icon, name, description, total_permissions }) => {
+                  const iconOption = iconOptions.find(
+                    opt => opt.value === icon
+                  ) || {
+                    icon: () => null,
+                    color: '#00a8bf',
+                  };
+                  return (
+                    <div key={uuid}>
+                      <RoleCard
+                        menuOptions={menuOptions}
+                        iconSrc={iconOption.icon}
+                        iconBgColor={iconOption.color + '26'}
+                        title={name}
+                        description={description}
+                        permissionCount={total_permissions || 0}
+                        iconColor={iconOption.color}
+                        onEdit={() => handleEditRole(uuid)}
+                        onDelete={() => handleDeleteRole(uuid)}
+                      />
+                    </div>
+                  );
+                }
+              )
             )}
           </div>
         </>

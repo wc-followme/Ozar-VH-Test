@@ -206,25 +206,36 @@ export default function CompanyManagement() {
             </div>
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
-              {companies.map(company => (
-                <CompanyCard
-                  key={company.id}
-                  name={company.name}
-                  createdOn={formatDate(company.created_at)}
-                  subsEnd={formatDate(company.expiry_date)}
-                  image={
-                    company.image
-                      ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + company.image
-                      : ''
-                  }
-                  status={company.status === 'ACTIVE'}
-                  onToggle={() => handleToggleStatus(company.id, company.status)}
-                  menuOptions={menuOptions}
-                  isDefault={company.is_default}
-                  companyUuid={company.uuid}
-                  onDelete={() => handleDeleteCompany(company.uuid)}
-                />
-              ))}
+              {companies.map(
+                ({
+                  id,
+                  name,
+                  created_at,
+                  expiry_date,
+                  image,
+                  status,
+                  is_default,
+                  uuid,
+                }) => (
+                  <CompanyCard
+                    key={id}
+                    name={name}
+                    createdOn={formatDate(created_at)}
+                    subsEnd={formatDate(expiry_date)}
+                    image={
+                      image
+                        ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + image
+                        : ''
+                    }
+                    status={status === 'ACTIVE'}
+                    onToggle={() => handleToggleStatus(id, status)}
+                    menuOptions={menuOptions}
+                    isDefault={is_default}
+                    companyUuid={uuid}
+                    onDelete={() => handleDeleteCompany(uuid)}
+                  />
+                )
+              )}
             </div>
           )}
         </>

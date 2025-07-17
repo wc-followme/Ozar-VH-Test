@@ -232,29 +232,38 @@ export default function UserManagement() {
             </div>
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
-              {users.map(user => (
-                <UserCard
-                  key={user.uuid} // Use uuid instead of id for unique keys
-                  name={user.name}
-                  role={user.role?.name || ''}
-                  phone={user.phone_number}
-                  email={user.email}
-                  image={
-                    user.profile_picture_url
-                      ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
-                        user.profile_picture_url
-                      : ''
-                  }
-                  status={user.status === 'ACTIVE'}
-                  onToggle={() =>
-                    handleToggleStatus(user.id, user.status === 'ACTIVE')
-                  }
-                  menuOptions={menuOptions}
-                  onDelete={() => handleDeleteUser(user.uuid)}
-                  disableActions={loading}
-                  userUuid={user.uuid}
-                />
-              ))}
+              {users.map(
+                ({
+                  uuid,
+                  name,
+                  role,
+                  phone_number,
+                  email,
+                  profile_picture_url,
+                  status,
+                  id,
+                }) => (
+                  <UserCard
+                    key={uuid} // Use uuid instead of id for unique keys
+                    name={name}
+                    role={role?.name || ''}
+                    phone={phone_number}
+                    email={email}
+                    image={
+                      profile_picture_url
+                        ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+                          profile_picture_url
+                        : ''
+                    }
+                    status={status === 'ACTIVE'}
+                    onToggle={() => handleToggleStatus(id, status === 'ACTIVE')}
+                    menuOptions={menuOptions}
+                    onDelete={() => handleDeleteUser(uuid)}
+                    disableActions={loading}
+                    userUuid={uuid}
+                  />
+                )
+              )}
             </div>
           )}
         </>
