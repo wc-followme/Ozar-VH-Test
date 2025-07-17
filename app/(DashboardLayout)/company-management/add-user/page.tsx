@@ -118,10 +118,11 @@ export default function AddCompanyUserPage() {
     const fetchRoles = async () => {
       setLoadingRoles(true);
       try {
-        const rolesRes = await apiService.fetchRoles({
-          page: 1,
-          limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
-        });
+              const rolesRes = await apiService.fetchRoles({
+        page: 1,
+        limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+        status: 'ACTIVE', // Only fetch active roles for dropdown
+      });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
           roleList.map((role: Role) => ({ id: role.id, name: role.name }))

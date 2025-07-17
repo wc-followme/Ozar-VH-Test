@@ -283,6 +283,7 @@ export default function AddUserPage() {
         const rolesRes = await apiService.fetchRoles({
           page: 1,
           limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+          status: 'ACTIVE', // Only fetch active roles for dropdown
         });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(

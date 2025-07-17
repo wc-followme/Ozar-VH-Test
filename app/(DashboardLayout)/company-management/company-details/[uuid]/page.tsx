@@ -174,6 +174,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
         const rolesRes = await apiService.fetchRoles({
           page: 1,
           limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+          status: 'ACTIVE', // Only fetch active roles for dropdown
         });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
@@ -192,8 +193,10 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
       if (searchParam) {
         fetchParams.search = searchParam;
       }
-      const usersRes: FetchUsersResponse =
-        await apiService.fetchUsers(fetchParams);
+      const usersRes: FetchUsersResponse = await apiService.fetchUsers({
+        ...fetchParams,
+        status: 'ACTIVE', // Only fetch active users
+      });
 
       const newUsers = usersRes.data;
       setUsers(prev => {

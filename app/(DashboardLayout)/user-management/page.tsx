@@ -53,6 +53,7 @@ export default function UserManagement() {
           const rolesRes = await apiService.fetchRoles({
             page: 1,
             limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+            status: 'ACTIVE', // Only fetch active roles for dropdown
           });
           const roleList = isRoleApiResponse(rolesRes)
             ? rolesRes.data.data
@@ -70,6 +71,7 @@ export default function UserManagement() {
           page: targetPage,
           limit: PAGINATION.USERS_LIMIT,
           role_id,
+          status: 'ACTIVE', // Only fetch active users
         });
         const newUsers = usersRes.data;
 

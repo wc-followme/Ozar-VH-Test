@@ -46,6 +46,7 @@ const RoleManagement = () => {
           limit,
           search,
           name,
+          status: 'ACTIVE', // Only fetch active roles
         };
         const res = (await apiService.fetchRoles(params)) as RoleApiResponse;
         const data = res.data || { data: [], total: 0 };

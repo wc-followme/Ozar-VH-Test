@@ -91,8 +91,7 @@ const ACCESS_CONTROL_ACCORDIONS_DATA = [
       },
       {
         title: 'Company User Assignment Setting',
-        description:
-          'Add employees to companies and manage user setting',
+        description: 'Add employees to companies and manage user setting',
       },
       {
         title: 'Archive & Restore Company Setting',
@@ -112,8 +111,7 @@ const ACCESS_CONTROL_ACCORDIONS_DATA = [
       },
       {
         title: 'Create & Modify Category Setting',
-        description:
-          'Create new service categories and manage categories',
+        description: 'Create new service categories and manage categories',
       },
       {
         title: 'Archive & Restore Category Setting',
@@ -128,13 +126,11 @@ const ACCESS_CONTROL_ACCORDIONS_DATA = [
     stripes: [
       {
         title: 'Browse Trade Setting',
-        description:
-          'View complete trades list and access trade details',
+        description: 'View complete trades list and access trade details',
       },
       {
         title: 'Create & Modify Trade Setting',
-        description:
-          'Create new trades and manage trade categories',
+        description: 'Create new trades and manage trade categories',
       },
       {
         title: 'Archive & Restore Trade Setting',
@@ -149,13 +145,11 @@ const ACCESS_CONTROL_ACCORDIONS_DATA = [
     stripes: [
       {
         title: 'Browse Service Setting',
-        description:
-          'View complete services list and access service details',
+        description: 'View complete services list and access service details',
       },
       {
         title: 'Create & Modify Service Setting',
-        description:
-          'Create new services and manage services',
+        description: 'Create new services and manage services',
       },
       {
         title: 'Archive & Restore Service Setting',
@@ -175,8 +169,7 @@ const ACCESS_CONTROL_ACCORDIONS_DATA = [
       },
       {
         title: 'Create & Modify Material Setting',
-        description:
-          'Create new material entries and manage material',
+        description: 'Create new material entries and manage material',
       },
       {
         title: 'Archive & Restore Material Setting',
@@ -196,8 +189,7 @@ const ACCESS_CONTROL_ACCORDIONS_DATA = [
       },
       {
         title: 'Create & Modify Tools Setting',
-        description:
-          'Create new tool entries and manage tool specifications',
+        description: 'Create new tool entries and manage tool specifications',
       },
       {
         title: 'Archive & Restore Tools Setting',
@@ -217,8 +209,7 @@ const ACCESS_CONTROL_ACCORDIONS_DATA = [
     stripes: [
       {
         title: 'Create & Modify Job Setting',
-        description:
-          'Create new jobs and manage job details',
+        description: 'Create new jobs and manage job details',
       },
       {
         title: 'Archive & Restore Job Setting',
@@ -310,6 +301,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           apiService.fetchRoles({
             page: 1,
             limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+            status: 'ACTIVE', // Only fetch active roles for dropdown
           }),
         ]);
 
