@@ -52,10 +52,7 @@ export default function ServiceForm({
   return (
     <form onSubmit={handleSubmit} className='space-y-6 w-full max-w-xl'>
       <div className='space-y-2'>
-        <Label
-          htmlFor='trades'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='trades' className='field-label'>
           Trade
         </Label>
         <MultiSelect
@@ -68,10 +65,7 @@ export default function ServiceForm({
         />
       </div>
       <div className='space-y-2'>
-        <Label
-          htmlFor='serviceName'
-          className='text-[14px] font-semibold text-[var(--text-dark)]'
-        >
+        <Label htmlFor='serviceName' className='field-label'>
           Service Name
         </Label>
         <Input
@@ -80,10 +74,10 @@ export default function ServiceForm({
           onChange={e => setServiceName(e.target.value)}
           placeholder='Enter Service Name'
           className={cn(
-            'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+            'input-field',
             errors.serviceName
-              ? 'border-[var(--warning)]'
-              : 'border-[var(--border-dark)]'
+              ? '!border-[var(--warning)]'
+              : '!border-[var(--border-dark)]'
           )}
         />
         <FormErrorMessage message={errors.serviceName || ''} />
@@ -92,7 +86,7 @@ export default function ServiceForm({
         <Button
           type='button'
           variant='outline'
-          className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
+          className='btn-secondary !h-12 !px-8'
           onClick={onCancel}
           disabled={loading}
         >
@@ -100,7 +94,7 @@ export default function ServiceForm({
         </Button>
         <Button
           type='submit'
-          className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'
+          className='btn-primary !h-12 !px-12'
           disabled={loading}
         >
           {loading ? 'Creating...' : 'Create'}

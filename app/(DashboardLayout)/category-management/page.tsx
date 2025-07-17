@@ -2,6 +2,7 @@
 
 import { CategoryCard } from '@/components/shared/cards/CategoryCard';
 import FormErrorMessage from '@/components/shared/common/FormErrorMessage';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import SideSheet from '@/components/shared/common/SideSheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,25 +33,10 @@ import {
   createCategorySchema,
 } from '@/lib/validations/category';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { AddCircle, Edit2, Trash } from 'iconsax-react';
-import { useCallback, useEffect, useState } from 'react';
+import { Edit2, Trash } from 'iconsax-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { CATEGORY_MESSAGES } from './category-messages';
-
-const menuOptions = [
-  {
-    label: CATEGORY_MESSAGES.EDIT_MENU,
-    action: 'edit',
-    icon: Edit2,
-    variant: 'default' as const,
-  },
-  {
-    label: CATEGORY_MESSAGES.DELETE_MENU,
-    action: 'delete',
-    icon: Trash,
-    variant: 'destructive' as const,
-  },
-];
 
 const CategoryManagement = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -61,8 +47,27 @@ const CategoryManagement = () => {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
+  // Memoize menu options to prevent unnecessary re-renders
+  const menuOptions = useMemo(
+    () => [
+      {
+        label: CATEGORY_MESSAGES.EDIT_MENU,
+        action: 'edit',
+        icon: Edit2,
+        variant: 'default' as const,
+      },
+      {
+        label: CATEGORY_MESSAGES.DELETE_MENU,
+        action: 'delete',
+        icon: Trash,
+        variant: 'destructive' as const,
+      },
+    ],
+    []
+  );
+
   // Form management with react-hook-form
-  const defaultIconOption = iconOptions[0];
+  const defaultIconOption = useMemo(() => iconOptions[0], []);
   const {
     control,
     handleSubmit,
@@ -301,56 +306,52 @@ const CategoryManagement = () => {
   };
 
   return (
-    <section className='flex flex-col w-full items-start gap-8 p-6 overflow-y-auto'>
+    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
-        <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
+        <h2 className='page-title'>
           {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
         </h2>
-        <Button
-          onClick={() => setOpen(true)}
-          className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
-        >
-          <AddCircle
-            size='32'
-            color='currentColor'
-            className='!w-[1.375rem] !h-[1.375rem]'
-          />
+        <Button onClick={() => setOpen(true)} className='btn-primary'>
           {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
         </Button>
       </header>
 
       {/* Categories Grid */}
-      {loading ? (
-        <div className='text-center py-10'>{CATEGORY_MESSAGES.LOADING}</div>
-      ) : categories.length === 0 ? (
-        <div className='text-center py-10 text-gray-500'>
-          {CATEGORY_MESSAGES.NO_CATEGORIES_FOUND}
-        </div>
+      {categories.length === 0 && loading ? (
+        <LoadingComponent variant='fullscreen' />
       ) : (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
-          {categories.map((category, index) => {
-            const iconOption = iconOptions.find(
-              opt => opt.value === category.icon
-            ) || {
-              icon: () => null,
-              color: '#00a8bf',
-            };
-            return (
-              <CategoryCard
-                key={category.id || index}
-                name={category.name}
-                description={category.description}
-                iconSrc={iconOption.icon}
-                iconColor={iconOption.color}
-                iconBgColor={iconOption.color + '26'}
-                menuOptions={menuOptions}
-                categoryUuid={category.uuid}
-                onDelete={() => handleDeleteCategory(category.uuid)}
-                onEdit={() => handleEditCategory(category.uuid)}
-              />
-            );
-          })}
-        </div>
+        <>
+          {categories.length === 0 && !loading ? (
+            <div className='text-center py-10 text-gray-500'>
+              {CATEGORY_MESSAGES.NO_CATEGORIES_FOUND}
+            </div>
+          ) : (
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
+              {categories.map((category, index) => {
+                const iconOption = iconOptions.find(
+                  opt => opt.value === category.icon
+                ) || {
+                  icon: () => null,
+                  color: '#00a8bf',
+                };
+                return (
+                  <CategoryCard
+                    key={category.id || index}
+                    name={category.name}
+                    description={category.description}
+                    iconSrc={iconOption.icon}
+                    iconColor={iconOption.color}
+                    iconBgColor={iconOption.color + '26'}
+                    menuOptions={menuOptions}
+                    categoryUuid={category.uuid}
+                    onDelete={() => handleDeleteCategory(category.uuid)}
+                    onEdit={() => handleEditCategory(category.uuid)}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
 
       {/* Create/Edit Category Side Sheet */}
@@ -362,14 +363,11 @@ const CategoryManagement = () => {
         }
         open={open}
         onOpenChange={setOpen}
-        size='400px'
+        size='600px'
       >
         <div className='space-y-6'>
           {isLoadingCategory ? (
-            <div className='text-center py-10'>
-              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4'></div>
-              <p className='text-gray-600'>{CATEGORY_MESSAGES.LOADING}</p>
-            </div>
+            <LoadingComponent variant='fullscreen' size='sm' />
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
               {/* Icon & Category Name */}
@@ -509,7 +507,7 @@ const CategoryManagement = () => {
                 <Button
                   type='button'
                   variant='outline'
-                  className='h-[48px] px-8 rounded-full font-semibold text-[var(--text-dark)] border-2 border-[var(--border-dark)] bg-transparent'
+                  className='btn-secondary !h-12 !px-8'
                   onClick={handleClose}
                   disabled={isSubmitting}
                 >
@@ -517,7 +515,7 @@ const CategoryManagement = () => {
                 </Button>
                 <Button
                   type='submit'
-                  className='h-[48px] px-12 bg-[#38B24D] hover:bg-[#2e9c41] rounded-full font-semibold text-white'
+                  className='btn-primary !h-12 !px-12'
                   disabled={isSubmitting}
                 >
                   {isSubmitting

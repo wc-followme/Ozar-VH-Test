@@ -26,6 +26,7 @@ interface ChangePasswordFormProps {
 export default function ChangePasswordForm({
   onSubmit,
   loading,
+  onCancel,
 }: ChangePasswordFormProps) {
   const {
     control,
@@ -49,6 +50,9 @@ export default function ChangePasswordForm({
       await apiService.changePassword(data.currentPassword, data.newPassword);
       showSuccessToast(CHANGE_PASSWORD_MESSAGES.CHANGE_PASSWORD_SUCCESS);
       reset();
+      if (onCancel) {
+        onCancel();
+      }
     } catch (error: any) {
       showErrorToast(
         error?.message || CHANGE_PASSWORD_MESSAGES.CHANGE_PASSWORD_ERROR
@@ -62,10 +66,7 @@ export default function ChangePasswordForm({
         {CHANGE_PASSWORD_MESSAGES.SUBTITLE}
       </p>
       <div className='mb-4 space-y-2'>
-        <Label
-          htmlFor='currentPassword'
-          className='text-[14px] font-semibold text-[var(--text-dark)] mb-1'
-        >
+        <Label htmlFor='currentPassword' className='field-label mb-1'>
           {CHANGE_PASSWORD_MESSAGES.CURRENT_PASSWORD_LABEL}
         </Label>
         <Controller
@@ -80,10 +81,10 @@ export default function ChangePasswordForm({
               }
               {...field}
               className={cn(
-                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                'input-field',
                 errors.currentPassword
-                  ? 'border-[var(--warning)]'
-                  : 'border-[var(--border-dark)]'
+                  ? '!border-[var(--warning)]'
+                  : '!border-[var(--border-dark)]'
               )}
             />
           )}
@@ -91,10 +92,7 @@ export default function ChangePasswordForm({
         <FormErrorMessage message={errors.currentPassword?.message || ''} />
       </div>
       <div className='mb-4 space-y-2'>
-        <Label
-          htmlFor='newPassword'
-          className='text-[14px] font-semibold text-[var(--text-dark)] mb-1'
-        >
+        <Label htmlFor='newPassword' className='field-label mb-1'>
           {CHANGE_PASSWORD_MESSAGES.NEW_PASSWORD_LABEL}
         </Label>
         <Controller
@@ -107,10 +105,10 @@ export default function ChangePasswordForm({
               placeholder={CHANGE_PASSWORD_MESSAGES.NEW_PASSWORD_PLACEHOLDER}
               {...field}
               className={cn(
-                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                'input-field',
                 errors.newPassword
-                  ? 'border-[var(--warning)]'
-                  : 'border-[var(--border-dark)]'
+                  ? '!border-[var(--warning)]'
+                  : '!border-[var(--border-dark)]'
               )}
             />
           )}
@@ -121,10 +119,7 @@ export default function ChangePasswordForm({
         <FormErrorMessage message={errors.newPassword?.message || ''} />
       </div>
       <div className='mb-8 space-y-2'>
-        <Label
-          htmlFor='confirmPassword'
-          className='text-[14px] font-semibold text-[var(--text-dark)] mb-1'
-        >
+        <Label htmlFor='confirmPassword' className='field-label mb-1'>
           {CHANGE_PASSWORD_MESSAGES.CONFIRM_PASSWORD_LABEL}
         </Label>
         <Controller
@@ -139,10 +134,10 @@ export default function ChangePasswordForm({
               }
               {...field}
               className={cn(
-                'h-12 border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
+                'input-field',
                 errors.confirmPassword
-                  ? 'border-[var(--warning)]'
-                  : 'border-[var(--border-dark)]'
+                  ? '!border-[var(--warning)]'
+                  : '!border-[var(--border-dark)]'
               )}
             />
           )}
@@ -151,12 +146,12 @@ export default function ChangePasswordForm({
       </div>
       <Button
         type='submit'
-        className='w-full h-12 bg-[var(--secondary)] hover:bg-green-600 text-white font-semibold rounded-full text-base mb-6'
+        className='btn-primary !h-12 !px-12 w-full mb-8'
         disabled={loading}
       >
         {CHANGE_PASSWORD_MESSAGES.BUTTON}
       </Button>
-      <div className='text-center text-[14px] text-[var(--text-secondary)] mt-2'>
+      <div className='text-center text-[14px] text-[var(--text-secondary)] mt-2 hidden'>
         {CHANGE_PASSWORD_MESSAGES.SUPPORT_TEXT}{' '}
         <a
           href='#'

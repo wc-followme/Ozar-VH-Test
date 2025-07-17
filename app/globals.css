@@ -5,12 +5,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
 @layer base {
   :root {
     --primary: #24338c;
@@ -71,7 +65,39 @@ body {
     --destructive-foreground: 0 86% 97%;
   }
 }
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .btn-primary {
+    @apply h-[42px] px-6 bg-[var(--secondary)] hover:!bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2;
+  }
+  .btn-secondary {
+    @apply h-[42px] px-[18px] border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center;
+  }
+  .page-title {
+    @apply text-2xl font-medium text-[var(--text-dark)];
+  }
+  .field-label {
+    @apply text-[14px] font-semibold text-[var(--text-dark)] leading-[1];
+  }
+  .input-field {
+    @apply h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] focus:border-green-500 focus:ring-green-500;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Smooth scrolling for tabs */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+}
 @layer base {
   * {
     @apply border-border;
@@ -95,7 +121,7 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0px 1000px #f0f9ff inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
   -webkit-text-fill-color: #2d2d2d !important;
   transition: background-color 5000s ease-in-out 0s;
   color: #2d2d2d;

@@ -51,9 +51,9 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
         style={{ display: 'none' }}
         onChange={handleChange}
       />
-      <div className='mb-2'>
+      <div className='mb-2 h-full w-full'>
         <div
-          className='w-full min-h-[9.375rem] rounded-xl border-2 border-dashed border-cyanwave-main bg-cyanwave-light flex flex-col items-center justify-center cursor-pointer relative py-10'
+          className='w-full h-full px-4 min-h-[9.375rem] rounded-xl border-2 border-dashed border-cyanwave-main bg-cyanwave-light flex flex-col items-center justify-center cursor-pointer relative py-10'
           onClick={handleClick}
         >
           {photo ? (
@@ -105,11 +105,18 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
           <div className='flex gap-2 mt-2'>
             <button
               type='button'
-              className='flex-1 px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)]/90 transition-colors text-sm font-medium'
+              className='flex-1 px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)]/90 transition-colors text-sm font-medium flex items-center justify-center gap-2'
               onClick={handleClick}
               disabled={uploading}
             >
-              {uploading ? 'Uploading...' : 'Change Photo'}
+              {uploading ? (
+                <>
+                  <div className='animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent'></div>
+                  Uploading...
+                </>
+              ) : (
+                'Change Photo'
+              )}
             </button>
             {onDeletePhoto && (
               <button

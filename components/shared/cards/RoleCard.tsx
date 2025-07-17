@@ -3,16 +3,10 @@
 import { ROLE_MESSAGES } from '@/app/(DashboardLayout)/role-management/role-messages';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React, { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
+import Dropdown from '../common/Dropdown';
 
 interface MenuOption {
   label: string;
@@ -73,8 +67,10 @@ export const RoleCard: React.FC<RoleCardProps> = ({
           })}
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <Dropdown
+          menuOptions={menuOptions}
+          onAction={handleMenuAction}
+          trigger={
             <Button
               variant='ghost'
               size='sm'
@@ -86,36 +82,9 @@ export const RoleCard: React.FC<RoleCardProps> = ({
                 color='var(--text)'
               />
             </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent
-            align='end'
-            className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
-          >
-            {menuOptions.map((option, index) => {
-              const IconComponent = option.icon; // ensure Icon is a capitalized component
-              return (
-                <DropdownMenuItem
-                  key={index}
-                  onClick={() => handleMenuAction(option.action)}
-                  className={cn(
-                    'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:!bg-[var(--select-option)]',
-                    option.variant === 'destructive'
-                      ? 'text-red-600 hover:bg-red-50'
-                      : ''
-                  )}
-                >
-                  <IconComponent
-                    size='18'
-                    color='var(--text-dark)'
-                    variant='Outline'
-                  />
-                  <span>{option.label}</span>
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          }
+          align='end'
+        />
       </div>
 
       <CardContent className='flex flex-col items-start gap-4 p-0 w-full flex-1'>
