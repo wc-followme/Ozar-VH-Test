@@ -187,7 +187,7 @@ export default function JobManagement() {
                   className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Need Attention{' '}
-                  <Badge className='py-[4px] px-[6px] text-sm font-medium bg-[#6B77BF] rounded-[8px]'>
+                  <Badge className='py-[4px] px-[6px] text-sm font-medium bg-sidebarpurple rounded-lg'>
                     8
                   </Badge>
                 </TabsTrigger>
@@ -196,7 +196,7 @@ export default function JobManagement() {
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   New Leads
-                  <Badge className='py-[4px] px-[6px] text-sm text-[#90C91D] font-medium bg-transparent rounded-[8px]'>
+                  <Badge className='py-[4px] px-[6px] text-sm text-limebrand font-medium bg-transparent rounded-lg'>
                     8
                   </Badge>
                 </TabsTrigger>
@@ -205,7 +205,7 @@ export default function JobManagement() {
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Ongoing Job
-                  <Badge className='py-[4px] px-[6px] text-sm text-[#EBB402] font-medium bg-transparent rounded-[8px]'>
+                  <Badge className='py-[4px] px-[6px] text-sm text-yellowbrand font-medium bg-transparent rounded-lg'>
                     8
                   </Badge>
                 </TabsTrigger>
@@ -214,7 +214,7 @@ export default function JobManagement() {
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Waiting on Client
-                  <Badge className='py-[4px] px-[6px] text-sm font-medium text-[#EBB402] bg-transparent rounded-[8px]'>
+                  <Badge className='py-[4px] px-[6px] text-sm font-medium text-yellowbrand bg-transparent rounded-lg'>
                     8
                   </Badge>
                 </TabsTrigger>
@@ -223,7 +223,7 @@ export default function JobManagement() {
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Archive
-                  <Badge className='py-[4px] px-[6px] text-sm font-medium bg-transparent text-[#818181] rounded-[8px]'>
+                  <Badge className='py-[4px] px-[6px] text-sm font-medium bg-transparent text-graybrand rounded-lg'>
                     8
                   </Badge>
                 </TabsTrigger>

@@ -65,13 +65,27 @@ export function UserCard({
   // Pick a random color if avatarColor is not provided
   const randomAvatarColor = useMemo(() => {
     if (avatarColor) return avatarColor;
-    if (AVATAR_COLORS && AVATAR_COLORS.length > 0) {
-      const idx = Math.floor(Math.random() * AVATAR_COLORS.length);
-      return AVATAR_COLORS[idx];
+    const colorArray = AVATAR_COLORS ?? [];
+    if (
+      colorArray.length > 0 &&
+      typeof name === 'string' &&
+      name.trim().length > 0
+    ) {
+      // Use the first character of the name to pick a color deterministically
+      const trimmed = name.trim();
+      const firstChar = trimmed.length > 0 ? trimmed[0]?.toUpperCase() : '';
+      if (!firstChar) return { bg: '#ccc', color: '#222' };
+      const charCode = firstChar.charCodeAt(0);
+      // Map A-Z to 0-25, fallback for non-letters
+      const idx =
+        charCode >= 65 && charCode <= 90
+          ? (charCode - 65) % colorArray.length
+          : charCode % colorArray.length;
+      return colorArray[idx] ?? { bg: '#ccc', color: '#222' };
     }
     // fallback color
     return { bg: '#ccc', color: '#222' };
-  }, [avatarColor]);
+  }, [avatarColor, name]);
 
   const handleToggle = async () => {
     if (disableActions) return;

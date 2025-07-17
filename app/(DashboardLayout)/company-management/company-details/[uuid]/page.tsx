@@ -421,7 +421,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
             </div>
             {/* Info Row */}
             <div className='flex gap-4'>
-              <div className='flex gap-14 text-[14px] text-[#667085] flex-1 leading-tight'>
+              <div className='flex gap-14 text-[14px] flex-1 leading-tight'>
                 <div>
                   <div className='text-[var(--text-secondary)]'>Industry</div>
                   <div className='font-medium text-[var(--text-dark)]'>
@@ -498,7 +498,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
               </div>
             </div>
             {/* Contact Info Row */}
-            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-6 flex gap-8 text-[14px] text-[#667085]'>
+            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-6 flex gap-8 text-[14px]'>
               <div>
                 <div className='font-medium text-[var(--text-secondary)] mb-1'>
                   Email

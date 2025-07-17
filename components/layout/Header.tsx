@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { HambergerMenu, Key, UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '../../lib/utils';
 import { Search } from '../icons/Search';
 import { SignoutIcon } from '../icons/SignoutIcon';
@@ -14,11 +14,7 @@ import Dropdown from '../shared/common/Dropdown';
 import SideSheet from '../shared/common/SideSheet';
 import { Input } from '../ui/input';
 import { SidebarMobile } from './SidebarMobile';
-type MenuOption = {
-  label: string;
-  action: string;
-  icon: React.ElementType;
-};
+
 const menuOptions = [
   { label: 'View Profile', action: 'edit', icon: UserOctagon },
   { label: 'Change Password', action: 'changePassword', icon: Key },
