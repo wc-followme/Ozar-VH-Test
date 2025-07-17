@@ -1,8 +1,8 @@
 'use client';
 
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
-import { UserInfoForm } from '@/components/shared/forms/UserinfoForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
@@ -10,11 +10,24 @@ import { apiService, UpdateUserRequest, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage } from '@/lib/utils';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import ComingSoon from '../../../../../components/shared/common/ComingSoon';
 import { Role, RoleApiResponse, UserFormData } from '../../types';
 import { USER_MESSAGES } from '../../user-messages';
+
+// Dynamic import for better performance
+const UserInfoForm = dynamic(
+  () =>
+    import('@/components/shared/forms/UserinfoForm').then(mod => ({
+      default: mod.UserInfoForm,
+    })),
+  {
+    loading: () => <LoadingComponent variant='inline' />,
+    ssr: false,
+  }
+);
 
 interface EditUserPageProps {
   params: Promise<{
@@ -190,11 +203,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   };
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-screen'>
-        <div className='text-center'>{USER_MESSAGES.LOADING}</div>
-      </div>
-    );
+    return <LoadingComponent variant='fullscreen' />;
   }
 
   if (!user) {

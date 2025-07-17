@@ -1,6 +1,7 @@
 'use client';
 import { Search } from '@/components/icons/Search';
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -25,7 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
 import { Edit2, Trash } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { UserCard } from '../../../../../components/shared/cards/UserCard';
 import {
@@ -49,8 +50,16 @@ const breadcrumbData: BreadcrumbItem[] = [
 
 const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
   const resolvedParams = React.use(params);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { showSuccessToast, showErrorToast } = useToast();
+  const { handleAuthError } = useAuth();
+
+  // Get initial tab from URL parameter, default to 'about'
+  const initialTab = searchParams.get('tab') || 'about';
+
   const [enabled, setEnabled] = useState(true);
-  const [selectedTab, setSelectedTab] = useState('about');
+  const [selectedTab, setSelectedTab] = useState(initialTab);
   const [filter, setFilter] = useState('all');
   const [company, setCompany] = useState<GetCompanyResponse['data'] | null>(
     null
@@ -64,10 +73,6 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const router = useRouter();
-  const { showSuccessToast, showErrorToast } = useToast();
-  const { handleAuthError } = useAuth();
 
   const isCompanyApiResponse = (obj: unknown): obj is GetCompanyResponse => {
     return (
@@ -331,14 +336,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
   };
 
   if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4'></div>
-          <p className='text-gray-600'>{COMPANY_MESSAGES.LOADING}</p>
-        </div>
-      </div>
-    );
+    return <LoadingComponent variant='page' />;
   }
 
   if (!company) {
@@ -407,8 +405,8 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                   </Button>
                 </Link>
                 <Link
-                  className='btn-primary !h-9 text-base py-3'
-                  href={'/company-management/add-user'}
+                  className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-1'
+                  href={`/company-management/add-user?company_id=${company.uuid}`}
                 >
                   {/* <Add
                     size='28'
@@ -596,44 +594,56 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
             <div className='mt-6'>
               {/* User Grid */}
               {usersLoading && users.length === 0 ? (
-                <div className='text-center py-10'>{USER_MESSAGES.LOADING}</div>
+                <LoadingComponent variant='inline' />
               ) : users.length === 0 ? (
                 <div className='text-center py-10 text-gray-500'>
                   {USER_MESSAGES.NO_USERS_FOUND}
                 </div>
               ) : (
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
-                  {filteredUsers.map(user => (
-                    <UserCard
-                      key={user.uuid} // Use uuid instead of id for unique keys
-                      name={user.name}
-                      role={user.role?.name || ''}
-                      phone={user.phone_number}
-                      email={user.email}
-                      image={
-                        user.profile_picture_url
-                          ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
-                            user.profile_picture_url
-                          : ''
-                      }
-                      status={user.status === 'ACTIVE'}
-                      onToggle={() =>
-                        handleUserToggleStatus(
-                          user.id,
-                          user.status === 'ACTIVE'
-                        )
-                      }
-                      onDelete={() => handleDeleteUser(user.uuid)}
-                      menuOptions={menuOptions}
-                      userUuid={user.uuid}
-                      disableActions={usersLoading}
-                    />
-                  ))}
+                  {filteredUsers.map(
+                    ({
+                      uuid,
+                      name,
+                      role,
+                      phone_number,
+                      email,
+                      profile_picture_url,
+                      status,
+                      id,
+                    }) => (
+                      <UserCard
+                        key={uuid} // Use uuid instead of id for unique keys
+                        name={name}
+                        role={role?.name || ''}
+                        phone={phone_number}
+                        email={email}
+                        image={
+                          profile_picture_url
+                            ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+                              profile_picture_url
+                            : ''
+                        }
+                        status={status === 'ACTIVE'}
+                        onToggle={() =>
+                          handleUserToggleStatus(id, status === 'ACTIVE')
+                        }
+                        onDelete={() => handleDeleteUser(uuid)}
+                        menuOptions={menuOptions}
+                        userUuid={uuid}
+                        disableActions={usersLoading}
+                      />
+                    )
+                  )}
                 </div>
               )}
               {usersLoading && users.length > 0 && (
                 <div className='text-center py-4'>
-                  {USER_MESSAGES.LOADING_MORE}
+                  <LoadingComponent
+                    variant='inline'
+                    size='sm'
+                    text={USER_MESSAGES.LOADING_MORE}
+                  />
                 </div>
               )}
             </div>

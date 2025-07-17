@@ -30,7 +30,6 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   menuOptions = [],
   onMenuAction,
 }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   return (

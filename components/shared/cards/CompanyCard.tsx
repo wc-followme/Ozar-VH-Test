@@ -74,14 +74,6 @@ export function CompanyCard({
     ? menuOptions.filter(option => option.action !== 'delete')
     : menuOptions;
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase();
-  };
-
   return (
     <div
       className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] hover:shadow-lg px-4 py-[18px] transition-shadow duration-200 cursor-pointer'

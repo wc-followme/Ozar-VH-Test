@@ -7,12 +7,7 @@ import Link from 'next/link';
 import { SignoutIcon } from '../icons/SignoutIcon';
 import { SupportIcon } from '../icons/SupportIcon';
 import Dropdown from '../shared/common/Dropdown';
-type MenuOption = {
-  label: string;
-  action: string;
-  icon: React.ElementType;
-  variant?: 'default' | 'destructive';
-};
+
 const menuOptions = [
   { label: 'View Profile', action: 'edit', icon: UserOctagon },
   { label: 'Logout', action: 'delete', icon: SignoutIcon },

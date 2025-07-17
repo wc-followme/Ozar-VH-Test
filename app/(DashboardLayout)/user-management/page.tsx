@@ -1,7 +1,7 @@
 'use client';
 
 import { UserCard } from '@/components/shared/cards/UserCard';
-import { Button } from '@/components/ui/button';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import {
   Select,
   SelectContent,
@@ -15,7 +15,7 @@ import { apiService, FetchUsersResponse, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { MenuOption, Role, RoleApiResponse } from './types';
 import { USER_MESSAGES } from './user-messages';
@@ -27,8 +27,10 @@ export default function UserManagement() {
   const [loading, setLoading] = useState<boolean>(true);
   const [_page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [isNavigating, setIsNavigating] = useState(false);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+  const router = useRouter();
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -167,6 +169,12 @@ export default function UserManagement() {
     }
   };
 
+  // Handler for create user navigation with loading state
+  const handleCreateUser = useCallback(() => {
+    setIsNavigating(true);
+    router.push('/user-management/create-user');
+  }, [router]);
+
   const menuOptions: MenuOption[] = [
     { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' },
     {
@@ -176,6 +184,11 @@ export default function UserManagement() {
       variant: 'destructive',
     },
   ];
+
+  // Show navigation loading state
+  if (isNavigating) {
+    return <LoadingComponent variant='fullscreen' text='Loading form...' />;
+  }
 
   return (
     <div className='w-full overflow-y-auto'>
@@ -205,58 +218,71 @@ export default function UserManagement() {
               ))}
             </SelectContent>
           </Select>
-          <Button asChild className='btn-primary' disabled={loading}>
-            <Link href='/user-management/create-user'>
-              {USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
-            </Link>
-          </Button>
+          <button
+            onClick={handleCreateUser}
+            className='btn-primary'
+            disabled={loading}
+          >
+            {USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
+          </button>
         </div>
       </div>
-      {/* User Grid */}
-      {loading && users.length === 0 ? (
-        <div className='text-center py-10'>{USER_MESSAGES.LOADING}</div>
-      ) : users.length === 0 ? (
-        <div className='text-center py-10 text-gray-500'>
-          {USER_MESSAGES.NO_USERS_FOUND}
-        </div>
+      {/* Initial Loading State */}
+      {users.length === 0 && loading ? (
+        <LoadingComponent variant='fullscreen' />
       ) : (
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
-          {users.map(
-            ({
-              uuid,
-              name,
-              role,
-              phone_number,
-              email,
-              profile_picture_url,
-              status,
-              id,
-            }) => (
-              <UserCard
-                key={uuid} // Use uuid instead of id for unique keys
-                name={name}
-                role={role?.name || ''}
-                phone={phone_number}
-                email={email}
-                image={
-                  profile_picture_url
-                    ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+        <>
+          {/* User Grid */}
+          {users.length === 0 && !loading ? (
+            <div className='text-center py-10 text-gray-500'>
+              {USER_MESSAGES.NO_USERS_FOUND}
+            </div>
+          ) : (
+            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
+              {users.map(
+                ({
+                  uuid,
+                  name,
+                  role,
+                  phone_number,
+                  email,
+                  profile_picture_url,
+                  status,
+                  id,
+                }) => (
+                  <UserCard
+                    key={uuid} // Use uuid instead of id for unique keys
+                    name={name}
+                    role={role?.name || ''}
+                    phone={phone_number}
+                    email={email}
+                    image={
                       profile_picture_url
-                    : ''
-                }
-                status={status === 'ACTIVE'}
-                onToggle={() => handleToggleStatus(id, status === 'ACTIVE')}
-                menuOptions={menuOptions}
-                onDelete={() => handleDeleteUser(uuid)}
-                disableActions={loading}
-                userUuid={uuid}
-              />
-            )
+                        ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+                          profile_picture_url
+                        : ''
+                    }
+                    status={status === 'ACTIVE'}
+                    onToggle={() => handleToggleStatus(id, status === 'ACTIVE')}
+                    menuOptions={menuOptions}
+                    onDelete={() => handleDeleteUser(uuid)}
+                    disableActions={loading}
+                    userUuid={uuid}
+                  />
+                )
+              )}
+            </div>
           )}
-        </div>
+        </>
       )}
       {loading && users.length > 0 && (
-        <div className='text-center py-4'>{USER_MESSAGES.LOADING_MORE}</div>
+        <div className='text-center py-4'>
+          <LoadingComponent
+            variant='inline'
+            size='sm'
+            text={USER_MESSAGES.LOADING_MORE}
+          />
+        </div>
       )}
     </div>
   );

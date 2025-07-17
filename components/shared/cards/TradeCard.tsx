@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
-import React, { useState } from 'react';
+import React from 'react';
 import Dropdown from '../common/Dropdown';
 
 interface MenuOption {
@@ -28,8 +28,6 @@ export const TradeCard: React.FC<TradeCardProps> = ({
   menuOptions = [],
   onMenuAction,
 }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-
   return (
     <div className='bg-white rounded-[12px] border border-[var(--border-dark)] w-full p-[10px] flex items-center gap-4 min-h-[64px] hover:shadow-md transition-shadow duration-200'>
       {/* Initials */}

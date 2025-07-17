@@ -1,354 +1,324 @@
 'use client';
 
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
-// import CompanyManagementAddUser from '@/components/shared/CompanyManagementAddUser';
-import { ImageUpload } from '@/components/shared/ImageUpload';
-import { Button } from '@/components/ui/button';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { Calendar1 } from 'iconsax-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import ComingSoon from '../../../../components/shared/common/ComingSoon';
+import { useToast } from '@/components/ui/use-toast';
+import { PAGINATION } from '@/constants/common';
+import { apiService, CreateUserRequest } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
+import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
+import { extractApiErrorMessage } from '@/lib/utils';
+import dynamic from 'next/dynamic';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import {
+  Role,
+  RoleApiResponse,
+  UserFormData,
+} from '../../user-management/types';
+import { USER_MESSAGES } from '../../user-management/user-messages';
+
+// Dynamic import for better performance
+const UserInfoForm = dynamic(
+  () =>
+    import('@/components/shared/forms/UserinfoForm').then(mod => ({
+      default: mod.UserInfoForm,
+    })),
+  {
+    loading: () => <LoadingComponent variant='inline' />,
+    ssr: false,
+  }
+);
 
 const breadcrumbData: BreadcrumbItem[] = [
   { name: 'Company Management', href: '/company-management' },
-  {
-    name: 'Envision Construction',
-    href: '/company-management/company-details',
-  },
   { name: 'Add User' }, // current page
 ];
 
 export default function AddCompanyUserPage() {
   const [selectedTab, setSelectedTab] = useState('info');
-  const [date, setDate] = useState<Date>();
-  const [country, setCountry] = useState('us');
-
+  const [fileKey, setFileKey] = useState<string>('');
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
+  const [formLoading, setFormLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { showSuccessToast, showErrorToast } = useToast();
+  const { handleAuthError } = useAuth();
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [companyNumericId, setCompanyNumericId] = useState<number | null>(null);
+  const [loadingCompany, setLoadingCompany] = useState<boolean>(true);
 
-  const handleCreateClick = () => {
-    // Replace with your actual route
-    router.push('/company-management/company-details');
+  // Get company UUID from URL params or use default
+  const companyUuid =
+    searchParams.get('company_id') || '7aef8cc2-91ad-46ea-ba05-514d605eeff2';
+
+  const handleCancel = () => {
+    // Redirect back to the company details page
+    router.push(
+      `/company-management/company-details/${companyUuid}?tab=usermanagement`
+    );
   };
-  const handleUploadClick = () => {
-    // Implement upload logic
+
+  const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'data' in obj &&
+      typeof (obj as RoleApiResponse).data === 'object' &&
+      (obj as RoleApiResponse).data !== null &&
+      'data' in (obj as RoleApiResponse).data &&
+      Array.isArray((obj as RoleApiResponse).data.data)
+    );
+  };
+
+  // Fetch company details to get numeric ID
+  useEffect(() => {
+    const fetchCompanyDetails = async () => {
+      setLoadingCompany(true);
+      try {
+        const companyRes = await apiService.getCompanyDetails(companyUuid);
+        const rawId = companyRes.data.id;
+        console.log('Company response data:', companyRes.data);
+        console.log('Raw ID from API:', rawId, 'Type:', typeof rawId);
+
+        // Convert string ID to number
+        const numericId =
+          typeof rawId === 'string' ? parseInt(rawId, 10) : rawId;
+        console.log(
+          'Converted to numeric ID:',
+          numericId,
+          'Type:',
+          typeof numericId
+        );
+
+        if (isNaN(numericId) || typeof numericId !== 'number') {
+          console.error('Could not convert ID to number:', rawId);
+          showErrorToast('Invalid company ID received from server');
+          return;
+        }
+
+        setCompanyNumericId(numericId);
+      } catch (err: unknown) {
+        if (handleAuthError(err)) {
+          return; // Don't show toast if it's an auth error
+        }
+        showErrorToast('Failed to load company details');
+      } finally {
+        setLoadingCompany(false);
+      }
+    };
+    fetchCompanyDetails();
+  }, [companyUuid, handleAuthError, showErrorToast]);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      setLoadingRoles(true);
+      try {
+        const rolesRes = await apiService.fetchRoles({
+          page: 1,
+          limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+        });
+        const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
+        setRoles(
+          roleList.map((role: Role) => ({ id: role.id, name: role.name }))
+        );
+      } catch (err: unknown) {
+        if (handleAuthError(err)) {
+          return; // Don't show toast if it's an auth error
+        }
+        // Error fetching roles - proceed with empty array
+        setRoles([]);
+      } finally {
+        setLoadingRoles(false);
+      }
+    };
+    fetchRoles();
+  }, [handleAuthError]);
+
+  const handlePhotoChange = async (file: File | null) => {
+    if (!file) {
+      setPhotoFile(null);
+      setFileKey('');
+      return;
+    }
+    setPhotoFile(file);
+    setUploading(true);
+    try {
+      const ext = file.name.split('.').pop() || 'png';
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(2, 15);
+      const generatedFileName = `user_${randomId}_${timestamp}.${ext}`;
+      const presigned = await getPresignedUrl({
+        fileName: generatedFileName,
+        fileType: file.type,
+        fileSize: file.size,
+        purpose: 'profile-picture',
+        customPath: ``,
+      });
+      await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
+      setFileKey(presigned.data['fileKey'] || '');
+    } catch (err: unknown) {
+      showErrorToast(USER_MESSAGES.UPLOAD_ERROR);
+      setPhotoFile(null);
+      setFileKey('');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeletePhoto = () => {
+    setPhotoFile(null);
+    setFileKey('');
+  };
+
+  const handleCreateUser = async (data: UserFormData) => {
+    // Prevent submission if company details are not loaded yet
+    if (loadingCompany || !companyNumericId) {
+      showErrorToast('Company details are still loading. Please wait.');
+      return;
+    }
+
+    setFormLoading(true);
+    try {
+      // Ensure all required fields are provided for create operation
+      if (!data.date_of_joining) {
+        throw new Error('Date of joining is required for user creation');
+      }
+
+      const payload: CreateUserRequest = {
+        role_id: data.role_id,
+        name: data.name,
+        email: data.email,
+        // Password will be generated on the backend
+        country_code: data.country_code,
+        phone_number: data.phone_number,
+        date_of_joining: data.date_of_joining,
+        designation: data.designation,
+        preferred_communication_method: data.preferred_communication_method,
+        address: data.address,
+        city: data.city,
+        pincode: data.pincode,
+        profile_picture_url: fileKey,
+        company_id: companyNumericId!, // Pass the numeric company_id to associate user with specific company
+      };
+
+      console.log('=== FORM SUBMISSION DEBUG ===');
+      console.log(
+        'companyNumericId value:',
+        companyNumericId,
+        'Type:',
+        typeof companyNumericId
+      );
+      console.log(
+        'companyUuid value:',
+        companyUuid,
+        'Type:',
+        typeof companyUuid
+      );
+      console.log(
+        'Final payload.company_id:',
+        payload.company_id,
+        'Type:',
+        typeof payload.company_id
+      );
+      console.log('Full payload:', payload);
+      console.log('=== END DEBUG ===');
+
+      await apiService.createUser(payload);
+      showSuccessToast(USER_MESSAGES.CREATE_SUCCESS);
+
+      // Redirect to company details page with user management tab
+      router.push(
+        `/company-management/company-details/${companyUuid}?tab=usermanagement`
+      );
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(err, USER_MESSAGES.CREATE_ERROR);
+      showErrorToast(message);
+    } finally {
+      setFormLoading(false);
+    }
   };
 
   return (
-    <div>
-      {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbData} className='mb-5' />
-      <div className='bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
-        <Tabs
-          value={selectedTab}
-          onValueChange={setSelectedTab}
-          className='w-full'
-        >
-          <TabsList className='grid w-full max-w-[328px] grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal mb-6'>
-            <TabsTrigger
-              value='info'
-              className='px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-            >
-              Info
-            </TabsTrigger>
-            <TabsTrigger
-              value='settings'
-              className='px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-            >
-              Settings
-            </TabsTrigger>
-          </TabsList>
+    <div className=''>
+      <div className=''>
+        {/* Breadcrumb */}
+        <Breadcrumb items={breadcrumbData} className='mb-6 mt-2' />
 
-          <TabsContent value='info' className='pt-2'>
-            <div className='flex items-start gap-8'>
-              {/* Left Column - Upload Photo */}
-              <div className='w-[250px] flex-shrink-0'>
-                <ImageUpload
-                  onClick={handleUploadClick}
-                  label='Upload Photo'
-                  className='h-[250px]'
-                  //   text={''}
-                />
-                {/* <div className='mt-5'>
-                  <Image
-                    src='https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2'
-                    height={250}
-                    width={250}
-                    alt=''
-                    className='mx-auto object-cover h-[15.625rem] rounded-[0.625rem]'
+        {/* Main Content */}
+        <div className='bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
+          <Tabs
+            value={selectedTab}
+            onValueChange={setSelectedTab}
+            className='w-full'
+          >
+            <TabsList className='grid w-full max-w-[328px] grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal'>
+              <TabsTrigger
+                value='info'
+                className='px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+              >
+                Info
+              </TabsTrigger>
+              <TabsTrigger
+                value='permissions'
+                className='px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+              >
+                Settings
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value='info' className='pt-8'>
+              <div className='flex items-start gap-6'>
+                {/* Left Column - Upload Photo */}
+                <div className='w-[250px] flex-shrink-0 relative'>
+                  <PhotoUploadField
+                    photo={photoFile}
+                    onPhotoChange={handlePhotoChange}
+                    onDeletePhoto={handleDeletePhoto}
+                    label={USER_MESSAGES.UPLOAD_PHOTO_LABEL}
+                    text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
                   />
-                  <Button
-                    variant='outline'
-                    className='!text-[var(--text-dark)] px-6 h-[40px] rounded-full border-[#D0D5DD] text-[#344054] font-semibold !bg-opacity-20 hover:bg-white mt-4 w-full'
-                  >
-                    <span className='text-[var(--text-dark)]'>
-                      Change Photo
-                    </span>
-                  </Button>
-                </div> */}
-              </div>
-
-              {/* Right Column - Form Fields */}
-              <div className='flex-1'>
-                <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-4'>
-                  <div className='space-y-2 xl:col-span-3'>
-                    <Label
-                      htmlFor='role-category'
-                      className='text-[14px] font-semibold text-[var(--text-dark)]'
-                    >
-                      Role Category
-                    </Label>
-                    <Select defaultValue='contractors'>
-                      <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'>
-                        <SelectValue placeholder='Select role category' />
-                      </SelectTrigger>
-                      <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='rolecategory'>
-                          Role Category
-                        </SelectItem>
-                        <SelectItem value='contractors'>Contractors</SelectItem>
-                        <SelectItem value='employees'>Employees</SelectItem>
-                        <SelectItem value='managers'>Managers</SelectItem>
-                        <SelectItem value='administrators'>
-                          Administrators
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className='space-y-2'>
-                    <Label
-                      htmlFor='full-name'
-                      className='text-[14px] font-semibold text-[var(--text-dark)]'
-                    >
-                      Full Name
-                    </Label>
-                    <Input
-                      id='full-name'
-                      placeholder='Enter Full Name'
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label
-                      htmlFor='designation'
-                      className='text-[14px] font-semibold text-[var(--text-dark)]'
-                    >
-                      Designation
-                    </Label>
-                    <Input
-                      id='designation'
-                      placeholder='Enter Job Title'
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label
-                      htmlFor='date-joining'
-                      className='text-[14px] font-semibold text-[var(--text-dark)]'
-                    >
-                      Date Of Joining
-                    </Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant='outline'
-                          className={cn(
-                            'w-full h-12 px-4 pr-2 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]',
-                            'focus:border-green-500 focus:ring-green-500',
-                            'justify-between font-normal',
-                            !date && 'text-muted-foreground'
-                          )}
-                        >
-                          {date ? (
-                            format(date, 'PPP')
-                          ) : (
-                            <span>Select Date</span>
-                          )}
-                          <Calendar1
-                            size='60'
-                            color='#24338C'
-                            variant='Outline'
-                            className='!h-8 !w-8'
-                          />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <CalendarComponent
-                          mode='single'
-                          selected={date}
-                          onSelect={setDate}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div className='space-y-2'>
-                    <Label
-                      htmlFor='email'
-                      className='text-[14px] font-semibold text-[var(--text-dark)]'
-                    >
-                      Email
-                    </Label>
-                    <Input
-                      id='email'
-                      type='email'
-                      placeholder='Enter Email'
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label
-                      htmlFor='phone'
-                      className='text-[14px] font-semibold text-[var(--text-dark)]'
-                    >
-                      Phone Number
-                    </Label>
-                    <div className='flex w-full'>
-                      <Select defaultValue={country} onValueChange={setCountry}>
-                        <SelectTrigger
-                          className={cn(
-                            'h-12 w-24 rounded-l-[10px] rounded-r-none border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)]'
-                          )}
-                        >
-                          {' '}
-                          <SelectValue />{' '}
-                        </SelectTrigger>
-                        <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                          <SelectItem value='us'>
-                            <div className='flex items-center gap-2'>
-                              <span className='text-xs'>🇺🇸</span>
-                              <span>+1</span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value='uk'>
-                            <div className='flex items-center gap-2'>
-                              <span className='text-xs'>🇬🇧</span>
-                              <span>+44</span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value='in'>
-                            <div className='flex items-center gap-2'>
-                              <span className='text-xs'>🇮🇳</span>
-                              <span>+91</span>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        id='phone'
-                        placeholder='Enter Number'
-                        className={cn(
-                          'h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] !placeholder-[var(--text-placeholder)]'
-                        )}
-                      />
+                  {uploading && (
+                    <div className='text-xs mt-2'>
+                      {USER_MESSAGES.UPLOADING}
                     </div>
-                  </div>
-                  <div className='space-y-2'>
-                    <Label
-                      htmlFor='communication'
-                      className='text-[14px] font-semibold text-[var(--text-dark)]'
-                    >
-                      Preferred Method of Communication
-                    </Label>
-                    <Select>
-                      <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px]'>
-                        <SelectValue placeholder='eg. email, phone, etc.' />
-                      </SelectTrigger>
-                      <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='email'>Email</SelectItem>
-                        <SelectItem value='phone'>Phone</SelectItem>
-                        <SelectItem value='sms'>SMS</SelectItem>
-                        <SelectItem value='slack'>Slack</SelectItem>
-                        <SelectItem value='teams'>Microsoft Teams</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  )}
                 </div>
-                <div className='space-y-2 mt-4'>
-                  <Label
-                    htmlFor='address'
-                    className='text-[14px] font-semibold text-[var(--text-dark)]'
-                  >
-                    Address
-                  </Label>
-                  <Input
-                    id='address'
-                    placeholder='Enter Company Address'
-                    className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                  />
-                </div>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
-                  <div className='space-y-2'>
-                    <Label
-                      htmlFor='city'
-                      className='text-[14px] font-semibold text-[var(--text-dark)]'
-                    >
-                      City
-                    </Label>
-                    <Input
-                      id='city'
-                      placeholder='Enter City'
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+
+                {/* Right Column - Form Fields */}
+                <div className='flex-1'>
+                  {loadingCompany ? (
+                    <LoadingComponent variant='inline' />
+                  ) : (
+                    <UserInfoForm
+                      roles={roles}
+                      loadingRoles={loadingRoles}
+                      imageUrl={fileKey}
+                      onSubmit={handleCreateUser}
+                      onCancel={handleCancel}
+                      loading={formLoading}
                     />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label
-                      htmlFor='pin-code'
-                      className='text-[14px] font-semibold text-[var(--text-dark)]'
-                    >
-                      Pin Code
-                    </Label>
-                    <Input
-                      id='pin-code'
-                      placeholder='Enter Pin Code'
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    />
-                  </div>
+                  )}
                 </div>
               </div>
-            </div>
-            {/* Action Buttons */}
-            <div className='flex justify-end gap-6 mt-8'>
-              <Button
-                type='button'
-                variant='outline'
-                className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)]'
-                onClick={() => router.back()}
-              >
-                Cancel
-              </Button>
-              <Button
-                className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white'
-                onClick={handleCreateClick}
-              >
-                Create
-              </Button>
-            </div>
-          </TabsContent>
-          <TabsContent value='settings' className='pt-2 pb-8'>
-            {/* <CompanyManagementAddUser /> */}
-            <div className='min-h-[550px] text-center flex items-center justify-center'>
-              <ComingSoon />
-            </div>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+
+            <TabsContent value='permissions' className='pt-8'>
+              <div className='text-center py-10 text-gray-500'>
+                Permissions management coming soon...
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
