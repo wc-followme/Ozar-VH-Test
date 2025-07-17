@@ -185,7 +185,11 @@ export default function AddUserPage() {
         });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
-          roleList.map((role: Role) => ({ id: role.id, name: role.name }))
+          roleList.map(({ id, name, status }: Role) => ({
+            id,
+            name,
+            status: status || 'ACTIVE',
+          }))
         );
       } catch (err: unknown) {
         if (handleAuthError(err)) {
@@ -222,7 +226,7 @@ export default function AddUserPage() {
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
-    } catch (err: unknown) {
+    } catch {
       showErrorToast(USER_MESSAGES.UPLOAD_ERROR);
       setPhotoFile(null);
       setFileKey('');

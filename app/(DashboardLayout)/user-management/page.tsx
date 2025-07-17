@@ -58,7 +58,11 @@ export default function UserManagement() {
             ? rolesRes.data.data
             : [];
           setRoles(
-            roleList.map((role: Role) => ({ id: role.id, name: role.name }))
+            roleList.map(({ id, name, status }) => ({
+              id,
+              name,
+              status: status || 'ACTIVE',
+            }))
           );
         }
         const role_id = filter !== 'all' ? filter : '';

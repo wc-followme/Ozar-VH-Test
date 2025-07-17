@@ -261,9 +261,10 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
             label={USER_MESSAGES.ROLE_LABEL}
             value={roleId}
             onValueChange={setRoleId}
-            options={roles.map(({ id, name }) => ({
+            options={roles.map(({ id, name, status }) => ({
               value: String(id),
-              label: name,
+              label: status === 'INACTIVE' ? `${name} (Deactivated)` : name,
+              disabled: status === 'INACTIVE',
             }))}
             placeholder={
               loadingRoles

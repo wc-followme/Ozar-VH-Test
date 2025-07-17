@@ -788,17 +788,20 @@ class ApiService {
     limit = PAGINATION.DEFAULT_LIMIT,
     search = '',
     name = '',
+    status = 'ACTIVE',
   }: {
     page?: number;
     limit?: number;
     search?: string;
     name?: string;
+    status?: 'ACTIVE' | 'INACTIVE' | '';
   }): Promise<FetchCategoriesResponse> {
     const params = new URLSearchParams();
     params.append('page', String(page));
     params.append('limit', String(limit));
     if (search) params.append('search', search);
     if (name) params.append('name', name);
+    if (status) params.append('status', status);
     return this.makeRequest(`/categories?${params.toString()}`, {
       method: 'GET',
       headers: this.getRoleHeaders(),
