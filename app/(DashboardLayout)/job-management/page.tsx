@@ -187,43 +187,53 @@ export default function JobManagement() {
                   className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Need Attention{' '}
-                  <Badge className='py-[4px] px-[6px] text-sm font-medium bg-sidebarpurple rounded-lg'>
+                  <Badge
+                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
+                  >
                     8
                   </Badge>
                 </TabsTrigger>
                 <TabsTrigger
-                  value='permissions'
+                  value='newLeads'
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   New Leads
-                  <Badge className='py-[4px] px-[6px] text-sm text-limebrand font-medium bg-transparent rounded-lg'>
+                  <Badge
+                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-limebrand text-white' : 'bg-transparent text-limebrand'}`}
+                  >
                     8
                   </Badge>
                 </TabsTrigger>
                 <TabsTrigger
-                  value='permissions'
+                  value='ongoingJob'
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Ongoing Job
-                  <Badge className='py-[4px] px-[6px] text-sm text-yellowbrand font-medium bg-transparent rounded-lg'>
+                  <Badge
+                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                  >
                     8
                   </Badge>
                 </TabsTrigger>
                 <TabsTrigger
-                  value='permissions'
+                  value='waitingOnClient'
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Waiting on Client
-                  <Badge className='py-[4px] px-[6px] text-sm font-medium text-yellowbrand bg-transparent rounded-lg'>
+                  <Badge
+                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'waitingOnClient' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                  >
                     8
                   </Badge>
                 </TabsTrigger>
                 <TabsTrigger
-                  value='permissions'
+                  value='archive'
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
                   Archive
-                  <Badge className='py-[4px] px-[6px] text-sm font-medium bg-transparent text-graybrand rounded-lg'>
+                  <Badge
+                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
+                  >
                     8
                   </Badge>
                 </TabsTrigger>
@@ -244,7 +254,16 @@ export default function JobManagement() {
               </div>
             </TabsContent>
 
-            <TabsContent value='permissions' className='p-8'>
+            <TabsContent value='newLeads' className='p-8'>
+              <ComingSoon />
+            </TabsContent>
+            <TabsContent value='ongoingJob' className='p-8'>
+              <ComingSoon />
+            </TabsContent>
+            <TabsContent value='waitingOnClient' className='p-8'>
+              <ComingSoon />
+            </TabsContent>
+            <TabsContent value='archive' className='p-8'>
               <ComingSoon />
             </TabsContent>
           </Tabs>

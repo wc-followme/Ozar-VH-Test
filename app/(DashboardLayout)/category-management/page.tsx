@@ -440,7 +440,9 @@ const CategoryManagement = () => {
                                         style={{ color }}
                                       />
                                     </div>
-                                    <span className='text-sm'>{label}</span>
+                                    <span className='text-sm'>
+                                      {label} sdfsd
+                                    </span>
                                   </div>
                                 </SelectItem>
                               )
