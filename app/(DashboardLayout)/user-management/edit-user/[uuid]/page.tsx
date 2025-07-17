@@ -97,10 +97,10 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         // Set roles data
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
-          roleList.map((role: Role) => ({
-            id: role.id,
-            name: role.name,
-            status: role.status || 'ACTIVE',
+          roleList.map(({ id, name, status }) => ({
+            id,
+            name,
+            status: status || 'ACTIVE',
           }))
         );
       } catch (err: unknown) {
