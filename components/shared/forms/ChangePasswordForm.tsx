@@ -26,6 +26,7 @@ interface ChangePasswordFormProps {
 export default function ChangePasswordForm({
   onSubmit,
   loading,
+  onCancel,
 }: ChangePasswordFormProps) {
   const {
     control,
@@ -49,6 +50,9 @@ export default function ChangePasswordForm({
       await apiService.changePassword(data.currentPassword, data.newPassword);
       showSuccessToast(CHANGE_PASSWORD_MESSAGES.CHANGE_PASSWORD_SUCCESS);
       reset();
+      if (onCancel) {
+        onCancel();
+      }
     } catch (error: any) {
       showErrorToast(
         error?.message || CHANGE_PASSWORD_MESSAGES.CHANGE_PASSWORD_ERROR
@@ -156,7 +160,7 @@ export default function ChangePasswordForm({
       >
         {CHANGE_PASSWORD_MESSAGES.BUTTON}
       </Button>
-      <div className='text-center text-[14px] text-[var(--text-secondary)] mt-2'>
+      <div className='text-center text-[14px] text-[var(--text-secondary)] mt-2 hidden'>
         {CHANGE_PASSWORD_MESSAGES.SUPPORT_TEXT}{' '}
         <a
           href='#'
