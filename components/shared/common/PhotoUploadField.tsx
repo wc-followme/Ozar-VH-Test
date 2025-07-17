@@ -105,11 +105,18 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
           <div className='flex gap-2 mt-2'>
             <button
               type='button'
-              className='flex-1 px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)]/90 transition-colors text-sm font-medium'
+              className='flex-1 px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary)]/90 transition-colors text-sm font-medium flex items-center justify-center gap-2'
               onClick={handleClick}
               disabled={uploading}
             >
-              {uploading ? 'Uploading...' : 'Change Photo'}
+              {uploading ? (
+                <>
+                  <div className='animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent'></div>
+                  Uploading...
+                </>
+              ) : (
+                'Change Photo'
+              )}
             </button>
             {onDeletePhoto && (
               <button

@@ -8,7 +8,7 @@ import { CreateRoleFormData, createRoleSchema } from '@/lib/validations/role';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import FormErrorMessage from '../common/FormErrorMessage';
 import IconFieldWrapper from '../common/IconFieldWrapper';
@@ -20,19 +20,21 @@ interface RoleFormProps {
   mode: 'create' | 'edit';
 }
 
-export const RoleForm: React.FC<RoleFormProps> = ({
+export const RoleForm: React.FC<RoleFormProps> = React.memo(({
   initialValues,
   onSubmit,
   isSubmitting,
   mode,
 }) => {
   const router = useRouter();
-  const defaultIconOption = iconOptions[0];
+  
+  // Memoize default icon option to prevent unnecessary re-computations
+  const defaultIconOption = useMemo(() => iconOptions[0], []);
+  
   const {
     control,
     handleSubmit,
     formState: { errors },
-    // watch,
     reset,
   } = useForm<CreateRoleFormData>({
     resolver: yupResolver(createRoleSchema),
@@ -55,12 +57,25 @@ export const RoleForm: React.FC<RoleFormProps> = ({
     }
   }, [initialValues, reset, defaultIconOption?.value]);
 
-  // const selectedIcon = watch('icon');
-  // const getSelectedIconOption = () => {
-  //   return (
-  //     iconOptions.find(opt => opt.value === selectedIcon) ?? defaultIconOption
-  //   );
-  // };
+  // Memoize the cancel handler to prevent unnecessary re-renders
+  const handleCancel = useCallback(() => {
+    router.push('/role-management');
+  }, [router]);
+
+  // Memoize submit button content
+  const submitButtonContent = useMemo(() => {
+    if (isSubmitting) {
+      return (
+        <>
+          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+          {mode === 'edit'
+            ? ROLE_MESSAGES.UPDATING_BUTTON
+            : ROLE_MESSAGES.CREATING_BUTTON}
+        </>
+      );
+    }
+    return mode === 'edit' ? ROLE_MESSAGES.UPDATE_BUTTON : ROLE_MESSAGES.CREATE_BUTTON;
+  }, [isSubmitting, mode]);
 
   return (
     <Card className='flex flex-col gap-8 p-6 flex-1 w-full border-1 border-[#E8EAED] rounded-[20px] bg-[var(--card-background)]'>
@@ -144,7 +159,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
           <button
             type='button'
             className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
-            onClick={() => router.push('/role-management')}
+            onClick={handleCancel}
           >
             {ROLE_MESSAGES.CANCEL_BUTTON}
           </button>
@@ -153,21 +168,12 @@ export const RoleForm: React.FC<RoleFormProps> = ({
             className='h-[48px] font-semibold text-white text-base bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-[30px] px-6'
             disabled={isSubmitting}
           >
-            {isSubmitting ? (
-              <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                {mode === 'edit'
-                  ? ROLE_MESSAGES.UPDATING_BUTTON
-                  : ROLE_MESSAGES.CREATING_BUTTON}
-              </>
-            ) : mode === 'edit' ? (
-              ROLE_MESSAGES.UPDATE_BUTTON
-            ) : (
-              ROLE_MESSAGES.CREATE_BUTTON
-            )}
+            {submitButtonContent}
           </button>
         </div>
       </form>
     </Card>
   );
-};
+});
+
+RoleForm.displayName = 'RoleForm';
