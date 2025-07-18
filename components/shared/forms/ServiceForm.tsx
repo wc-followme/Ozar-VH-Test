@@ -1,103 +1,239 @@
-import FormErrorMessage from '@/components/shared/common/FormErrorMessage';
+import { SERVICE_MESSAGES } from '@/app/(DashboardLayout)/service-management/service-messages';
+import {
+  ServiceFormProps,
+  Trade,
+} from '@/app/(DashboardLayout)/service-management/service-types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { apiService } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import React, { useState } from 'react';
+import { serviceFormSchema } from '@/lib/validations/service';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { showErrorToast, showSuccessToast } from '../../ui/use-toast';
+import FormErrorMessage from '../common/FormErrorMessage';
 import MultiSelect from '../common/MultiSelect';
 
-const TRADE_OPTIONS = [
-  'Plumbing',
-  'Carpenter',
-  'Painting',
-  'Roofer',
-  'Framer',
-  'Mason',
-  'Drywaller',
-  'Contractor',
-  'Electrician',
-  'Builder',
-];
-
-interface ServiceFormProps {
-  onSubmit: (data: { serviceName: string; trades: string[] }) => void;
-  loading?: boolean;
-  onCancel?: () => void;
-}
-
 export default function ServiceForm({
-  onSubmit,
   loading,
   onCancel,
+  initialServiceUuid,
+  onSubmit,
 }: ServiceFormProps) {
-  const [serviceName, setServiceName] = useState('');
-  const [trades, setTrades] = useState<string[]>([]);
-  const [errors, setErrors] = useState<{
-    serviceName?: string;
-    trades?: string;
-  }>({});
+  const [tradesOption, setTradesOption] = useState<Trade[]>([]);
+  const [loadingTrades, setLoadingTrades] = useState(true);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(serviceFormSchema),
+    defaultValues: {
+      serviceName: '',
+      trades: [],
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newErrors: { serviceName?: string; trades?: string } = {};
-    if (trades.length === 0)
-      newErrors.trades = 'At least one trade is required.';
-    if (!serviceName) newErrors.serviceName = 'Service Name is required.';
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) {
-      onSubmit({ serviceName, trades });
+  useEffect(() => {
+    const fetchTrades = async () => {
+      try {
+        setLoadingTrades(true);
+        const response = await apiService.getTradesDropdown();
+        if (response.statusCode === 200 && Array.isArray(response.data)) {
+          setTradesOption(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch trades:', error);
+        setTradesOption([]);
+      } finally {
+        setLoadingTrades(false);
+      }
+    };
+    fetchTrades();
+  }, []);
+
+  useEffect(() => {
+    if (!initialServiceUuid || loadingTrades) return;
+
+    const fetchService = async () => {
+      try {
+        const response = await apiService.getServiceDetails(initialServiceUuid);
+        if (response.statusCode === 200 && response.data) {
+          const serviceData = response.data;
+
+          // Extract trade IDs from trades array
+          const tradeIds = Array.isArray(serviceData.trades)
+            ? serviceData.trades.map((trade: any) =>
+                trade?.id ? String(trade.id) : null
+              )
+            : [];
+
+          reset({
+            serviceName: serviceData.name || '',
+            trades: tradeIds,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch service details:', error);
+        // Optionally show error toast
+      }
+    };
+    fetchService();
+  }, [initialServiceUuid, reset, loadingTrades, tradesOption]);
+
+  const onFormSubmit = async (data: any) => {
+    const { serviceName, trades = [] } = data;
+    try {
+      const payload = {
+        name: serviceName,
+        description: '', // You can add a description field to the form if needed
+        is_default: false,
+        is_active: true,
+        status: 'ACTIVE',
+        trade_ids: trades.join(','),
+      };
+
+      if (initialServiceUuid) {
+        // Update existing service
+        const response = await apiService.updateService(
+          initialServiceUuid,
+          payload
+        );
+        const { message, data } = response;
+        showSuccessToast(message || SERVICE_MESSAGES.UPDATE_SUCCESS);
+
+        // Call onSubmit with updated service data
+        if (onSubmit && data) {
+          onSubmit({
+            serviceName: data.name || serviceName,
+            trades: trades.join(', '),
+            serviceData: data,
+          });
+        }
+      } else {
+        // Create new service
+        const response = await apiService.createService(payload);
+        const { message, data } = response;
+        showSuccessToast(message || SERVICE_MESSAGES.CREATE_SUCCESS);
+
+        // Call onSubmit with created service data
+        if (onSubmit && data) {
+          onSubmit({
+            serviceName: data.name || serviceName,
+            trades: trades.join(', '),
+            serviceData: data,
+          });
+        }
+      }
+
+      reset();
+      if (onCancel) {
+        onCancel();
+      }
+    } catch (error: unknown) {
+      const errorMessage = initialServiceUuid
+        ? SERVICE_MESSAGES.UPDATE_ERROR
+        : SERVICE_MESSAGES.CREATE_ERROR;
+
+      showErrorToast(
+        typeof error === 'object' &&
+          error &&
+          'message' in error &&
+          typeof (error as any).message === 'string'
+          ? (error as any).message
+          : errorMessage
+      );
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-6 w-full max-w-xl'>
+    <form
+      onSubmit={handleSubmit(onFormSubmit)}
+      className='space-y-6 w-full max-w-xl'
+    >
       <div className='space-y-2'>
         <Label htmlFor='trades' className='field-label'>
-          Trade
+          {SERVICE_MESSAGES.TRADE_LABEL}
         </Label>
-        <MultiSelect
-          options={TRADE_OPTIONS.map(opt => ({ value: opt, label: opt }))}
-          value={trades}
-          onChange={setTrades}
-          placeholder='Select Trade'
-          error={errors.trades || ''}
+        <Controller
           name='trades'
+          control={control}
+          render={({ field }) => {
+            return loadingTrades ? (
+              <Input
+                disabled
+                placeholder={SERVICE_MESSAGES.LOADING_TRADES}
+                className='h-12 w-full border-2 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              />
+            ) : (
+              <MultiSelect
+                options={tradesOption}
+                getOptionLabel={(option: Trade) => option?.name || ''}
+                getOptionValue={(option: Trade) => String(option?.id)}
+                value={
+                  Array.isArray(field.value)
+                    ? field.value.filter(
+                        (v): v is string => typeof v === 'string'
+                      )
+                    : []
+                }
+                onChange={field.onChange}
+                placeholder={SERVICE_MESSAGES.SELECT_TRADE}
+                error={errors.trades?.message as string}
+                name='trades'
+              />
+            );
+          }}
         />
       </div>
       <div className='space-y-2'>
         <Label htmlFor='serviceName' className='field-label'>
-          Service Name
+          {SERVICE_MESSAGES.SERVICE_NAME_LABEL}
         </Label>
-        <Input
-          id='serviceName'
-          value={serviceName}
-          onChange={e => setServiceName(e.target.value)}
-          placeholder='Enter Service Name'
-          className={cn(
-            'input-field',
-            errors.serviceName
-              ? '!border-[var(--warning)]'
-              : '!border-[var(--border-dark)]'
+        <Controller
+          name='serviceName'
+          control={control}
+          render={({ field }) => (
+            <Input
+              id='serviceName'
+              {...field}
+              placeholder={SERVICE_MESSAGES.ENTER_SERVICE_NAME}
+              className={cn(
+                'input-field',
+                errors.serviceName
+                  ? 'border-[var(--warning)]'
+                  : 'border-[var(--border-dark)]'
+              )}
+            />
           )}
         />
-        <FormErrorMessage message={errors.serviceName || ''} />
+        <FormErrorMessage message={errors.serviceName?.message as string} />
       </div>
       <div className='pt-2 flex items-center gap-4'>
         <Button
           type='button'
           variant='outline'
-          className='btn-secondary !h-12 !px-8'
+          className='btn-secondary !px-8 !h-12'
           onClick={onCancel}
           disabled={loading}
         >
-          Cancel
+          {SERVICE_MESSAGES.CANCEL_BUTTON}
         </Button>
         <Button
           type='submit'
           className='btn-primary !h-12 !px-12'
           disabled={loading}
         >
-          {loading ? 'Creating...' : 'Create'}
+          {loading
+            ? initialServiceUuid
+              ? SERVICE_MESSAGES.UPDATING_BUTTON
+              : SERVICE_MESSAGES.CREATING_BUTTON
+            : initialServiceUuid
+              ? SERVICE_MESSAGES.UPDATE_BUTTON
+              : SERVICE_MESSAGES.CREATE_BUTTON}
         </Button>
       </div>
     </form>

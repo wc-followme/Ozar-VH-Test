@@ -12,8 +12,8 @@ interface MenuOption {
 }
 
 interface InfoCardProps {
-  initials: string;
-  initialsBg: string;
+  initials?: string;
+  initialsBg?: string;
   tradeName: string;
   category: string;
   image?: string;

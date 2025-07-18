@@ -963,6 +963,188 @@ class ApiService {
     });
   }
 
+  // Get trades dropdown
+  async getTradesDropdown(): Promise<any> {
+    return this.makeRequest('/trades/dropdown', {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Service management APIs
+  async fetchServices({
+    page = 1,
+    limit = 10,
+    name = '',
+    description = '',
+    is_active = true,
+    status = 'ACTIVE',
+    trade_id = '',
+  }: {
+    page?: number;
+    limit?: number;
+    name?: string;
+    description?: string;
+    is_active?: boolean;
+    status?: string;
+    trade_id?: string | number;
+  }): Promise<any> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (name) params.append('name', name);
+    if (description) params.append('description', description);
+    if (is_active !== undefined) params.append('is_active', String(is_active));
+    if (status) params.append('status', status);
+    if (trade_id) params.append('trade_id', String(trade_id));
+    return this.makeRequest(`/services?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Create service
+  async createService(payload: {
+    name: string;
+    description: string;
+    is_default: boolean;
+    is_active: boolean;
+    status: string;
+    trade_ids: string;
+  }): Promise<any> {
+    return this.makeRequest('/services', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Get service details by UUID
+  async getServiceDetails(uuid: string): Promise<any> {
+    return this.makeRequest(`/services/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update service
+  async updateService(
+    uuid: string,
+    payload: {
+      name: string;
+      description: string;
+      is_default: boolean;
+      is_active: boolean;
+      status: string;
+      trade_ids: string;
+    }
+  ): Promise<any> {
+    return this.makeRequest(`/services/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Delete service
+  async deleteService(uuid: string): Promise<any> {
+    return this.makeRequest(`/services/${uuid}`, {
+      method: 'DELETE',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Get services dropdown
+  async getServicesDropdown(): Promise<any> {
+    return this.makeRequest('/services/dropdown', {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Material management APIs
+  async fetchMaterials({
+    page = 1,
+    limit = 10,
+    name = '',
+    description = '',
+    is_active = true,
+    status = 'ACTIVE',
+    service_id = '',
+  }: {
+    page?: number;
+    limit?: number;
+    name?: string;
+    description?: string;
+    is_active?: boolean;
+    status?: string;
+    service_id?: string | number;
+  }): Promise<any> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (name) params.append('name', name);
+    if (description) params.append('description', description);
+    if (is_active !== undefined) params.append('is_active', String(is_active));
+    if (status) params.append('status', status);
+    if (service_id) params.append('service_id', String(service_id));
+    return this.makeRequest(`/materials?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Create material
+  async createMaterial(payload: {
+    name: string;
+    description: string;
+    is_default: boolean;
+    is_active: boolean;
+    status: string;
+    service_ids: string;
+  }): Promise<any> {
+    return this.makeRequest('/materials', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Get material details by UUID
+  async getMaterialDetails(uuid: string): Promise<any> {
+    return this.makeRequest(`/materials/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update material
+  async updateMaterial(
+    uuid: string,
+    payload: {
+      name: string;
+      description: string;
+      is_default: boolean;
+      is_active: boolean;
+      status: string;
+      service_ids: string;
+    }
+  ): Promise<any> {
+    return this.makeRequest(`/materials/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Delete material
+  async deleteMaterial(uuid: string): Promise<any> {
+    return this.makeRequest(`/materials/${uuid}`, {
+      method: 'DELETE',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   // Removed testConnection and all debug code
 }
 

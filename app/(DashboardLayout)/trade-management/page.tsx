@@ -269,21 +269,6 @@ export default function TradeManagementPage() {
           trades.map((trade, idx) => (
             <InfoCard
               key={trade.uuid}
-              initials={
-                trade.name
-                  ? trade.name
-                      .split(' ')
-                      .map(word => word[0])
-                      .join('')
-                      .toUpperCase()
-                      .slice(0, 2)
-                  : 'TR'
-              }
-              initialsBg={
-                trade.name
-                  ? `bg-blue-${(trade.name.length % 7) + 1}00 text-blue-${(trade.name.length % 7) + 1}00`
-                  : 'bg-blue-100 text-blue-700'
-              }
               tradeName={trade.name || ''}
               category={`${trade.categories?.length || 0} Category${(trade.categories?.length || 0) !== 1 ? 's' : ''}`}
               menuOptions={menuOptions}
