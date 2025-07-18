@@ -9,7 +9,7 @@ import { PAGINATION } from '@/constants/common';
 import { apiService, CreateUserRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -121,6 +121,7 @@ export default function AddCompanyUserPage() {
         const rolesRes = await apiService.fetchRoles({
           page: 1,
           limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+          status: 'ACTIVE', // Only fetch active roles for dropdown
         });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
@@ -228,8 +229,10 @@ export default function AddCompanyUserPage() {
       console.log('Full payload:', payload);
       console.log('=== END DEBUG ===');
 
-      await apiService.createUser(payload);
-      showSuccessToast(USER_MESSAGES.CREATE_SUCCESS);
+      const response = await apiService.createUser(payload);
+      showSuccessToast(
+        extractApiSuccessMessage(response, USER_MESSAGES.CREATE_SUCCESS)
+      );
 
       // Redirect to company details page with user management tab
       router.push(
