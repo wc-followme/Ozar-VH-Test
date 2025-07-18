@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils';
 import { GalleryAdd } from 'iconsax-react';
 import Image from 'next/image';
 import React, { useRef } from 'react';
@@ -12,6 +13,7 @@ interface PhotoUploadFieldProps {
   className?: string;
   uploading?: boolean;
   existingImageUrl?: string;
+  cardHeight?: string;
 }
 
 const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
@@ -23,6 +25,7 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
   className = '',
   uploading = false,
   existingImageUrl,
+  cardHeight,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -53,7 +56,10 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
       />
       <div className='mb-2 h-full w-full'>
         <div
-          className='w-full h-full px-4 min-h-[9.375rem] rounded-xl border-2 border-dashed border-cyanwave-main bg-cyanwave-light flex flex-col items-center justify-center cursor-pointer relative py-10'
+          className={cn(
+            'w-full h-full px-4 min-h-[9.375rem] rounded-xl border-2 border-dashed border-cyanwave-main bg-cyanwave-light flex flex-col items-center justify-center cursor-pointer relative py-10',
+            cardHeight
+          )}
           onClick={handleClick}
         >
           {photo ? (
@@ -85,11 +91,11 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
           ) : (
             <>
               <GalleryAdd size='32' color='#00A8BF' variant='Outline' />
-              <div className='mt-2 text-base font-medium text-center text-[var(--text-dark)]'>
+              <div className='mt-2 text-sm font-semibold text-center text-[var(--text-dark)]'>
                 {label}
               </div>
               {text && (
-                <div className='text-sm text-[var(--text-secondary)] mt-1.5 text-center'>
+                <div className='text-sm text-[var(--text-secondary)] mt-1.5 text-center max-w-[246px]'>
                   {text}
                 </div>
               )}

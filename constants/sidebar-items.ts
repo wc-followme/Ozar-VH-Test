@@ -8,16 +8,16 @@ import { Tool } from './../components/icons/Tool';
 import { Trade } from './../components/icons/Trade';
 
 // Common icon options for roles and other modules
-import {
-  BarChart,
-  Database,
-  FileText,
-  Settings,
-  Shield,
-  Users,
-} from 'lucide-react';
+import { CatCraneIcon } from '../components/icons/CatCraneIcon';
+import { CatHomeIcon } from '../components/icons/CatHomeIcon';
+import { CatPaintBrushIcon } from '../components/icons/CatPaintBrushIcon';
+import { CatSkrewDriveIcon } from '../components/icons/CatSkrewDriveIcon';
+import { CatToolIcon } from '../components/icons/CatToolIcon';
 import { CircleUsersStarIcon } from '../components/icons/CircleUsersStarIcon';
+import { HelmetIcon } from '../components/icons/HelmetIcon';
+import { PeopleGroupIcon } from '../components/icons/PeopleGroupIcon';
 import { Service } from '../components/icons/Service';
+import { UserCardIcon } from '../components/icons/UserCardIcon';
 
 type SidebarItem = {
   title: string;
@@ -78,36 +78,46 @@ export const sidebarItems: SidebarItem[] = [
   },
 ];
 
-export const iconOptions = [
+export const catIconOptions = [
+  { value: 'home', icon: CatHomeIcon, color: '#F58B1E', bgColor: '#F58B1E1A' },
   {
-    value: 'fas fa-cog',
-    label: 'Settings',
-    icon: Settings,
-    color: '#00a8bf',
-  },
-  { value: 'fas fa-users', label: 'Users', icon: Users, color: '#34ad44' },
-  {
-    value: 'fas fa-user-shield',
-    label: 'Shield',
-    icon: Shield,
-    color: '#ff6b6b',
+    value: 'crane',
+    icon: CatCraneIcon,
+    color: '#90C91D',
+    bgColor: '#90C91D26',
   },
   {
-    value: 'fas fa-database',
-    label: 'Database',
-    icon: Database,
-    color: '#4c6ef5',
+    value: 'paint',
+    icon: CatPaintBrushIcon,
+    color: '#24338C',
+    bgColor: '#1A57BF1A',
   },
   {
-    value: 'fas fa-file-text',
-    label: 'Documents',
-    icon: FileText,
-    color: '#fd7e14',
+    value: 'skrew',
+    icon: CatSkrewDriveIcon,
+    color: '#EBB402',
+    bgColor: '#EBB4021A',
+  },
+  { value: 'tool', icon: CatToolIcon, color: '#00A8BF', bgColor: '#00A8BF26' },
+];
+export const roleIconOptions = [
+  { value: 'helmet', icon: HelmetIcon, color: '#24338C', bgColor: '#1A57BF1A' },
+  {
+    value: 'group',
+    icon: PeopleGroupIcon,
+    color: '#90C91D',
+    bgColor: '#90C91D26',
   },
   {
-    value: 'fas fa-chart-bar',
-    label: 'Analytics',
-    icon: BarChart,
-    color: '#9c88ff',
+    value: 'identification-badge',
+    icon: UserCardIcon,
+    color: '#34AD44',
+    bgColor: '#34AD4426',
+  },
+  {
+    value: 'home',
+    icon: CatHomeIcon,
+    color: '#00A8BF',
+    bgColor: '#00A8BF26',
   },
 ];

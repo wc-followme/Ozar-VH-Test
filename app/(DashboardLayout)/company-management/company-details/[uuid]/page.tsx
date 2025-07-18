@@ -2,15 +2,9 @@
 import { Search } from '@/components/icons/Search';
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import SelectField from '@/components/shared/common/SelectField';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
@@ -295,10 +289,6 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
 
   const switchStyleSm =
     'h-4 w-9 data-[state=checked]:bg-[var(--secondary)] data-[state=unchecked]:bg-gray-300 [&>span]:h-3 [&>span]:w-3  [&>span]:bg-white data-[state=checked]:[&>span]:border-green-400 [&>span]:transition-all [&>span]:duration-200';
-  const selectContentStyle =
-    'bg-[var(--white-background)] border border-[var(--secondary)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]';
-  const selectItemStyle =
-    'text-[var(--text-dark)] hover:bg-[var(--dark-background)] focus:bg-[var(--secondary)] cursor-pointer';
 
   const [isToggling, setIsToggling] = useState(false);
 
@@ -379,7 +369,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
       <Breadcrumb items={breadcrumbData} className='mb-5' />
       <div className='p-6 bg-[var(--white-background)] rounded-[24px]'>
         {/* Header */}
-        <div className='flex gap-6'>
+        <div className='flex gap-6 items-center'>
           <div className='flex-0 w-[120px]'>
             {company.image ? (
               <div className='w-[120px] h-[120px] p-3 rounded-[16px] border border-[var(--border-dark)] flex items-center justify-center'>
@@ -387,10 +377,10 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                   src={
                     (process.env['NEXT_PUBLIC_CDN_URL'] || '') + company.image
                   }
-                  height={90}
-                  width={90}
+                  height={120}
+                  width={120}
                   alt='company'
-                  className='mx-auto'
+                  className='mx-auto object-contain'
                 />
               </div>
             ) : (
@@ -404,10 +394,10 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
           <div className='flex-1 -mt-[5px]'>
             <div className='flex items-center gap-4 border-b border-[var(--border-dark)] pb-4 mb-4'>
               <div className='flex-1'>
-                <h1 className='text-[24px] font-bold text-[var(--text-dark)] leading-7'>
+                <h1 className='text-[24px] font-bold text-[var(--text-dark)] leading-[1] mb-2'>
                   {company.name}
                 </h1>
-                <p className='text-[16px] text-[var(--text-secondary)] mt-0.5'>
+                <p className='text-[16px] text-[var(--text-secondary)] leading-[1]'>
                   Construction Company
                 </p>
               </div>
@@ -416,7 +406,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                 <Link href={`/company-management/edit-company/${company.uuid}`}>
                   <Button
                     variant='outline'
-                    className='btn-secondary !h-9 text-[14px]'
+                    className='btn-secondary !h-9 text-sm'
                   >
                     <Edit2
                       size='28'
@@ -429,7 +419,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                   </Button>
                 </Link>
                 <Link
-                  className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-1'
+                  className='!h-9 btn-primary !px-6'
                   href={`/company-management/add-user?company_id=${company.uuid}`}
                 >
                   {/* <Add
@@ -443,24 +433,28 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
             </div>
             {/* Info Row */}
             <div className='flex gap-4'>
-              <div className='flex gap-14 text-[14px] flex-1 leading-tight'>
+              <div className='flex gap-14 text-[16px] flex-1 leading-tight'>
                 <div>
-                  <div className='text-[var(--text-secondary)]'>Industry</div>
-                  <div className='font-medium text-[var(--text-dark)]'>
+                  <div className='text-[var(--text-secondary)] text-sm'>
+                    Industry
+                  </div>
+                  <div className='font-medium text-[var(--text-dark)] text-sm'>
                     Construction
                   </div>
                 </div>
                 <div>
-                  <div className='text-[var(--text-secondary)]'>Created on</div>
-                  <div className='font-medium text-[var(--text-dark)]'>
+                  <div className='text-[var(--text-secondary)] text-sm'>
+                    Created on
+                  </div>
+                  <div className='font-medium text-[var(--text-dark)] text-sm'>
                     {formatDate(company.created_at)}
                   </div>
                 </div>
                 <div>
-                  <div className='text-[var(--text-secondary)]'>
+                  <div className='text-[var(--text-secondary)] text-sm'>
                     Subscription Ends
                   </div>
-                  <div className='font-medium text-[var(--text-dark)]'>
+                  <div className='font-medium text-[var(--text-dark)] text-sm'>
                     {formatDate(company.expiry_date)}
                   </div>
                 </div>
@@ -511,55 +505,55 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
 
           <TabsContent value='about' className='py-6'>
             {/* About Section */}
-            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-6 mb-6'>
-              <div className='text-[14px] text-[var(--text-secondary)] font-medium mb-2'>
+            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-5 mb-6'>
+              <div className='text-sm text-[var(--text-secondary)] font-normal mb-2'>
                 About
               </div>
-              <div className='text-[14px] text-[var(--text-dark)] font-medium leading-6'>
+              <div className='text-sm text-[var(--text-dark)] font-medium leading-tight'>
                 {company.about || 'No description available.'}
               </div>
             </div>
             {/* Contact Info Row */}
-            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-6 flex gap-8 text-[14px]'>
-              <div>
-                <div className='font-medium text-[var(--text-secondary)] mb-1'>
+            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-5 flex gap-8 text-sm'>
+              <div className='flex-1'>
+                <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
                   Email
                 </div>
-                <div className='text-[var(--text-dark)]'>
+                <div className='text-[var(--text-dark)] text-sm font-medium'>
                   {company.email || 'N/A'}
                 </div>
               </div>
-              <div>
-                <div className='font-medium text-[var(--text-secondary)] mb-1'>
+              <div className='flex-1'>
+                <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
                   Phone Number
                 </div>
-                <div className='text-[var(--text-dark)]'>
+                <div className='text-[var(--text-dark)] text-sm font-medium'>
                   {company.phone_number || 'N/A'}
                 </div>
               </div>
-              <div>
-                <div className='font-medium text-[var(--text-secondary)] mb-1'>
+              <div className='flex-1'>
+                <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
                   Address
                 </div>
-                <div className='text-[var(--text-dark)]'>
+                <div className='text-[var(--text-dark)] text-sm font-medium'>
                   {company.city && company.pincode
                     ? `${company.city}, ${company.pincode}`
                     : 'N/A'}
                 </div>
               </div>
-              <div>
-                <div className='font-medium text-[var(--text-secondary)] mb-1'>
+              <div className='flex-1'>
+                <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
                   Communication
                 </div>
-                <div className='text-[var(--text-dark)]'>
+                <div className='text-[var(--text-dark)] text-sm font-medium'>
                   {company.preferred_communication_method || 'N/A'}
                 </div>
               </div>
-              <div>
-                <div className='font-medium text-[var(--text-secondary)] mb-1'>
+              <div className='flex-1'>
+                <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
                   Website
                 </div>
-                <div className='flex items-center gap-1 text-[var(--text-dark)]'>
+                <div className='flex items-center gap-1 text-[var(--text-dark)] text-sm font-medium'>
                   {company.website ? (
                     <>
                       <span>{company.website}</span>
@@ -595,25 +589,21 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                 />
                 <Search className='absolute top-3 left-4' />
               </div>
-              <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger className='w-40 bg-[var(--white-background)] rounded-[30px] border-2 border-[var(--border-dark)] h-[42px] focus:border-[var(--secondary)] focus:ring-0 focus:outline-none'>
-                  <SelectValue placeholder={USER_MESSAGES.ALL_USERS} />
-                </SelectTrigger>
-                <SelectContent className={selectContentStyle}>
-                  <SelectItem value='all' className={selectItemStyle}>
-                    {USER_MESSAGES.ALL_USERS}
-                  </SelectItem>
-                  {roles.map(role => (
-                    <SelectItem
-                      key={role.id}
-                      value={String(role.id)}
-                      className={selectItemStyle}
-                    >
-                      {role.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SelectField
+                value={filter}
+                onValueChange={setFilter}
+                options={[
+                  { value: 'all', label: USER_MESSAGES.ALL_USERS },
+                  ...roles.map(role => ({
+                    value: String(role.id),
+                    label: role.name,
+                  })),
+                ]}
+                placeholder={USER_MESSAGES.ALL_USERS}
+                className='w-40 rounded-full'
+                optionClassName={''}
+                triggerClassName='rounded-full h-[42px] border-2 border-[var(--border-dark)]'
+              />
             </div>
             <div className='mt-6'>
               {/* User Grid */}

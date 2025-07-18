@@ -245,6 +245,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
         <div className='flex items-start gap-6'>
           {/* Left Column - Upload Photo */}
           <div className='w-[412px] flex-shrink-0 bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[1rem] relative'>
+            <h2 className='text-lg font-bold mb-4'>Upload Logo</h2>
             <PhotoUploadField
               photo={photoFile}
               onPhotoChange={handlePhotoChange}
@@ -257,6 +258,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
                   ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
                   : ''
               }
+              cardHeight='h-[265px]'
             />
             {uploading && (
               <div className='text-xs mt-2'>{COMPANY_MESSAGES.UPLOADING}</div>

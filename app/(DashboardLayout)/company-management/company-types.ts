@@ -16,6 +16,9 @@ export interface CompanyFormErrors {
   pincode?: string;
   projects?: string;
   general?: string;
+  contractor_name?: string;
+  contractor_email?: string;
+  contractor_phone?: string;
 }
 
 // Company form data interface for create operations

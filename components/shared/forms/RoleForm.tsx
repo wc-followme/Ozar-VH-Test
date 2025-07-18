@@ -2,7 +2,7 @@ import { ROLE_MESSAGES } from '@/app/(DashboardLayout)/role-management/role-mess
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { iconOptions } from '@/constants/sidebar-items';
+import { roleIconOptions } from '@/constants/sidebar-items';
 import { cn } from '@/lib/utils';
 import { CreateRoleFormData, createRoleSchema } from '@/lib/validations/role';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -24,8 +24,19 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
   ({ initialValues, onSubmit, isSubmitting, mode }) => {
     const router = useRouter();
 
+    // Ensure iconOptions is always an array
+    const safeIconOptions = Array.isArray(roleIconOptions)
+      ? roleIconOptions.map(opt => ({
+          ...opt,
+          label: opt.value.charAt(0).toUpperCase() + opt.value.slice(1),
+        }))
+      : [];
+
     // Memoize default icon option to prevent unnecessary re-computations
-    const defaultIconOption = useMemo(() => iconOptions[0], []);
+    const defaultIconOption = useMemo(
+      () => safeIconOptions[0] || null,
+      [safeIconOptions]
+    );
 
     const {
       control,
@@ -89,7 +100,7 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
                   label={ROLE_MESSAGES.ICON_LABEL}
                   value={field.value}
                   onChange={field.onChange}
-                  iconOptions={iconOptions}
+                  iconOptions={safeIconOptions}
                   error={errors.icon?.message || ''}
                 />
               )}
