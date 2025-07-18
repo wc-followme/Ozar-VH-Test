@@ -387,6 +387,7 @@ const CategoryManagement = () => {
               iconOptions={catIconOptions}
               errors={{
                 icon: errors.icon?.message || '',
+                name: errors.name?.message || '',
                 description: errors.description?.message || '',
               }}
               selectedIcon={watch('icon')}

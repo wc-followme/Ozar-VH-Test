@@ -95,7 +95,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
           {options.map(({ value: optValue, label: optLabel }) => (
             <label
               key={optValue}
-              className='flex items-center gap-3 py-2 px-2 cursor-pointer text-[var(--text-dark)] text-base border-b border-[var(--border-dark)] last-of-type:border-b-0'
+              className='flex items-center gap-3 py-2 px-2 cursor-pointer text-[var(--text-dark)] text-base border-b border-[var(--border-dark)] last-of-type:border-b-0 hover:bg-[var(--select-option)]'
             >
               <Checkbox
                 checked={value.includes(optValue)}
