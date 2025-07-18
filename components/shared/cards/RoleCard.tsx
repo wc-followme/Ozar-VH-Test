@@ -112,7 +112,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
         <div className='flex flex-col gap-2 w-full'>
           <h3 className='text-base font-bold text-[var(--text)]'>{title}</h3>
 
-          <p className='text-base text-[var(--text-secondary)] leading-tight'>
+          <p className='text-base text-[var(--text-secondary)] leading-tight line-clamp-3'>
             {description}
           </p>
         </div>

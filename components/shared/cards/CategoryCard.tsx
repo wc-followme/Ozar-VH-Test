@@ -78,7 +78,7 @@ export function CategoryCard({
         <div className='flex items-start justify-between w-full'>
           <div
             className={`flex items-center justify-center w-[60px] h-[60px] rounded-[16px] mb-2`}
-            style={{ background: iconBgColor }}
+            style={{ background: iconBgColor, color: iconColor }}
           >
             {(() => {
               // Heuristic: local icons expect className, external expect size/color

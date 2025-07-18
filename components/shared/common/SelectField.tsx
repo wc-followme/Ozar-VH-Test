@@ -24,6 +24,7 @@ interface SelectFieldProps {
   error?: string;
   className?: string;
   optionClassName?: string;
+  triggerClassName?: string; // New prop for SelectTrigger
 }
 
 const selectContentStyle =
@@ -40,6 +41,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   error,
   className = '',
   optionClassName = '',
+  triggerClassName = '', // Destructure new prop
 }) => {
   const [internalValue, setInternalValue] = useState(value);
 
@@ -61,7 +63,9 @@ const SelectField: React.FC<SelectFieldProps> = ({
         </Label>
       )}
       <Select value={internalValue} onValueChange={handleValueChange}>
-        <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'>
+        <SelectTrigger
+          className={`h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] ${triggerClassName}`}
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent className={selectContentStyle}>
