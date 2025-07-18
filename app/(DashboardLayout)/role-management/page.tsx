@@ -31,11 +31,13 @@ const menuOptions: MenuOption[] = [
 ];
 
 // Adapter for icons that expect className instead of size/color
-const IconAdapter =
-  (IconComp: any) =>
-  ({ size = 30, color = '#00a8bf' }) => (
+const IconAdapter = (IconComp: any) => {
+  const WrappedIcon = ({ color = '#00a8bf' }) => (
     <IconComp className='w-[30px] h-[30px]' style={{ color }} />
   );
+  WrappedIcon.displayName = `IconAdapter(${IconComp.displayName || IconComp.name || 'Component'})`;
+  return WrappedIcon;
+};
 
 const RoleManagement = () => {
   const [roles, setRoles] = useState<Role[]>([]);

@@ -74,7 +74,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
 
     // Photo upload stubs for contractor
     const [photoFile, setPhotoFile] = useState<File | null>(null);
-    const [uploading, setUploading] = useState(false);
+    const [uploading] = useState(false);
     const [fileKey, setFileKey] = useState<string | null>(null);
     const handlePhotoChange = (file: File | null) => {
       setPhotoFile(file);

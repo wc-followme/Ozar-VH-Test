@@ -387,16 +387,10 @@ const CategoryManagement = () => {
               iconOptions={catIconOptions}
               errors={{
                 icon: errors.icon?.message || '',
-                categoryName: errors.name?.message || '',
                 description: errors.description?.message || '',
               }}
               selectedIcon={watch('icon')}
               setSelectedIcon={val => setValue('icon', val)}
-              categoryName={watch('name')}
-              setCategoryName={val => setValue('name', val)}
-              description={watch('description')}
-              setDescription={val => setValue('description', val)}
-              onClose={handleClose}
               onSubmit={handleSubmit(onSubmit)}
             />
           )}

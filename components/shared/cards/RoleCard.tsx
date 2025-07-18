@@ -32,14 +32,6 @@ export interface RoleCardProps {
 }
 
 // Utility to detect if a component supports className prop
-function isClassNameIcon(Component: any) {
-  // Heuristic: if the component's propTypes or defaultProps include className, or if it's a function with className in its argument
-  // This is a best-effort guess for local icons
-  return (
-    (Component && Component.length === 1) ||
-    (Component && Component.toString().includes('className'))
-  );
-}
 
 export const RoleCard: React.FC<RoleCardProps> = ({
   iconSrc,

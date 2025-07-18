@@ -289,10 +289,6 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
 
   const switchStyleSm =
     'h-4 w-9 data-[state=checked]:bg-[var(--secondary)] data-[state=unchecked]:bg-gray-300 [&>span]:h-3 [&>span]:w-3  [&>span]:bg-white data-[state=checked]:[&>span]:border-green-400 [&>span]:transition-all [&>span]:duration-200';
-  const selectContentStyle =
-    'bg-[var(--white-background)] border border-[var(--secondary)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]';
-  const selectItemStyle =
-    'text-[var(--text-dark)] hover:bg-[var(--dark-background)] focus:bg-[var(--secondary)] cursor-pointer';
 
   const [isToggling, setIsToggling] = useState(false);
 

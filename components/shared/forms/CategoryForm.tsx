@@ -16,16 +16,10 @@ interface CategoryFormProps {
   iconOptions: any[];
   errors: {
     icon?: string;
-    categoryName?: string;
     description?: string;
   };
   selectedIcon: string;
   setSelectedIcon: (icon: string) => void;
-  categoryName: string;
-  setCategoryName: (name: string) => void;
-  description: string;
-  setDescription: (desc: string) => void;
-  onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -39,11 +33,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   errors,
   selectedIcon,
   setSelectedIcon,
-  categoryName,
-  setCategoryName,
-  description,
-  setDescription,
-  onClose,
   onSubmit,
 }) => {
   return (
@@ -81,12 +70,9 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               />
             </div>
           </div>
-          {(errors.icon || errors.categoryName) && (
+          {errors.icon && (
             <div className='space-y-1'>
               {errors.icon && <FormErrorMessage message={errors.icon} />}
-              {errors.categoryName && (
-                <FormErrorMessage message={errors.categoryName} />
-              )}
             </div>
           )}
         </div>
