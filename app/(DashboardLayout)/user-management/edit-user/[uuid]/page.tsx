@@ -264,7 +264,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           apiService.fetchRoles({
             page: 1,
             limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
-            status: 'ACTIVE', // Only fetch active roles for dropdown
+            status: '', // Fetch both active and inactive roles
           }),
         ]);
 
