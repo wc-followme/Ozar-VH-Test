@@ -351,6 +351,71 @@ export interface GetCategoryResponse {
   data: Category;
 }
 
+// User permissions interfaces
+export interface UserPermissions {
+  roles: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+  };
+  users: {
+    view: boolean;
+    create: boolean;
+    customize: boolean;
+    archive: boolean;
+  };
+  companies: {
+    view: boolean;
+    assign_user: boolean;
+    archive: boolean;
+  };
+  categories: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+  };
+  trades: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+  };
+  services: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+  };
+  materials: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+  };
+  tools: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+    history: boolean;
+  };
+  jobs: {
+    edit: boolean;
+    archive: boolean;
+  };
+}
+
+export interface GetUserPermissionsResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    permissions: UserPermissions;
+    [key: string]: any; // Allow other user properties
+  };
+}
+
+export interface UpdateUserPermissionsResponse {
+  statusCode: number;
+  message: string;
+  data?: UserPermissions;
+}
+
 export interface GetCompanyResponse {
   statusCode: number;
   message: string;
@@ -870,6 +935,34 @@ class ApiService {
       headers: this.getRoleHeaders(),
       body: JSON.stringify({ current_password, new_password }),
     });
+  }
+
+  // Get user permissions
+  async getUserPermissions(
+    userUuid: string
+  ): Promise<GetUserPermissionsResponse> {
+    return this.makeRequest<GetUserPermissionsResponse>(
+      `/users/${userUuid}/permissions`,
+      {
+        method: 'GET',
+        headers: this.getRoleHeaders(),
+      }
+    );
+  }
+
+  // Update user permissions
+  async updateUserPermissions(
+    userUuid: string,
+    permissions: UserPermissions
+  ): Promise<UpdateUserPermissionsResponse> {
+    return this.makeRequest<UpdateUserPermissionsResponse>(
+      `/users/${userUuid}/permissions`,
+      {
+        method: 'PATCH',
+        headers: this.getRoleHeaders(),
+        body: JSON.stringify(permissions),
+      }
+    );
   }
 
   // Removed testConnection and all debug code

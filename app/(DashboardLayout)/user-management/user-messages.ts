@@ -114,6 +114,12 @@ export const USER_MESSAGES = {
   // Confirm Modal Messages
   DELETE_CONFIRM_TITLE: 'Are you sure you want to archive?',
   DELETE_CONFIRM_SUBTITLE: 'This action cannot be undone.',
+
+  // Permissions Messages
+  PERMISSIONS_UPDATE_SUCCESS: 'User permissions updated successfully.',
+  PERMISSIONS_UPDATE_ERROR: 'Failed to update user permissions.',
+  PERMISSIONS_FETCH_ERROR: 'Failed to fetch user permissions.',
+  PERMISSIONS_LOADING: 'Loading permissions...',
 };
 
 export const CHANGE_PASSWORD_MESSAGES = {

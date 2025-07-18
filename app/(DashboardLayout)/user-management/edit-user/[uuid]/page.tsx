@@ -7,7 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { ACCESS_CONTROL_ACCORDIONS_DATA } from '@/constants/access-control';
 import { PAGINATION } from '@/constants/common';
-import { apiService, UpdateUserRequest, User } from '@/lib/api';
+import {
+  apiService,
+  UpdateUserRequest,
+  User,
+  UserPermissions,
+} from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
@@ -58,8 +63,8 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const [openAccordionIdx, setOpenAccordionIdx] = useState(0);
 
   // Function to generate JSON from accordions state
-  const generatePermissionsJson = (accordionsData: any[]) => {
-    const permissionsMap: { [key: string]: { [key: string]: boolean } } = {
+  const generatePermissionsJson = (accordionsData: any[]): UserPermissions => {
+    const permissionsMap: UserPermissions = {
       roles: { view: false, edit: false, archive: false },
       users: { view: false, create: false, customize: false, archive: false },
       companies: { view: false, assign_user: false, archive: false },
@@ -99,28 +104,26 @@ export default function EditUserPage({ params }: EditUserPageProps) {
 
     accordionsData.forEach((accordion, accordionIdx) => {
       const permissionKey = accordionToPermissionMap[accordionIdx];
-      if (permissionKey && permissionsMap[permissionKey]) {
+      if (
+        permissionKey &&
+        permissionsMap[permissionKey as keyof UserPermissions]
+      ) {
         accordion.stripes.forEach((isChecked: boolean, stripeIdx: number) => {
           const permissionName =
             stripeToPermissionMap[accordionIdx]?.[stripeIdx];
-          if (permissionName && permissionsMap[permissionKey]) {
-            permissionsMap[permissionKey][permissionName] = isChecked;
+          if (
+            permissionName &&
+            permissionsMap[permissionKey as keyof UserPermissions]
+          ) {
+            (permissionsMap[permissionKey as keyof UserPermissions] as any)[
+              permissionName
+            ] = isChecked;
           }
         });
       }
     });
 
     return permissionsMap;
-  };
-
-  // Function to save permissions to localStorage
-  const savePermissionsToLocalStorage = (permissions: any) => {
-    try {
-      localStorage.setItem('userPermissions', JSON.stringify(permissions));
-      console.log('Permissions saved to localStorage:', permissions);
-    } catch (error) {
-      console.error('Error saving permissions to localStorage:', error);
-    }
   };
 
   // Handler to toggle a switch
@@ -137,9 +140,8 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           : acc
       );
 
-      // Generate and save JSON to localStorage after each toggle
-      const permissionsJson = generatePermissionsJson(newAccordions);
-      savePermissionsToLocalStorage(permissionsJson);
+      // Remove localStorage saving - we'll save via API when user clicks update
+      console.log('Toggle updated accordions state');
 
       return newAccordions;
     });
@@ -153,6 +155,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const [formLoading, setFormLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [permissionsLoading, setPermissionsLoading] = useState(false);
   const router = useRouter();
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
@@ -176,81 +179,8 @@ export default function EditUserPage({ params }: EditUserPageProps) {
 
   // Load permissions from localStorage and initialize
   useEffect(() => {
-    try {
-      const savedPermissions = localStorage.getItem('userPermissions');
-      if (savedPermissions) {
-        const parsedPermissions = JSON.parse(savedPermissions);
-        console.log('Loaded permissions from localStorage:', parsedPermissions);
-
-        // Update accordions state based on saved permissions
-        const updatedAccordions = ACCESS_CONTROL_ACCORDIONS_DATA.map(
-          (acc, accordionIdx) => {
-            const permissionKeys = [
-              'roles',
-              'users',
-              'companies',
-              'categories',
-              'trades',
-              'services',
-              'materials',
-              'tools',
-              'jobs',
-            ];
-            const permissionKey = permissionKeys[accordionIdx];
-            const permissions = permissionKey
-              ? parsedPermissions[permissionKey]
-              : undefined;
-
-            if (permissions) {
-              const updatedStripes = acc.stripes.map((_, stripeIdx) => {
-                const permissionNamesArray = [
-                  ['view', 'edit', 'archive'], // roles
-                  ['view', 'create', 'customize', 'archive'], // users
-                  ['view', 'assign_user', 'archive'], // companies
-                  ['view', 'edit', 'archive'], // categories
-                  ['view', 'edit', 'archive'], // trades
-                  ['view', 'edit', 'archive'], // services
-                  ['view', 'edit', 'archive'], // materials
-                  ['view', 'edit', 'archive', 'history'], // tools
-                  ['edit', 'archive'], // jobs
-                ];
-                const permissionNames = permissionNamesArray[accordionIdx];
-                const permissionName = permissionNames?.[stripeIdx];
-                if (
-                  permissionName &&
-                  typeof permissionName === 'string' &&
-                  permissions
-                ) {
-                  return (permissions as any)[permissionName] || false;
-                }
-                return false;
-              });
-
-              return {
-                ...acc,
-                stripes: updatedStripes,
-              };
-            }
-
-            return {
-              ...acc,
-              stripes: acc.stripes.map(() => true), // default to true if no saved permissions
-            };
-          }
-        );
-
-        setAccordions(updatedAccordions);
-      } else {
-        // Initialize with default permissions if none exist
-        const defaultPermissions = generatePermissionsJson(accordions);
-        savePermissionsToLocalStorage(defaultPermissions);
-      }
-    } catch (error) {
-      console.error('Error loading permissions from localStorage:', error);
-      // Initialize with default permissions if error occurs
-      const defaultPermissions = generatePermissionsJson(accordions);
-      savePermissionsToLocalStorage(defaultPermissions);
-    }
+    // Remove localStorage logic - we'll load from API instead
+    console.log('Removed localStorage logic - loading from API');
   }, []); // Run only once on component mount
 
   // Fetch user details and roles
@@ -306,6 +236,110 @@ export default function EditUserPage({ params }: EditUserPageProps) {
 
     fetchData();
   }, [resolvedParams.uuid, router, showErrorToast, handleAuthError]);
+
+  // Fetch user permissions
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      setPermissionsLoading(true);
+      try {
+        const response = await apiService.getUserPermissions(
+          resolvedParams.uuid
+        );
+        if (response.statusCode === 200 && response.data) {
+          // Extract permissions from the response
+          const permissionsData = response.data.permissions || response.data;
+          console.log('Fetched permissions data:', permissionsData);
+
+          // Update accordions state based on fetched permissions
+          const updatedAccordions = ACCESS_CONTROL_ACCORDIONS_DATA.map(
+            (acc, accordionIdx) => {
+              const permissionKeys = [
+                'roles',
+                'users',
+                'companies',
+                'categories',
+                'trades',
+                'services',
+                'materials',
+                'tools',
+                'jobs',
+              ];
+              const permissionKey = permissionKeys[accordionIdx];
+              const userPermissions = permissionKey
+                ? (permissionsData as any)[permissionKey]
+                : undefined;
+
+              console.log(`Processing ${permissionKey}:`, userPermissions);
+
+              if (userPermissions) {
+                const updatedStripes = acc.stripes.map((_, stripeIdx) => {
+                  const permissionNamesArray = [
+                    ['view', 'edit', 'archive'], // roles
+                    ['view', 'create', 'customize', 'archive'], // users
+                    ['view', 'assign_user', 'archive'], // companies
+                    ['view', 'edit', 'archive'], // categories
+                    ['view', 'edit', 'archive'], // trades
+                    ['view', 'edit', 'archive'], // services
+                    ['view', 'edit', 'archive'], // materials
+                    ['view', 'edit', 'archive', 'history'], // tools
+                    ['edit', 'archive'], // jobs
+                  ];
+                  const permissionNames = permissionNamesArray[accordionIdx];
+                  const permissionName = permissionNames?.[stripeIdx];
+                  if (
+                    permissionName &&
+                    typeof permissionName === 'string' &&
+                    userPermissions
+                  ) {
+                    const permissionValue = (userPermissions as any)[
+                      permissionName
+                    ];
+                    console.log(
+                      `Setting ${permissionKey}.${permissionName} to:`,
+                      permissionValue
+                    );
+                    return permissionValue === true;
+                  }
+                  return false;
+                });
+
+                return {
+                  ...acc,
+                  stripes: updatedStripes,
+                };
+              }
+
+              // If no permissions found for this section, default all to false
+              console.log(
+                `No permissions found for ${permissionKey}, defaulting to false`
+              );
+              return {
+                ...acc,
+                stripes: acc.stripes.map(() => false),
+              };
+            }
+          );
+
+          setAccordions(updatedAccordions);
+        }
+      } catch (err: unknown) {
+        // Handle auth errors first (will redirect to login if 401)
+        if (handleAuthError(err)) {
+          return; // Don't show toast if it's an auth error
+        }
+
+        const message = extractApiErrorMessage(
+          err,
+          USER_MESSAGES.PERMISSIONS_FETCH_ERROR
+        );
+        showErrorToast(message);
+      } finally {
+        setPermissionsLoading(false);
+      }
+    };
+
+    fetchPermissions();
+  }, [resolvedParams.uuid, showErrorToast, handleAuthError]);
 
   const handlePhotoChange = async (file: File | null) => {
     if (!file) {
@@ -388,6 +422,38 @@ export default function EditUserPage({ params }: EditUserPageProps) {
       }
 
       const message = extractApiErrorMessage(err, USER_MESSAGES.UPDATE_ERROR);
+      showErrorToast(message);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleUpdatePermissions = async () => {
+    setFormLoading(true);
+    try {
+      const permissionsData = generatePermissionsJson(accordions);
+      const response = await apiService.updateUserPermissions(
+        resolvedParams.uuid,
+        permissionsData
+      );
+
+      showSuccessToast(
+        extractApiSuccessMessage(
+          response,
+          USER_MESSAGES.PERMISSIONS_UPDATE_SUCCESS
+        )
+      );
+      router.push('/user-management');
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+
+      const message = extractApiErrorMessage(
+        err,
+        USER_MESSAGES.PERMISSIONS_UPDATE_ERROR
+      );
       showErrorToast(message);
     } finally {
       setFormLoading(false);
@@ -486,51 +552,66 @@ export default function EditUserPage({ params }: EditUserPageProps) {
             </TabsContent>
 
             <TabsContent value='permissions' className='pt-8'>
-              <div className='flex flex-col gap-4'>
-                {accordions.map((accordion, idx) => {
-                  const { title, badgeLabel, stripes } = accordion;
-                  return (
-                    <CompanyManagementAddUser
-                      key={title + idx}
-                      title={title}
-                      badgeLabel={badgeLabel}
-                      stripes={
-                        Array.isArray(stripes) &&
-                        Array.isArray(
-                          ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes
-                        )
-                          ? ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes.map(
-                              (stripe, sIdx) => ({
-                                title: stripe.title,
-                                description: stripe.description,
-                                checked:
-                                  typeof stripes?.[sIdx] === 'boolean'
-                                    ? stripes[sIdx]
-                                    : false,
-                                onToggle: () => handleToggle(idx, sIdx),
-                              })
+              {permissionsLoading ? (
+                <div className='flex items-center justify-center py-8'>
+                  <LoadingComponent variant='inline' />
+                  <span className='ml-2'>
+                    {USER_MESSAGES.PERMISSIONS_LOADING}
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <div className='flex flex-col gap-4'>
+                    {accordions.map((accordion, idx) => {
+                      const { title, badgeLabel, stripes } = accordion;
+                      return (
+                        <CompanyManagementAddUser
+                          key={title + idx}
+                          title={title}
+                          badgeLabel={badgeLabel}
+                          stripes={
+                            Array.isArray(stripes) &&
+                            Array.isArray(
+                              ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes
                             )
-                          : []
-                      }
-                      open={openAccordionIdx === idx}
-                      onOpenChange={open =>
-                        setOpenAccordionIdx(open ? idx : -1)
-                      }
-                    />
-                  );
-                })}
-              </div>
-              <div className='flex justify-end gap-6 mt-8'>
-                <Link
-                  href={''}
-                  className='inline-flex items-center h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] hover:bg-gray-50 transition-colors'
-                >
-                  Cancel
-                </Link>
-                <Button className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'>
-                  Update
-                </Button>
-              </div>
+                              ? ACCESS_CONTROL_ACCORDIONS_DATA[
+                                  idx
+                                ]?.stripes.map((stripe, sIdx) => ({
+                                  title: stripe.title,
+                                  description: stripe.description,
+                                  checked:
+                                    typeof stripes?.[sIdx] === 'boolean'
+                                      ? stripes[sIdx]
+                                      : false,
+                                  onToggle: () => handleToggle(idx, sIdx),
+                                }))
+                              : []
+                          }
+                          open={openAccordionIdx === idx}
+                          onOpenChange={open =>
+                            setOpenAccordionIdx(open ? idx : -1)
+                          }
+                        />
+                      );
+                    })}
+                  </div>
+                  <div className='flex justify-end gap-6 mt-8'>
+                    <Link
+                      href={'/user-management'}
+                      className='inline-flex items-center h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] hover:bg-gray-50 transition-colors'
+                    >
+                      Cancel
+                    </Link>
+                    <Button
+                      onClick={handleUpdatePermissions}
+                      disabled={formLoading}
+                      className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'
+                    >
+                      {formLoading ? 'Updating...' : 'Update'}
+                    </Button>
+                  </div>
+                </>
+              )}
             </TabsContent>
           </Tabs>
         </div>
