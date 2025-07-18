@@ -946,6 +946,14 @@ class ApiService {
     });
   }
 
+  // Delete trade
+  async deleteTrade(uuid: string): Promise<any> {
+    return this.makeRequest(`/trades/${uuid}`, {
+      method: 'DELETE',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   // Removed testConnection and all debug code
 }
 

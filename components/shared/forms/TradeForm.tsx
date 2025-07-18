@@ -16,15 +16,11 @@ import { showErrorToast, showSuccessToast } from '../../ui/use-toast';
 import FormErrorMessage from '../common/FormErrorMessage';
 import MultiSelect from '../common/MultiSelect';
 
-interface TradeFormData {
-  tradeName: string;
-  categories: string[];
-}
-
 export default function TradeForm({
   loading,
   onCancel,
   initialTradeUuid,
+  onSubmit,
 }: TradeFormProps) {
   const [categoriesOption, setCategoriesOption] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -106,13 +102,31 @@ export default function TradeForm({
           initialTradeUuid,
           payload
         );
-        const { message } = response;
+        const { message, data } = response;
         showSuccessToast(message || TRADE_MESSAGES.UPDATE_SUCCESS);
+
+        // Call onSubmit with updated trade data
+        if (onSubmit && data) {
+          onSubmit({
+            tradeName: data.name || tradeName,
+            category: categories.join(', '),
+            tradeData: data, // Pass the complete trade data
+          });
+        }
       } else {
         // Create new trade
         const response = await apiService.createTrade(payload);
-        const { message } = response;
+        const { message, data } = response;
         showSuccessToast(message || TRADE_MESSAGES.CREATE_SUCCESS);
+
+        // Call onSubmit with created trade data
+        if (onSubmit && data) {
+          onSubmit({
+            tradeName: data.name || tradeName,
+            category: categories.join(', '),
+            tradeData: data, // Pass the complete trade data
+          });
+        }
       }
 
       reset();
@@ -120,7 +134,6 @@ export default function TradeForm({
         onCancel();
       }
     } catch (error: unknown) {
-      const action = initialTradeUuid ? 'update' : 'create';
       const errorMessage = initialTradeUuid
         ? TRADE_MESSAGES.UPDATE_ERROR
         : TRADE_MESSAGES.CREATE_ERROR;

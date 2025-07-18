@@ -72,7 +72,11 @@ export interface FetchTradesParams {
 
 // Props interface for trade form component
 export interface TradeFormProps {
-  onSubmit: (data: { tradeName: string; category: string }) => void;
+  onSubmit?: (data: {
+    tradeName: string;
+    category: string;
+    tradeData?: Trade;
+  }) => void;
   loading?: boolean;
   onCancel?: () => void;
   initialTradeUuid?: string | undefined;
