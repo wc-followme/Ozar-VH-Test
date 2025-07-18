@@ -9,12 +9,12 @@ import { PAGINATION } from '@/constants/common';
 import { apiService, CreateUserRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
 import Link from 'next/link';
+import { ACCESS_CONTROL_ACCORDIONS_DATA } from '@/constants/access-control';
 import CompanyManagementAddUser from '../../../../components/shared/CompanyManagementAddUser';
 import { Button } from '../../../../components/ui/button';
 import { Role, RoleApiResponse, UserFormData } from '../types';
@@ -31,94 +31,6 @@ const UserInfoForm = dynamic(
     ssr: false,
   }
 );
-
-// Dummy data for access control accordions
-const ACCESS_CONTROL_ACCORDIONS_DATA = [
-  {
-    title: 'Roles Access Control',
-    badgeLabel: 'Full Access',
-    stripes: [
-      {
-        title: 'Browse Roles',
-        description:
-          'View the complete list of available roles and their basic information including role names, descriptions, and user counts.',
-      },
-      {
-        title: 'Configure & Modify Roles',
-        description:
-          "Modify or set up new roles with custom names, descriptions, and permission assignments tailored to your organization's needs.",
-      },
-      {
-        title: 'Archive & Restore Roles',
-        description:
-          'Remove roles that are no longer needed. System prevents deletion of roles with active users for data safety.',
-      },
-    ],
-  },
-  {
-    title: 'Users Access Control',
-    badgeLabel: 'Limited Access',
-    stripes: [
-      {
-        title: 'Browse Roles',
-        description:
-          'View the complete list of available roles and their basic information including role names, descriptions, and user counts.',
-      },
-      {
-        title: 'Configure & Modify Roles',
-        description:
-          "Modify or set up new roles with custom names, descriptions, and permission assignments tailored to your organization's needs.",
-      },
-      {
-        title: 'Archive & Restore Roles',
-        description:
-          'Remove roles that are no longer needed. System prevents deletion of roles with active users for data safety.',
-      },
-    ],
-  },
-  {
-    title: 'Company Management & Operations',
-    badgeLabel: 'Restricted',
-    stripes: [
-      {
-        title: 'Browse Roles',
-        description:
-          'View the complete list of available roles and their basic information including role names, descriptions, and user counts.',
-      },
-      {
-        title: 'Configure & Modify Roles',
-        description:
-          "Modify or set up new roles with custom names, descriptions, and permission assignments tailored to your organization's needs.",
-      },
-      {
-        title: 'Archive & Restore Roles',
-        description:
-          'Remove roles that are no longer needed. System prevents deletion of roles with active users for data safety.',
-      },
-    ],
-  },
-  {
-    title: 'Category Management & Service',
-    badgeLabel: 'Restricted',
-    stripes: [
-      {
-        title: 'Browse Roles',
-        description:
-          'View the complete list of available roles and their basic information including role names, descriptions, and user counts.',
-      },
-      {
-        title: 'Configure & Modify Roles',
-        description:
-          "Modify or set up new roles with custom names, descriptions, and permission assignments tailored to your organization's needs.",
-      },
-      {
-        title: 'Archive & Restore Roles',
-        description:
-          'Remove roles that are no longer needed. System prevents deletion of roles with active users for data safety.',
-      },
-    ],
-  },
-];
 
 export default function AddUserPage() {
   // State for all accordions' switches
@@ -182,10 +94,15 @@ export default function AddUserPage() {
         const rolesRes = await apiService.fetchRoles({
           page: 1,
           limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+          status: 'ACTIVE', // Only fetch active roles for dropdown
         });
         const roleList = isRoleApiResponse(rolesRes) ? rolesRes.data.data : [];
         setRoles(
-          roleList.map((role: Role) => ({ id: role.id, name: role.name }))
+          roleList.map(({ id, name, status }: Role) => ({
+            id,
+            name,
+            status: status || 'ACTIVE',
+          }))
         );
       } catch (err: unknown) {
         if (handleAuthError(err)) {
@@ -222,7 +139,7 @@ export default function AddUserPage() {
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
-    } catch (err: unknown) {
+    } catch {
       showErrorToast(USER_MESSAGES.UPLOAD_ERROR);
       setPhotoFile(null);
       setFileKey('');
@@ -259,8 +176,10 @@ export default function AddUserPage() {
         pincode: data.pincode,
         profile_picture_url: fileKey,
       };
-      await apiService.createUser(payload);
-      showSuccessToast(USER_MESSAGES.CREATE_SUCCESS);
+      const response = await apiService.createUser(payload);
+      showSuccessToast(
+        extractApiSuccessMessage(response, USER_MESSAGES.CREATE_SUCCESS)
+      );
       router.push('/user-management');
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)

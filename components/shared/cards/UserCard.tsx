@@ -1,25 +1,14 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Call, Icon, Sms } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { Avatar } from '../common/Avatar';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 import Dropdown from '../common/Dropdown';
-
-// Avatar color pairs (background and text)
-export const AVATAR_COLORS = [
-  { bg: '#1A57BF1A', color: '#24338C' }, // Orange
-  { bg: '#34AD4426', color: '#34AD44' }, // Green
-  { bg: '#00A8BF26', color: '#00A8BF' }, // Blue
-  { bg: '#90C91D26', color: '#90C91D' }, // Red
-  { bg: '#EBB40226', color: '#EBB402' }, // Bright Green
-  { bg: '#D4323226', color: '#D43232' }, // Teal
-  { bg: '#F58B1E1A', color: '#F58B1E' }, // Brown
-];
 
 interface MenuOption {
   label: string;
@@ -59,29 +48,7 @@ export function UserCard({
 }: UserCardProps) {
   const [isToggling, setIsToggling] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
-  const [imgError, setImgError] = useState(false);
   const router = useRouter();
-
-  // Pick a random color if avatarColor is not provided
-  const randomAvatarColor = useMemo(() => {
-    if (avatarColor) return avatarColor;
-    const colorArray = AVATAR_COLORS ?? [];
-    if (
-      colorArray.length > 0 &&
-      typeof name === 'string' &&
-      name.trim().length > 0
-    ) {
-      // Use the first character of the name to pick a color deterministically
-      const trimmed = name.trim();
-      const firstChar = trimmed.length > 0 ? trimmed[0] : '';
-      if (!firstChar) return { bg: '#ccc', color: '#222' };
-      const charCode = firstChar.charCodeAt(0);
-      const idx = charCode % colorArray.length;
-      return colorArray[idx] ?? { bg: '#ccc', color: '#222' };
-    }
-    // fallback color
-    return { bg: '#ccc', color: '#222' };
-  }, [avatarColor, name]);
 
   const handleToggle = async () => {
     if (disableActions) return;
@@ -99,51 +66,18 @@ export function UserCard({
     return action;
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase();
-  };
-
   return (
     <div className='flex flex-col bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] p-[10px] hover:shadow-lg transition-shadow duration-200'>
       {/* Header with Avatar, User Info and Menu */}
       <div className='flex items-start gap-4 mb-2'>
-        <Avatar className='w-20 h-20 rounded-[10px]'>
-          {image && !imgError ? (
-            <AvatarImage
-              src={image}
-              alt={name}
-              className='rounded-[10px] object-cover text-6 font-bold'
-              onError={() => setImgError(true)}
-              style={{
-                background: randomAvatarColor?.bg ?? '#ccc',
-                color: randomAvatarColor?.color ?? '#222',
-              }}
-            />
-          ) : (
-            <AvatarImage
-              src='/img-placeholder-sm.png'
-              alt='placeholder'
-              className='rounded-[10px] object-cover text-6 font-bold'
-              style={{
-                background: randomAvatarColor?.bg ?? '#ccc',
-                color: randomAvatarColor?.color ?? '#222',
-              }}
-            />
-          )}
-          <AvatarFallback
-            className='rounded-[10px] object-cover text-6 font-bold'
-            style={{
-              background: randomAvatarColor?.bg ?? '#ccc',
-              color: randomAvatarColor?.color ?? '#222',
-            }}
-          >
-            {getInitials(name)}
-          </AvatarFallback>
-        </Avatar>
+        <Avatar
+          name={name}
+          image={image}
+          avatarColor={avatarColor}
+          height={80}
+          width={80}
+          className='rounded-[10px]' // tailwind for rounded corners
+        />
 
         <div className='flex-1 min-w-0'>
           {/* User Info */}

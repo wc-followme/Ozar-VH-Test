@@ -5,7 +5,7 @@ import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import { useToast } from '@/components/ui/use-toast';
 import { STATUS_CODES } from '@/constants/status-codes';
 import { apiService } from '@/lib/api';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import { CreateRoleFormData } from '@/lib/validations/role';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
@@ -15,9 +15,12 @@ import type { ApiResponse, Role, UpdateRoleRequest } from '../../types';
 
 // Dynamic import for better performance
 const RoleForm = dynamic(
-  () => import('@/components/shared/forms/RoleForm').then(mod => ({ default: mod.RoleForm })),
+  () =>
+    import('@/components/shared/forms/RoleForm').then(mod => ({
+      default: mod.RoleForm,
+    })),
   {
-    loading: () => <LoadingComponent variant="inline" />,
+    loading: () => <LoadingComponent variant='inline' />,
     ssr: false,
   }
 );
@@ -75,7 +78,9 @@ const EditRolePage = () => {
         response.statusCode === STATUS_CODES.OK ||
         response.statusCode === STATUS_CODES.CREATED
       ) {
-        showSuccessToast(ROLE_MESSAGES.UPDATE_SUCCESS);
+        showSuccessToast(
+          extractApiSuccessMessage(response, ROLE_MESSAGES.UPDATE_SUCCESS)
+        );
         router.push('/role-management');
       } else {
         throw new Error(response.message || ROLE_MESSAGES.UPDATE_ERROR);

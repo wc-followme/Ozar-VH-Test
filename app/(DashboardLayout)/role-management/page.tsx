@@ -2,9 +2,12 @@
 
 import { RoleCard } from '@/components/shared/cards/RoleCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { iconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -36,6 +39,8 @@ const RoleManagement = () => {
   const [hasMore, setHasMore] = useState(true);
   const [isNavigating, setIsNavigating] = useState(false);
   const router = useRouter();
+  const { showSuccessToast, showErrorToast } = useToast();
+  const { handleAuthError } = useAuth();
 
   const fetchRoles = useCallback(
     async (targetPage = 1, append = false) => {
@@ -46,6 +51,7 @@ const RoleManagement = () => {
           limit,
           search,
           name,
+          status: 'ACTIVE', // Only fetch active roles
         };
         const res = (await apiService.fetchRoles(params)) as RoleApiResponse;
         const data = res.data || { data: [], total: 0 };
@@ -106,10 +112,18 @@ const RoleManagement = () => {
   // Handler for deleting a role
   const handleDeleteRole = async (uuid: string) => {
     try {
-      await apiService.deleteRole(uuid);
+      const response = await apiService.deleteRole(uuid);
       setRoles(prev => prev.filter(role => role.uuid !== uuid));
-    } catch {
-      alert(ROLE_MESSAGES.DELETE_ERROR);
+      showSuccessToast(
+        extractApiSuccessMessage(response, ROLE_MESSAGES.DELETE_SUCCESS)
+      );
+    } catch (err: unknown) {
+      // Handle auth errors first (will redirect to login if 401)
+      if (handleAuthError(err)) {
+        return; // Don't show toast if it's an auth error
+      }
+      const message = extractApiErrorMessage(err, ROLE_MESSAGES.DELETE_ERROR);
+      showErrorToast(message);
     }
   };
 

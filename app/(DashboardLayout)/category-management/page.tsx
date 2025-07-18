@@ -27,7 +27,7 @@ import {
   UpdateCategoryRequest,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import {
   CreateCategoryFormData,
   createCategorySchema,
@@ -90,6 +90,7 @@ const CategoryManagement = () => {
       const res = await apiService.fetchCategories({
         page: 1,
         limit: PAGINATION.DEFAULT_LIMIT,
+        status: 'ACTIVE', // Only fetch active categories
       });
 
       // Handle different possible response structures
@@ -144,9 +145,11 @@ const CategoryManagement = () => {
         return;
       }
 
-      await apiService.deleteCategory(uuid);
-      setCategories(categories => categories.filter(c => c.uuid !== uuid));
-      showSuccessToast(CATEGORY_MESSAGES.DELETE_SUCCESS);
+      const response = await apiService.deleteCategory(uuid);
+      showSuccessToast(
+        extractApiSuccessMessage(response, CATEGORY_MESSAGES.DELETE_SUCCESS)
+      );
+      fetchCategories();
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -226,7 +229,9 @@ const CategoryManagement = () => {
           response.statusCode === STATUS_CODES.OK ||
           response.statusCode === STATUS_CODES.CREATED
         ) {
-          showSuccessToast(CATEGORY_MESSAGES.UPDATE_SUCCESS);
+          showSuccessToast(
+            extractApiSuccessMessage(response, CATEGORY_MESSAGES.UPDATE_SUCCESS)
+          );
 
           // Update the category in the list
           setCategories(categories =>
@@ -261,7 +266,9 @@ const CategoryManagement = () => {
           response.statusCode === STATUS_CODES.OK ||
           response.statusCode === STATUS_CODES.CREATED
         ) {
-          showSuccessToast(CATEGORY_MESSAGES.CREATE_SUCCESS);
+          showSuccessToast(
+            extractApiSuccessMessage(response, CATEGORY_MESSAGES.CREATE_SUCCESS)
+          );
 
           // Reset form and close modal
           reset({
@@ -440,7 +447,9 @@ const CategoryManagement = () => {
                                         style={{ color }}
                                       />
                                     </div>
-                                    <span className='text-sm'>{label}</span>
+                                    <span className='text-sm'>
+                                      {label} sdfsd
+                                    </span>
                                   </div>
                                 </SelectItem>
                               )

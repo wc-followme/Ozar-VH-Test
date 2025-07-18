@@ -567,23 +567,26 @@ class ApiService {
     });
   }
 
-  // Fetch roles with pagination, search, and name filter
+  // Fetch roles with pagination, search, name filter, and status
   async fetchRoles({
     page = 1,
     limit = PAGINATION.DEFAULT_LIMIT,
     search = '',
     name = '',
+    status = 'ACTIVE',
   }: {
     page?: number;
     limit?: number;
     search?: string;
     name?: string;
+    status?: 'ACTIVE' | 'INACTIVE' | '';
   }) {
     const params = new URLSearchParams();
     params.append('page', String(page));
     params.append('limit', String(limit));
     if (search) params.append('search', search);
     if (name) params.append('name', name);
+    if (status) params.append('status', status);
     return this.makeRequest(`/roles?${params.toString()}`, {
       headers: this.getRoleHeaders(),
     });
@@ -640,12 +643,14 @@ class ApiService {
     role_id = '',
     company_id = '',
     search = '',
+    status = 'ACTIVE',
   }: {
     page?: number;
     limit?: number;
     role_id?: string | number;
     company_id?: string | number;
     search?: string;
+    status?: 'ACTIVE' | 'INACTIVE' | '';
   }): Promise<FetchUsersResponse> {
     const params = new URLSearchParams();
     params.append('page', String(page));
@@ -653,6 +658,7 @@ class ApiService {
     if (role_id) params.append('role_id', String(role_id));
     if (company_id) params.append('company_id', String(company_id));
     if (search) params.append('search', search);
+    if (status) params.append('status', status);
     return this.makeRequest(`/users?${params.toString()}`, {
       method: 'GET',
       headers: this.getRoleHeaders(),
@@ -788,17 +794,20 @@ class ApiService {
     limit = PAGINATION.DEFAULT_LIMIT,
     search = '',
     name = '',
+    status = 'ACTIVE',
   }: {
     page?: number;
     limit?: number;
     search?: string;
     name?: string;
+    status?: 'ACTIVE' | 'INACTIVE' | '';
   }): Promise<FetchCategoriesResponse> {
     const params = new URLSearchParams();
     params.append('page', String(page));
     params.append('limit', String(limit));
     if (search) params.append('search', search);
     if (name) params.append('name', name);
+    if (status) params.append('status', status);
     return this.makeRequest(`/categories?${params.toString()}`, {
       method: 'GET',
       headers: this.getRoleHeaders(),
