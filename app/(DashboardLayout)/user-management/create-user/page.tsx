@@ -3,7 +3,6 @@
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { apiService, CreateUserRequest } from '@/lib/api';
@@ -13,10 +12,6 @@ import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { ACCESS_CONTROL_ACCORDIONS_DATA } from '@/constants/access-control';
-import CompanyManagementAddUser from '../../../../components/shared/CompanyManagementAddUser';
-import { Button } from '../../../../components/ui/button';
 import { Role, RoleApiResponse, UserFormData } from '../types';
 import { USER_MESSAGES } from '../user-messages';
 
@@ -33,34 +28,6 @@ const UserInfoForm = dynamic(
 );
 
 export default function AddUserPage() {
-  // State for all accordions' switches
-  const [accordions, setAccordions] = useState(() =>
-    ACCESS_CONTROL_ACCORDIONS_DATA.map(acc => ({
-      ...acc,
-      stripes: acc.stripes.map(() => true), // all switches checked by default
-    }))
-  );
-
-  // State for which accordion is open
-  const [openAccordionIdx, setOpenAccordionIdx] = useState(0);
-
-  // Handler to toggle a switch
-  const handleToggle = (accordionIdx: number, stripeIdx: number) => {
-    setAccordions(prev =>
-      prev.map((acc, aIdx) =>
-        aIdx === accordionIdx
-          ? {
-              ...acc,
-              stripes: acc.stripes.map((checked: boolean, sIdx: number) =>
-                sIdx === stripeIdx ? !checked : checked
-              ),
-            }
-          : acc
-      )
-    );
-  };
-
-  const [selectedTab, setSelectedTab] = useState('info');
   const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -209,107 +176,38 @@ export default function AddUserPage() {
 
         {/* Main Content */}
         <div className='bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
-          <Tabs
-            value={selectedTab}
-            onValueChange={setSelectedTab}
-            className='w-full'
-          >
-            <TabsList className='grid w-full max-w-[328px] grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal'>
-              <TabsTrigger
-                value='info'
-                className='px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-              >
-                {USER_MESSAGES.INFO_TAB}
-              </TabsTrigger>
-              <TabsTrigger
-                value='permissions'
-                className='px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-              >
-                {USER_MESSAGES.SETTINGS_TAB}
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value='info' className='pt-8'>
-              <div className='flex flex-col lg:flex-row items-start gap-6'>
-                {/* Left Column - Upload Photo */}
-                <div className='w-[250px] flex-shrink-0 relative'>
-                  <PhotoUploadField
-                    photo={photoFile}
-                    onPhotoChange={handlePhotoChange}
-                    onDeletePhoto={handleDeletePhoto}
-                    label={USER_MESSAGES.UPLOAD_PHOTO_LABEL}
-                    // text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
-                    className='h-[250px]'
-                  />
-                  {uploading && (
-                    <div className='text-xs mt-2'>
-                      {USER_MESSAGES.UPLOADING}
-                    </div>
-                  )}
-                </div>
-
-                {/* Right Column - Form Fields */}
-                <div className='w-full lg:flex-1'>
-                  <UserInfoForm
-                    roles={roles}
-                    loadingRoles={loadingRoles}
-                    imageUrl={fileKey}
-                    onSubmit={handleCreateUser}
-                    onCancel={handleCancel}
-                    loading={formLoading}
-                  />
-                </div>
+          <div className='pt-8'>
+            <div className='flex flex-col lg:flex-row items-start gap-6'>
+              {/* Left Column - Upload Photo */}
+              <div className='w-[250px] flex-shrink-0 relative'>
+                <PhotoUploadField
+                  photo={photoFile}
+                  onPhotoChange={handlePhotoChange}
+                  onDeletePhoto={handleDeletePhoto}
+                  label={USER_MESSAGES.UPLOAD_PHOTO_LABEL}
+                  // text={USER_MESSAGES.UPLOAD_PHOTO_TEXT}
+                  className='h-[250px]'
+                />
+                {uploading && (
+                  <div className='text-xs mt-2'>
+                    {USER_MESSAGES.UPLOADING}
+                  </div>
+                )}
               </div>
-            </TabsContent>
 
-            <TabsContent value='permissions' className='pt-8'>
-              <div className='flex flex-col gap-4'>
-                {accordions.map((accordion, idx) => {
-                  const { title, badgeLabel, stripes } = accordion;
-                  return (
-                    <CompanyManagementAddUser
-                      key={title + idx}
-                      title={title}
-                      badgeLabel={badgeLabel}
-                      stripes={
-                        Array.isArray(stripes) &&
-                        Array.isArray(
-                          ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes
-                        )
-                          ? ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes.map(
-                              (stripe, sIdx) => ({
-                                title: stripe.title,
-                                description: stripe.description,
-                                checked:
-                                  typeof stripes?.[sIdx] === 'boolean'
-                                    ? stripes[sIdx]
-                                    : false,
-                                onToggle: () => handleToggle(idx, sIdx),
-                              })
-                            )
-                          : []
-                      }
-                      open={openAccordionIdx === idx}
-                      onOpenChange={open =>
-                        setOpenAccordionIdx(open ? idx : -1)
-                      }
-                    />
-                  );
-                })}
+              {/* Right Column - Form Fields */}
+              <div className='w-full lg:flex-1'>
+                <UserInfoForm
+                  roles={roles}
+                  loadingRoles={loadingRoles}
+                  imageUrl={fileKey}
+                  onSubmit={handleCreateUser}
+                  onCancel={handleCancel}
+                  loading={formLoading}
+                />
               </div>
-              <div className='flex justify-end gap-6 mt-8'>
-                <Link
-                  href={''}
-                  className='inline-flex items-center h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] hover:bg-gray-50 transition-colors'
-                >
-                  Cancel
-                </Link>
-                <Button className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'>
-                  Create
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
+            </div>
+          </div>
         </div>
       </div>
     </div>
