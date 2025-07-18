@@ -185,7 +185,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         // Update accordions state based on saved permissions
         const updatedAccordions = ACCESS_CONTROL_ACCORDIONS_DATA.map(
           (acc, accordionIdx) => {
-            const permissionKey = [
+            const permissionKeys = [
               'roles',
               'users',
               'companies',
@@ -195,29 +195,36 @@ export default function EditUserPage({ params }: EditUserPageProps) {
               'materials',
               'tools',
               'jobs',
-            ][accordionIdx];
-            const permissions = parsedPermissions[permissionKey];
+            ];
+            const permissionKey = permissionKeys[accordionIdx];
+            const permissions = permissionKey
+              ? parsedPermissions[permissionKey]
+              : undefined;
 
             if (permissions) {
-                             const updatedStripes = acc.stripes.map((_, stripeIdx) => {
-                 const permissionNames = [
-                   ['view', 'edit', 'archive'], // roles
-                   ['view', 'create', 'customize', 'archive'], // users
-                   ['view', 'assign_user', 'archive'], // companies
-                   ['view', 'edit', 'archive'], // categories
-                   ['view', 'edit', 'archive'], // trades
-                   ['view', 'edit', 'archive'], // services
-                   ['view', 'edit', 'archive'], // materials
-                   ['view', 'edit', 'archive', 'history'], // tools
-                   ['edit', 'archive'], // jobs
-                 ][accordionIdx];
-
-                 const permissionName = permissionNames?.[stripeIdx];
-                 if (permissionName && typeof permissionName === 'string' && permissions) {
-                   return (permissions as any)[permissionName] || false;
-                 }
-                 return false;
-               });
+              const updatedStripes = acc.stripes.map((_, stripeIdx) => {
+                const permissionNamesArray = [
+                  ['view', 'edit', 'archive'], // roles
+                  ['view', 'create', 'customize', 'archive'], // users
+                  ['view', 'assign_user', 'archive'], // companies
+                  ['view', 'edit', 'archive'], // categories
+                  ['view', 'edit', 'archive'], // trades
+                  ['view', 'edit', 'archive'], // services
+                  ['view', 'edit', 'archive'], // materials
+                  ['view', 'edit', 'archive', 'history'], // tools
+                  ['edit', 'archive'], // jobs
+                ];
+                const permissionNames = permissionNamesArray[accordionIdx];
+                const permissionName = permissionNames?.[stripeIdx];
+                if (
+                  permissionName &&
+                  typeof permissionName === 'string' &&
+                  permissions
+                ) {
+                  return (permissions as any)[permissionName] || false;
+                }
+                return false;
+              });
 
               return {
                 ...acc,
