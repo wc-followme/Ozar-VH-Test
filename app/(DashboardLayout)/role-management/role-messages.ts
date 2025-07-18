@@ -1,7 +1,7 @@
 // Role management module static messages
 export const ROLE_MESSAGES = {
   // Page titles and headers
-  PAGE_TITLE: 'Role and Permissions Management',
+  PAGE_TITLE: 'Role and Settings Management',
   CREATE_ROLE_BREADCRUMB: 'Create Role',
   EDIT_ROLE_BREADCRUMB: 'Edit Role',
   ROLE_MANAGEMENT_BREADCRUMB: 'Role Management',

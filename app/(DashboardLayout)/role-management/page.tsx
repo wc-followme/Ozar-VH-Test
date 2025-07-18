@@ -1,10 +1,11 @@
 'use client';
 
+import { HelmetIcon } from '@/components/icons/HelmetIcon';
 import { RoleCard } from '@/components/shared/cards/RoleCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
-import { iconOptions } from '@/constants/sidebar-items';
+import { roleIconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
@@ -28,6 +29,15 @@ const menuOptions: MenuOption[] = [
   { label: ROLE_MESSAGES.EDIT_MENU, action: 'edit', icon: Edit2 },
   { label: ROLE_MESSAGES.DELETE_MENU, action: 'delete', icon: Trash },
 ];
+
+// Adapter for icons that expect className instead of size/color
+const IconAdapter = (IconComp: any) => {
+  const WrappedIcon = ({ color = '#00a8bf' }) => (
+    <IconComp className='w-[30px] h-[30px]' style={{ color }} />
+  );
+  WrappedIcon.displayName = `IconAdapter(${IconComp.displayName || IconComp.name || 'Component'})`;
+  return WrappedIcon;
+};
 
 const RoleManagement = () => {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -147,6 +157,9 @@ const RoleManagement = () => {
     return <LoadingComponent variant='fullscreen' text='Loading form...' />;
   }
 
+  // Ensure icon options is always an array and has label property
+  const safeIconOptions = Array.isArray(roleIconOptions) ? roleIconOptions : [];
+
   return (
     <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
@@ -175,12 +188,19 @@ const RoleManagement = () => {
             ) : (
               roles.map(
                 ({ uuid, icon, name, description, total_permissions }) => {
-                  const iconOption = iconOptions.find(
-                    opt => opt.value === icon
-                  ) || {
-                    icon: () => null,
-                    color: '#00a8bf',
-                  };
+                  // Use the icon component directly if it matches the expected signature
+                  const iconOptionRaw = safeIconOptions.find(
+                    (opt: any) => opt.value === icon
+                  );
+                  const iconOption = iconOptionRaw
+                    ? {
+                        ...iconOptionRaw,
+                        icon: IconAdapter(iconOptionRaw.icon),
+                      }
+                    : {
+                        icon: IconAdapter(HelmetIcon),
+                        color: '#00a8bf',
+                      };
                   return (
                     <div key={uuid}>
                       <RoleCard

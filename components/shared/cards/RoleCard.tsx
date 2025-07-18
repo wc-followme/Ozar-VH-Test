@@ -31,6 +31,8 @@ export interface RoleCardProps {
   onDelete?: () => void;
 }
 
+// Utility to detect if a component supports className prop
+
 export const RoleCard: React.FC<RoleCardProps> = ({
   iconSrc,
   iconBgColor,
@@ -61,10 +63,21 @@ export const RoleCard: React.FC<RoleCardProps> = ({
           className={`flex items-center justify-center w-[60px] h-[60px] rounded-[16px] mb-2`}
           style={{ color: iconColor, background: iconBgColor }}
         >
-          {React.createElement(iconSrc, {
-            size: 30,
-            color: iconColor || '#000000',
-          })}
+          {(() => {
+            // Heuristic: local icons expect className, external expect size/color
+            const isLocalIcon = iconSrc && iconSrc.length === 1;
+            if (isLocalIcon) {
+              return React.createElement(iconSrc as any, {
+                className: 'w-[30px] h-[30px]',
+                style: { color: iconColor || '#000000' },
+              });
+            } else {
+              return React.createElement(iconSrc, {
+                size: 30,
+                color: iconColor || '#000000',
+              });
+            }
+          })()}
         </div>
 
         <Dropdown
@@ -91,7 +104,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
         <div className='flex flex-col gap-2 w-full'>
           <h3 className='text-base font-bold text-[var(--text)]'>{title}</h3>
 
-          <p className='text-base text-[var(--text-secondary)] leading-tight'>
+          <p className='text-base text-[var(--text-secondary)] leading-tight line-clamp-3'>
             {description}
           </p>
         </div>

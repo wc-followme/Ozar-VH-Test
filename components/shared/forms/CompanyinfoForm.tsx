@@ -26,10 +26,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { COUNTRY_CODES } from '@/constants/common';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as IconsaxCalendar } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import FormErrorMessage from '../common/FormErrorMessage';
+import PhotoUploadField from '../common/PhotoUploadField';
 
 export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
   ({
@@ -57,7 +58,31 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
     const [projects, setProjects] = useState('');
     const [isInitialized, setIsInitialized] = useState(false);
 
+    // Contractor fields
+    const [contractorName, setContractorName] = useState('');
+    const [contractorEmail, setContractorEmail] = useState('');
+    const [contractorPhone, setContractorPhone] = useState('');
+    const [contractorCountryCode, setContractorCountryCode] = useState('+1');
+    const countryCodes = [
+      { code: '+1', flag: '🇺🇸' },
+      { code: '+44', flag: '🇬🇧' },
+      { code: '+91', flag: '🇮🇳' },
+      // Add more as needed
+    ];
+
     const [errors, setErrors] = useState<CompanyFormErrors>({});
+
+    // Photo upload stubs for contractor
+    const [photoFile, setPhotoFile] = useState<File | null>(null);
+    const [uploading] = useState(false);
+    const [fileKey, setFileKey] = useState<string | null>(null);
+    const handlePhotoChange = (file: File | null) => {
+      setPhotoFile(file);
+    };
+    const handleDeletePhoto = () => {
+      setPhotoFile(null);
+      setFileKey(null);
+    };
 
     // Initialize form with initial data
     const initializeForm = useCallback(() => {
@@ -251,10 +276,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             {/* Company Name */}
             <div className='space-y-2'>
-              <Label
-                htmlFor='company-name'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='company-name' className='field-label'>
                 {COMPANY_MESSAGES.COMPANY_NAME_LABEL}
               </Label>
               <Input
@@ -269,10 +291,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
 
             {/* Tagline */}
             <div className='space-y-2'>
-              <Label
-                htmlFor='tagline'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='tagline' className='field-label'>
                 {COMPANY_MESSAGES.TAGLINE_LABEL}
               </Label>
               <Input
@@ -284,13 +303,24 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               />
               <FormErrorMessage message={errors.tagline || ''} />
             </div>
-
+            {/* About - Full Width */}
+            <div className='space-y-2 col-span-2'>
+              <Label htmlFor='about' className='field-label'>
+                {COMPANY_MESSAGES.ABOUT_LABEL}
+              </Label>
+              <Textarea
+                id='about'
+                value={about}
+                onChange={e => setAbout(e.target.value)}
+                placeholder={COMPANY_MESSAGES.ENTER_ABOUT}
+                rows={3}
+                className='border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              />
+              <FormErrorMessage message={errors.about || ''} />
+            </div>
             {/* Email */}
             <div className='space-y-2'>
-              <Label
-                htmlFor='email'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='email' className='field-label'>
                 {COMPANY_MESSAGES.EMAIL_LABEL}
               </Label>
               <Input
@@ -306,10 +336,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
 
             {/* Phone Number */}
             <div className='space-y-2'>
-              <Label
-                htmlFor='phone'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='phone' className='field-label'>
                 {COMPANY_MESSAGES.PHONE_LABEL}
               </Label>
               <div className='flex gap-2'>
@@ -340,13 +367,53 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               </div>
               <FormErrorMessage message={errors.phone_number || ''} />
             </div>
+            <div className='space-y-2 col-span-2'>
+              <Label htmlFor='email' className='field-label'>
+                Address
+              </Label>
+              <Input
+                id='email'
+                type='email'
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder={COMPANY_MESSAGES.ENTER_EMAIL}
+                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              />
+              <FormErrorMessage message={errors.email || ''} />
+            </div>
 
+            {/* City */}
+            <div className='space-y-2'>
+              <Label htmlFor='city' className='field-label'>
+                {COMPANY_MESSAGES.CITY_LABEL}
+              </Label>
+              <Input
+                id='city'
+                value={city}
+                onChange={e => setCity(e.target.value)}
+                placeholder={COMPANY_MESSAGES.ENTER_CITY}
+                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              />
+              <FormErrorMessage message={errors.city || ''} />
+            </div>
+
+            {/* Pin Code */}
+            <div className='space-y-2'>
+              <Label htmlFor='pincode' className='field-label'>
+                {COMPANY_MESSAGES.PINCODE_LABEL}
+              </Label>
+              <Input
+                id='pincode'
+                value={pincode}
+                onChange={e => setPincode(e.target.value)}
+                placeholder={COMPANY_MESSAGES.ENTER_PINCODE}
+                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              />
+              <FormErrorMessage message={errors.pincode || ''} />
+            </div>
             {/* Website */}
             <div className='space-y-2'>
-              <Label
-                htmlFor='website'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
+              <Label htmlFor='website' className='field-label'>
                 {COMPANY_MESSAGES.WEBSITE_LABEL}
               </Label>
               <Input
@@ -355,14 +422,14 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                 value={website}
                 onChange={e => setWebsite(e.target.value)}
                 placeholder={COMPANY_MESSAGES.ENTER_WEBSITE}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                className='input-field'
               />
               <FormErrorMessage message={errors.website || ''} />
             </div>
 
             {/* Expiry Date */}
             <div className='space-y-2'>
-              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+              <Label className='field-label'>
                 {COMPANY_MESSAGES.EXPIRY_DATE_LABEL}
               </Label>
               <Popover>
@@ -374,7 +441,10 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                       !expiryDate && 'text-muted-foreground'
                     )}
                   >
-                    <CalendarIcon className='mr-2 h-4 w-4' />
+                    <IconsaxCalendar
+                      className='mr-2 !h-6 !w-6'
+                      color='var(--primary)'
+                    />
                     {expiryDate ? (
                       format(expiryDate, 'PPP')
                     ) : (
@@ -396,46 +466,9 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               </Popover>
               <FormErrorMessage message={errors.expiry_date || ''} />
             </div>
-
-            {/* City */}
-            <div className='space-y-2'>
-              <Label
-                htmlFor='city'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
-                {COMPANY_MESSAGES.CITY_LABEL}
-              </Label>
-              <Input
-                id='city'
-                value={city}
-                onChange={e => setCity(e.target.value)}
-                placeholder={COMPANY_MESSAGES.ENTER_CITY}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-              />
-              <FormErrorMessage message={errors.city || ''} />
-            </div>
-
-            {/* Pin Code */}
-            <div className='space-y-2'>
-              <Label
-                htmlFor='pincode'
-                className='text-[14px] font-semibold text-[var(--text-dark)]'
-              >
-                {COMPANY_MESSAGES.PINCODE_LABEL}
-              </Label>
-              <Input
-                id='pincode'
-                value={pincode}
-                onChange={e => setPincode(e.target.value)}
-                placeholder={COMPANY_MESSAGES.ENTER_PINCODE}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-              />
-              <FormErrorMessage message={errors.pincode || ''} />
-            </div>
-
             {/* Preferred Communication */}
             <div className='space-y-2'>
-              <Label className='text-[14px] font-semibold text-[var(--text-dark)]'>
+              <Label className='field-label'>
                 {COMPANY_MESSAGES.PREFERRED_COMMUNICATION_LABEL}
               </Label>
               <Select
@@ -467,33 +500,105 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                 message={errors.preferred_communication_method || ''}
               />
             </div>
-          </div>
+            <div className='col-span-2 pt-6'>
+              <h2 className='text-lg font-bold mb-4'>
+                Contractor Information{' '}
+                <span className='font-medium text-[var(--text-secondary)]'>
+                  (Optional)
+                </span>
+              </h2>
+              <div className='flex items-center gap-6'>
+                <div className='h-[180px] w-[180px]'>
+                  <PhotoUploadField
+                    photo={photoFile}
+                    onPhotoChange={handlePhotoChange}
+                    onDeletePhoto={handleDeletePhoto}
+                    label={COMPANY_MESSAGES.UPLOAD_PHOTO_LABEL}
+                    uploading={uploading}
+                    existingImageUrl={
+                      fileKey && !photoFile
+                        ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
+                        : ''
+                    }
+                    cardHeight='h-[180px]'
+                  />
+                  {uploading && (
+                    <div className='text-xs mt-2'>
+                      {COMPANY_MESSAGES.UPLOADING}
+                    </div>
+                  )}
+                </div>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4 flex-1'>
+                  {/* Contractor Name */}
+                  <div className='col-span-2 space-y-2'>
+                    <Label htmlFor='contractor-name' className='field-label'>
+                      {COMPANY_MESSAGES.CONTRACTOR_NAME_LABEL}
+                    </Label>
+                    <Input
+                      id='contractor-name'
+                      value={contractorName}
+                      onChange={e => setContractorName(e.target.value)}
+                      placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_NAME}
+                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                    />
+                    <FormErrorMessage message={errors.contractor_name || ''} />
+                  </div>
 
-          {/* About - Full Width */}
-          <div className='space-y-2 mt-4'>
-            <Label
-              htmlFor='about'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
-              {COMPANY_MESSAGES.ABOUT_LABEL}
-            </Label>
-            <Textarea
-              id='about'
-              value={about}
-              onChange={e => setAbout(e.target.value)}
-              placeholder={COMPANY_MESSAGES.ENTER_ABOUT}
-              rows={3}
-              className='border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-            />
-            <FormErrorMessage message={errors.about || ''} />
+                  {/* Contractor Email */}
+                  <div className='space-y-2'>
+                    <Label htmlFor='contractor-email' className='field-label'>
+                      {COMPANY_MESSAGES.CONTRACTOR_EMAIL_LABEL}
+                    </Label>
+                    <Input
+                      id='contractor-email'
+                      type='email'
+                      value={contractorEmail}
+                      onChange={e => setContractorEmail(e.target.value)}
+                      placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_EMAIL}
+                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                    />
+                    <FormErrorMessage message={errors.contractor_email || ''} />
+                  </div>
+
+                  {/* Contractor Phone */}
+                  <div className='space-y-2'>
+                    <Label htmlFor='contractor-phone' className='field-label'>
+                      {COMPANY_MESSAGES.CONTRACTOR_PHONE_LABEL}
+                    </Label>
+                    <div className='flex gap-2'>
+                      <Select
+                        value={contractorCountryCode}
+                        onValueChange={setContractorCountryCode}
+                      >
+                        <SelectTrigger className='w-[120px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countryCodes.map(country => (
+                            <SelectItem key={country.code} value={country.code}>
+                              {country.flag} {country.code}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        id='contractor-phone'
+                        value={contractorPhone}
+                        onChange={e => setContractorPhone(e.target.value)}
+                        placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_PHONE}
+                        className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                      />
+                    </div>
+                    <FormErrorMessage message={errors.contractor_phone || ''} />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Communication - Full Width */}
-          <div className='space-y-2 mt-4'>
-            <Label
-              htmlFor='communication'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+          {/* <div className='mt-4'>
+            <Label htmlFor='communication' className='field-label'>
               {COMPANY_MESSAGES.COMMUNICATION_LABEL}
             </Label>
             <Textarea
@@ -505,14 +610,11 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               className='border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
             <FormErrorMessage message={errors.communication || ''} />
-          </div>
+          </div> */}
 
           {/* Projects - Full Width */}
-          <div className='space-y-2 mt-4'>
-            <Label
-              htmlFor='projects'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
-            >
+          {/* <div className='space-y-2 mt-4'>
+            <Label htmlFor='projects' className='field-label'>
               {COMPANY_MESSAGES.PROJECTS_LABEL}
             </Label>
             <Textarea
@@ -524,30 +626,30 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               className='border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
             />
             <FormErrorMessage message={errors.projects || ''} />
-          </div>
+          </div> */}
         </div>
 
         {/* Form Actions */}
-        <div className='flex items-center gap-4 pt-6'>
+        <div className='flex items-center justify-end gap-4 pt-6'>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={handleCancel}
+            disabled={loading}
+            className='btn-secondary !px-8 !h-12'
+          >
+            {COMPANY_MESSAGES.CANCEL_BUTTON}
+          </Button>
           <Button
             type='submit'
             disabled={loading}
-            className='px-8 py-3 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] text-white rounded-[10px] font-semibold'
+            className='btn-primary !h-12 !px-12'
           >
             {loading
               ? 'Creating...'
               : isEditMode
                 ? COMPANY_MESSAGES.UPDATE_BUTTON
                 : COMPANY_MESSAGES.CREATE_BUTTON}
-          </Button>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={handleCancel}
-            disabled={loading}
-            className='px-8 py-3 border-2 border-[var(--border-dark)] bg-[var(--white-background)] text-[var(--text-dark)] rounded-[10px] font-semibold hover:bg-gray-50'
-          >
-            {COMPANY_MESSAGES.CANCEL_BUTTON}
           </Button>
         </div>
       </form>

@@ -2,13 +2,7 @@
 
 import { UserCard } from '@/components/shared/cards/UserCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import SelectField from '@/components/shared/common/SelectField';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { apiService, FetchUsersResponse, User } from '@/lib/api';
@@ -204,28 +198,21 @@ export default function UserManagement() {
       <div className='flex items-center justify-between mb-8'>
         <h2 className='page-title'>{USER_MESSAGES.USER_MANAGEMENT_TITLE}</h2>
         <div className='flex items-center gap-4'>
-          <Select value={filter} onValueChange={setFilter}>
-            <SelectTrigger className='w-40 bg-[var(--white-background)] rounded-[30px] border-2 border-[var(--border-dark)] h-[42px]'>
-              <SelectValue placeholder={USER_MESSAGES.ALL_USERS} />
-            </SelectTrigger>
-            <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-              <SelectItem
-                value='all'
-                className='text-[var(--text-dark)] hover:bg-[var(--select-option)] focus:bg-[var(--select-option)] cursor-pointer rounded-[5px]'
-              >
-                {USER_MESSAGES.ALL_USERS}
-              </SelectItem>
-              {roles.map(({ id, name }) => (
-                <SelectItem
-                  key={id}
-                  value={String(id)}
-                  className='text-[var(--text-dark)] hover:bg-[var(--select-option)] focus:bg-[var(--select-option)] cursor-pointer rounded-[5px]'
-                >
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SelectField
+            value={filter}
+            onValueChange={setFilter}
+            options={[
+              { value: 'all', label: USER_MESSAGES.ALL_USERS },
+              ...roles.map(({ id, name }) => ({
+                value: String(id),
+                label: name,
+              })),
+            ]}
+            placeholder={USER_MESSAGES.ALL_USERS}
+            className='w-40'
+            triggerClassName='bg-[var(--white-background)] rounded-[30px] border-2 border-[var(--border-dark)] h-[42px]'
+            optionClassName='text-[var(--text-dark)] hover:bg-[var(--select-option)] focus:bg-[var(--select-option)] cursor-pointer rounded-[5px]'
+          />
           <button
             onClick={handleCreateUser}
             className='btn-primary'
