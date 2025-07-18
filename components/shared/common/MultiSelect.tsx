@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import FormErrorMessage from './FormErrorMessage';
 
 export interface MultiSelectOption {
@@ -16,17 +16,19 @@ export interface MultiSelectOption {
   label: string;
 }
 
-interface MultiSelectProps {
+interface MultiSelectProps<OptionType = MultiSelectOption> {
   label?: string;
-  options: MultiSelectOption[];
+  options: OptionType[];
   value: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
   error?: string;
   name?: string;
+  getOptionLabel?: (option: OptionType) => string;
+  getOptionValue?: (option: OptionType) => string;
 }
 
-const MultiSelect: React.FC<MultiSelectProps> = ({
+const MultiSelect = <OptionType = MultiSelectOption,>({
   label,
   options,
   value,
@@ -34,14 +36,16 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   placeholder = 'Select',
   error,
   name,
-}) => {
+  getOptionLabel = (option: any) => option.label,
+  getOptionValue = (option: any) => option.value,
+}: MultiSelectProps<OptionType>) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  const handleToggle = (option: string) => {
-    if (value.includes(option)) {
-      onChange(value.filter(v => v !== option));
+  const handleToggle = (optionValue: string) => {
+    if (value.includes(optionValue)) {
+      onChange(value.filter(v => v !== optionValue));
     } else {
-      onChange([...value, option]);
+      onChange([...value, optionValue]);
     }
   };
 
@@ -72,13 +76,13 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                 <span className='text-gray-400'>{placeholder}</span>
               )}
               {displayTags.map(tag => {
-                const { label } = options.find(o => o.value === tag) || {};
+                const opt = options.find(o => getOptionValue(o) === tag);
                 return (
                   <span
                     key={tag}
                     className='bg-[#00A8BF26] text-[var(--text-dark)] rounded-full px-3 py-1 text-sm font-medium'
                   >
-                    {label || tag}
+                    {opt ? getOptionLabel(opt) : tag}
                   </span>
                 );
               })}
@@ -92,19 +96,22 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-full bg-[var(--card-background)] min-w-[var(--radix-popover-trigger-width)] p-2 rounded-[12px] border border-[var(--border-dark)]'>
-          {options.map(({ value: optValue, label: optLabel }) => (
-            <label
-              key={optValue}
-              className='flex items-center gap-3 py-2 px-2 cursor-pointer text-[var(--text-dark)] text-base border-b border-[var(--border-dark)] last-of-type:border-b-0'
-            >
-              <Checkbox
-                checked={value.includes(optValue)}
-                onCheckedChange={() => handleToggle(optValue)}
-                className='rounded-[6px] border-2 border-[#BFBFBF] data-[state=checked]:bg-[--primary] data-[state=checked]:border-[--primary] data-[state=checked]:text-white text-white w-6 h-6 flex items-base justify-center mt-0.5'
-              />
-              <span>{optLabel}</span>
-            </label>
-          ))}
+          {options.map(opt => {
+            const optionValue = getOptionValue(opt);
+            return (
+              <label
+                key={optionValue}
+                className='flex items-center gap-3 py-2 px-2 cursor-pointer text-[var(--text-dark)] text-base border-b border-[var(--border-dark)] last-of-type:border-b-0'
+              >
+                <Checkbox
+                  checked={value.includes(optionValue)}
+                  onCheckedChange={() => handleToggle(optionValue)}
+                  className='rounded-[6px] border-2 border-[#BFBFBF] data-[state=checked]:bg-[--primary] data-[state=checked]:border-[--primary] data-[state=checked]:text-white text-white w-6 h-6 flex items-base justify-center mt-0.5'
+                />
+                <span>{getOptionLabel(opt)}</span>
+              </label>
+            );
+          })}
         </PopoverContent>
       </Popover>
       <FormErrorMessage message={error || ''} />
