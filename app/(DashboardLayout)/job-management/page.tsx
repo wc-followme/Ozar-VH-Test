@@ -2,13 +2,14 @@
 import { IconFlag } from '@tabler/icons-react';
 import { Profile2User } from 'iconsax-react';
 import { DollarSign } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlagHookIcon } from '../../../components/icons/FalgHookIcon';
 import { JobCard } from '../../../components/shared/cards/JobCard';
 import { StatsCard } from '../../../components/shared/cards/StatsCard';
 import ComingSoon from '../../../components/shared/common/ComingSoon';
 import SideSheet from '../../../components/shared/common/SideSheet';
 import { CreateJobForm } from '../../../components/shared/forms/CreateJobForm';
+import JobManagementPageSkeleton from '../../../components/shared/skeleton/JobManagementPageSkeleton';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import {
@@ -121,6 +122,14 @@ const mockJobs = [
 export default function JobManagement() {
   const [selectedTab, setSelectedTab] = useState('info');
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Simulate loading for 1 second
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const stats = [
     {
       id: 'active-projects',
@@ -158,117 +167,121 @@ export default function JobManagement() {
 
   return (
     <div className=''>
-      <div className=''>
-        {/* Stats Cards */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-8'>
-          {stats.map(({ id, icon, value, label, iconColor, bgColor }) => (
-            <StatsCard
-              key={id}
-              icon={icon}
-              value={value}
-              label={label}
-              iconColor={iconColor}
-              bgColor={bgColor}
-            />
-          ))}
-        </div>
+      {loading ? (
+        <JobManagementPageSkeleton />
+      ) : (
+        <div className=''>
+          {/* Stats Cards */}
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-8'>
+            {stats.map(({ id, icon, value, label, iconColor, bgColor }) => (
+              <StatsCard
+                key={id}
+                icon={icon}
+                value={value}
+                label={label}
+                iconColor={iconColor}
+                bgColor={bgColor}
+              />
+            ))}
+          </div>
 
-        {/* Jobs Grid */}
-        <div>
-          <Tabs
-            value={selectedTab}
-            onValueChange={setSelectedTab}
-            className='w-full'
-          >
-            <div className='flex items-center gap-2 w-full'>
-              <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start flex-wrap max-w-fit'>
-                <TabsTrigger
-                  value='info'
-                  className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                >
-                  Need Attention{' '}
-                  <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
+          {/* Jobs Grid */}
+          <div>
+            <Tabs
+              value={selectedTab}
+              onValueChange={setSelectedTab}
+              className='w-full'
+            >
+              <div className='flex items-center gap-2 w-full'>
+                <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start flex-wrap max-w-fit'>
+                  <TabsTrigger
+                    value='info'
+                    className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                   >
-                    8
-                  </Badge>
-                </TabsTrigger>
-                <TabsTrigger
-                  value='newLeads'
-                  className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                >
-                  New Leads
-                  <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-limebrand text-white' : 'bg-transparent text-limebrand'}`}
+                    Need Attention{' '}
+                    <Badge
+                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
+                    >
+                      8
+                    </Badge>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value='newLeads'
+                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                   >
-                    8
-                  </Badge>
-                </TabsTrigger>
-                <TabsTrigger
-                  value='ongoingJob'
-                  className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                >
-                  Ongoing Job
-                  <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                    New Leads
+                    <Badge
+                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-limebrand text-white' : 'bg-transparent text-limebrand'}`}
+                    >
+                      8
+                    </Badge>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value='ongoingJob'
+                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                   >
-                    8
-                  </Badge>
-                </TabsTrigger>
-                <TabsTrigger
-                  value='waitingOnClient'
-                  className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                >
-                  Waiting on Client
-                  <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'waitingOnClient' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                    Ongoing Job
+                    <Badge
+                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                    >
+                      8
+                    </Badge>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value='waitingOnClient'
+                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                   >
-                    8
-                  </Badge>
-                </TabsTrigger>
-                <TabsTrigger
-                  value='archive'
-                  className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                >
-                  Archive
-                  <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
+                    Waiting on Client
+                    <Badge
+                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'waitingOnClient' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                    >
+                      8
+                    </Badge>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value='archive'
+                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                   >
-                    8
-                  </Badge>
-                </TabsTrigger>
-              </TabsList>
-              <Button
-                variant='ghost'
-                className='btn-primary !h-[48px] ml-auto hover:text-white'
-                onClick={() => setIsOpen(true)}
-              >
-                Create Job
-              </Button>
-            </div>
-            <TabsContent value='info' className='pt-8'>
-              <div className='grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
-                {mockJobs.map(({ id, ...jobProps }) => (
-                  <JobCard key={id} job={{ id, ...jobProps }} />
-                ))}
+                    Archive
+                    <Badge
+                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
+                    >
+                      8
+                    </Badge>
+                  </TabsTrigger>
+                </TabsList>
+                <Button
+                  variant='ghost'
+                  className='btn-primary !h-[48px] ml-auto hover:text-white'
+                  onClick={() => setIsOpen(true)}
+                >
+                  Create Job
+                </Button>
               </div>
-            </TabsContent>
+              <TabsContent value='info' className='pt-8'>
+                <div className='grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
+                  {mockJobs.map(({ id, ...jobProps }) => (
+                    <JobCard key={id} job={{ id, ...jobProps }} />
+                  ))}
+                </div>
+              </TabsContent>
 
-            <TabsContent value='newLeads' className='p-8'>
-              <ComingSoon />
-            </TabsContent>
-            <TabsContent value='ongoingJob' className='p-8'>
-              <ComingSoon />
-            </TabsContent>
-            <TabsContent value='waitingOnClient' className='p-8'>
-              <ComingSoon />
-            </TabsContent>
-            <TabsContent value='archive' className='p-8'>
-              <ComingSoon />
-            </TabsContent>
-          </Tabs>
+              <TabsContent value='newLeads' className='p-8'>
+                <ComingSoon />
+              </TabsContent>
+              <TabsContent value='ongoingJob' className='p-8'>
+                <ComingSoon />
+              </TabsContent>
+              <TabsContent value='waitingOnClient' className='p-8'>
+                <ComingSoon />
+              </TabsContent>
+              <TabsContent value='archive' className='p-8'>
+                <ComingSoon />
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
-      </div>
+      )}
       <SideSheet open={isOpen} onOpenChange={setIsOpen} title='Create Job'>
         <CreateJobForm />
       </SideSheet>

@@ -38,6 +38,9 @@ export const USER_MESSAGES = {
 
   // Status Messages
   NO_USERS_FOUND: 'No users found.',
+  NO_USERS_FOUND_DESCRIPTION:
+    "You haven't created any users yet. Start by adding your first one to organize your users.",
+  NO_MORE_USERS: 'No more users to load.',
   USER_NOT_FOUND: 'User not found',
 
   // Form Placeholders
