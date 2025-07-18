@@ -12,6 +12,7 @@ import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import UserCardSkeleton from '../../../components/shared/skeleton/UserCardSkeleton';
 import { MenuOption, Role, RoleApiResponse } from './types';
 import { USER_MESSAGES } from './user-messages';
 
@@ -227,7 +228,11 @@ export default function UserManagement() {
       </div>
       {/* Initial Loading State */}
       {users.length === 0 && loading ? (
-        <LoadingComponent variant='fullscreen' />
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
+          {[...Array(8)].map((_, i) => (
+            <UserCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           {/* User Grid */}
