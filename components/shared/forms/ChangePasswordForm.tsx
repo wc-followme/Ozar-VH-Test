@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { apiService } from '@/lib/api';
-import { cn } from '@/lib/utils';
+import { cn, extractApiSuccessMessage } from '@/lib/utils';
 import {
   ChangePasswordFormData,
   changePasswordSchema,
@@ -47,8 +47,16 @@ export default function ChangePasswordForm({
       onSubmit(data);
     }
     try {
-      await apiService.changePassword(data.currentPassword, data.newPassword);
-      showSuccessToast(CHANGE_PASSWORD_MESSAGES.CHANGE_PASSWORD_SUCCESS);
+      const response = await apiService.changePassword(
+        data.currentPassword,
+        data.newPassword
+      );
+      showSuccessToast(
+        extractApiSuccessMessage(
+          response,
+          CHANGE_PASSWORD_MESSAGES.CHANGE_PASSWORD_SUCCESS
+        )
+      );
       reset();
       if (onCancel) {
         onCancel();

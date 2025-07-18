@@ -70,4 +70,5 @@ export interface FetchRolesParams {
   limit: number;
   search?: string;
   name?: string;
+  status?: 'ACTIVE' | 'INACTIVE' | '';
 }

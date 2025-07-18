@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { apiService, FetchUsersResponse, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage } from '@/lib/utils';
+import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -47,6 +47,7 @@ export default function UserManagement() {
           const rolesRes = await apiService.fetchRoles({
             page: 1,
             limit: PAGINATION.ROLES_DROPDOWN_LIMIT,
+            status: 'ACTIVE', // Only fetch active roles for dropdown
           });
           const roleList = isRoleApiResponse(rolesRes)
             ? rolesRes.data.data
@@ -64,6 +65,7 @@ export default function UserManagement() {
           page: targetPage,
           limit: PAGINATION.USERS_LIMIT,
           role_id,
+          status: 'ACTIVE', // Only fetch active users
         });
         const newUsers = usersRes.data;
 
@@ -132,11 +134,13 @@ export default function UserManagement() {
       if (!user || !user.uuid)
         throw new Error(USER_MESSAGES.USER_NOT_FOUND_ERROR);
       const newStatus = currentStatus ? 'INACTIVE' : 'ACTIVE';
-      await apiService.updateUserStatus(user.uuid, newStatus);
+      const response = await apiService.updateUserStatus(user.uuid, newStatus);
       setUsers(users =>
         users.map(u => (u.id === id ? { ...u, status: newStatus } : u))
       );
-      showSuccessToast(`${USER_MESSAGES.STATUS_UPDATE_SUCCESS}`);
+      showSuccessToast(
+        extractApiSuccessMessage(response, USER_MESSAGES.STATUS_UPDATE_SUCCESS)
+      );
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -152,9 +156,9 @@ export default function UserManagement() {
   // Delete handler
   const handleDeleteUser = async (uuid: string) => {
     try {
-      await apiService.deleteUser(uuid);
+      const response = await apiService.deleteUser(uuid);
       setUsers(users => users.filter(user => user.uuid !== uuid));
-      showSuccessToast(USER_MESSAGES.DELETE_SUCCESS);
+      showSuccessToast(extractApiSuccessMessage(response, USER_MESSAGES.DELETE_SUCCESS));
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
