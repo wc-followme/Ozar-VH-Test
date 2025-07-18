@@ -3,6 +3,7 @@
 import { HelmetIcon } from '@/components/icons/HelmetIcon';
 import { RoleCard } from '@/components/shared/cards/RoleCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import NoDataFound from '@/components/shared/common/NoDataFound';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { roleIconOptions } from '@/constants/sidebar-items';
@@ -182,8 +183,12 @@ const RoleManagement = () => {
           {/* Roles Grid */}
           <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
             {roles.length === 0 && !loading ? (
-              <div className='col-span-4 text-center py-8'>
-                {ROLE_MESSAGES.NO_ROLES_FOUND}
+              <div className='col-span-4'>
+                <NoDataFound
+                  buttonText={ROLE_MESSAGES.CREATE_ROLE_BUTTON}
+                  onButtonClick={handleCreateRole}
+                  description={ROLE_MESSAGES.NO_ROLES_FOUND_DESCRIPTION}
+                />
               </div>
             ) : (
               roles.map(

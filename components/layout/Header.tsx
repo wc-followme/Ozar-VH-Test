@@ -21,7 +21,7 @@ const menuOptions = [
   { label: 'Logout', action: 'delete', icon: SignoutIcon },
 ];
 export function Header() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   // Add scroll direction state
   const [showHeader, setShowHeader] = useState(true);
@@ -115,7 +115,7 @@ export function Header() {
                 className='h-8 w-8 p-0 flex-shrink-0 self-center'
               >
                 <Image
-                  src={'/images/profile.jpg'}
+                  src={user?.profile_picture_url || '/images/profile.jpg'}
                   alt='profile'
                   width={40}
                   height={40}

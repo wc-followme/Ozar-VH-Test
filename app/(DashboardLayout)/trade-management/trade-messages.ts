@@ -30,6 +30,8 @@ export const TRADE_MESSAGES = {
 
   // Status Messages
   NO_TRADES_FOUND: 'No trades found.',
+  NO_TRADES_FOUND_DESCRIPTION:
+    "You haven't created any trades yet. Start by adding your first one to organize your trades.",
 
   // Button Labels
   ADD_TRADE_BUTTON: 'Create Trade',

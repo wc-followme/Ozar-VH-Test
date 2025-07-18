@@ -2,6 +2,7 @@
 import { InfoCard } from '@/components/shared/cards/InfoCard';
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import NoDataFound from '@/components/shared/common/NoDataFound';
 import SideSheet from '@/components/shared/common/SideSheet';
 import ServiceForm from '@/components/shared/forms/ServiceForm';
 import ServiceCardSkeleton from '@/components/shared/skeleton/ServiceCardSkeleton';
@@ -267,8 +268,12 @@ export default function ServiceManagementPage() {
             <ServiceCardSkeleton key={idx} />
           ))
         ) : services.length === 0 && !loading ? (
-          <div className='col-span-full text-center py-8'>
-            {SERVICE_MESSAGES.NO_SERVICES_FOUND}
+          <div className='col-span-full text-center '>
+            <NoDataFound
+              buttonText={SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
+              onButtonClick={() => setSideSheetOpen(true)}
+              description={SERVICE_MESSAGES.NO_SERVICES_FOUND_DESCRIPTION}
+            />
           </div>
         ) : (
           services.map((service, idx) => (

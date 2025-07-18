@@ -44,7 +44,8 @@ export const MATERIAL_MESSAGES = {
   // Loading and empty states
   LOADING_MATERIALS: 'Loading materials...',
   NO_MATERIALS_FOUND: 'No materials found',
-
+  NO_MATERIALS_FOUND_DESCRIPTION:
+    "You haven't created any materials yet. Start by adding your first one to organize your materials.",
   // Validation messages
   MATERIAL_NAME_REQUIRED: 'Material name is required',
   SERVICE_REQUIRED: 'At least one service is required',

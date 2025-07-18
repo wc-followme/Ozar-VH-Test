@@ -2,6 +2,7 @@
 import { InfoCard } from '@/components/shared/cards/InfoCard';
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import NoDataFound from '@/components/shared/common/NoDataFound';
 import SideSheet from '@/components/shared/common/SideSheet';
 import TradeForm from '@/components/shared/forms/TradeForm';
 import TradeCardSkeleton from '@/components/shared/skeleton/TradeCardSkeleton';
@@ -262,8 +263,12 @@ export default function TradeManagementPage() {
             <TradeCardSkeleton key={idx} />
           ))
         ) : trades.length === 0 && !loading ? (
-          <div className='col-span-full text-center py-8'>
-            {TRADE_MESSAGES.NO_TRADES_FOUND}
+          <div className='col-span-full text-center '>
+            <NoDataFound
+              buttonText={TRADE_MESSAGES.ADD_TRADE_BUTTON}
+              onButtonClick={() => setSideSheetOpen(true)}
+              description={TRADE_MESSAGES.NO_TRADES_FOUND_DESCRIPTION}
+            />
           </div>
         ) : (
           trades.map((trade, idx) => (

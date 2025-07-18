@@ -29,6 +29,9 @@ export const CATEGORY_MESSAGES = {
 
   // Status Messages
   NO_CATEGORIES_FOUND: 'No categories found.',
+  NO_CATEGORIES_FOUND_DESCRIPTION:
+    "You haven't created any categories yet. Start by adding your first one to organize your categories.",
+  NO_MORE_CATEGORIES: 'No more categories to load.',
 
   // Button Labels
   ADD_CATEGORY_BUTTON: 'Create Category',

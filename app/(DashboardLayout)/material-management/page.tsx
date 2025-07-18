@@ -12,6 +12,7 @@ import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import React, { useCallback, useEffect, useState } from 'react';
+import NoDataFound from '../../../components/shared/common/NoDataFound';
 import { MATERIAL_MESSAGES } from './material-messages';
 import { Material } from './material-types';
 
@@ -269,8 +270,12 @@ export default function MaterialManagementPage() {
             <MaterialCardSkeleton key={idx} />
           ))
         ) : materials.length === 0 && !loading ? (
-          <div className='col-span-full text-center py-8'>
-            {MATERIAL_MESSAGES.NO_MATERIALS_FOUND}
+          <div className='col-span-full text-center '>
+            <NoDataFound
+              buttonText={MATERIAL_MESSAGES.ADD_MATERIAL_BUTTON}
+              onButtonClick={() => setSideSheetOpen(true)}
+              description={MATERIAL_MESSAGES.NO_MATERIALS_FOUND_DESCRIPTION}
+            />
           </div>
         ) : (
           materials.map((material, idx) => (
