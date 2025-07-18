@@ -1,5 +1,6 @@
-import ComingSoon from '@/components/shared/common/ComingSoon';
+import NoDataFound from '../../components/shared/common/NoDataFound';
 
 export default function DashboardOverview() {
-  return <ComingSoon />;
+  return <NoDataFound />;
+  // <ComingSoon />;
 }
