@@ -2,6 +2,7 @@
 
 import { UserCard } from '@/components/shared/cards/UserCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import NoDataFound from '@/components/shared/common/NoDataFound';
 import SelectField from '@/components/shared/common/SelectField';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
@@ -236,9 +237,11 @@ export default function UserManagement() {
         <>
           {/* User Grid */}
           {users.length === 0 && !loading ? (
-            <div className='text-center py-10 text-gray-500'>
-              {USER_MESSAGES.NO_USERS_FOUND}
-            </div>
+            <NoDataFound
+              description={USER_MESSAGES.NO_USERS_FOUND_DESCRIPTION}
+              buttonText={USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
+              onButtonClick={handleCreateUser}
+            />
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
               {users.map(

@@ -28,6 +28,8 @@ export const ROLE_MESSAGES = {
   // Loading and empty states
   LOADING: 'Loading...',
   NO_ROLES_FOUND: 'No roles found.',
+  NO_ROLES_FOUND_DESCRIPTION:
+    "You haven't created any roles yet. Start by adding your first one to organize your roles.",
   NO_MORE_ROLES: 'No more roles to load.',
   LOADING_ROLES: 'Loading...',
 
