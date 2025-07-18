@@ -2,6 +2,7 @@
 
 import { CategoryCard } from '@/components/shared/cards/CategoryCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import NoDataFound from '@/components/shared/common/NoDataFound';
 import SideSheet from '@/components/shared/common/SideSheet';
 import CategoryForm from '@/components/shared/forms/CategoryForm';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Edit2, Trash } from 'iconsax-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import CategoryCardSkeleton from '../../../components/shared/skeleton/CategoryCardSkeleton';
 import { catIconOptions } from '../../../constants/sidebar-items';
 import { CATEGORY_MESSAGES } from './category-messages';
 
@@ -305,8 +307,8 @@ const CategoryManagement = () => {
   };
 
   return (
-    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto pb-8'>
-      <header className='flex items-center justify-between w-full'>
+    <section className='w-full overflow-y-auto pb-4'>
+      <header className='flex items-center justify-between mb-8'>
         <h2 className='page-title'>
           {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
         </h2>
@@ -317,15 +319,21 @@ const CategoryManagement = () => {
 
       {/* Categories Grid */}
       {categories.length === 0 && loading ? (
-        <LoadingComponent variant='fullscreen' />
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6 w-full'>
+          {[...Array(8)].map((_, i) => (
+            <CategoryCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           {categories.length === 0 && !loading ? (
-            <div className='text-center py-10 text-gray-500'>
-              {CATEGORY_MESSAGES.NO_CATEGORIES_FOUND}
-            </div>
+            <NoDataFound
+              description={CATEGORY_MESSAGES.NO_CATEGORIES_FOUND_DESCRIPTION}
+              buttonText={CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
+              onButtonClick={() => setOpen(true)}
+            />
           ) : (
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
+            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6 w-full'>
               {categories.map((category, index) => {
                 const iconOption = catIconOptions.find(
                   opt => opt.value === category.icon

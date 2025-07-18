@@ -173,6 +173,13 @@ const config: Config = {
             borderStyle: 'solid',
             borderImage: "url('/images/border-img.png') 30 stretch",
           },
+          // Custom grid-cols utilities
+          '.grid-cols-autofit': {
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          },
+          '.grid-cols-autofit-xl': {
+            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+          },
         },
         {
           variants: ['responsive'], // optional

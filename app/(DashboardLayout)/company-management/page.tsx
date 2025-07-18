@@ -2,6 +2,7 @@
 
 import { CompanyCard } from '@/components/shared/cards/CompanyCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import NoDataFound from '@/components/shared/common/NoDataFound';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
@@ -14,6 +15,7 @@ import {
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import CompanyCardSkeleton from '../../../components/shared/skeleton/CompanyCardSkeleton';
 import { COMPANY_MESSAGES } from './company-messages';
 
 const menuOptions = [
@@ -207,16 +209,22 @@ export default function CompanyManagement() {
 
       {/* Initial Loading State */}
       {companies.length === 0 && loading ? (
-        <LoadingComponent variant='fullscreen' />
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6'>
+          {[...Array(8)].map((_, i) => (
+            <CompanyCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           {/* Company Grid */}
           {companies.length === 0 && !loading ? (
-            <div className='text-center py-10 text-gray-500'>
-              {COMPANY_MESSAGES.NO_COMPANIES_FOUND}
-            </div>
+            <NoDataFound
+              description={COMPANY_MESSAGES.NO_COMPANIES_FOUND_DESCRIPTION}
+              buttonText={COMPANY_MESSAGES.ADD_COMPANY_BUTTON}
+              onButtonClick={handleCreateCompany}
+            />
           ) : (
-            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
+            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6'>
               {companies.map(
                 ({
                   id,

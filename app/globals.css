@@ -28,6 +28,7 @@ body {
     --hover-bg: #3bc44e;
     --select-option: #e8eaed;
     --bg-limited: #f58b1e;
+    --bg-skeleton: oklch(0.922 0 0);
     /* Shadcn/ui variables needed for toast components */
     --foreground: 0 0% 10%;
     --border: 0 0% 90%;
@@ -58,6 +59,7 @@ body {
     --hover-bg: #3bc44e;
     --select-option: #3bc44e;
     --bg-limited: #f58b1e;
+    --bg-skeleton: oklch(0.922 0 0);
     /* Shadcn/ui variables for dark theme */
     --foreground: 0 0% 98%;
     --border: 0 0% 20%;

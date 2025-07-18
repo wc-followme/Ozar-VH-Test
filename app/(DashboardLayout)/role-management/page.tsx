@@ -3,6 +3,7 @@
 import { HelmetIcon } from '@/components/icons/HelmetIcon';
 import { RoleCard } from '@/components/shared/cards/RoleCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import NoDataFound from '@/components/shared/common/NoDataFound';
 import { useToast } from '@/components/ui/use-toast';
 import { PAGINATION } from '@/constants/common';
 import { roleIconOptions } from '@/constants/sidebar-items';
@@ -12,6 +13,7 @@ import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import RoleCardSkeleton from '../../../components/shared/skeleton/RoleCardSkeleton';
 import { ROLE_MESSAGES } from './role-messages';
 import type { FetchRolesParams, Role, RoleApiResponse } from './types';
 
@@ -176,14 +178,22 @@ const RoleManagement = () => {
 
       {/* Initial Loading State */}
       {roles.length === 0 && loading ? (
-        <LoadingComponent variant='fullscreen' />
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6 w-full'>
+          {[...Array(8)].map((_, i) => (
+            <RoleCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           {/* Roles Grid */}
-          <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
+          <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6 w-full'>
             {roles.length === 0 && !loading ? (
-              <div className='col-span-4 text-center py-8'>
-                {ROLE_MESSAGES.NO_ROLES_FOUND}
+              <div className='col-span-4'>
+                <NoDataFound
+                  buttonText={ROLE_MESSAGES.CREATE_ROLE_BUTTON}
+                  onButtonClick={handleCreateRole}
+                  description={ROLE_MESSAGES.NO_ROLES_FOUND_DESCRIPTION}
+                />
               </div>
             ) : (
               roles.map(
