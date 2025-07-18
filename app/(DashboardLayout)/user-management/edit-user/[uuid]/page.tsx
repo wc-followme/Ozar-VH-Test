@@ -54,13 +54,43 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   // State for all accordions' switches
   const [accordions, setAccordions] = useState(() =>
     ACCESS_CONTROL_ACCORDIONS_DATA.map(acc => ({
-      ...acc,
-      stripes: acc.stripes.map(() => true), // all switches checked by default
+      title: acc.title,
+      stripes: acc.stripes.map(() => false), // all switches unchecked by default
     }))
   );
 
   // State for which accordion is open
   const [openAccordionIdx, setOpenAccordionIdx] = useState(0);
+
+  // Function to calculate access level for an accordion
+  const calculateAccessLevel = (
+    stripes: boolean[]
+  ): 'Full Access' | 'Limited Access' | 'Restricted' => {
+    if (stripes.length === 0) return 'Restricted';
+
+    const enabledCount = stripes.filter(stripe => stripe).length;
+    const totalCount = stripes.length;
+
+    if (enabledCount === 0) return 'Restricted';
+    if (enabledCount === totalCount) return 'Full Access';
+    return 'Limited Access';
+  };
+
+  // Function to get badge color based on access level
+  const getBadgeColor = (
+    accessLevel: 'Full Access' | 'Limited Access' | 'Restricted'
+  ): string => {
+    switch (accessLevel) {
+      case 'Full Access':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'Limited Access':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'Restricted':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
 
   // Function to generate JSON from accordions state
   const generatePermissionsJson = (accordionsData: any[]): UserPermissions => {
@@ -304,7 +334,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                 });
 
                 return {
-                  ...acc,
+                  title: acc.title,
                   stripes: updatedStripes,
                 };
               }
@@ -314,7 +344,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                 `No permissions found for ${permissionKey}, defaulting to false`
               );
               return {
-                ...acc,
+                title: acc.title,
                 stripes: acc.stripes.map(() => false),
               };
             }
@@ -432,6 +462,8 @@ export default function EditUserPage({ params }: EditUserPageProps) {
     setFormLoading(true);
     try {
       const permissionsData = generatePermissionsJson(accordions);
+      console.log('Sending permissions data to API:', permissionsData);
+
       const response = await apiService.updateUserPermissions(
         resolvedParams.uuid,
         permissionsData
@@ -443,7 +475,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           USER_MESSAGES.PERMISSIONS_UPDATE_SUCCESS
         )
       );
-      router.push('/user-management');
+      // Removed redirect - user stays on the same page
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -563,12 +595,13 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                 <>
                   <div className='flex flex-col gap-4'>
                     {accordions.map((accordion, idx) => {
-                      const { title, badgeLabel, stripes } = accordion;
+                      const { title, stripes } = accordion;
+                      const accessLevel = calculateAccessLevel(stripes);
                       return (
                         <CompanyManagementAddUser
                           key={title + idx}
                           title={title}
-                          badgeLabel={badgeLabel}
+                          badgeLabel={accessLevel}
                           stripes={
                             Array.isArray(stripes) &&
                             Array.isArray(
