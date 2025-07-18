@@ -25,6 +25,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Edit2, Trash } from 'iconsax-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import CategoryCardSkeleton from '../../../components/shared/skeleton/CategoryCardSkeleton';
 import { catIconOptions } from '../../../constants/sidebar-items';
 import { CATEGORY_MESSAGES } from './category-messages';
 
@@ -317,7 +318,11 @@ const CategoryManagement = () => {
 
       {/* Categories Grid */}
       {categories.length === 0 && loading ? (
-        <LoadingComponent variant='fullscreen' />
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
+          {[...Array(8)].map((_, i) => (
+            <CategoryCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           {categories.length === 0 && !loading ? (

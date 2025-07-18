@@ -14,6 +14,7 @@ import {
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import CompanyCardSkeleton from '../../../components/shared/skeleton/CompanyCardSkeleton';
 import { COMPANY_MESSAGES } from './company-messages';
 
 const menuOptions = [
@@ -207,7 +208,11 @@ export default function CompanyManagement() {
 
       {/* Initial Loading State */}
       {companies.length === 0 && loading ? (
-        <LoadingComponent variant='fullscreen' />
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
+          {[...Array(8)].map((_, i) => (
+            <CompanyCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           {/* Company Grid */}

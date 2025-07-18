@@ -12,6 +12,7 @@ import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import RoleCardSkeleton from '../../../components/shared/skeleton/RoleCardSkeleton';
 import { ROLE_MESSAGES } from './role-messages';
 import type { FetchRolesParams, Role, RoleApiResponse } from './types';
 
@@ -176,7 +177,11 @@ const RoleManagement = () => {
 
       {/* Initial Loading State */}
       {roles.length === 0 && loading ? (
-        <LoadingComponent variant='fullscreen' />
+        <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
+          {[...Array(8)].map((_, i) => (
+            <RoleCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           {/* Roles Grid */}

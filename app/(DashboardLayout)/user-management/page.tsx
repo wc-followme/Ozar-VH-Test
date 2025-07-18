@@ -11,6 +11,7 @@ import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import UserCardSkeleton from '../../../components/shared/skeleton/UserCardSkeleton';
 import { MenuOption, Role, RoleApiResponse } from './types';
 import { USER_MESSAGES } from './user-messages';
 
@@ -158,7 +159,9 @@ export default function UserManagement() {
     try {
       const response = await apiService.deleteUser(uuid);
       setUsers(users => users.filter(user => user.uuid !== uuid));
-      showSuccessToast(extractApiSuccessMessage(response, USER_MESSAGES.DELETE_SUCCESS));
+      showSuccessToast(
+        extractApiSuccessMessage(response, USER_MESSAGES.DELETE_SUCCESS)
+      );
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)
       if (handleAuthError(err)) {
@@ -224,7 +227,11 @@ export default function UserManagement() {
       </div>
       {/* Initial Loading State */}
       {users.length === 0 && loading ? (
-        <LoadingComponent variant='fullscreen' />
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
+          {[...Array(8)].map((_, i) => (
+            <UserCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           {/* User Grid */}
