@@ -973,6 +973,14 @@ class ApiService {
     );
   }
 
+  // Fetch current user's permissions
+  async getMyPermissions(): Promise<any> {
+    return this.makeRequest('/users/my-permissions', {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   // Fetch trades with filters
   async fetchTrades({
     page = 1,

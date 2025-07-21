@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ApiError, apiService, LoginResponse, User } from './api';
+import { encryptData } from './utils';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -169,6 +170,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log(
           '✅ Authentication data stored in both localStorage and cookies'
         );
+
+        // --- Fetch and securely store user permissions ---
+        try {
+          const permissionsRes = await apiService.getMyPermissions();
+          if (permissionsRes && permissionsRes.data) {
+            const encrypted = encryptData(JSON.stringify(permissionsRes.data));
+            localStorage.setItem('user_permissions', encrypted);
+            setCookie('user_permissions', encrypted);
+            console.log('🔒 User permissions encrypted and stored');
+          }
+        } catch (permErr) {
+          console.error('Failed to fetch/store user permissions:', permErr);
+        }
 
         return { success: true };
       } else {

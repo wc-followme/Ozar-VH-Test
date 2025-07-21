@@ -1,6 +1,24 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+// --- Encryption Utilities ---
+import CryptoJS from 'crypto-js';
+
+// Encrypts a string using AES and a secret key from env
+export function encryptData(data: string): string {
+  const key = process.env.NEXT_PUBLIC_PERMISSIONS_ENCRYPTION_KEY || '';
+  if (!key) throw new Error('Encryption key is not set');
+  return CryptoJS.AES.encrypt(data, key).toString();
+}
+
+// Decrypts a string using AES and a secret key from env
+export function decryptData(ciphertext: string): string {
+  const key = process.env.NEXT_PUBLIC_PERMISSIONS_ENCRYPTION_KEY || '';
+  if (!key) throw new Error('Encryption key is not set');
+  const bytes = CryptoJS.AES.decrypt(ciphertext, key);
+  return bytes.toString(CryptoJS.enc.Utf8);
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
