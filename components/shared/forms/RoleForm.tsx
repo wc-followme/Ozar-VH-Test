@@ -193,16 +193,39 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
     // Handler to toggle a switch
     const handleToggle = (accordionIdx: number, stripeIdx: number) => {
       setAccordions(prev =>
-        prev.map((acc, aIdx) =>
-          aIdx === accordionIdx
-            ? {
+        prev.map((acc, aIdx) => {
+          if (aIdx !== accordionIdx) return acc;
+          const newStripes = [...acc.stripes];
+          const isParent = stripeIdx === 0;
+          const toggledValue = !newStripes[stripeIdx];
+
+          if (isParent) {
+            // If parent is toggled off, disable all children
+            if (!toggledValue) {
+              return {
                 ...acc,
-                stripes: acc.stripes.map((checked: boolean, sIdx: number) =>
-                  sIdx === stripeIdx ? !checked : checked
-                ),
-              }
-            : acc
-        )
+                stripes: newStripes.map(() => false),
+              };
+            } else {
+              // If parent is toggled on, only enable parent (children stay as is)
+              newStripes[0] = true;
+              return {
+                ...acc,
+                stripes: newStripes,
+              };
+            }
+          } else {
+            // If child is toggled on, enable parent
+            newStripes[stripeIdx] = toggledValue;
+            if (toggledValue) {
+              newStripes[0] = true;
+            }
+            return {
+              ...acc,
+              stripes: newStripes,
+            };
+          }
+        })
       );
     };
 
