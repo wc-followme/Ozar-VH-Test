@@ -242,9 +242,9 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
 
       {/* Main Content */}
       <div className=''>
-        <div className='flex items-start gap-6'>
+        <div className='flex flex-col xl:flex-row items-start gap-6'>
           {/* Left Column - Upload Photo */}
-          <div className='w-[412px] flex-shrink-0 bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[1rem] relative'>
+          <div className='w-[412px] flex-shrink-0 bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[1rem] relative'>
             <h2 className='text-lg font-bold mb-4'>Upload Logo</h2>
             <PhotoUploadField
               photo={photoFile}
@@ -266,7 +266,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
           </div>
 
           {/* Right Column - Form Fields */}
-          <div className='flex-1 bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
+          <div className='flex-1 bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
             {getInitialData() && (
               <CompanyInfoForm
                 key={company?.uuid || 'loading'}

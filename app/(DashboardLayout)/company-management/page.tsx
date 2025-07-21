@@ -193,7 +193,7 @@ export default function CompanyManagement() {
   return (
     <div className='w-full overflow-y-auto pb-4'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-8'>
+      <div className='flex items-center justify-between mb-4 xl:mb-8'>
         <h1 className='page-title'>
           {COMPANY_MESSAGES.COMPANY_MANAGEMENT_TITLE}
         </h1>
@@ -209,7 +209,7 @@ export default function CompanyManagement() {
 
       {/* Initial Loading State */}
       {companies.length === 0 && loading ? (
-        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6'>
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
           {[...Array(8)].map((_, i) => (
             <CompanyCardSkeleton key={i} />
           ))}
@@ -224,7 +224,7 @@ export default function CompanyManagement() {
               onButtonClick={handleCreateCompany}
             />
           ) : (
-            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6'>
+            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
               {companies.map(
                 ({
                   id,

@@ -15,14 +15,14 @@ const NoDataFound: React.FC<NoDataFoundProps> = ({
   onButtonClick,
 }) => {
   return (
-    <div className='flex flex-col items-center justify-center min-h-[60vh] h-full text-center'>
+    <div className='flex flex-col items-center justify-center h-full text-center'>
       <div className='mb-8'>
         <Image
           src='/images/no-data-found.svg'
           height={250}
           width={250}
           alt=''
-          className='object-fit'
+          className='object-fit max-w-[140px] xl:max-w-[250px]'
         />
       </div>
       <h2 className='text-2xl font-bold text-[var(--text-dark)] mb-2'>

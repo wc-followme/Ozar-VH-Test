@@ -12,6 +12,7 @@ import { CreateJobForm } from '../../../components/shared/forms/CreateJobForm';
 import JobManagementPageSkeleton from '../../../components/shared/skeleton/JobManagementPageSkeleton';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
+import { ScrollArea, ScrollBar } from '../../../components/ui/scroll-area';
 import {
   Tabs,
   TabsContent,
@@ -172,7 +173,7 @@ export default function JobManagement() {
       ) : (
         <div className=''>
           {/* Stats Cards */}
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-8'>
+          <div className='grid grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-4 xl:mb-8'>
             {stats.map(({ id, icon, value, label, iconColor, bgColor }) => (
               <StatsCard
                 key={id}
@@ -193,63 +194,67 @@ export default function JobManagement() {
               className='w-full'
             >
               <div className='flex items-center gap-2 w-full'>
-                <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start flex-wrap max-w-fit'>
-                  <TabsTrigger
-                    value='info'
-                    className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                  >
-                    Need Attention{' '}
-                    <Badge
-                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
+                <ScrollArea className='w-[400px] max-w-full flex-1 rounded-full'>
+                  <TabsList className='flex flex-row justify-start h-full w-fit bg-[var(--dark-background)] rounded-full min-w-max whitespace-nowrap'>
+                    <TabsTrigger
+                      value='info'
+                      className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                     >
-                      8
-                    </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value='newLeads'
-                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                  >
-                    New Leads
-                    <Badge
-                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-limebrand text-white' : 'bg-transparent text-limebrand'}`}
+                      Need Attention{' '}
+                      <Badge
+                        className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
+                      >
+                        8
+                      </Badge>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value='newLeads'
+                      className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                     >
-                      8
-                    </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value='ongoingJob'
-                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                  >
-                    Ongoing Job
-                    <Badge
-                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                      New Leads
+                      <Badge
+                        className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-limebrand text-white' : 'bg-transparent text-limebrand'}`}
+                      >
+                        8
+                      </Badge>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value='ongoingJob'
+                      className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                     >
-                      8
-                    </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value='waitingOnClient'
-                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                  >
-                    Waiting on Client
-                    <Badge
-                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'waitingOnClient' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                      Ongoing Job
+                      <Badge
+                        className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                      >
+                        8
+                      </Badge>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value='waitingOnClient'
+                      className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                     >
-                      8
-                    </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value='archive'
-                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                  >
-                    Archive
-                    <Badge
-                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
+                      Waiting on Client
+                      <Badge
+                        className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'waitingOnClient' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                      >
+                        8
+                      </Badge>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value='archive'
+                      className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                     >
-                      8
-                    </Badge>
-                  </TabsTrigger>
-                </TabsList>
+                      Archive
+                      <Badge
+                        className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
+                      >
+                        8
+                      </Badge>
+                    </TabsTrigger>
+                  </TabsList>
+                  <ScrollBar orientation='horizontal' />
+                </ScrollArea>
+
                 <Button
                   variant='ghost'
                   className='btn-primary !h-[48px] ml-auto hover:text-white'
@@ -258,8 +263,8 @@ export default function JobManagement() {
                   Create Job
                 </Button>
               </div>
-              <TabsContent value='info' className='pt-8'>
-                <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6'>
+              <TabsContent value='info' className='pt-4 xl:pt-8'>
+                <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
                   {mockJobs.map(({ id, ...jobProps }) => (
                     <JobCard key={id} job={{ id, ...jobProps }} />
                   ))}

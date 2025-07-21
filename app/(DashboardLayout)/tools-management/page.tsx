@@ -182,7 +182,7 @@ const ToolsManagement = () => {
           onSubmit={e => e.preventDefault()}
         />
       </SideSheet>
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+      <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
         {loading
           ? Array.from({ length: 12 }).map((_, idx) => (
               <ToolCardSkeleton key={idx} />

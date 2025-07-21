@@ -444,7 +444,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
             </TabsList>
 
             <TabsContent value='info' className='pt-8'>
-              <div className='flex items-start gap-6'>
+              <div className='flex flex-col xl:flex-row items-start gap-6'>
                 {/* Left Column - Upload Photo */}
                 <div className='w-[250px] flex-shrink-0 relative'>
                   <PhotoUploadField
@@ -469,7 +469,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                 </div>
 
                 {/* Right Column - Form Fields */}
-                <div className='flex-1'>
+                <div className='flex-1 w-full'>
                   <UserInfoForm
                     key={user?.uuid || 'loading'}
                     roles={roles}

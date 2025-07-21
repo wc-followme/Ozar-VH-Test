@@ -163,7 +163,7 @@ const RoleManagement = () => {
   const safeIconOptions = Array.isArray(roleIconOptions) ? roleIconOptions : [];
 
   return (
-    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
+    <section className='flex flex-col w-full items-start gap-4 xl:gap-8 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
         <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
           {ROLE_MESSAGES.PAGE_TITLE}
@@ -178,7 +178,7 @@ const RoleManagement = () => {
 
       {/* Initial Loading State */}
       {roles.length === 0 && loading ? (
-        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6 w-full'>
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6 w-full'>
           {[...Array(8)].map((_, i) => (
             <RoleCardSkeleton key={i} />
           ))}
@@ -186,9 +186,9 @@ const RoleManagement = () => {
       ) : (
         <>
           {/* Roles Grid */}
-          <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6 w-full'>
+          <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl w-full gap-3 xl:gap-6'>
             {roles.length === 0 && !loading ? (
-              <div className='col-span-4'>
+              <div className='w-full col-span-full'>
                 <NoDataFound
                   buttonText={ROLE_MESSAGES.CREATE_ROLE_BUTTON}
                   onButtonClick={handleCreateRole}

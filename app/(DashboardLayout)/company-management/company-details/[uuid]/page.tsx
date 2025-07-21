@@ -514,7 +514,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
               </div>
             </div>
             {/* Contact Info Row */}
-            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-5 flex gap-8 text-sm'>
+            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-5 flex gap-8 text-sm flex-wrap'>
               <div className='flex-1'>
                 <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
                   Email

@@ -5,7 +5,6 @@ import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import NoDataFound from '@/components/shared/common/NoDataFound';
 import SideSheet from '@/components/shared/common/SideSheet';
 import ServiceForm from '@/components/shared/forms/ServiceForm';
-import ServiceCardSkeleton from '@/components/shared/skeleton/ServiceCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService } from '@/lib/api';
@@ -13,6 +12,7 @@ import { useAuth } from '@/lib/auth-context';
 import { extractApiErrorMessage } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import React, { useCallback, useEffect, useState } from 'react';
+import TradeCardSkeleton from '../../../components/shared/skeleton/TradeCardSkeleton';
 import { SERVICE_MESSAGES } from './service-messages';
 import { Service } from './service-types';
 
@@ -252,7 +252,7 @@ export default function ServiceManagementPage() {
   return (
     <div className='w-full overflow-y-auto'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-8'>
+      <div className='flex items-center justify-between mb-4 xl:mb-8'>
         <h2 className='page-title'>
           {SERVICE_MESSAGES.SERVICE_MANAGEMENT_TITLE}
         </h2>
@@ -261,11 +261,11 @@ export default function ServiceManagementPage() {
         </Button>
       </div>
       {/* Service Grid */}
-      <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 xl:gap-6'>
+      <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 xl:gap-6'>
         {services.length === 0 && loading ? (
           // Initial loading state with skeleton cards
           Array.from({ length: 10 }).map((_, idx) => (
-            <ServiceCardSkeleton key={idx} />
+            <TradeCardSkeleton key={idx} />
           ))
         ) : services.length === 0 && !loading ? (
           <div className='col-span-full text-center '>

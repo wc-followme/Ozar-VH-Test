@@ -308,7 +308,7 @@ const CategoryManagement = () => {
 
   return (
     <section className='w-full overflow-y-auto pb-4'>
-      <header className='flex items-center justify-between mb-8'>
+      <header className='flex items-center justify-between mb-4 xl:mb-8'>
         <h2 className='page-title'>
           {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
         </h2>
@@ -319,7 +319,7 @@ const CategoryManagement = () => {
 
       {/* Categories Grid */}
       {categories.length === 0 && loading ? (
-        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6 w-full'>
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6 w-full'>
           {[...Array(8)].map((_, i) => (
             <CategoryCardSkeleton key={i} />
           ))}
@@ -333,7 +333,7 @@ const CategoryManagement = () => {
               onButtonClick={() => setOpen(true)}
             />
           ) : (
-            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-6 w-full'>
+            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6 w-full'>
               {categories.map((category, index) => {
                 const iconOption = catIconOptions.find(
                   opt => opt.value === category.icon

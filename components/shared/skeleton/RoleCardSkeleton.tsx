@@ -5,7 +5,7 @@ import { Gallery } from 'iconsax-react';
 import React from 'react';
 
 const RoleCardSkeleton: React.FC = () => (
-  <div className='flex flex-col items-start gap-4 p-6 bg-[var(--card-background)] h-full rounded-[24px] border border-[var(--border-dark)] min-h-[234px] relative'>
+  <div className='flex flex-col items-start gap-4 p-6 bg-[var(--card-background)] h-full rounded-[24px] border border-[var(--border-dark)] relative'>
     {/* Top Row: Icon and Menu */}
     <div className='flex items-start justify-between w-full'>
       <Skeleton className='w-[60px] h-[60px] rounded-[16px] flex items-center justify-center bg-[var(--bg-skeleton)] mb-2'>

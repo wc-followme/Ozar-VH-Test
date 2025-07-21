@@ -249,14 +249,14 @@ export default function TradeManagementPage() {
   return (
     <div className='w-full overflow-y-auto'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-8'>
+      <div className='flex items-center justify-between mb-4 xl:mb-8'>
         <h2 className='page-title'>{TRADE_MESSAGES.TRADE_MANAGEMENT_TITLE}</h2>
         <Button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
           {TRADE_MESSAGES.ADD_TRADE_BUTTON}
         </Button>
       </div>
       {/* Trade Grid */}
-      <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
+      <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 xl:gap-6'>
         {trades.length === 0 && loading ? (
           // Initial loading state with skeleton cards
           Array.from({ length: 10 }).map((_, idx) => (

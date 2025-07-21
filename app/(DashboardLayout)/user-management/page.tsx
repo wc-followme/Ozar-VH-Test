@@ -199,7 +199,7 @@ export default function UserManagement() {
   return (
     <div className='w-full overflow-y-auto'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-8'>
+      <div className='flex items-center justify-between mb-4 xl:mb-8'>
         <h2 className='page-title'>{USER_MESSAGES.USER_MANAGEMENT_TITLE}</h2>
         <div className='flex items-center gap-4'>
           <SelectField
@@ -228,7 +228,7 @@ export default function UserManagement() {
       </div>
       {/* Initial Loading State */}
       {users.length === 0 && loading ? (
-        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-4'>
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
           {[...Array(8)].map((_, i) => (
             <UserCardSkeleton key={i} />
           ))}
@@ -243,7 +243,7 @@ export default function UserManagement() {
               onButtonClick={handleCreateUser}
             />
           ) : (
-            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-4'>
+            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
               {users.map(
                 ({
                   uuid,
