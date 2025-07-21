@@ -15,6 +15,10 @@ export const createRoleSchema = yup.object({
     .max(200, 'Description must not exceed 200 characters'),
 
   icon: yup.string().required('Icon is required'),
+
+  permissions: yup.mixed().optional(), // Accept permissions object, validated in logic
 });
 
-export type CreateRoleFormData = yup.InferType<typeof createRoleSchema>;
+export type CreateRoleFormData = yup.InferType<typeof createRoleSchema> & {
+  permissions?: import('../lib/api').UserPermissions;
+};

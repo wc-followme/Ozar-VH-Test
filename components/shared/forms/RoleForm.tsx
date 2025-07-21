@@ -2,7 +2,9 @@ import { ROLE_MESSAGES } from '@/app/(DashboardLayout)/role-management/role-mess
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ACCESS_CONTROL_ACCORDIONS_DATA } from '@/constants/access-control';
 import { roleIconOptions } from '@/constants/sidebar-items';
+import type { UserPermissions } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { CreateRoleFormData, createRoleSchema } from '@/lib/validations/role';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -12,6 +14,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import FormErrorMessage from '../common/FormErrorMessage';
 import IconFieldWrapper from '../common/IconFieldWrapper';
+import AccessControlAccordion from '../CompanyManagementAddUser';
 
 interface RoleFormProps {
   initialValues?: Partial<CreateRoleFormData>;
@@ -86,9 +89,144 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
         : ROLE_MESSAGES.CREATE_BUTTON;
     }, [isSubmitting, mode]);
 
+    // --- Permissions Accordions State ---
+    // Map accordion indices to permission keys
+    const accordionToPermissionMap = [
+      'roles',
+      'users',
+      'companies',
+      'categories',
+      'trades',
+      'services',
+      'materials',
+      'tools',
+      'jobs',
+    ];
+    // Map stripe indices to permission keys for each accordion
+    const stripeToPermissionMap = [
+      ['view', 'edit', 'archive'], // roles
+      ['view', 'create', 'customize', 'archive'], // users
+      ['view', 'assign_user', 'archive'], // companies
+      ['view', 'edit', 'archive'], // categories
+      ['view', 'edit', 'archive'], // trades
+      ['view', 'edit', 'archive'], // services
+      ['view', 'edit', 'archive'], // materials
+      ['view', 'edit', 'archive', 'history'], // tools
+      ['edit', 'archive'], // jobs
+    ];
+
+    // Helper: Convert permissions object to accordions state
+    const permissionsToAccordions = (permissions?: UserPermissions) => {
+      return ACCESS_CONTROL_ACCORDIONS_DATA.map((acc, accordionIdx) => {
+        const permissionKey = accordionToPermissionMap[accordionIdx];
+        const perms = permissions?.[permissionKey as keyof UserPermissions] as
+          | Record<string, boolean>
+          | undefined;
+        const updatedStripes = acc.stripes.map((_, stripeIdx) => {
+          const permName = stripeToPermissionMap[accordionIdx]?.[stripeIdx];
+          return perms && permName ? perms[permName] === true : false;
+        });
+        return {
+          title: acc.title,
+          stripes: updatedStripes,
+        };
+      });
+    };
+
+    // Helper: Convert accordions state to permissions object
+    const accordionsToPermissions = (
+      accordions: { stripes: boolean[] }[]
+    ): UserPermissions => {
+      const permissionsMap: UserPermissions = {
+        roles: { view: false, edit: false, archive: false },
+        users: { view: false, create: false, customize: false, archive: false },
+        companies: { view: false, assign_user: false, archive: false },
+        categories: { view: false, edit: false, archive: false },
+        trades: { view: false, edit: false, archive: false },
+        services: { view: false, edit: false, archive: false },
+        materials: { view: false, edit: false, archive: false },
+        tools: { view: false, edit: false, archive: false, history: false },
+        jobs: { edit: false, archive: false },
+      };
+      accordions.forEach((accordion, accordionIdx) => {
+        const permissionKey = accordionToPermissionMap[accordionIdx];
+        if (
+          permissionKey &&
+          permissionsMap[permissionKey as keyof UserPermissions]
+        ) {
+          accordion.stripes.forEach((isChecked: boolean, stripeIdx: number) => {
+            const permissionName =
+              stripeToPermissionMap[accordionIdx]?.[stripeIdx];
+            if (
+              permissionName &&
+              permissionsMap[permissionKey as keyof UserPermissions]
+            ) {
+              (permissionsMap[permissionKey as keyof UserPermissions] as any)[
+                permissionName
+              ] = isChecked;
+            }
+          });
+        }
+      });
+      return permissionsMap;
+    };
+
+    // Accordions state
+    const [accordions, setAccordions] = React.useState(() =>
+      mode === 'edit' && initialValues && initialValues.permissions
+        ? permissionsToAccordions(initialValues.permissions)
+        : ACCESS_CONTROL_ACCORDIONS_DATA.map(acc => ({
+            title: acc.title,
+            stripes: acc.stripes.map(() => false),
+          }))
+    );
+    // Open accordion index
+    const [openAccordionIdx, setOpenAccordionIdx] = React.useState(0);
+
+    // If initialValues.permissions changes (edit mode), update accordions
+    React.useEffect(() => {
+      if (mode === 'edit' && initialValues && initialValues.permissions) {
+        setAccordions(permissionsToAccordions(initialValues.permissions));
+      }
+    }, [mode, initialValues?.permissions]);
+
+    // Handler to toggle a switch
+    const handleToggle = (accordionIdx: number, stripeIdx: number) => {
+      setAccordions(prev =>
+        prev.map((acc, aIdx) =>
+          aIdx === accordionIdx
+            ? {
+                ...acc,
+                stripes: acc.stripes.map((checked: boolean, sIdx: number) =>
+                  sIdx === stripeIdx ? !checked : checked
+                ),
+              }
+            : acc
+        )
+      );
+    };
+
+    // Calculate access level for badge
+    const calculateAccessLevel = (
+      stripes: boolean[]
+    ): 'Full Access' | 'Limited Access' | 'Restricted' => {
+      if (stripes.length === 0) return 'Restricted';
+      const enabledCount = stripes.filter(Boolean).length;
+      if (enabledCount === 0) return 'Restricted';
+      if (enabledCount === stripes.length) return 'Full Access';
+      return 'Limited Access';
+    };
+
     return (
       <Card className='flex flex-col gap-8 p-6 flex-1 w-full border-1 border-[#E8EAED] rounded-[20px] bg-[var(--card-background)]'>
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-8'>
+        <form
+          onSubmit={handleSubmit(data => {
+            // Attach permissions to form data
+            const permissions = accordionsToPermissions(accordions);
+            onSubmit({ ...data, permissions });
+          })}
+          className='flex flex-col gap-8'
+        >
           {/* Top row with input fields */}
           <div className='flex items-start gap-6 w-full'>
             {/* Icon selector */}
@@ -105,7 +243,6 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
                 />
               )}
             />
-
             {/* Role Name input */}
             <div className='flex flex-col w-[300px] items-start gap-2'>
               <Label className='field-label'>
@@ -133,7 +270,6 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
                 <FormErrorMessage message={errors.name.message || ''} />
               )}
             </div>
-
             {/* Description input */}
             <div className='flex flex-col items-start gap-2 flex-1'>
               <Label className='field-label'>
@@ -160,6 +296,39 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
                 <FormErrorMessage message={errors.description.message || ''} />
               )}
             </div>
+          </div>
+
+          {/* Permissions Accordions */}
+          <div className='flex flex-col gap-4 mt-4'>
+            {accordions.map((accordion, idx) => {
+              const { title, stripes } = accordion;
+              const accessLevel = calculateAccessLevel(stripes);
+              return (
+                <AccessControlAccordion
+                  key={title + idx}
+                  title={title}
+                  badgeLabel={accessLevel}
+                  stripes={
+                    Array.isArray(stripes) &&
+                    Array.isArray(ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes)
+                      ? ACCESS_CONTROL_ACCORDIONS_DATA[idx]?.stripes.map(
+                          (stripe, sIdx) => ({
+                            title: stripe.title,
+                            description: stripe.description,
+                            checked:
+                              typeof stripes?.[sIdx] === 'boolean'
+                                ? stripes[sIdx]
+                                : false,
+                            onToggle: () => handleToggle(idx, sIdx),
+                          })
+                        )
+                      : []
+                  }
+                  open={openAccordionIdx === idx}
+                  onOpenChange={open => setOpenAccordionIdx(open ? idx : -1)}
+                />
+              );
+            })}
           </div>
 
           {/* Footer with action buttons */}
