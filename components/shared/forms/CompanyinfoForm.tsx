@@ -653,7 +653,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                     photo={contractorPhotoFile}
                     onPhotoChange={handleContractorPhotoChange}
                     onDeletePhoto={handleDeleteContractorPhoto}
-                    label={COMPANY_MESSAGES.UPLOAD_PHOTO_LABEL}
+                    label={COMPANY_MESSAGES.ENTER_CONTRACTOR_PHOTO}
                     uploading={contractorUploading}
                     existingImageUrl={
                       contractorFileKey && !contractorPhotoFile
