@@ -23,7 +23,7 @@ export const SERVICE_MESSAGES = {
 
   // Menu options
   EDIT_MENU: 'Edit',
-  DELETE_MENU: 'Delete',
+  DELETE_MENU: 'Archive',
 
   // Success messages
   CREATE_SUCCESS: 'Service created successfully',
