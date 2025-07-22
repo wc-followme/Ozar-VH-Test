@@ -91,6 +91,7 @@ export const COMPANY_MESSAGES = {
 
   // Photo Upload
   UPLOAD_PHOTO_LABEL: 'Upload Company Logo',
+  ENTER_CONTRACTOR_PHOTO: 'Upload Contractor Photo',
   UPLOAD_PHOTO_TEXT:
     '1600 x 1200 (4:3) recommended. PNG and JPG files are allowed.',
 

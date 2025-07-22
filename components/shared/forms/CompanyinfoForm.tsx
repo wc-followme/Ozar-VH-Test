@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { COUNTRY_CODES } from '@/constants/common';
+import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar as IconsaxCalendar } from 'iconsax-react';
@@ -72,17 +73,87 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
 
     const [errors, setErrors] = useState<CompanyFormErrors>({});
 
-    // Photo upload stubs for contractor
-    const [photoFile, setPhotoFile] = useState<File | null>(null);
-    const [uploading] = useState(false);
-    const [fileKey, setFileKey] = useState<string | null>(null);
-    const handlePhotoChange = (file: File | null) => {
-      setPhotoFile(file);
+    // Contractor image upload states
+    const [contractorPhotoFile, setContractorPhotoFile] = useState<File | null>(
+      null
+    );
+    const [contractorUploading, setContractorUploading] = useState(false);
+    const [contractorFileKey, setContractorFileKey] = useState<string | null>(
+      null
+    );
+
+    // Contractor image handlers
+    const handleContractorPhotoChange = (file: File | null) => {
+      setContractorPhotoFile(file);
     };
-    const handleDeletePhoto = () => {
-      setPhotoFile(null);
-      setFileKey(null);
+
+    const handleDeleteContractorPhoto = () => {
+      setContractorPhotoFile(null);
+      setContractorFileKey(null);
     };
+
+    // Upload contractor image function
+    const uploadContractorImage = useCallback(async (): Promise<
+      string | null
+    > => {
+      if (!contractorPhotoFile) return null;
+
+      try {
+        setContractorUploading(true);
+
+        // Generate a unique filename for contractor image
+        const ext = contractorPhotoFile.name.split('.').pop() || 'png';
+        const timestamp = Date.now();
+        const generatedFileName = `contractor_${timestamp}.${ext}`;
+
+        // Get presigned URL with purpose 'profile-picture'
+        const presignedResponse = await getPresignedUrl({
+          fileName: generatedFileName,
+          fileType: contractorPhotoFile.type,
+          fileSize: contractorPhotoFile.size,
+          purpose: 'profile-picture', // Try 'company' instead of 'profile-picture'
+          customPath: '',
+        });
+
+        console.log('Presigned URL response:', presignedResponse);
+        console.log(
+          'Presigned URL response status:',
+          presignedResponse.statusCode
+        );
+        console.log('Presigned URL response data:', presignedResponse.data);
+
+        if (
+          presignedResponse.statusCode !== 200 &&
+          presignedResponse.statusCode !== 201
+        ) {
+          console.error('Presigned URL failed:', presignedResponse);
+          console.error(
+            'Presigned URL error message:',
+            presignedResponse.message
+          );
+          throw new Error(
+            `Failed to get presigned URL: ${presignedResponse.message || 'Unknown error'}`
+          );
+        }
+
+        // Upload file
+        await uploadFileToPresignedUrl(
+          presignedResponse.data['uploadUrl'],
+          contractorPhotoFile
+        );
+
+        // Use fileKey for contractor_profile_url
+        const fileKey = presignedResponse.data['fileKey'];
+
+        setContractorFileKey(fileKey);
+        return fileKey;
+      } catch (error) {
+        console.error('Error uploading contractor image:', error);
+        throw error;
+      } finally {
+        setContractorUploading(false);
+      }
+    }, [contractorPhotoFile]);
 
     // Initialize form with initial data
     const initializeForm = useCallback(() => {
@@ -168,8 +239,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
       if (!email) newErrors.email = COMPANY_MESSAGES.EMAIL_REQUIRED;
       if (!phoneNumber)
         newErrors.phone_number = COMPANY_MESSAGES.PHONE_REQUIRED;
-      if (!communication)
-        newErrors.communication = COMPANY_MESSAGES.COMMUNICATION_REQUIRED;
+      if (!communication) newErrors.communication = 'Address is required';
       if (!website) newErrors.website = COMPANY_MESSAGES.WEBSITE_REQUIRED;
       if (!expiryDate)
         newErrors.expiry_date = COMPANY_MESSAGES.EXPIRY_DATE_REQUIRED;
@@ -178,7 +248,8 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
           COMPANY_MESSAGES.PREFERRED_COMMUNICATION_REQUIRED;
       if (!city) newErrors.city = COMPANY_MESSAGES.CITY_REQUIRED;
       if (!pincode) newErrors.pincode = COMPANY_MESSAGES.PINCODE_REQUIRED;
-      if (!projects) newErrors.projects = COMPANY_MESSAGES.PROJECTS_REQUIRED;
+      // Removed projects validation as field is commented out
+      // if (!projects) newErrors.projects = COMPANY_MESSAGES.PROJECTS_REQUIRED;
 
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
@@ -194,44 +265,94 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
       preferredCommunication,
       city,
       pincode,
-      projects,
     ]);
 
     const handleSubmit = useCallback(
-      (e: React.FormEvent<HTMLFormElement>) => {
+      async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!validate()) return;
 
-        // After validation, all required fields including expiryDate are guaranteed to be defined
-        if (!expiryDate) {
-          throw new Error('Expiry date is required but validation passed'); // This should never happen
+        try {
+          // Upload contractor image if provided
+          let contractorProfileUrl: string | null = null;
+          if (contractorPhotoFile) {
+            contractorProfileUrl = await uploadContractorImage();
+          }
+
+          // After validation, all required fields including expiryDate are guaranteed to be defined
+          if (!expiryDate) {
+            throw new Error('Expiry date is required but validation passed'); // This should never happen
+          }
+
+          const payload: CompanyCreateFormData = {
+            name,
+            tagline,
+            about,
+            email,
+            country_code: phoneCountryCode,
+            phone_number: phoneNumber,
+            communication, // Now using communication field as address
+            website,
+            preferred_communication_method: preferredCommunication,
+            city,
+            pincode,
+            projects: projects || 'N/A', // Default value since field is hidden
+          };
+
+          // Add contractor information if provided
+          console.log('Contractor data before adding to payload:', {
+            contractorName,
+            contractorEmail,
+            contractorPhone,
+            contractorCountryCode,
+            contractorProfileUrl,
+          });
+
+          if (contractorName.trim()) {
+            payload.contractor_name = contractorName.trim();
+            console.log(
+              'Added contractor_name to payload:',
+              payload.contractor_name
+            );
+          }
+          if (contractorEmail.trim()) {
+            payload.contractor_email = contractorEmail.trim();
+            console.log(
+              'Added contractor_email to payload:',
+              payload.contractor_email
+            );
+          }
+          if (contractorPhone.trim()) {
+            payload.contractor_phone = `${contractorCountryCode} ${contractorPhone.trim()}`;
+            console.log(
+              'Added contractor_phone to payload:',
+              payload.contractor_phone
+            );
+          }
+          if (contractorProfileUrl) {
+            payload.contractor_profile_url = contractorProfileUrl;
+            console.log(
+              'Added contractor_profile_url to payload:',
+              payload.contractor_profile_url
+            );
+          }
+
+          console.log('Final payload before onSubmit:', payload);
+
+          // Add optional fields only if they're set
+          if (expiryDate) {
+            payload.expiry_date = expiryDate.toISOString().split('T')[0];
+          }
+
+          if (imageUrl) {
+            payload.image = imageUrl;
+          }
+
+          onSubmit(payload);
+        } catch (error) {
+          console.error('Error submitting form:', error);
+          // Optionally, display an error message to the user
         }
-
-        const payload: CompanyCreateFormData = {
-          name,
-          tagline,
-          about,
-          email,
-          country_code: phoneCountryCode,
-          phone_number: phoneNumber,
-          communication,
-          website,
-          preferred_communication_method: preferredCommunication,
-          city,
-          pincode,
-          projects,
-        };
-
-        // Add optional fields only if they're set
-        if (expiryDate) {
-          payload.expiry_date = expiryDate.toISOString().split('T')[0];
-        }
-
-        if (imageUrl) {
-          payload.image = imageUrl;
-        }
-
-        onSubmit(payload);
       },
       [
         validate,
@@ -249,7 +370,13 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
         pincode,
         projects,
         imageUrl,
+        contractorName,
+        contractorEmail,
+        contractorPhone,
+        contractorCountryCode,
         onSubmit,
+        uploadContractorImage,
+        contractorPhotoFile,
       ]
     );
 
@@ -367,19 +494,20 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               </div>
               <FormErrorMessage message={errors.phone_number || ''} />
             </div>
+            {/* Address field - using communication state since it's not used elsewhere */}
             <div className='space-y-2 col-span-2'>
-              <Label htmlFor='email' className='field-label'>
+              <Label htmlFor='address' className='field-label'>
                 Address
               </Label>
               <Input
-                id='email'
-                type='email'
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder={COMPANY_MESSAGES.ENTER_EMAIL}
+                id='address'
+                type='text'
+                value={communication}
+                onChange={e => setCommunication(e.target.value)}
+                placeholder='Enter company address'
                 className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
               />
-              <FormErrorMessage message={errors.email || ''} />
+              <FormErrorMessage message={errors.communication || ''} />
             </div>
 
             {/* City */}
@@ -501,98 +629,124 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               />
             </div>
             <div className='col-span-2 pt-6'>
-              <h2 className='text-lg font-bold mb-4'>
-                Contractor Information{' '}
-                <span className='font-medium text-[var(--text-secondary)]'>
-                  (Optional)
-                </span>
-              </h2>
-              <div className='flex items-center gap-6'>
-                <div className='h-[180px] w-[180px]'>
-                  <PhotoUploadField
-                    photo={photoFile}
-                    onPhotoChange={handlePhotoChange}
-                    onDeletePhoto={handleDeletePhoto}
-                    label={COMPANY_MESSAGES.UPLOAD_PHOTO_LABEL}
-                    uploading={uploading}
-                    existingImageUrl={
-                      fileKey && !photoFile
-                        ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
-                        : ''
-                    }
-                    cardHeight='h-[180px]'
-                  />
-                  {uploading && (
-                    <div className='text-xs mt-2'>
-                      {COMPANY_MESSAGES.UPLOADING}
-                    </div>
-                  )}
-                </div>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4 flex-1'>
-                  {/* Contractor Name */}
-                  <div className='col-span-2 space-y-2'>
-                    <Label htmlFor='contractor-name' className='field-label'>
-                      {COMPANY_MESSAGES.CONTRACTOR_NAME_LABEL}
-                    </Label>
-                    <Input
-                      id='contractor-name'
-                      value={contractorName}
-                      onChange={e => setContractorName(e.target.value)}
-                      placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_NAME}
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    />
-                    <FormErrorMessage message={errors.contractor_name || ''} />
-                  </div>
-
-                  {/* Contractor Email */}
-                  <div className='space-y-2'>
-                    <Label htmlFor='contractor-email' className='field-label'>
-                      {COMPANY_MESSAGES.CONTRACTOR_EMAIL_LABEL}
-                    </Label>
-                    <Input
-                      id='contractor-email'
-                      type='email'
-                      value={contractorEmail}
-                      onChange={e => setContractorEmail(e.target.value)}
-                      placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_EMAIL}
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    />
-                    <FormErrorMessage message={errors.contractor_email || ''} />
-                  </div>
-
-                  {/* Contractor Phone */}
-                  <div className='space-y-2'>
-                    <Label htmlFor='contractor-phone' className='field-label'>
-                      {COMPANY_MESSAGES.CONTRACTOR_PHONE_LABEL}
-                    </Label>
-                    <div className='flex gap-2'>
-                      <Select
-                        value={contractorCountryCode}
-                        onValueChange={setContractorCountryCode}
-                      >
-                        <SelectTrigger className='w-[120px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {countryCodes.map(country => (
-                            <SelectItem key={country.code} value={country.code}>
-                              {country.flag} {country.code}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        id='contractor-phone'
-                        value={contractorPhone}
-                        onChange={e => setContractorPhone(e.target.value)}
-                        placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_PHONE}
-                        className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              {/* Only show Contractor Information in create mode, not edit mode */}
+              {!isEditMode && (
+                <>
+                  <h2 className='text-lg font-bold mb-4'>
+                    Contractor Information{' '}
+                    <span className='font-medium text-[var(--text-secondary)]'>
+                      (Optional)
+                    </span>
+                  </h2>
+                  <div className='flex items-center gap-6'>
+                    <div className='h-[180px] w-[180px]'>
+                      <PhotoUploadField
+                        photo={contractorPhotoFile}
+                        onPhotoChange={handleContractorPhotoChange}
+                        onDeletePhoto={handleDeleteContractorPhoto}
+                        label={COMPANY_MESSAGES.ENTER_CONTRACTOR_PHOTO}
+                        uploading={contractorUploading}
+                        existingImageUrl={
+                          contractorFileKey && !contractorPhotoFile
+                            ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+                              contractorFileKey
+                            : ''
+                        }
+                        cardHeight='h-[180px]'
                       />
+                      {contractorUploading && (
+                        <div className='text-xs mt-2'>
+                          {COMPANY_MESSAGES.UPLOADING}
+                        </div>
+                      )}
                     </div>
-                    <FormErrorMessage message={errors.contractor_phone || ''} />
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4 flex-1'>
+                      {/* Contractor Name */}
+                      <div className='col-span-2 space-y-2'>
+                        <Label
+                          htmlFor='contractor-name'
+                          className='field-label'
+                        >
+                          {COMPANY_MESSAGES.CONTRACTOR_NAME_LABEL}
+                        </Label>
+                        <Input
+                          id='contractor-name'
+                          value={contractorName}
+                          onChange={e => setContractorName(e.target.value)}
+                          placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_NAME}
+                          className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                        />
+                        <FormErrorMessage
+                          message={errors.contractor_name || ''}
+                        />
+                      </div>
+
+                      {/* Contractor Email */}
+                      <div className='space-y-2'>
+                        <Label
+                          htmlFor='contractor-email'
+                          className='field-label'
+                        >
+                          {COMPANY_MESSAGES.CONTRACTOR_EMAIL_LABEL}
+                        </Label>
+                        <Input
+                          id='contractor-email'
+                          type='email'
+                          value={contractorEmail}
+                          onChange={e => setContractorEmail(e.target.value)}
+                          placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_EMAIL}
+                          className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                        />
+                        <FormErrorMessage
+                          message={errors.contractor_email || ''}
+                        />
+                      </div>
+
+                      {/* Contractor Phone */}
+                      <div className='space-y-2'>
+                        <Label
+                          htmlFor='contractor-phone'
+                          className='field-label'
+                        >
+                          {COMPANY_MESSAGES.CONTRACTOR_PHONE_LABEL}
+                        </Label>
+                        <div className='flex gap-2'>
+                          <Select
+                            value={contractorCountryCode}
+                            onValueChange={setContractorCountryCode}
+                          >
+                            <SelectTrigger className='w-[100px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className='bg-[var(--white-background)] border border-[var(--border-light)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
+                              {countryCodes.map(country => (
+                                <SelectItem
+                                  key={country.code}
+                                  value={country.code}
+                                >
+                                  {country.flag} {country.code}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            id='contractor-phone'
+                            value={contractorPhone}
+                            onChange={e => setContractorPhone(e.target.value)}
+                            placeholder={
+                              COMPANY_MESSAGES.ENTER_CONTRACTOR_PHONE
+                            }
+                            className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                          />
+                        </div>
+                        <FormErrorMessage
+                          message={errors.contractor_phone || ''}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
 

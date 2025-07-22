@@ -7,7 +7,7 @@ import SideSheet from '@/components/shared/common/SideSheet';
 import CategoryForm from '@/components/shared/forms/CategoryForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { STATUS_CODES } from '@/constants/status-codes';
 import {
   apiService,
@@ -17,7 +17,11 @@ import {
   UpdateCategoryRequest,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  extractApiSuccessMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
 import {
   CreateCategoryFormData,
   createCategorySchema,
@@ -39,18 +43,22 @@ const CategoryManagement = () => {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
+  // Get user permissions for categories
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.categories?.edit;
+
   // Memoize menu options to prevent unnecessary re-renders
   const menuOptions = useMemo(
     () => [
       {
         label: CATEGORY_MESSAGES.EDIT_MENU,
-        action: 'edit',
+        action: ACTIONS.EDIT,
         icon: Edit2,
         variant: 'default' as const,
       },
       {
         label: CATEGORY_MESSAGES.DELETE_MENU,
-        action: 'delete',
+        action: ACTIONS.DELETE,
         icon: Trash,
         variant: 'destructive' as const,
       },
@@ -312,9 +320,11 @@ const CategoryManagement = () => {
         <h2 className='page-title'>
           {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
         </h2>
-        <Button onClick={() => setOpen(true)} className='btn-primary'>
-          {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
-        </Button>
+        {canEdit && (
+          <Button onClick={() => setOpen(true)} className='btn-primary'>
+            {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
+          </Button>
+        )}
       </header>
 
       {/* Categories Grid */}
@@ -331,6 +341,7 @@ const CategoryManagement = () => {
               description={CATEGORY_MESSAGES.NO_CATEGORIES_FOUND_DESCRIPTION}
               buttonText={CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
               onButtonClick={() => setOpen(true)}
+              showButton={canEdit ?? false}
             />
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>

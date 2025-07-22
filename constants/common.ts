@@ -13,6 +13,18 @@ export const APP_CONFIG = {
   TOAST_AUTO_HIDE_MS: 3000,
 } as const;
 
+// Action constants for menu options and permissions
+export const ACTIONS = {
+  EDIT: 'edit',
+  DELETE: 'delete',
+  ARCHIVE: 'archive',
+  VIEW: 'view',
+  CREATE: 'create',
+  CUSTOMIZE: 'customize',
+  ASSIGN_USER: 'assign_user',
+  HISTORY: 'history',
+} as const;
+
 // Country codes and phone number related constants
 export const COUNTRY_CODES = {
   // Key-value mapping for easy lookup (country key -> phone code)

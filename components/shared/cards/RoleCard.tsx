@@ -3,6 +3,8 @@
 import { ROLE_MESSAGES } from '@/app/(DashboardLayout)/role-management/role-messages';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { ACTIONS } from '@/constants/common';
+import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React, { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
@@ -31,8 +33,6 @@ export interface RoleCardProps {
   onDelete?: () => void;
 }
 
-// Utility to detect if a component supports className prop
-
 export const RoleCard: React.FC<RoleCardProps> = ({
   iconSrc,
   iconBgColor,
@@ -46,9 +46,28 @@ export const RoleCard: React.FC<RoleCardProps> = ({
 }) => {
   const [showDelete, setShowDelete] = useState(false);
 
+  // Get user permissions for roles
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.roles?.edit;
+  const canArchive = userPermissions?.roles?.archive;
+
+  // Filter menu options based on permissions
+  const filteredMenuOptions = menuOptions.filter(option => {
+    if (option.action === ACTIONS.EDIT) {
+      return canEdit;
+    }
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
+      return canArchive;
+    }
+    return true; // Show other actions by default
+  });
+
+  // Only show menu if there are any visible options
+  const showMenu = filteredMenuOptions.length > 0;
+
   const handleMenuAction = (action: string) => {
-    if (action === 'edit' && onEdit) onEdit();
-    if (action === 'delete') setShowDelete(true);
+    if (action === ACTIONS.EDIT && onEdit) onEdit();
+    if (action === ACTIONS.DELETE) setShowDelete(true);
   };
 
   const handleConfirmDelete = () => {
@@ -80,24 +99,26 @@ export const RoleCard: React.FC<RoleCardProps> = ({
           })()}
         </div>
 
-        <Dropdown
-          menuOptions={menuOptions}
-          onAction={handleMenuAction}
-          trigger={
-            <Button
-              variant='ghost'
-              size='sm'
-              className='h-8 w-8 p-0 flex-shrink-0'
-            >
-              <IconDotsVertical
-                className='!w-6 !h-6'
-                strokeWidth={2}
-                color='var(--text)'
-              />
-            </Button>
-          }
-          align='end'
-        />
+        {showMenu && (
+          <Dropdown
+            menuOptions={filteredMenuOptions}
+            onAction={handleMenuAction}
+            trigger={
+              <Button
+                variant='ghost'
+                size='sm'
+                className='h-8 w-8 p-0 flex-shrink-0'
+              >
+                <IconDotsVertical
+                  className='!w-6 !h-6'
+                  strokeWidth={2}
+                  color='var(--text)'
+                />
+              </Button>
+            }
+            align='end'
+          />
+        )}
       </div>
 
       <CardContent className='flex flex-col items-start gap-4 p-0 w-full flex-1'>

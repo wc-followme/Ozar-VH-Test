@@ -5,11 +5,15 @@ import { RoleCard } from '@/components/shared/cards/RoleCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import NoDataFound from '@/components/shared/common/NoDataFound';
 import { useToast } from '@/components/ui/use-toast';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { roleIconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  extractApiSuccessMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -28,8 +32,16 @@ interface MenuOption {
 }
 
 const menuOptions: MenuOption[] = [
-  { label: ROLE_MESSAGES.EDIT_MENU, action: 'edit', icon: Edit2 },
-  { label: ROLE_MESSAGES.DELETE_MENU, action: 'delete', icon: Trash },
+  {
+    label: ROLE_MESSAGES.EDIT_MENU,
+    action: ACTIONS.EDIT,
+    icon: Edit2,
+  },
+  {
+    label: ROLE_MESSAGES.DELETE_MENU,
+    action: ACTIONS.DELETE,
+    icon: Trash,
+  },
 ];
 
 // Adapter for icons that expect className instead of size/color
@@ -53,6 +65,10 @@ const RoleManagement = () => {
   const router = useRouter();
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+
+  // Get user permissions for roles
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.roles?.edit;
 
   const fetchRoles = useCallback(
     async (targetPage = 1, append = false) => {
@@ -168,12 +184,14 @@ const RoleManagement = () => {
         <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
           {ROLE_MESSAGES.PAGE_TITLE}
         </h2>
-        <button
-          onClick={handleCreateRole}
-          className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
-        >
-          {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
-        </button>
+        {canEdit && (
+          <button
+            onClick={handleCreateRole}
+            className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
+          >
+            {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
+          </button>
+        )}
       </header>
 
       {/* Initial Loading State */}
@@ -193,6 +211,7 @@ const RoleManagement = () => {
                   buttonText={ROLE_MESSAGES.CREATE_ROLE_BUTTON}
                   onButtonClick={handleCreateRole}
                   description={ROLE_MESSAGES.NO_ROLES_FOUND_DESCRIPTION}
+                  showButton={canEdit ?? false}
                 />
               </div>
             ) : (
