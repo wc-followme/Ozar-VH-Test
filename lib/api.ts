@@ -686,7 +686,7 @@ class ApiService {
   async logout() {
     return this.makeRequest('/auth/logout', {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: this.getRoleHeaders(),
     });
   }
 
