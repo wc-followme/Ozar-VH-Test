@@ -128,9 +128,9 @@ export function CompanyCard({
         <div className='w-[60px] h-[60px] rounded-[12px] overflow-hidden bg-[var(--border-light)] flex items-center justify-center'>
           <Image
             src={
-              !image || image.trim() === '' || isPlaceholder
+              (!image || image.trim() === '' || isPlaceholder
                 ? getPlaceholderImage()
-                : image || '/images/company-management/company-img-1.png'
+                : image || getPlaceholderImage()) as string
             }
             alt={name}
             width={60}

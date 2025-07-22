@@ -74,15 +74,15 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
     const [errors, setErrors] = useState<CompanyFormErrors>({});
 
     // Photo upload stubs for contractor
-    const [photoFile, setPhotoFile] = useState<File | null>(null);
-    const [uploading] = useState(false);
-    const [fileKey, setFileKey] = useState<string | null>(null);
-    const handlePhotoChange = (file: File | null) => {
-      setPhotoFile(file);
+    const [_photoFile, _setPhotoFile] = useState<File | null>(null);
+    const [_uploading] = useState(false);
+    const [_fileKey, _setFileKey] = useState<string | null>(null);
+    const _handlePhotoChange = (file: File | null) => {
+      _setPhotoFile(file);
     };
-    const handleDeletePhoto = () => {
-      setPhotoFile(null);
-      setFileKey(null);
+    const _handleDeletePhoto = () => {
+      _setPhotoFile(null);
+      _setFileKey(null);
     };
 
     // Contractor image upload states
