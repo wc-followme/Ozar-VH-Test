@@ -13,6 +13,7 @@ import { StatsCard } from '../../../components/shared/cards/StatsCard';
 import ComingSoon from '../../../components/shared/common/ComingSoon';
 import SideSheet from '../../../components/shared/common/SideSheet';
 import { CreateJobForm } from '../../../components/shared/forms/CreateJobForm';
+import JobManagementPageSkeleton from '../../../components/shared/skeleton/JobManagementPageSkeleton';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import {
@@ -238,7 +239,9 @@ export default function JobManagement() {
       bgColor: 'bg-[#F58B1E1A]',
     },
   ];
-
+  if (loading) {
+    return <JobManagementPageSkeleton />;
+  }
   return (
     <div className='w-full'>
       {/* Stats Cards */}
