@@ -245,6 +245,7 @@ export interface CreateCompanyRequest {
   contractor_name?: string;
   contractor_email?: string;
   contractor_phone?: string;
+  contractor_profile_url?: string;
 }
 
 export interface CreateCompanyResponse {

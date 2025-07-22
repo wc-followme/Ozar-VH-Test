@@ -40,6 +40,7 @@ export interface CompanyCreateFormData {
   contractor_name?: string;
   contractor_email?: string;
   contractor_phone?: string;
+  contractor_profile_url?: string;
 }
 
 // Company initial data for form (for edit mode)

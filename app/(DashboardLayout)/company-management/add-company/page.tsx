@@ -104,6 +104,9 @@ export default function AddCompanyPage() {
       if (data.contractor_phone) {
         payload.contractor_phone = data.contractor_phone;
       }
+      if (data.contractor_profile_url) {
+        payload.contractor_profile_url = data.contractor_profile_url;
+      }
 
       // Add expiry_date only if it's provided
       if (data.expiry_date) {

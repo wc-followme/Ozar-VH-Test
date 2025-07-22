@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { COUNTRY_CODES } from '@/constants/common';
+import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar as IconsaxCalendar } from 'iconsax-react';
@@ -83,6 +84,89 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
       setPhotoFile(null);
       setFileKey(null);
     };
+
+    // Contractor image upload states
+    const [contractorPhotoFile, setContractorPhotoFile] = useState<File | null>(
+      null
+    );
+    const [contractorUploading, setContractorUploading] = useState(false);
+    const [contractorFileKey, setContractorFileKey] = useState<string | null>(
+      null
+    );
+
+    // Contractor image handlers
+    const handleContractorPhotoChange = (file: File | null) => {
+      setContractorPhotoFile(file);
+    };
+
+    const handleDeleteContractorPhoto = () => {
+      setContractorPhotoFile(null);
+      setContractorFileKey(null);
+    };
+
+    // Upload contractor image function
+    const uploadContractorImage = useCallback(async (): Promise<
+      string | null
+    > => {
+      if (!contractorPhotoFile) return null;
+
+      try {
+        setContractorUploading(true);
+
+        // Generate a unique filename for contractor image
+        const ext = contractorPhotoFile.name.split('.').pop() || 'png';
+        const timestamp = Date.now();
+        const generatedFileName = `contractor_${timestamp}.${ext}`;
+
+        // Get presigned URL with purpose 'profile-picture'
+        const presignedResponse = await getPresignedUrl({
+          fileName: generatedFileName,
+          fileType: contractorPhotoFile.type,
+          fileSize: contractorPhotoFile.size,
+          purpose: 'company', // Try 'company' instead of 'profile-picture'
+          customPath: '',
+        });
+
+        console.log('Presigned URL response:', presignedResponse);
+        console.log(
+          'Presigned URL response status:',
+          presignedResponse.statusCode
+        );
+        console.log('Presigned URL response data:', presignedResponse.data);
+
+        if (
+          presignedResponse.statusCode !== 200 &&
+          presignedResponse.statusCode !== 201
+        ) {
+          console.error('Presigned URL failed:', presignedResponse);
+          console.error(
+            'Presigned URL error message:',
+            presignedResponse.message
+          );
+          throw new Error(
+            `Failed to get presigned URL: ${presignedResponse.message || 'Unknown error'}`
+          );
+        }
+
+        // Upload file
+        await uploadFileToPresignedUrl(
+          presignedResponse.data.uploadUrl,
+          contractorPhotoFile
+        );
+
+        // Extract file key from fileUrl
+        const fileUrl = presignedResponse.data.publicUrl;
+        const fileKey = fileUrl.split('/').pop() || '';
+
+        setContractorFileKey(fileKey);
+        return fileUrl;
+      } catch (error) {
+        console.error('Error uploading contractor image:', error);
+        throw error;
+      } finally {
+        setContractorUploading(false);
+      }
+    }, [contractorPhotoFile]);
 
     // Initialize form with initial data
     const initializeForm = useCallback(() => {
@@ -197,72 +281,91 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
     ]);
 
     const handleSubmit = useCallback(
-      (e: React.FormEvent<HTMLFormElement>) => {
+      async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!validate()) return;
 
-        // After validation, all required fields including expiryDate are guaranteed to be defined
-        if (!expiryDate) {
-          throw new Error('Expiry date is required but validation passed'); // This should never happen
+        try {
+          // Upload contractor image if provided
+          let contractorProfileUrl: string | null = null;
+          if (contractorPhotoFile) {
+            contractorProfileUrl = await uploadContractorImage();
+          }
+
+          // After validation, all required fields including expiryDate are guaranteed to be defined
+          if (!expiryDate) {
+            throw new Error('Expiry date is required but validation passed'); // This should never happen
+          }
+
+          const payload: CompanyCreateFormData = {
+            name,
+            tagline,
+            about,
+            email,
+            country_code: phoneCountryCode,
+            phone_number: phoneNumber,
+            communication, // Now using communication field as address
+            website,
+            preferred_communication_method: preferredCommunication,
+            city,
+            pincode,
+            projects: projects || 'N/A', // Default value since field is hidden
+          };
+
+          // Add contractor information if provided
+          console.log('Contractor data before adding to payload:', {
+            contractorName,
+            contractorEmail,
+            contractorPhone,
+            contractorCountryCode,
+            contractorProfileUrl,
+          });
+
+          if (contractorName.trim()) {
+            payload.contractor_name = contractorName.trim();
+            console.log(
+              'Added contractor_name to payload:',
+              payload.contractor_name
+            );
+          }
+          if (contractorEmail.trim()) {
+            payload.contractor_email = contractorEmail.trim();
+            console.log(
+              'Added contractor_email to payload:',
+              payload.contractor_email
+            );
+          }
+          if (contractorPhone.trim()) {
+            payload.contractor_phone = `${contractorCountryCode} ${contractorPhone.trim()}`;
+            console.log(
+              'Added contractor_phone to payload:',
+              payload.contractor_phone
+            );
+          }
+          if (contractorProfileUrl) {
+            payload.contractor_profile_url = contractorProfileUrl;
+            console.log(
+              'Added contractor_profile_url to payload:',
+              payload.contractor_profile_url
+            );
+          }
+
+          console.log('Final payload before onSubmit:', payload);
+
+          // Add optional fields only if they're set
+          if (expiryDate) {
+            payload.expiry_date = expiryDate.toISOString().split('T')[0];
+          }
+
+          if (imageUrl) {
+            payload.image = imageUrl;
+          }
+
+          onSubmit(payload);
+        } catch (error) {
+          console.error('Error submitting form:', error);
+          // Optionally, display an error message to the user
         }
-
-        const payload: CompanyCreateFormData = {
-          name,
-          tagline,
-          about,
-          email,
-          country_code: phoneCountryCode,
-          phone_number: phoneNumber,
-          communication, // Now using communication field as address
-          website,
-          preferred_communication_method: preferredCommunication,
-          city,
-          pincode,
-          projects: projects || 'N/A', // Default value since field is hidden
-        };
-
-        // Add contractor information if provided
-        console.log('Contractor data before adding to payload:', {
-          contractorName,
-          contractorEmail,
-          contractorPhone,
-          contractorCountryCode,
-        });
-
-        if (contractorName.trim()) {
-          payload.contractor_name = contractorName.trim();
-          console.log(
-            'Added contractor_name to payload:',
-            payload.contractor_name
-          );
-        }
-        if (contractorEmail.trim()) {
-          payload.contractor_email = contractorEmail.trim();
-          console.log(
-            'Added contractor_email to payload:',
-            payload.contractor_email
-          );
-        }
-        if (contractorPhone.trim()) {
-          payload.contractor_phone = `${contractorCountryCode} ${contractorPhone.trim()}`;
-          console.log(
-            'Added contractor_phone to payload:',
-            payload.contractor_phone
-          );
-        }
-
-        console.log('Final payload before onSubmit:', payload);
-
-        // Add optional fields only if they're set
-        if (expiryDate) {
-          payload.expiry_date = expiryDate.toISOString().split('T')[0];
-        }
-
-        if (imageUrl) {
-          payload.image = imageUrl;
-        }
-
-        onSubmit(payload);
       },
       [
         validate,
@@ -285,6 +388,8 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
         contractorPhone,
         contractorCountryCode,
         onSubmit,
+        uploadContractorImage,
+        contractorPhotoFile,
       ]
     );
 
@@ -546,19 +651,20 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               <div className='flex items-center gap-6'>
                 <div className='h-[180px] w-[180px]'>
                   <PhotoUploadField
-                    photo={photoFile}
-                    onPhotoChange={handlePhotoChange}
-                    onDeletePhoto={handleDeletePhoto}
+                    photo={contractorPhotoFile}
+                    onPhotoChange={handleContractorPhotoChange}
+                    onDeletePhoto={handleDeleteContractorPhoto}
                     label={COMPANY_MESSAGES.UPLOAD_PHOTO_LABEL}
-                    uploading={uploading}
+                    uploading={contractorUploading}
                     existingImageUrl={
-                      fileKey && !photoFile
-                        ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
+                      contractorFileKey && !contractorPhotoFile
+                        ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+                          contractorFileKey
                         : ''
                     }
                     cardHeight='h-[180px]'
                   />
-                  {uploading && (
+                  {contractorUploading && (
                     <div className='text-xs mt-2'>
                       {COMPANY_MESSAGES.UPLOADING}
                     </div>
