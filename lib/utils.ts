@@ -6,14 +6,14 @@ import CryptoJS from 'crypto-js';
 
 // Encrypts a string using AES and a secret key from env
 export function encryptData(data: string): string {
-  const key = process.env.NEXT_PUBLIC_PERMISSIONS_ENCRYPTION_KEY || '';
+  const key = process.env['NEXT_PUBLIC_PERMISSIONS_ENCRYPTION_KEY'] || '';
   if (!key) throw new Error('Encryption key is not set');
   return CryptoJS.AES.encrypt(data, key).toString();
 }
 
 // Decrypts a string using AES and a secret key from env
 export function decryptData(ciphertext: string): string {
-  const key = process.env.NEXT_PUBLIC_PERMISSIONS_ENCRYPTION_KEY || '';
+  const key = process.env['NEXT_PUBLIC_PERMISSIONS_ENCRYPTION_KEY'] || '';
   if (!key) throw new Error('Encryption key is not set');
   const bytes = CryptoJS.AES.decrypt(ciphertext, key);
   return bytes.toString(CryptoJS.enc.Utf8);
@@ -99,7 +99,7 @@ export function getUserPermissionsFromStorage():
     if (!encrypted) {
       // Try cookies
       const match = document.cookie.match(/(?:^|; )user_permissions=([^;]*)/);
-      if (match) encrypted = decodeURIComponent(match[1]);
+      if (match && match[1]) encrypted = decodeURIComponent(match[1]);
     }
   }
   if (!encrypted) return null;

@@ -36,13 +36,11 @@ const menuOptions: MenuOption[] = [
     label: ROLE_MESSAGES.EDIT_MENU,
     action: ACTIONS.EDIT,
     icon: Edit2,
-    variant: 'default',
   },
   {
     label: ROLE_MESSAGES.DELETE_MENU,
     action: ACTIONS.DELETE,
     icon: Trash,
-    variant: 'destructive',
   },
 ];
 
@@ -213,7 +211,7 @@ const RoleManagement = () => {
                   buttonText={ROLE_MESSAGES.CREATE_ROLE_BUTTON}
                   onButtonClick={handleCreateRole}
                   description={ROLE_MESSAGES.NO_ROLES_FOUND_DESCRIPTION}
-                  showButton={canEdit}
+                  showButton={canEdit ?? false}
                 />
               </div>
             ) : (

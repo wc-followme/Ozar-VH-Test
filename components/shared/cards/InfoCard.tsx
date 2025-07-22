@@ -1,5 +1,5 @@
-import { ACTIONS } from '@/constants/common';
 import { Button } from '@/components/ui/button';
+import { ACTIONS } from '@/constants/common';
 import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React from 'react';
@@ -21,7 +21,16 @@ interface InfoCardProps {
   image?: string;
   menuOptions?: MenuOption[];
   onMenuAction?: (action: string) => void;
-  module?: 'categories' | 'roles' | 'users' | 'companies' | 'trades' | 'services' | 'materials' | 'tools' | 'jobs';
+  module?:
+    | 'categories'
+    | 'roles'
+    | 'users'
+    | 'companies'
+    | 'trades'
+    | 'services'
+    | 'materials'
+    | 'tools'
+    | 'jobs';
 }
 
 export const InfoCard: React.FC<InfoCardProps> = ({
@@ -33,9 +42,26 @@ export const InfoCard: React.FC<InfoCardProps> = ({
 }) => {
   // Get user permissions for the specified module
   const userPermissions = getUserPermissionsFromStorage();
-  const canEdit = module ? userPermissions?.[module]?.edit : true;
+
+  // Handle different permission structures for different modules
+  const getCanEdit = () => {
+    if (!module || !userPermissions?.[module]) return true;
+
+    switch (module) {
+      case 'companies':
+        return userPermissions.companies.assign_user;
+      case 'users':
+        return userPermissions.users.create;
+      case 'jobs':
+        return userPermissions.jobs.edit;
+      default:
+        return userPermissions[module]?.edit ?? true;
+    }
+  };
+
+  const canEdit = getCanEdit();
   const canArchive = module ? userPermissions?.[module]?.archive : true;
-  
+
   // Filter menu options based on permissions
   const filteredMenuOptions = menuOptions.filter(option => {
     if (option.action === ACTIONS.EDIT) {
@@ -46,7 +72,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
     }
     return true; // Show other actions by default
   });
-  
+
   // Only show menu if there are any visible options
   const showMenu = filteredMenuOptions.length > 0;
 
@@ -54,6 +80,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
     <div className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] w-full p-[10px] flex items-center gap-4 min-h-[64px] hover:shadow-md transition-shadow duration-200'>
       {/* Avatar */}
       <Avatar
+        name={tradeName}
         image=''
         height={48}
         width={48}

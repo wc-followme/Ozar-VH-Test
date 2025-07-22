@@ -7,9 +7,9 @@ import MaterialForm from '@/components/shared/forms/MaterialForm';
 import MaterialCardSkeleton from '@/components/shared/skeleton/MaterialCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ACTIONS } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { ACTIONS } from '@/constants/common';
 import {
   extractApiErrorMessage,
   getUserPermissionsFromStorage,
@@ -288,7 +288,7 @@ export default function MaterialManagementPage() {
               buttonText={MATERIAL_MESSAGES.ADD_MATERIAL_BUTTON}
               onButtonClick={() => setSideSheetOpen(true)}
               description={MATERIAL_MESSAGES.NO_MATERIALS_FOUND_DESCRIPTION}
-              showButton={canEdit}
+              showButton={canEdit ?? false}
             />
           </div>
         ) : (

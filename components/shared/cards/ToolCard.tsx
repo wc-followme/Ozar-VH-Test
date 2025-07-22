@@ -1,6 +1,5 @@
-import { ACTIONS } from '@/constants/common';
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
-import SideSheet from '@/components/shared/common/SideSheet';
+import { ACTIONS } from '@/constants/common';
 import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Edit2, Trash } from 'iconsax-react';
@@ -26,7 +25,6 @@ export default function ToolCard({
   videoCount,
   onDelete,
 }: ToolCardProps) {
-  const [editOpen, setEditOpen] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -34,23 +32,23 @@ export default function ToolCard({
   const userPermissions = getUserPermissionsFromStorage();
   const canEdit = userPermissions?.tools?.edit;
   const canArchive = userPermissions?.tools?.archive;
-  
+
   // Filter menu options based on permissions
   const menuOptions = [
     { label: 'Edit', action: ACTIONS.EDIT, icon: Edit2 },
     { label: 'Archive', action: ACTIONS.ARCHIVE, icon: Trash },
   ];
-  
+
   const filteredMenuOptions = menuOptions.filter(option => {
     if (option.action === ACTIONS.EDIT) {
       return canEdit;
     }
-    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
+    if (option.action === ACTIONS.ARCHIVE) {
       return canArchive;
     }
     return true; // Show other actions by default
   });
-  
+
   // Only show menu if there are any visible options
   const showMenu = filteredMenuOptions.length > 0;
 
@@ -78,9 +76,7 @@ export default function ToolCard({
           <h3 className='font-bold text-[var(--text)] truncate text-base mb-1'>
             {name}
           </h3>
-          <p className='text-sm text-[var(--text-secondary)] mb-2'>
-            {brand}
-          </p>
+          <p className='text-sm text-[var(--text-secondary)] mb-2'>{brand}</p>
           <div className='flex items-center gap-2'>
             <Badge className='bg-[var(--border-light)] text-[var(--text)] text-xs px-2 py-1'>
               Qty: {quantity}

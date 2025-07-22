@@ -34,7 +34,7 @@ export default function UserManagement() {
 
   // Get user permissions for users
   const userPermissions = getUserPermissionsFromStorage();
-  const canEdit = userPermissions?.users?.edit;
+  const canEdit = userPermissions?.users?.create;
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -251,7 +251,7 @@ export default function UserManagement() {
               description={USER_MESSAGES.NO_USERS_FOUND_DESCRIPTION}
               buttonText={USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
               onButtonClick={handleCreateUser}
-              showButton={canEdit}
+              showButton={canEdit ?? false}
             />
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>

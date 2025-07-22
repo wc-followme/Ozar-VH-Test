@@ -8,6 +8,7 @@ import ServiceForm from '@/components/shared/forms/ServiceForm';
 import ServiceCardSkeleton from '@/components/shared/skeleton/ServiceCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ACTIONS } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -285,7 +286,7 @@ export default function ServiceManagementPage() {
               buttonText={SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
               onButtonClick={() => setSideSheetOpen(true)}
               description={SERVICE_MESSAGES.NO_SERVICES_FOUND_DESCRIPTION}
-              showButton={canEdit}
+              showButton={canEdit ?? false}
             />
           </div>
         ) : (

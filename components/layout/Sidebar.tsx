@@ -32,7 +32,7 @@ export function Sidebar() {
       case 'Tools Management':
         return userPermissions?.tools?.view;
       case 'Jobs':
-        return userPermissions?.jobs?.view;
+        return userPermissions?.jobs?.edit;
       case 'Home':
         return true; // Always show home
       default:

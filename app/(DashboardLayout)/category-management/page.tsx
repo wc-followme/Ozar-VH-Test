@@ -7,8 +7,7 @@ import SideSheet from '@/components/shared/common/SideSheet';
 import CategoryForm from '@/components/shared/forms/CategoryForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { ACTIONS } from '@/constants/common';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { STATUS_CODES } from '@/constants/status-codes';
 import {
   apiService,
@@ -342,7 +341,7 @@ const CategoryManagement = () => {
               description={CATEGORY_MESSAGES.NO_CATEGORIES_FOUND_DESCRIPTION}
               buttonText={CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
               onButtonClick={() => setOpen(true)}
-              showButton={canEdit}
+              showButton={canEdit ?? false}
             />
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>

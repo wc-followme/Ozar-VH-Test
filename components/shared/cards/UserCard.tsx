@@ -54,7 +54,7 @@ export function UserCard({
 
   // Get user permissions for users
   const userPermissions = getUserPermissionsFromStorage();
-  const canEdit = userPermissions?.users?.edit;
+  const canEdit = userPermissions?.users?.create;
   const canArchive = userPermissions?.users?.archive;
 
   // Filter menu options based on permissions
@@ -93,6 +93,7 @@ export function UserCard({
       {/* Header with Avatar, User Info and Menu */}
       <div className='flex items-start gap-4 mb-2'>
         <Avatar
+          name={name}
           image={image}
           avatarColor={avatarColor}
           height={80}

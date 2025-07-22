@@ -4,8 +4,7 @@ import { CompanyCard } from '@/components/shared/cards/CompanyCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import NoDataFound from '@/components/shared/common/NoDataFound';
 import { useToast } from '@/components/ui/use-toast';
-import { ACTIONS } from '@/constants/common';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -14,20 +13,24 @@ import {
   formatDate,
   getUserPermissionsFromStorage,
 } from '@/lib/utils';
-import { MenuOption } from '@/types/menu';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import CompanyCardSkeleton from '../../../components/shared/skeleton/CompanyCardSkeleton';
 import { COMPANY_MESSAGES } from './company-messages';
 
-const menuOptions: MenuOption[] = [
-  { label: 'Edit', action: ACTIONS.EDIT, icon: Edit2, variant: 'default' },
+const menuOptions = [
+  {
+    label: 'Edit',
+    action: ACTIONS.EDIT,
+    icon: Edit2,
+    variant: 'default' as const,
+  },
   {
     label: 'Archive',
     action: ACTIONS.DELETE,
     icon: Trash,
-    variant: 'destructive',
+    variant: 'destructive' as const,
   },
 ];
 
@@ -43,7 +46,7 @@ export default function CompanyManagement() {
 
   // Get user permissions for companies
   const userPermissions = getUserPermissionsFromStorage();
-  const canEdit = userPermissions?.companies?.edit;
+  const canEdit = userPermissions?.companies?.assign_user;
 
   // Fetch companies
   useEffect(() => {
@@ -226,7 +229,7 @@ export default function CompanyManagement() {
               description={COMPANY_MESSAGES.NO_COMPANIES_FOUND_DESCRIPTION}
               buttonText={COMPANY_MESSAGES.ADD_COMPANY_BUTTON}
               onButtonClick={handleCreateCompany}
-              showButton={canEdit}
+              showButton={canEdit ?? false}
             />
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>

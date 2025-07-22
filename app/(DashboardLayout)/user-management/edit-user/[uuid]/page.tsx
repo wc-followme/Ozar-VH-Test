@@ -62,34 +62,15 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   // State for which accordion is open
   const [openAccordionIdx, setOpenAccordionIdx] = useState(0);
 
-  // Function to calculate access level for an accordion
+  // Function to calculate access level based on enabled permissions
   const calculateAccessLevel = (
     stripes: boolean[]
   ): 'Full Access' | 'Limited Access' | 'Restricted' => {
-    if (stripes.length === 0) return 'Restricted';
-
-    const enabledCount = stripes.filter(stripe => stripe).length;
+    const enabledCount = stripes.filter(Boolean).length;
     const totalCount = stripes.length;
-
     if (enabledCount === 0) return 'Restricted';
     if (enabledCount === totalCount) return 'Full Access';
     return 'Limited Access';
-  };
-
-  // Function to get badge color based on access level
-  const getBadgeColor = (
-    accessLevel: 'Full Access' | 'Limited Access' | 'Restricted'
-  ): string => {
-    switch (accessLevel) {
-      case 'Full Access':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'Limited Access':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'Restricted':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
   };
 
   // Function to generate JSON from accordions state

@@ -281,7 +281,7 @@ export default function TradeManagementPage() {
               buttonText={TRADE_MESSAGES.ADD_TRADE_BUTTON}
               onButtonClick={() => setSideSheetOpen(true)}
               description={TRADE_MESSAGES.NO_TRADES_FOUND_DESCRIPTION}
-              showButton={canEdit}
+              showButton={canEdit ?? false}
             />
           </div>
         ) : (

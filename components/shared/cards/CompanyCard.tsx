@@ -1,8 +1,8 @@
 'use client';
 
-import { ACTIONS } from '@/constants/common';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { ACTIONS } from '@/constants/common';
 import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import Image from 'next/image';
@@ -54,9 +54,9 @@ export function CompanyCard({
 
   // Get user permissions for companies
   const userPermissions = getUserPermissionsFromStorage();
-  const canEdit = userPermissions?.companies?.edit;
+  const canEdit = userPermissions?.companies?.assign_user;
   const canArchive = userPermissions?.companies?.archive;
-  
+
   // Filter menu options based on permissions and isDefault
   const permissionFilteredOptions = menuOptions.filter(option => {
     if (option.action === ACTIONS.EDIT) {
@@ -67,12 +67,14 @@ export function CompanyCard({
     }
     return true; // Show other actions by default
   });
-  
+
   // Apply isDefault filter on top of permission filter
   const filteredMenuOptions = isDefault
-    ? permissionFilteredOptions.filter(option => option.action !== ACTIONS.DELETE)
+    ? permissionFilteredOptions.filter(
+        option => option.action !== ACTIONS.DELETE
+      )
     : permissionFilteredOptions;
-  
+
   // Only show menu if there are any visible options
   const showMenu = filteredMenuOptions.length > 0;
 
