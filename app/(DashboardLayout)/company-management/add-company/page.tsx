@@ -73,6 +73,7 @@ export default function AddCompanyPage() {
   };
 
   const handleCreateCompany = async (data: CompanyCreateFormData) => {
+    console.log('Received form data in handleCreateCompany:', data);
     setFormLoading(true);
     try {
       const payload: CreateCompanyRequest = {
@@ -93,13 +94,28 @@ export default function AddCompanyPage() {
         image: fileKey,
       };
 
+      // Add contractor information if provided
+      if (data.contractor_name) {
+        payload.contractor_name = data.contractor_name;
+      }
+      if (data.contractor_email) {
+        payload.contractor_email = data.contractor_email;
+      }
+      if (data.contractor_phone) {
+        payload.contractor_phone = data.contractor_phone;
+      }
+
       // Add expiry_date only if it's provided
       if (data.expiry_date) {
         payload.expiry_date = data.expiry_date;
       }
 
+      console.log('Final API payload being sent:', payload);
+
       const response = await apiService.createCompany(payload);
-      showSuccessToast(extractApiSuccessMessage(response, COMPANY_MESSAGES.CREATE_SUCCESS));
+      showSuccessToast(
+        extractApiSuccessMessage(response, COMPANY_MESSAGES.CREATE_SUCCESS)
+      );
       router.push('/company-management');
     } catch (err: unknown) {
       // Handle auth errors first (will redirect to login if 401)

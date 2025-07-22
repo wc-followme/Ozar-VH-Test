@@ -37,6 +37,9 @@ export interface CompanyCreateFormData {
   pincode: string;
   projects: string;
   image?: string | undefined;
+  contractor_name?: string;
+  contractor_email?: string;
+  contractor_phone?: string;
 }
 
 // Company initial data for form (for edit mode)
@@ -55,6 +58,9 @@ export interface CompanyInitialData {
   pincode?: string;
   projects?: string;
   image?: string;
+  contractor_name?: string;
+  contractor_email?: string;
+  contractor_phone?: string;
 }
 
 // Props interface for company form component

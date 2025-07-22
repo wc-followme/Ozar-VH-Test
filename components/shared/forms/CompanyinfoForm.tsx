@@ -168,8 +168,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
       if (!email) newErrors.email = COMPANY_MESSAGES.EMAIL_REQUIRED;
       if (!phoneNumber)
         newErrors.phone_number = COMPANY_MESSAGES.PHONE_REQUIRED;
-      if (!communication)
-        newErrors.communication = COMPANY_MESSAGES.COMMUNICATION_REQUIRED;
+      if (!communication) newErrors.communication = 'Address is required';
       if (!website) newErrors.website = COMPANY_MESSAGES.WEBSITE_REQUIRED;
       if (!expiryDate)
         newErrors.expiry_date = COMPANY_MESSAGES.EXPIRY_DATE_REQUIRED;
@@ -178,7 +177,8 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
           COMPANY_MESSAGES.PREFERRED_COMMUNICATION_REQUIRED;
       if (!city) newErrors.city = COMPANY_MESSAGES.CITY_REQUIRED;
       if (!pincode) newErrors.pincode = COMPANY_MESSAGES.PINCODE_REQUIRED;
-      if (!projects) newErrors.projects = COMPANY_MESSAGES.PROJECTS_REQUIRED;
+      // Removed projects validation as field is commented out
+      // if (!projects) newErrors.projects = COMPANY_MESSAGES.PROJECTS_REQUIRED;
 
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
@@ -194,7 +194,6 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
       preferredCommunication,
       city,
       pincode,
-      projects,
     ]);
 
     const handleSubmit = useCallback(
@@ -214,13 +213,45 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
           email,
           country_code: phoneCountryCode,
           phone_number: phoneNumber,
-          communication,
+          communication, // Now using communication field as address
           website,
           preferred_communication_method: preferredCommunication,
           city,
           pincode,
-          projects,
+          projects: projects || 'N/A', // Default value since field is hidden
         };
+
+        // Add contractor information if provided
+        console.log('Contractor data before adding to payload:', {
+          contractorName,
+          contractorEmail,
+          contractorPhone,
+          contractorCountryCode,
+        });
+
+        if (contractorName.trim()) {
+          payload.contractor_name = contractorName.trim();
+          console.log(
+            'Added contractor_name to payload:',
+            payload.contractor_name
+          );
+        }
+        if (contractorEmail.trim()) {
+          payload.contractor_email = contractorEmail.trim();
+          console.log(
+            'Added contractor_email to payload:',
+            payload.contractor_email
+          );
+        }
+        if (contractorPhone.trim()) {
+          payload.contractor_phone = `${contractorCountryCode} ${contractorPhone.trim()}`;
+          console.log(
+            'Added contractor_phone to payload:',
+            payload.contractor_phone
+          );
+        }
+
+        console.log('Final payload before onSubmit:', payload);
 
         // Add optional fields only if they're set
         if (expiryDate) {
@@ -249,6 +280,10 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
         pincode,
         projects,
         imageUrl,
+        contractorName,
+        contractorEmail,
+        contractorPhone,
+        contractorCountryCode,
         onSubmit,
       ]
     );
@@ -367,19 +402,20 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               </div>
               <FormErrorMessage message={errors.phone_number || ''} />
             </div>
+            {/* Address field - using communication state since it's not used elsewhere */}
             <div className='space-y-2 col-span-2'>
-              <Label htmlFor='email' className='field-label'>
+              <Label htmlFor='address' className='field-label'>
                 Address
               </Label>
               <Input
-                id='email'
-                type='email'
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder={COMPANY_MESSAGES.ENTER_EMAIL}
+                id='address'
+                type='text'
+                value={communication}
+                onChange={e => setCommunication(e.target.value)}
+                placeholder='Enter company address'
                 className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
               />
-              <FormErrorMessage message={errors.email || ''} />
+              <FormErrorMessage message={errors.communication || ''} />
             </div>
 
             {/* City */}

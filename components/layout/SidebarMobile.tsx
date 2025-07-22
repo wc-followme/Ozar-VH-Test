@@ -1,7 +1,9 @@
 import { sidebarItems } from '@/constants/sidebar-items';
+import type { UserPermissions } from '@/lib/api';
 import { cn, getUserPermissionsFromStorage } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Sheet, SheetContent, SheetTitle } from '../ui/sheet';
 
 interface SidebarMobileProps {
@@ -10,13 +12,25 @@ interface SidebarMobileProps {
 }
 
 export function SidebarMobile({ open, onOpenChange }: SidebarMobileProps) {
+  const [userPermissions, setUserPermissions] =
+    useState<UserPermissions | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
   const pathname = usePathname();
 
-  // Get user permissions
-  const userPermissions = getUserPermissionsFromStorage();
+  // Handle hydration and permissions loading
+  useEffect(() => {
+    setIsHydrated(true);
+    const permissions = getUserPermissionsFromStorage();
+    setUserPermissions(permissions);
+  }, []);
 
   // Filter sidebar items based on permissions
   const filteredSidebarItems = sidebarItems.filter(item => {
+    // During SSR or before hydration, show all items to prevent mismatch
+    if (!isHydrated) {
+      return true;
+    }
+
     switch (item.title) {
       case 'Category Management':
         return userPermissions?.categories?.view;

@@ -242,6 +242,9 @@ export interface CreateCompanyRequest {
   is_default: boolean;
   status: 'ACTIVE' | 'INACTIVE';
   image?: string;
+  contractor_name?: string;
+  contractor_email?: string;
+  contractor_phone?: string;
 }
 
 export interface CreateCompanyResponse {
