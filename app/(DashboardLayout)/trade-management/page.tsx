@@ -8,9 +8,13 @@ import TradeForm from '@/components/shared/forms/TradeForm';
 import TradeCardSkeleton from '@/components/shared/skeleton/TradeCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ACTIONS } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { TRADE_MESSAGES } from './trade-messages';
@@ -24,13 +28,13 @@ const menuOptions: {
 }[] = [
   {
     label: TRADE_MESSAGES.EDIT_MENU,
-    action: 'edit',
+    action: ACTIONS.EDIT,
     icon: Edit2,
     variant: 'default',
   },
   {
     label: TRADE_MESSAGES.DELETE_MENU,
-    action: 'delete',
+    action: ACTIONS.DELETE,
     icon: Trash,
     variant: 'destructive',
   },
@@ -52,6 +56,10 @@ export default function TradeManagementPage() {
   );
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+
+  // Get user permissions for trades
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.trades?.edit;
 
   const fetchTrades = useCallback(
     async (targetPage = 1, append = false) => {
@@ -147,11 +155,11 @@ export default function TradeManagementPage() {
     const trade = trades[idx];
     if (!trade) return;
 
-    if (action === 'edit') {
+    if (action === ACTIONS.EDIT) {
       setEditingTradeUuid(trade.uuid);
       setSideSheetOpen(true);
     }
-    if (action === 'delete') {
+    if (action === ACTIONS.DELETE) {
       setDeleteIdx(idx);
       setDeleteTradeName(trade.name || '');
       setModalOpen(true);
@@ -251,9 +259,14 @@ export default function TradeManagementPage() {
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
         <h2 className='page-title'>{TRADE_MESSAGES.TRADE_MANAGEMENT_TITLE}</h2>
-        <Button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
-          {TRADE_MESSAGES.ADD_TRADE_BUTTON}
-        </Button>
+        {canEdit && (
+          <Button
+            className='btn-primary'
+            onClick={() => setSideSheetOpen(true)}
+          >
+            {TRADE_MESSAGES.ADD_TRADE_BUTTON}
+          </Button>
+        )}
       </div>
       {/* Trade Grid */}
       <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 xl:gap-6'>
@@ -268,6 +281,7 @@ export default function TradeManagementPage() {
               buttonText={TRADE_MESSAGES.ADD_TRADE_BUTTON}
               onButtonClick={() => setSideSheetOpen(true)}
               description={TRADE_MESSAGES.NO_TRADES_FOUND_DESCRIPTION}
+              showButton={canEdit ?? false}
             />
           </div>
         ) : (
@@ -278,6 +292,7 @@ export default function TradeManagementPage() {
               category={`${trade.categories?.length || 0} Category${(trade.categories?.length || 0) !== 1 ? 's' : ''}`}
               menuOptions={menuOptions}
               onMenuAction={action => handleMenuAction(action, idx)}
+              module='trades'
             />
           ))
         )}

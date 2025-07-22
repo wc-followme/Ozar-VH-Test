@@ -8,9 +8,13 @@ import ServiceForm from '@/components/shared/forms/ServiceForm';
 import ServiceCardSkeleton from '@/components/shared/skeleton/ServiceCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ACTIONS } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { SERVICE_MESSAGES } from './service-messages';
@@ -24,13 +28,13 @@ const menuOptions: {
 }[] = [
   {
     label: SERVICE_MESSAGES.EDIT_MENU,
-    action: 'edit',
+    action: ACTIONS.EDIT,
     icon: Edit2,
     variant: 'default',
   },
   {
     label: SERVICE_MESSAGES.DELETE_MENU,
-    action: 'delete',
+    action: ACTIONS.DELETE,
     icon: Trash,
     variant: 'destructive',
   },
@@ -52,6 +56,10 @@ export default function ServiceManagementPage() {
   >(undefined);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+
+  // Get user permissions for services
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.services?.edit;
 
   const fetchServices = useCallback(
     async (targetPage = 1, append = false) => {
@@ -256,9 +264,14 @@ export default function ServiceManagementPage() {
         <h2 className='page-title'>
           {SERVICE_MESSAGES.SERVICE_MANAGEMENT_TITLE}
         </h2>
-        <Button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
-          {SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
-        </Button>
+        {canEdit && (
+          <Button
+            className='btn-primary'
+            onClick={() => setSideSheetOpen(true)}
+          >
+            {SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
+          </Button>
+        )}
       </div>
       {/* Service Grid */}
       <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 xl:gap-6'>
@@ -273,6 +286,7 @@ export default function ServiceManagementPage() {
               buttonText={SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
               onButtonClick={() => setSideSheetOpen(true)}
               description={SERVICE_MESSAGES.NO_SERVICES_FOUND_DESCRIPTION}
+              showButton={canEdit ?? false}
             />
           </div>
         ) : (
@@ -283,6 +297,7 @@ export default function ServiceManagementPage() {
               category={`${service.trades?.length || 0} Trade${(service.trades?.length || 0) !== 1 ? 's' : ''}`}
               menuOptions={menuOptions}
               onMenuAction={action => handleMenuAction(action, idx)}
+              module='services'
             />
           ))
         )}

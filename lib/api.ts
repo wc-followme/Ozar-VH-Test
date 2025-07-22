@@ -242,6 +242,10 @@ export interface CreateCompanyRequest {
   is_default: boolean;
   status: 'ACTIVE' | 'INACTIVE';
   image?: string;
+  contractor_name?: string;
+  contractor_email?: string;
+  contractor_phone?: string;
+  contractor_profile_url?: string;
 }
 
 export interface CreateCompanyResponse {
@@ -349,6 +353,71 @@ export interface GetCategoryResponse {
   statusCode: number;
   message: string;
   data: Category;
+}
+
+// User permissions interfaces
+export interface UserPermissions {
+  roles: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+  };
+  users: {
+    view: boolean;
+    create: boolean;
+    customize: boolean;
+    archive: boolean;
+  };
+  companies: {
+    view: boolean;
+    assign_user: boolean;
+    archive: boolean;
+  };
+  categories: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+  };
+  trades: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+  };
+  services: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+  };
+  materials: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+  };
+  tools: {
+    view: boolean;
+    edit: boolean;
+    archive: boolean;
+    history: boolean;
+  };
+  jobs: {
+    edit: boolean;
+    archive: boolean;
+  };
+}
+
+export interface GetUserPermissionsResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    permissions: UserPermissions;
+    [key: string]: any; // Allow other user properties
+  };
+}
+
+export interface UpdateUserPermissionsResponse {
+  statusCode: number;
+  message: string;
+  data?: UserPermissions;
 }
 
 export interface GetCompanyResponse {
@@ -621,7 +690,7 @@ class ApiService {
   async logout() {
     return this.makeRequest('/auth/logout', {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: this.getRoleHeaders(),
     });
   }
 
@@ -908,6 +977,42 @@ class ApiService {
       method: 'POST',
       headers: this.getRoleHeaders(),
       body: JSON.stringify({ current_password, new_password }),
+    });
+  }
+
+  // Get user permissions
+  async getUserPermissions(
+    userUuid: string
+  ): Promise<GetUserPermissionsResponse> {
+    return this.makeRequest<GetUserPermissionsResponse>(
+      `/users/${userUuid}/permissions`,
+      {
+        method: 'GET',
+        headers: this.getRoleHeaders(),
+      }
+    );
+  }
+
+  // Update user permissions
+  async updateUserPermissions(
+    userUuid: string,
+    permissions: UserPermissions
+  ): Promise<UpdateUserPermissionsResponse> {
+    return this.makeRequest<UpdateUserPermissionsResponse>(
+      `/users/${userUuid}/permissions`,
+      {
+        method: 'PATCH',
+        headers: this.getRoleHeaders(),
+        body: JSON.stringify(permissions),
+      }
+    );
+  }
+
+  // Fetch current user's permissions
+  async getMyPermissions(): Promise<any> {
+    return this.makeRequest('/users/my-permissions', {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
     });
   }
 

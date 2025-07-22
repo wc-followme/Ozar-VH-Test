@@ -5,10 +5,14 @@ import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import NoDataFound from '@/components/shared/common/NoDataFound';
 import SelectField from '@/components/shared/common/SelectField';
 import { useToast } from '@/components/ui/use-toast';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { apiService, FetchUsersResponse, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  extractApiSuccessMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -19,14 +23,18 @@ import { USER_MESSAGES } from './user-messages';
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [filter, setFilter] = useState<string>('all');
-  const [loading, setLoading] = useState<boolean>(true);
+  const [filter, setFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
   const [_page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [isNavigating, setIsNavigating] = useState(false);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
   const router = useRouter();
+
+  // Get user permissions for users
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.users?.create;
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -182,10 +190,10 @@ export default function UserManagement() {
   }, [router]);
 
   const menuOptions: MenuOption[] = [
-    { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' },
+    { label: 'Edit', action: ACTIONS.EDIT, icon: Edit2, variant: 'default' },
     {
       label: 'Archive',
-      action: 'delete',
+      action: ACTIONS.DELETE,
       icon: Trash,
       variant: 'destructive',
     },
@@ -217,13 +225,15 @@ export default function UserManagement() {
             triggerClassName='bg-[var(--white-background)] rounded-[30px] border-2 border-[var(--border-dark)] h-[42px]'
             optionClassName='text-[var(--text-dark)] hover:bg-[var(--select-option)] focus:bg-[var(--select-option)] cursor-pointer rounded-[5px]'
           />
-          <button
-            onClick={handleCreateUser}
-            className='btn-primary'
-            disabled={loading}
-          >
-            {USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
-          </button>
+          {canEdit && (
+            <button
+              onClick={handleCreateUser}
+              className='btn-primary'
+              disabled={loading}
+            >
+              {USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
+            </button>
+          )}
         </div>
       </div>
       {/* Initial Loading State */}
@@ -241,6 +251,7 @@ export default function UserManagement() {
               description={USER_MESSAGES.NO_USERS_FOUND_DESCRIPTION}
               buttonText={USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
               onButtonClick={handleCreateUser}
+              showButton={canEdit ?? false}
             />
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>

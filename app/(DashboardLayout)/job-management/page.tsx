@@ -13,7 +13,6 @@ import { StatsCard } from '../../../components/shared/cards/StatsCard';
 import ComingSoon from '../../../components/shared/common/ComingSoon';
 import SideSheet from '../../../components/shared/common/SideSheet';
 import { CreateJobForm } from '../../../components/shared/forms/CreateJobForm';
-import JobManagementPageSkeleton from '../../../components/shared/skeleton/JobManagementPageSkeleton';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import {
@@ -22,6 +21,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '../../../components/ui/tabs';
+import { getUserPermissionsFromStorage } from '../../../lib/utils';
 import { JOB_MESSAGES } from './job-messages';
 import {
   CreateJobFormData,
@@ -61,6 +61,9 @@ export default function JobManagement() {
     }
   };
 
+  // Get user permissions for jobs
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.jobs?.edit;
   // Function to fetch jobs based on selected tab
   const fetchJobsByTab = async (tab: string) => {
     try {
@@ -237,186 +240,179 @@ export default function JobManagement() {
   ];
 
   return (
-    <div className=''>
-      {loading ? (
-        <JobManagementPageSkeleton />
-      ) : (
-        <div className=''>
-          {/* Stats Cards */}
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-8'>
-            {stats.map(({ id, icon, value, label, iconColor, bgColor }) => (
-              <StatsCard
-                key={id}
-                icon={icon}
-                value={value}
-                label={label}
-                iconColor={iconColor}
-                bgColor={bgColor}
-              />
-            ))}
-          </div>
+    <div className='w-full'>
+      {/* Stats Cards */}
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
+        {stats.map((stat, index) => (
+          <StatsCard
+            key={index}
+            icon={stat.icon}
+            value={stat.value}
+            label={stat.label}
+            iconColor={stat.iconColor}
+            bgColor={stat.bgColor}
+          />
+        ))}
+      </div>
 
-          {/* Jobs Grid */}
-          <div>
-            <Tabs
-              value={selectedTab}
-              onValueChange={handleTabChange}
-              className='w-full'
-            >
-              <div className='flex items-center gap-2 w-full'>
-                <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start flex-wrap max-w-fit'>
-                  <TabsTrigger
-                    value='newLeads'
-                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                  >
-                    New Leads
-                    <Badge
-                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-limebrand text-white' : 'bg-transparent text-limebrand'}`}
-                    >
-                      {filterCounts.new_leads}
-                    </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value='info'
-                    className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                  >
-                    Need Attention{' '}
-                    <Badge
-                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
-                    >
-                      {filterCounts.need_attention}
-                    </Badge>
-                  </TabsTrigger>
-
-                  <TabsTrigger
-                    value='ongoingJob'
-                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                  >
-                    Ongoing Job
-                    <Badge
-                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
-                    >
-                      {filterCounts.ongoing_jobs}
-                    </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value='waitingOnClient'
-                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                  >
-                    Waiting on Client
-                    <Badge
-                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'waitingOnClient' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
-                    >
-                      {filterCounts.waiting_on_client}
-                    </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value='archive'
-                    className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
-                  >
-                    Archive
-                    <Badge
-                      className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
-                    >
-                      {filterCounts.archived}
-                    </Badge>
-                  </TabsTrigger>
-                </TabsList>
-                <Button
-                  variant='ghost'
-                  className='btn-primary !h-[48px] ml-auto hover:text-white'
-                  onClick={() => setIsOpen(true)}
+      {/* Jobs Grid */}
+      <div>
+        <Tabs
+          value={selectedTab}
+          onValueChange={handleTabChange}
+          className='w-full'
+        >
+          <div className='flex items-center gap-2 w-full'>
+            <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start flex-wrap max-w-fit'>
+              <TabsTrigger
+                value='newLeads'
+                className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+              >
+                New Leads
+                <Badge
+                  className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-limebrand text-white' : 'bg-transparent text-limebrand'}`}
                 >
-                  {JOB_MESSAGES.ADD_JOB_BUTTON}
-                </Button>
-              </div>
-              <TabsContent value='newLeads' className='pt-8'>
-                {jobs.length === 0 ? (
-                  <NoDataFound
-                    description={JOB_MESSAGES.NO_JOBS_FOUND_DESCRIPTION}
-                    buttonText={JOB_MESSAGES.ADD_JOB_BUTTON}
-                    onButtonClick={() => setIsOpen(true)}
-                  />
-                ) : (
-                  <div className='grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
-                    {jobs.map((job: Job) => (
-                      <JobCard
-                        key={job.id}
-                        job={{
-                          id: job.uuid,
-                          title: job.client_name || 'Project Name',
-                          jobId: job.project_id || 'Job#789',
-                          progress: 50, // Static value since not in API
-                          image:
-                            job.job_image ||
-                            'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                          email: job.client_email || 'tanya.hill@example.com',
-                          address:
-                            job.client_address ||
-                            '2972 Westheimer Rd. Santa Ana, Illinois 85486',
-                          startDate: job.project_start_date
-                            ? new Date(
-                                job.project_start_date
-                              ).toLocaleDateString()
-                            : '15 Mar 2025',
-                          daysLeft: 96, // Static value since not in API
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
+                  {filterCounts.new_leads}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger
+                value='info'
+                className='px-4 py-2 text-sm xl:text-base gap-3 transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+              >
+                Need Attention{' '}
+                <Badge
+                  className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
+                >
+                  {filterCounts.need_attention}
+                </Badge>
+              </TabsTrigger>
 
-              <TabsContent value='info' className='pt-8'>
-                <ComingSoon />
-              </TabsContent>
-
-              <TabsContent value='ongoingJob' className='p-8'>
-                <ComingSoon />
-              </TabsContent>
-              <TabsContent value='waitingOnClient' className='p-8'>
-                <ComingSoon />
-              </TabsContent>
-              <TabsContent value='archive' className='pt-8'>
-                {jobs.length === 0 ? (
-                  <NoDataFound
-                    description={JOB_MESSAGES.NO_JOBS_FOUND_DESCRIPTION}
-                    buttonText={JOB_MESSAGES.ADD_JOB_BUTTON}
-                    onButtonClick={() => setIsOpen(true)}
-                  />
-                ) : (
-                  <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
-                    {jobs.map((job: Job) => (
-                      <JobCard
-                        key={job.id}
-                        job={{
-                          id: job.uuid,
-                          title: job.client_name || 'Project Name',
-                          jobId: job.project_id || 'Job#789',
-                          progress: 50, // Static value since not in API
-                          image:
-                            job.job_image ||
-                            'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                          email: job.client_email || 'tanya.hill@example.com',
-                          address:
-                            job.client_address ||
-                            '2972 Westheimer Rd. Santa Ana, Illinois 85486',
-                          startDate: job.project_start_date
-                            ? new Date(
-                                job.project_start_date
-                              ).toLocaleDateString()
-                            : '15 Mar 2025',
-                          daysLeft: 96, // Static value since not in API
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
+              <TabsTrigger
+                value='ongoingJob'
+                className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+              >
+                Ongoing Job
+                <Badge
+                  className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                >
+                  {filterCounts.ongoing_jobs}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger
+                value='waitingOnClient'
+                className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+              >
+                Waiting on Client
+                <Badge
+                  className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'waitingOnClient' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                >
+                  {filterCounts.waiting_on_client}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger
+                value='archive'
+                className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+              >
+                Archive
+                <Badge
+                  className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
+                >
+                  {filterCounts.archived}
+                </Badge>
+              </TabsTrigger>
+            </TabsList>
+            {canEdit && (
+              <Button
+                variant='ghost'
+                className='btn-primary !h-[48px] ml-auto hover:text-white'
+                onClick={() => setIsOpen(true)}
+              >
+                {JOB_MESSAGES.ADD_JOB_BUTTON}
+              </Button>
+            )}
           </div>
-        </div>
-      )}
+          <TabsContent value='newLeads' className='pt-8'>
+            {jobs.length === 0 ? (
+              <NoDataFound
+                description={JOB_MESSAGES.NO_JOBS_FOUND_DESCRIPTION}
+                buttonText={JOB_MESSAGES.ADD_JOB_BUTTON}
+                onButtonClick={() => setIsOpen(true)}
+              />
+            ) : (
+              <div className='grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
+                {jobs.map((job: Job) => (
+                  <JobCard
+                    key={job.id}
+                    job={{
+                      id: job.uuid,
+                      title: job.client_name || 'Project Name',
+                      jobId: job.project_id || 'Job#789',
+                      progress: 50, // Static value since not in API
+                      image:
+                        job.job_image ||
+                        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
+                      email: job.client_email || 'tanya.hill@example.com',
+                      address:
+                        job.client_address ||
+                        '2972 Westheimer Rd. Santa Ana, Illinois 85486',
+                      startDate: job.project_start_date
+                        ? new Date(job.project_start_date).toLocaleDateString()
+                        : '15 Mar 2025',
+                      daysLeft: 96, // Static value since not in API
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value='info' className='pt-8'>
+            <ComingSoon />
+          </TabsContent>
+
+          <TabsContent value='ongoingJob' className='p-8'>
+            <ComingSoon />
+          </TabsContent>
+          <TabsContent value='waitingOnClient' className='p-8'>
+            <ComingSoon />
+          </TabsContent>
+          <TabsContent value='archive' className='pt-8'>
+            {jobs.length === 0 ? (
+              <NoDataFound
+                description={JOB_MESSAGES.NO_JOBS_FOUND_DESCRIPTION}
+                buttonText={JOB_MESSAGES.ADD_JOB_BUTTON}
+                onButtonClick={() => setIsOpen(true)}
+              />
+            ) : (
+              <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
+                {jobs.map((job: Job) => (
+                  <JobCard
+                    key={job.id}
+                    job={{
+                      id: job.uuid,
+                      title: job.client_name || 'Project Name',
+                      jobId: job.project_id || 'Job#789',
+                      progress: 50, // Static value since not in API
+                      image:
+                        job.job_image ||
+                        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
+                      email: job.client_email || 'tanya.hill@example.com',
+                      address:
+                        job.client_address ||
+                        '2972 Westheimer Rd. Santa Ana, Illinois 85486',
+                      startDate: job.project_start_date
+                        ? new Date(job.project_start_date).toLocaleDateString()
+                        : '15 Mar 2025',
+                      daysLeft: 96, // Static value since not in API
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+
       <SideSheet
         open={isOpen}
         onOpenChange={open => {

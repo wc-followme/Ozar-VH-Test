@@ -39,11 +39,12 @@ const CreateRole = () => {
   const onSubmit = async (data: CreateRoleFormData) => {
     setIsSubmitting(true);
     try {
-      const roleData: CreateRoleRequest = {
+      const roleData: CreateRoleRequest & { permissions?: any } = {
         name: data.name,
         description: data.description,
         icon: data.icon,
         status: 'ACTIVE', // Default to ACTIVE when creating
+        permissions: data.permissions,
       };
       const response: ApiResponse = await apiService.createRole(roleData);
       if (

@@ -1,13 +1,57 @@
 'use client';
 import { sidebarItems } from '@/constants/sidebar-items';
-import { cn } from '@/lib/utils';
+import type { UserPermissions } from '@/lib/api';
+import { cn, getUserPermissionsFromStorage } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [userPermissions, setUserPermissions] =
+    useState<UserPermissions | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
   const pathname = usePathname();
+
+  // Handle hydration and permissions loading
+  useEffect(() => {
+    setIsHydrated(true);
+    const permissions = getUserPermissionsFromStorage();
+    setUserPermissions(permissions);
+  }, []);
+
+  // Filter sidebar items based on permissions
+  const filteredSidebarItems = sidebarItems.filter(item => {
+    // During SSR or before hydration, show all items to prevent mismatch
+    if (!isHydrated) {
+      return true;
+    }
+
+    switch (item.title) {
+      case 'Category Management':
+        return userPermissions?.categories?.view;
+      case 'Role Management':
+        return userPermissions?.roles?.view;
+      case 'User Management':
+        return userPermissions?.users?.view;
+      case 'Company Management':
+        return userPermissions?.companies?.view;
+      case 'Trade Management':
+        return userPermissions?.trades?.view;
+      case 'Service Management':
+        return userPermissions?.services?.view;
+      case 'Material Management':
+        return userPermissions?.materials?.view;
+      case 'Tools Management':
+        return userPermissions?.tools?.view;
+      case 'Jobs':
+        return userPermissions?.jobs?.edit;
+      case 'Home':
+        return true; // Always show home
+      default:
+        return true; // Show other items by default
+    }
+  });
 
   return (
     <aside
@@ -46,7 +90,7 @@ export function Sidebar() {
 
           {/* Sidebar Links */}
           <ul className='py-2 [&>li+li]:mt-0.5 flex-1 overflow-auto '>
-            {sidebarItems.map(({ title, href, icon: Icon }, index) => (
+            {filteredSidebarItems.map(({ title, href, icon: Icon }, index) => (
               <li key={index}>
                 <Link
                   href={href}

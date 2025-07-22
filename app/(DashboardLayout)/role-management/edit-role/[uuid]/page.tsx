@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ROLE_MESSAGES } from '../../role-messages';
-import type { ApiResponse, Role, UpdateRoleRequest } from '../../types';
+import type { ApiResponse, Role } from '../../types';
 
 // Dynamic import for better performance
 const RoleForm = dynamic(
@@ -56,6 +56,7 @@ const EditRolePage = () => {
             name: data.name || '',
             description: data.description || '',
             icon: data.icon || '',
+            permissions: (data as any).permissions || undefined,
           });
         }
       } catch (err: unknown) {
@@ -70,10 +71,12 @@ const EditRolePage = () => {
   const onSubmit = async (data: CreateRoleFormData) => {
     setIsSubmitting(true);
     try {
-      const response = (await apiService.updateRoleDetails(
-        uuid,
-        data as UpdateRoleRequest
-      )) as ApiResponse;
+      const response = (await apiService.updateRoleDetails(uuid, {
+        name: data.name,
+        description: data.description,
+        icon: data.icon,
+        status: 'ACTIVE',
+      })) as ApiResponse;
       if (
         response.statusCode === STATUS_CODES.OK ||
         response.statusCode === STATUS_CODES.CREATED
