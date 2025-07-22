@@ -88,3 +88,25 @@ export function formatDateTime(dateString: string): string {
     return dateString; // Return original string if parsing fails
   }
 }
+
+// Get user permissions from localStorage or cookies (decrypted)
+export function getUserPermissionsFromStorage():
+  | import('@/lib/api').UserPermissions
+  | null {
+  let encrypted = '';
+  if (typeof window !== 'undefined') {
+    encrypted = localStorage.getItem('user_permissions') || '';
+    if (!encrypted) {
+      // Try cookies
+      const match = document.cookie.match(/(?:^|; )user_permissions=([^;]*)/);
+      if (match) encrypted = decodeURIComponent(match[1]);
+    }
+  }
+  if (!encrypted) return null;
+  try {
+    const decrypted = decryptData(encrypted);
+    return JSON.parse(decrypted);
+  } catch {
+    return null;
+  }
+}

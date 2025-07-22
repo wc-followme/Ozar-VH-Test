@@ -175,7 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const permissionsRes = await apiService.getMyPermissions();
           if (permissionsRes && permissionsRes.data) {
-            const encrypted = encryptData(JSON.stringify(permissionsRes.data));
+            const encrypted = encryptData(JSON.stringify(permissionsRes.data.permissions));
             localStorage.setItem('user_permissions', encrypted);
             setCookie('user_permissions', encrypted);
             console.log('🔒 User permissions encrypted and stored');
