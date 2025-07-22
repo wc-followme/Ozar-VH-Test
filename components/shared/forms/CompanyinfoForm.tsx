@@ -269,11 +269,13 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
     }
 
     return (
-      <form onSubmit={handleSubmit} className='space-y-6'>
+      <form onSubmit={handleSubmit} className='space-y-4 sm:space-y-6'>
         {/* Company Information */}
         <div>
-          <h2 className='text-lg font-bold mb-4'>Company Information</h2>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <h2 className='text-base sm:text-lg font-bold mb-3 sm:mb-4'>
+            Company Information
+          </h2>
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4'>
             {/* Company Name */}
             <div className='space-y-2'>
               <Label htmlFor='company-name' className='field-label'>
@@ -304,7 +306,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               <FormErrorMessage message={errors.tagline || ''} />
             </div>
             {/* About - Full Width */}
-            <div className='space-y-2 col-span-2'>
+            <div className='space-y-2 sm:col-span-2'>
               <Label htmlFor='about' className='field-label'>
                 {COMPANY_MESSAGES.ABOUT_LABEL}
               </Label>
@@ -382,7 +384,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               </div>
               <FormErrorMessage message={errors.phone_number || ''} />
             </div>
-            <div className='space-y-2 col-span-2'>
+            <div className='space-y-2 sm:col-span-2'>
               <Label htmlFor='email' className='field-label'>
                 Address
               </Label>
@@ -518,15 +520,15 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                 message={errors.preferred_communication_method || ''}
               />
             </div>
-            <div className='col-span-2 pt-6'>
-              <h2 className='text-lg font-bold mb-4'>
+            <div className='sm:col-span-2 pt-4 sm:pt-6'>
+              <h2 className='text-base sm:text-lg font-bold mb-3 sm:mb-4'>
                 Contractor Information{' '}
                 <span className='font-medium text-[var(--text-secondary)]'>
                   (Optional)
                 </span>
               </h2>
-              <div className='flex items-center gap-6'>
-                <div className='h-[180px] w-[180px]'>
+              <div className='flex flex-col sm:flex-row items-center gap-4 sm:gap-6'>
+                <div className='h-[150px] w-[150px] sm:h-[180px] sm:w-[180px]'>
                   <PhotoUploadField
                     photo={photoFile}
                     onPhotoChange={handlePhotoChange}
@@ -538,7 +540,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                         ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') + fileKey
                         : ''
                     }
-                    cardHeight='h-[180px]'
+                    cardHeight='h-[150px] sm:h-[180px]'
                   />
                   {uploading && (
                     <div className='text-xs mt-2'>
@@ -546,9 +548,9 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                     </div>
                   )}
                 </div>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4 flex-1'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 flex-1 w-full'>
                   {/* Contractor Name */}
-                  <div className='col-span-2 space-y-2'>
+                  <div className='sm:col-span-2 space-y-2'>
                     <Label htmlFor='contractor-name' className='field-label'>
                       {COMPANY_MESSAGES.CONTRACTOR_NAME_LABEL}
                     </Label>
@@ -663,7 +665,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
         </div>
 
         {/* Form Actions */}
-        <div className='flex items-center justify-end gap-4 pt-6'>
+        <div className='flex sm:items-center justify-end gap-3 sm:gap-4 pt-4 sm:pt-6'>
           <Button
             type='button'
             variant='outline'
@@ -676,7 +678,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
           <Button
             type='submit'
             disabled={loading}
-            className='btn-primary !h-12 !px-12'
+            className='btn-primary !h-12 !px-8 sm:!px-12'
           >
             {loading
               ? 'Creating...'

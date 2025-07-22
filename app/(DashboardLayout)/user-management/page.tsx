@@ -199,9 +199,9 @@ export default function UserManagement() {
   return (
     <div className='w-full overflow-y-auto'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-4 xl:mb-8'>
+      <div className='flex flex-col sm:flex-row gap-4 md:items-center justify-between mb-4 xl:mb-8'>
         <h2 className='page-title'>{USER_MESSAGES.USER_MANAGEMENT_TITLE}</h2>
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-2 lg:gap-4 justify-end'>
           <SelectField
             value={filter}
             onValueChange={setFilter}
@@ -237,11 +237,13 @@ export default function UserManagement() {
         <>
           {/* User Grid */}
           {users.length === 0 && !loading ? (
-            <NoDataFound
-              description={USER_MESSAGES.NO_USERS_FOUND_DESCRIPTION}
-              buttonText={USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
-              onButtonClick={handleCreateUser}
-            />
+            <div className='h-full md:h-[calc(100vh_-_220px)] w-full'>
+              <NoDataFound
+                description={USER_MESSAGES.NO_USERS_FOUND_DESCRIPTION}
+                buttonText={USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
+                onButtonClick={handleCreateUser}
+              />
+            </div>
           ) : (
             <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
               {users.map(

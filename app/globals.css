@@ -32,6 +32,7 @@ body {
     --select-option: #e8eaed;
     --bg-limited: #f58b1e;
     --bg-skeleton: oklch(0.922 0 0);
+    --card-hover: #e9eff9;
     /* Shadcn/ui variables needed for toast components */
     --foreground: 0 0% 10%;
     --border: 0 0% 90%;
@@ -63,6 +64,7 @@ body {
     --select-option: #3bc44e;
     --bg-limited: #f58b1e;
     --bg-skeleton: oklch(0.922 0 0);
+
     /* Shadcn/ui variables for dark theme */
     --foreground: 0 0% 98%;
     --border: 0 0% 20%;
@@ -75,7 +77,7 @@ body {
     text-wrap: balance;
   }
   .btn-primary {
-    @apply h-[42px] px-6 bg-[var(--secondary)] hover:!bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2;
+    @apply h-[42px] px-6 bg-[var(--secondary)] hover:!bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2 whitespace-nowrap;
   }
   .btn-secondary {
     @apply h-[42px] px-[18px] border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center;
@@ -271,5 +273,49 @@ input:-webkit-autofill:active {
     background: #f0fdf4 !important;
     border-color: #86efac !important;
     color: #166534 !important;
+  }
+}
+
+/* Mobile-specific styles */
+@media (max-width: 639px) {
+  .btn-primary {
+    @apply w-auto justify-center px-4 text-sm;
+  }
+
+  .btn-secondary {
+    @apply w-auto justify-center px-4 text-sm;
+  }
+
+  .page-title {
+    @apply text-xl;
+  }
+
+  .field-label {
+    @apply text-xs;
+  }
+
+  .input-field {
+    @apply h-11 text-sm;
+  }
+
+  /* Job details specific mobile styles */
+  .job-details-card {
+    @apply p-3 gap-3;
+  }
+
+  .job-details-grid {
+    @apply grid-cols-1 gap-3;
+  }
+
+  .job-details-image {
+    @apply w-full max-w-[100px] mx-auto;
+  }
+
+  .job-details-text {
+    @apply text-sm;
+  }
+
+  .job-details-label {
+    @apply text-xs;
   }
 }

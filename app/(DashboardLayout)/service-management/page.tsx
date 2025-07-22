@@ -252,13 +252,18 @@ export default function ServiceManagementPage() {
   return (
     <div className='w-full overflow-y-auto'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-4 xl:mb-8'>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
         <h2 className='page-title'>
           {SERVICE_MESSAGES.SERVICE_MANAGEMENT_TITLE}
         </h2>
-        <Button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
-          {SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
-        </Button>
+        <div className='flex justify-end'>
+          <Button
+            className='btn-primary'
+            onClick={() => setSideSheetOpen(true)}
+          >
+            {SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
+          </Button>
+        </div>
       </div>
       {/* Service Grid */}
       <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 xl:gap-6'>
@@ -268,7 +273,7 @@ export default function ServiceManagementPage() {
             <TradeCardSkeleton key={idx} />
           ))
         ) : services.length === 0 && !loading ? (
-          <div className='col-span-full text-center '>
+          <div className='col-span-full text-center h-full md:h-[calc(100vh_-_220px)]'>
             <NoDataFound
               buttonText={SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
               onButtonClick={() => setSideSheetOpen(true)}

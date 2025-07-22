@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { FlagHookIcon } from '../../../components/icons/FalgHookIcon';
 import { JobCard } from '../../../components/shared/cards/JobCard';
 import { StatsCard } from '../../../components/shared/cards/StatsCard';
-import ComingSoon from '../../../components/shared/common/ComingSoon';
+import NoDataFound from '../../../components/shared/common/NoDataFound';
 import SideSheet from '../../../components/shared/common/SideSheet';
 import { CreateJobForm } from '../../../components/shared/forms/CreateJobForm';
 import JobManagementPageSkeleton from '../../../components/shared/skeleton/JobManagementPageSkeleton';
@@ -173,7 +173,7 @@ export default function JobManagement() {
       ) : (
         <div className=''>
           {/* Stats Cards */}
-          <div className='grid grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-4 xl:mb-8'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-4 xl:mb-8'>
             {stats.map(({ id, icon, value, label, iconColor, bgColor }) => (
               <StatsCard
                 key={id}
@@ -194,7 +194,7 @@ export default function JobManagement() {
               className='w-full'
             >
               <div className='flex items-center gap-2 w-full'>
-                <ScrollArea className='w-[400px] max-w-full flex-1 rounded-full'>
+                <ScrollArea className='w-[400px] max-w-full flex-1 rounded-full hidden md:block'>
                   <TabsList className='flex flex-row justify-start h-full w-fit bg-[var(--dark-background)] rounded-full min-w-max whitespace-nowrap'>
                     <TabsTrigger
                       value='info'
@@ -264,7 +264,7 @@ export default function JobManagement() {
                 </Button>
               </div>
               <TabsContent value='info' className='pt-4 xl:pt-8'>
-                <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
                   {mockJobs.map(({ id, ...jobProps }) => (
                     <JobCard key={id} job={{ id, ...jobProps }} />
                   ))}
@@ -272,16 +272,16 @@ export default function JobManagement() {
               </TabsContent>
 
               <TabsContent value='newLeads' className='p-8'>
-                <ComingSoon />
+                <NoDataFound buttonText='Create Job' />
               </TabsContent>
               <TabsContent value='ongoingJob' className='p-8'>
-                <ComingSoon />
+                <NoDataFound buttonText='Create Job' />
               </TabsContent>
               <TabsContent value='waitingOnClient' className='p-8'>
-                <ComingSoon />
+                <NoDataFound buttonText='Create Job' />
               </TabsContent>
               <TabsContent value='archive' className='p-8'>
-                <ComingSoon />
+                <NoDataFound buttonText='Create Job' />
               </TabsContent>
             </Tabs>
           </div>

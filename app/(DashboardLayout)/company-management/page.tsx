@@ -193,11 +193,11 @@ export default function CompanyManagement() {
   return (
     <div className='w-full overflow-y-auto pb-4'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-4 xl:mb-8'>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
         <h1 className='page-title'>
           {COMPANY_MESSAGES.COMPANY_MANAGEMENT_TITLE}
         </h1>
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-4 justify-end'>
           <button
             onClick={handleCreateCompany}
             className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-2'
@@ -218,11 +218,13 @@ export default function CompanyManagement() {
         <>
           {/* Company Grid */}
           {companies.length === 0 && !loading ? (
-            <NoDataFound
-              description={COMPANY_MESSAGES.NO_COMPANIES_FOUND_DESCRIPTION}
-              buttonText={COMPANY_MESSAGES.ADD_COMPANY_BUTTON}
-              onButtonClick={handleCreateCompany}
-            />
+            <div className='h-full md:h-[calc(100vh_-_220px)] w-full'>
+              <NoDataFound
+                description={COMPANY_MESSAGES.NO_COMPANIES_FOUND_DESCRIPTION}
+                buttonText={COMPANY_MESSAGES.ADD_COMPANY_BUTTON}
+                onButtonClick={handleCreateCompany}
+              />
+            </div>
           ) : (
             <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
               {companies.map(

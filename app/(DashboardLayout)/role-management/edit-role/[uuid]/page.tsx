@@ -119,9 +119,9 @@ const EditRolePage = () => {
   if (!initialValues) return null;
 
   return (
-    <div className='flex flex-col gap-8 p-6 flex-1 w-full'>
+    <div className='flex flex-col gap-7 flex-1 w-full'>
       {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbData} className='mb-2' />
+      <Breadcrumb items={breadcrumbData} />
 
       <RoleForm
         mode='edit'

@@ -59,7 +59,7 @@ export function StepProjectType({
   cancelButtonClass,
 }: StepProjectTypeProps) {
   return (
-    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-10 flex flex-col items-center'>
+    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
       <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
         Which type of project do you need for your home?
       </h2>
@@ -67,13 +67,13 @@ export function StepProjectType({
         Choose the project category to help us provide accurate planning and
         estimates.
       </p>
-      <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
+      <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 h-[calc(100vh_-_470px)] overflow-y-auto'>
         {PROJECT_TYPES.map(
           ({ icon: Icon, key, bgColor, iconColor, title, desc }) => {
             return (
               <div
                 key={key}
-                className={`flex flex-col items-start border border-[var(--border-dark)] rounded-2xl bg-[var(--card-background)]  p-6 cursor-pointer transition-all duration-150 hover:shadow-md ${selectedType === key ? 'border-green-500 shadow-green-100' : ''}`}
+                className={`flex flex-col items-start border border-[var(--border-dark)] rounded-2xl bg-[var(--card-background)]  p-6 cursor-pointer transition-all duration-150 hover:shadow-md ${selectedType === key ? 'bg-[var(--card-hover)] shadow-green-100' : ''}`}
                 onClick={() => setSelectedType(key)}
               >
                 <div
@@ -81,10 +81,10 @@ export function StepProjectType({
                 >
                   <Icon className={`w-5 h-5 `} color='currentcolor' />
                 </div>
-                <div className='font-bold text-base mb-1 text-[var(--text-dark)]'>
+                <div className='font-bold text-base mb-2 text-[var(--text-dark)]'>
                   {title}
                 </div>
-                <div className='text-[var(--text-secondary)] text-base'>
+                <div className='text-[var(--text-secondary)] text-base font-normal leading-snug'>
                   {desc}
                 </div>
               </div>
@@ -92,7 +92,7 @@ export function StepProjectType({
           }
         )}
       </div>
-      <div className='flex w-full justify-between mt-6'>
+      <div className='flex w-full justify-between'>
         <button
           type='button'
           className={cancelButtonClass || 'btn-secondary !h-12 !px-8'}

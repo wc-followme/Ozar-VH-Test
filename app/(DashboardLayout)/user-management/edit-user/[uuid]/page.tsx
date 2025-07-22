@@ -422,7 +422,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         </div> */}
 
         {/* Main Content */}
-        <div className='bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
+        <div className='bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-4 md:p-6'>
           <Tabs
             value={selectedTab}
             onValueChange={setSelectedTab}
@@ -443,10 +443,10 @@ export default function EditUserPage({ params }: EditUserPageProps) {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value='info' className='pt-8'>
-              <div className='flex flex-col xl:flex-row items-start gap-6'>
+            <TabsContent value='info' className='pt-4 md:pt-8'>
+              <div className='flex flex-col xl:flex-row items-start gap-3 md:gap-6'>
                 {/* Left Column - Upload Photo */}
-                <div className='w-[250px] flex-shrink-0 relative'>
+                <div className='w-full md:w-[250px] flex-shrink-0 relative'>
                   <PhotoUploadField
                     photo={photoFile}
                     onPhotoChange={handlePhotoChange}
@@ -485,7 +485,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
               </div>
             </TabsContent>
 
-            <TabsContent value='permissions' className='pt-8'>
+            <TabsContent value='permissions' className='pt-4 md:pt-8'>
               <div className='flex flex-col gap-4'>
                 {accordions.map((accordion, idx) => {
                   const { title, badgeLabel, stripes } = accordion;
@@ -520,14 +520,11 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                   );
                 })}
               </div>
-              <div className='flex justify-end gap-6 mt-8'>
-                <Link
-                  href={''}
-                  className='inline-flex items-center h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] hover:bg-gray-50 transition-colors'
-                >
+              <div className='flex justify-end gap-2 md:gap-6 mt-4'>
+                <Link href={''} className='btn-secondary !h-12 !px-6 md:!px-8'>
                   Cancel
                 </Link>
-                <Button className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'>
+                <Button className='btn-primary !h-12 !px-6 md:!px-12'>
                   Update
                 </Button>
               </div>

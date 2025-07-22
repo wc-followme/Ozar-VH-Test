@@ -64,9 +64,9 @@ export default function HomeOwnerWizardPage() {
       {/* Centered content with background */}
       <div className='mt-auto'>
         <div className=''>
-          <div className='w-[90vw] mx-auto flex flex-col items-center bg-[var(--background)] min-h-[calc(100vh-100px)] rounded-tl-[32px] rounded-tr-[32px] px-4 md:px-12 py-8 md:py-16 shadow-none'>
+          <div className='w-[90vw] mx-auto flex flex-col items-center bg-[var(--background)] min-h-[calc(100vh-100px)] rounded-tl-[32px] rounded-tr-[32px] px-4 md:px-12 py-8 shadow-none'>
             {/* Custom Progress Bar */}
-            <div className='w-full flex justify-center mb-12'>
+            <div className='w-full flex justify-center mb-8'>
               <div className='flex items-center justify-center w-full max-w-2xl'>
                 {steps.map((s, idx) => (
                   <>

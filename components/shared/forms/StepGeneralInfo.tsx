@@ -50,7 +50,7 @@ export function StepGeneralInfo({
   onNext,
 }: StepGeneralInfoProps) {
   return (
-    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-10 flex flex-col items-center'>
+    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-4 flex flex-col items-center'>
       <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
         General information
       </h2>
@@ -65,144 +65,151 @@ export function StepGeneralInfo({
           onNext();
         }}
       >
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          {/* Your Name (full width) */}
-          <div className='flex flex-col gap-2 col-span-1 md:col-span-2'>
-            <label className='field-label'>Your Name</label>
-            <Input placeholder='Enter your full name' className='input-field' />
-          </div>
-          {/* Project Start Date */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Project Start Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant='outline'
-                  className='w-full h-12 px-4 pr-2 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] focus:border-green-500 focus:ring-green-500 justify-between font-normal'
-                >
-                  {projectStart ? format(projectStart, 'PPP') : 'Select Date'}
-                  <IconsaxCalendar
-                    size='50'
-                    className='!h-6 !w-6'
-                    color='#24338C'
-                  />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className='p-0 bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
-                align='start'
-              >
-                <Calendar
-                  mode='single'
-                  selected={projectStart}
-                  onSelect={setProjectStart}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          {/* Project Finish Date */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Project Finish Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant='outline'
-                  className='w-full h-12 px-4 pr-2 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] focus:border-green-500 focus:ring-green-500 justify-between font-normal'
-                >
-                  {projectFinish ? format(projectFinish, 'PPP') : 'Select Date'}
-                  <IconsaxCalendar
-                    size='50'
-                    className='!h-6 !w-6'
-                    color='#24338C'
-                  />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className='p-0 bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
-                align='start'
-              >
-                <Calendar
-                  mode='single'
-                  selected={projectFinish}
-                  onSelect={setProjectFinish}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          {/* Email(s) */}
-          <div className='flex flex-col gap-2'>
-            <div className='flex items-center justify-between'>
-              <label className='field-label'>Email</label>
-              <button
-                type='button'
-                className='text-green-600 text-xs font-semibold'
-                onClick={handleAddEmail}
-              >
-                + Add Another
-              </button>
-            </div>
-            {emails.map((email, idx) => (
+        <div className='h-[calc(100vh_-_470px)] overflow-y-auto'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            {/* Your Name (full width) */}
+            <div className='flex flex-col gap-2 col-span-1 md:col-span-2'>
+              <label className='field-label'>Your Name</label>
               <Input
-                key={idx}
-                type='email'
-                placeholder='Enter your email'
-                className='input-field mb-2'
-                value={email}
-                onChange={e => handleEmailChange(idx, e.target.value)}
+                placeholder='Enter your full name'
+                className='input-field'
               />
-            ))}
-          </div>
-          {/* Phone(s) */}
-          <div className='flex flex-col gap-2'>
-            <div className='flex items-center justify-between'>
-              <label className='field-label'>Phone Number</label>
-              <button
-                type='button'
-                className='text-green-600 text-xs font-semibold'
-                onClick={handleAddPhone}
-              >
-                + Add Another
-              </button>
             </div>
-            {phones.map((phone, idx) => (
-              <Input
-                key={idx}
-                placeholder='Enter your number'
-                className='input-field mb-2'
-                value={phone}
-                onChange={e => handlePhoneChange(idx, e.target.value)}
-              />
-            ))}
+            {/* Project Start Date */}
+            <div className='flex flex-col gap-2'>
+              <label className='field-label'>Project Start Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant='outline'
+                    className='w-full h-12 px-4 pr-2 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] focus:border-green-500 focus:ring-green-500 justify-between font-normal'
+                  >
+                    {projectStart ? format(projectStart, 'PPP') : 'Select Date'}
+                    <IconsaxCalendar
+                      size='50'
+                      className='!h-6 !w-6'
+                      color='#24338C'
+                    />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className='p-0 bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+                  align='start'
+                >
+                  <Calendar
+                    mode='single'
+                    selected={projectStart}
+                    onSelect={setProjectStart}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            {/* Project Finish Date */}
+            <div className='flex flex-col gap-2'>
+              <label className='field-label'>Project Finish Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant='outline'
+                    className='w-full h-12 px-4 pr-2 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] focus:border-green-500 focus:ring-green-500 justify-between font-normal'
+                  >
+                    {projectFinish
+                      ? format(projectFinish, 'PPP')
+                      : 'Select Date'}
+                    <IconsaxCalendar
+                      size='50'
+                      className='!h-6 !w-6'
+                      color='#24338C'
+                    />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className='p-0 bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+                  align='start'
+                >
+                  <Calendar
+                    mode='single'
+                    selected={projectFinish}
+                    onSelect={setProjectFinish}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            {/* Email(s) */}
+            <div className='flex flex-col gap-2'>
+              <div className='flex items-center justify-between'>
+                <label className='field-label'>Email</label>
+                <button
+                  type='button'
+                  className='text-[var(--secondary)] text-xs font-semibold'
+                  onClick={handleAddEmail}
+                >
+                  + Add Another
+                </button>
+              </div>
+              {emails.map((email, idx) => (
+                <Input
+                  key={idx}
+                  type='email'
+                  placeholder='Enter your email'
+                  className='input-field mb-2'
+                  value={email}
+                  onChange={e => handleEmailChange(idx, e.target.value)}
+                />
+              ))}
+            </div>
+            {/* Phone(s) */}
+            <div className='flex flex-col gap-2'>
+              <div className='flex items-center justify-between'>
+                <label className='field-label'>Phone Number</label>
+                <button
+                  type='button'
+                  className='text-[var(--secondary)] text-xs font-semibold'
+                  onClick={handleAddPhone}
+                >
+                  + Add Another
+                </button>
+              </div>
+              {phones.map((phone, idx) => (
+                <Input
+                  key={idx}
+                  placeholder='Enter your number'
+                  className='input-field mb-2'
+                  value={phone}
+                  onChange={e => handlePhoneChange(idx, e.target.value)}
+                />
+              ))}
+            </div>
+            {/* Your Budget */}
+            <div className='flex flex-col gap-2'>
+              <label className='field-label'>Your Budget</label>
+              <Input placeholder='Enter your Budget' className='input-field' />
+            </div>
+            {/* Preferred Contractor */}
+            <div className='flex flex-col gap-2'>
+              <label className='field-label'>Preferred Contractor</label>
+              <Select value={contractor} onValueChange={setContractor}>
+                <SelectTrigger className='input-field'>
+                  <SelectValue placeholder='Any' />
+                </SelectTrigger>
+                <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
+                  <SelectItem value='any'>Any</SelectItem>
+                  <SelectItem value='contractor1'>Contractor 1</SelectItem>
+                  <SelectItem value='contractor2'>Contractor 2</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          {/* Your Budget */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Your Budget</label>
-            <Input placeholder='Enter your Budget' className='input-field' />
+          {/* Address */}
+          <div className='flex flex-col gap-2 mt-4'>
+            <label className='field-label'>Address</label>
+            <Input placeholder='Enter your address' className='input-field' />
           </div>
-          {/* Preferred Contractor */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Preferred Contractor</label>
-            <Select value={contractor} onValueChange={setContractor}>
-              <SelectTrigger className='input-field'>
-                <SelectValue placeholder='Any' />
-              </SelectTrigger>
-              <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                <SelectItem value='any'>Any</SelectItem>
-                <SelectItem value='contractor1'>Contractor 1</SelectItem>
-                <SelectItem value='contractor2'>Contractor 2</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        {/* Address */}
-        <div className='flex flex-col gap-2'>
-          <label className='field-label'>Address</label>
-          <Input placeholder='Enter your address' className='input-field' />
         </div>
         {/* Next Step Button */}
-        <div className='flex justify-end mt-4'>
+        <div className='flex justify-end'>
           <Button type='submit' className='btn-primary !h-12 !px-12'>
             Next Step
           </Button>

@@ -56,8 +56,8 @@ export function CreateJobForm() {
       <CardContent className='p-0'>
         <form onSubmit={handleSubmit} className='space-y-6'>
           {/* Full Name Input */}
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div className='space-y-2 col-span-2'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4'>
+            <div className='space-y-2 md:col-span-2'>
               <Label htmlFor='full-name' className='fled-label'>
                 New to Us / Already with Us
               </Label>
@@ -99,7 +99,7 @@ export function CreateJobForm() {
             <Label htmlFor='full-name' className='fled-label'>
               Select Boxes
             </Label>
-            <div className='grid gap-4 grid-cols-3 md:grid-cols-3'>
+            <div className='grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3'>
               {selectBoxOptions.map(({ id, title, description, status }) => (
                 <SelectBoxCard
                   key={id}

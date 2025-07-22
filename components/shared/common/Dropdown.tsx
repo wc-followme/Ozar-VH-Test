@@ -49,7 +49,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
             onAction(action);
           }}
           className={cn(
-            'text-base p-[10px] rounded-md cursor-pointer transition-colors flex font-medium items-center gap-2 hover:!bg-[var(--select-option)]',
+            'text-sm xl:text-base p-2 xl:p-[10px] rounded-md cursor-pointer transition-colors flex font-medium items-center gap-2 hover:!bg-[var(--select-option)]',
             itemsClass,
             index !== menuOptions.length - 1 &&
               'border-b border-[var(--border-dark)]'

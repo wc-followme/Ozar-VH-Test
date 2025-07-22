@@ -153,11 +153,16 @@ const ToolsManagement = () => {
   return (
     <div className='w-full'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-8'>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8'>
         <h2 className='page-title'>Tools Management</h2>
-        <button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
-          <span>Create Tool</span>
-        </button>
+        <div className='flex justify-end'>
+          <button
+            className='btn-primary'
+            onClick={() => setSideSheetOpen(true)}
+          >
+            <span>Create Tool</span>
+          </button>
+        </div>
       </div>
       <SideSheet
         title='Add Tool'

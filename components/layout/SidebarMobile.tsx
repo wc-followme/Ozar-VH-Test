@@ -16,7 +16,7 @@ export function SidebarMobile({ open, onOpenChange }: SidebarMobileProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side='left'
-        className='p-0 w-[280px] max-w-full bg-[var(--card-background)] px-2 border-0'
+        className='p-0 w-[280px] max-w-full bg-[var(--card-background)] px-2 border-0 overflow-auto'
       >
         <SheetTitle className='hidden'></SheetTitle>
         <nav className='py-3'>

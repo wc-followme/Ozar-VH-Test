@@ -309,12 +309,16 @@ const CategoryManagement = () => {
   return (
     <section className='w-full overflow-y-auto pb-4'>
       <header className='flex items-center justify-between mb-4 xl:mb-8'>
-        <h2 className='page-title'>
-          {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
-        </h2>
-        <Button onClick={() => setOpen(true)} className='btn-primary'>
-          {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
-        </Button>
+        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full'>
+          <h2 className='page-title'>
+            {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
+          </h2>
+          <div className='flex justify-end'>
+            <Button onClick={() => setOpen(true)} className='btn-primary'>
+              {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
+            </Button>
+          </div>
+        </div>
       </header>
 
       {/* Categories Grid */}
@@ -327,11 +331,13 @@ const CategoryManagement = () => {
       ) : (
         <>
           {categories.length === 0 && !loading ? (
-            <NoDataFound
-              description={CATEGORY_MESSAGES.NO_CATEGORIES_FOUND_DESCRIPTION}
-              buttonText={CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
-              onButtonClick={() => setOpen(true)}
-            />
+            <div className='h-full md:h-[calc(100vh_-_220px)] w-full'>
+              <NoDataFound
+                description={CATEGORY_MESSAGES.NO_CATEGORIES_FOUND_DESCRIPTION}
+                buttonText={CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
+                onButtonClick={() => setOpen(true)}
+              />
+            </div>
           ) : (
             <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6 w-full'>
               {categories.map((category, index) => {

@@ -165,15 +165,14 @@ const RoleManagement = () => {
   return (
     <section className='flex flex-col w-full items-start gap-4 xl:gap-8 overflow-y-auto'>
       <header className='flex items-center justify-between w-full'>
-        <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
-          {ROLE_MESSAGES.PAGE_TITLE}
-        </h2>
-        <button
-          onClick={handleCreateRole}
-          className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
-        >
-          {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
-        </button>
+        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full'>
+          <h2 className='page-title'>{ROLE_MESSAGES.PAGE_TITLE}</h2>
+          <div className='flex justify-end'>
+            <button onClick={handleCreateRole} className='btn-primary'>
+              {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
+            </button>
+          </div>
+        </div>
       </header>
 
       {/* Initial Loading State */}
@@ -188,7 +187,7 @@ const RoleManagement = () => {
           {/* Roles Grid */}
           <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl w-full gap-3 xl:gap-6'>
             {roles.length === 0 && !loading ? (
-              <div className='w-full col-span-full'>
+              <div className='w-full col-span-full h-full md:h-[calc(100vh_-_220px)]'>
                 <NoDataFound
                   buttonText={ROLE_MESSAGES.CREATE_ROLE_BUTTON}
                   onButtonClick={handleCreateRole}
