@@ -1,5 +1,6 @@
 import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import SideSheet from '@/components/shared/common/SideSheet';
+import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Edit2, Trash } from 'iconsax-react';
 import Image from 'next/image';
@@ -27,6 +28,30 @@ export default function ToolCard({
   const [editOpen, setEditOpen] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [imgError, setImgError] = useState(false);
+
+  // Get user permissions for tools
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.tools?.edit;
+  const canArchive = userPermissions?.tools?.archive;
+
+  // Filter menu options based on permissions
+  const menuOptions = [
+    { label: 'Edit', action: 'edit', icon: Edit2 },
+    { label: 'Archive', action: 'archive', icon: Trash },
+  ];
+
+  const filteredMenuOptions = menuOptions.filter(option => {
+    if (option.action === 'edit') {
+      return canEdit;
+    }
+    if (option.action === 'delete' || option.action === 'archive') {
+      return canArchive;
+    }
+    return true; // Show other actions by default
+  });
+
+  // Only show menu if there are any visible options
+  const showMenu = filteredMenuOptions.length > 0;
 
   return (
     <div className='bg-[var(--card-background)] hover:shadow-lg rounded-2xl p-2.5 flex flex-col border border-[var(--border-dark)] min-h-[6.25rem] relative transition-all'>
@@ -65,38 +90,37 @@ export default function ToolCard({
             </div>
           </div>
         </div>
-        <div className='absolute top-2.5 right-2'>
-          <Dropdown
-            menuOptions={[
-              { label: 'Edit', action: 'edit', icon: Edit2 },
-              { label: 'Archive', action: 'archive', icon: Trash },
-            ]}
-            onAction={action => {
-              if (action === 'edit') alert('Edit clicked');
-              if (action === 'archive') setShowDelete(true);
-            }}
-            trigger={
-              <button className='h-8 w-8 p-0 flex items-center justify-center rounded-full'>
-                <IconDotsVertical
-                  className='!w-6 !h-6'
-                  strokeWidth={2}
-                  color='var(--text-dark)'
-                />
-              </button>
-            }
-            align='end'
-          />
-          <ConfirmDeleteModal
-            open={showDelete}
-            title={`Are you sure you want to archive "${name}"?`}
-            subtitle={`This action cannot be undone.`}
-            onCancel={() => setShowDelete(false)}
-            onDelete={() => {
-              setShowDelete(false);
-              onDelete();
-            }}
-          />
-        </div>
+        {showMenu && (
+          <div className='absolute top-2.5 right-2'>
+            <Dropdown
+              menuOptions={filteredMenuOptions}
+              onAction={action => {
+                if (action === 'edit') alert('Edit clicked');
+                if (action === 'archive') setShowDelete(true);
+              }}
+              trigger={
+                <button className='h-8 w-8 p-0 flex items-center justify-center rounded-full'>
+                  <IconDotsVertical
+                    className='!w-6 !h-6'
+                    strokeWidth={2}
+                    color='var(--text-dark)'
+                  />
+                </button>
+              }
+              align='end'
+            />
+            <ConfirmDeleteModal
+              open={showDelete}
+              title={`Are you sure you want to archive "${name}"?`}
+              subtitle={`This action cannot be undone.`}
+              onCancel={() => setShowDelete(false)}
+              onDelete={() => {
+                setShowDelete(false);
+                onDelete();
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <SideSheet

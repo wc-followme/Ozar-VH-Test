@@ -285,6 +285,7 @@ export default function MaterialManagementPage() {
               category={`${material.services?.length || 0} Service${(material.services?.length || 0) !== 1 ? 's' : ''}`}
               menuOptions={menuOptions}
               onMenuAction={action => handleMenuAction(action, idx)}
+              module="materials"
             />
           ))
         )}

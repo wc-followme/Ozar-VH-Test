@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -50,6 +51,30 @@ export function CompanyCard({
   const router = useRouter();
   const [isPlaceholder, setIsPlaceholder] = useState(!image);
 
+  // Get user permissions for companies
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.companies?.edit;
+  const canArchive = userPermissions?.companies?.archive;
+
+  // Filter menu options based on permissions and isDefault
+  const permissionFilteredOptions = menuOptions.filter(option => {
+    if (option.action === 'edit') {
+      return canEdit;
+    }
+    if (option.action === 'delete' || option.action === 'archive') {
+      return canArchive;
+    }
+    return true; // Show other actions by default
+  });
+
+  // Apply isDefault filter on top of permission filter
+  const filteredMenuOptions = isDefault
+    ? permissionFilteredOptions.filter(option => option.action !== 'delete')
+    : permissionFilteredOptions;
+
+  // Only show menu if there are any visible options
+  const showMenu = filteredMenuOptions.length > 0;
+
   const handleToggle = async () => {
     setIsToggling(true);
     onToggle();
@@ -68,11 +93,6 @@ export function CompanyCard({
     }
     // Other actions (like delete) can be handled by parent component
   };
-
-  // Filter menu options based on isDefault
-  const filteredMenuOptions = isDefault
-    ? menuOptions.filter(option => option.action !== 'delete')
-    : menuOptions;
 
   return (
     <div
@@ -110,27 +130,29 @@ export function CompanyCard({
             <h3 className='font-bold text-[var(--text)] truncate text-base'>
               {name}
             </h3>
-            <Dropdown
-              menuOptions={filteredMenuOptions}
-              onAction={handleMenuAction}
-              trigger={
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  className='h-7 w-6 p-0 flex-shrink-0 -mr-2 mt-0.5'
-                  onClick={e => {
-                    e.stopPropagation(); // Prevent card click when clicking menu
-                  }}
-                >
-                  <IconDotsVertical
-                    className='!w-6 !h-6'
-                    strokeWidth={2}
-                    color='var(--text)'
-                  />
-                </Button>
-              }
-              align='end'
-            />
+            {showMenu && (
+              <Dropdown
+                menuOptions={filteredMenuOptions}
+                onAction={handleMenuAction}
+                trigger={
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    className='h-7 w-6 p-0 flex-shrink-0 -mr-2 mt-0.5'
+                    onClick={e => {
+                      e.stopPropagation(); // Prevent card click when clicking menu
+                    }}
+                  >
+                    <IconDotsVertical
+                      className='!w-6 !h-6'
+                      strokeWidth={2}
+                      color='var(--text)'
+                    />
+                  </Button>
+                }
+                align='end'
+              />
+            )}
           </div>
 
           {/* Contact Info */}

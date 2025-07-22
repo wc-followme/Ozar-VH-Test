@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React from 'react';
 import { Avatar } from '../common/Avatar';
@@ -19,6 +20,16 @@ interface InfoCardProps {
   image?: string;
   menuOptions?: MenuOption[];
   onMenuAction?: (action: string) => void;
+  module?:
+    | 'categories'
+    | 'roles'
+    | 'users'
+    | 'companies'
+    | 'trades'
+    | 'services'
+    | 'materials'
+    | 'tools'
+    | 'jobs';
 }
 
 export const InfoCard: React.FC<InfoCardProps> = ({
@@ -26,7 +37,27 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   category,
   menuOptions = [],
   onMenuAction,
+  module,
 }) => {
+  // Get user permissions for the specified module
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = module ? userPermissions?.[module]?.edit : true;
+  const canArchive = module ? userPermissions?.[module]?.archive : true;
+
+  // Filter menu options based on permissions
+  const filteredMenuOptions = menuOptions.filter(option => {
+    if (option.action === 'edit') {
+      return canEdit;
+    }
+    if (option.action === 'delete' || option.action === 'archive') {
+      return canArchive;
+    }
+    return true; // Show other actions by default
+  });
+
+  // Only show menu if there are any visible options
+  const showMenu = filteredMenuOptions.length > 0;
+
   return (
     <div className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] w-full p-[10px] flex items-center gap-4 min-h-[64px] hover:shadow-md transition-shadow duration-200'>
       {/* Avatar with image, fallback to placeholder or initials */}
@@ -43,10 +74,10 @@ export const InfoCard: React.FC<InfoCardProps> = ({
             {tradeName}
           </span>
           {/* Menu Button */}
-          {menuOptions.length > 0 && (
+          {showMenu && (
             <Dropdown
               menuOptions={
-                menuOptions.filter(
+                filteredMenuOptions.filter(
                   (opt): opt is Required<MenuOption> => !!opt.icon
                 ) as import('../common/Dropdown').DropdownOption[]
               }

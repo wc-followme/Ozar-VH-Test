@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn, getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React from 'react';
 import Dropdown from '../common/Dropdown';
@@ -28,6 +28,25 @@ export const TradeCard: React.FC<TradeCardProps> = ({
   menuOptions = [],
   onMenuAction,
 }) => {
+  // Get user permissions for trades
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.trades?.edit;
+  const canArchive = userPermissions?.trades?.archive;
+
+  // Filter menu options based on permissions
+  const filteredMenuOptions = menuOptions.filter(option => {
+    if (option.action === 'edit') {
+      return canEdit;
+    }
+    if (option.action === 'delete' || option.action === 'archive') {
+      return canArchive;
+    }
+    return true; // Show other actions by default
+  });
+
+  // Only show menu if there are any visible options
+  const showMenu = filteredMenuOptions.length > 0;
+
   return (
     <div className='bg-white rounded-[12px] border border-[var(--border-dark)] w-full p-[10px] flex items-center gap-4 min-h-[64px] hover:shadow-md transition-shadow duration-200'>
       {/* Initials */}
@@ -49,10 +68,10 @@ export const TradeCard: React.FC<TradeCardProps> = ({
         </span>
       </div>
       {/* Menu Button */}
-      {menuOptions.length > 0 && (
+      {showMenu && (
         <Dropdown
           menuOptions={
-            menuOptions.filter(
+            filteredMenuOptions.filter(
               (opt): opt is Required<MenuOption> => !!opt.icon
             ) as import('../common/Dropdown').DropdownOption[]
           }

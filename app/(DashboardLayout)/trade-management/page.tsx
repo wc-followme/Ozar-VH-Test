@@ -278,6 +278,7 @@ export default function TradeManagementPage() {
               category={`${trade.categories?.length || 0} Category${(trade.categories?.length || 0) !== 1 ? 's' : ''}`}
               menuOptions={menuOptions}
               onMenuAction={action => handleMenuAction(action, idx)}
+              module='trades'
             />
           ))
         )}

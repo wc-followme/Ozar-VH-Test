@@ -283,6 +283,7 @@ export default function ServiceManagementPage() {
               category={`${service.trades?.length || 0} Trade${(service.trades?.length || 0) !== 1 ? 's' : ''}`}
               menuOptions={menuOptions}
               onMenuAction={action => handleMenuAction(action, idx)}
+              module='services'
             />
           ))
         )}

@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Call, Icon, Sms } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
@@ -50,6 +51,25 @@ export function UserCard({
   const [showDelete, setShowDelete] = useState(false);
   const router = useRouter();
 
+  // Get user permissions for users
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.users?.edit;
+  const canArchive = userPermissions?.users?.archive;
+
+  // Filter menu options based on permissions
+  const filteredMenuOptions = menuOptions.filter(option => {
+    if (option.action === 'edit') {
+      return canEdit;
+    }
+    if (option.action === 'delete' || option.action === 'archive') {
+      return canArchive;
+    }
+    return true; // Show other actions by default
+  });
+
+  // Only show menu if there are any visible options
+  const showMenu = filteredMenuOptions.length > 0;
+
   const handleToggle = async () => {
     if (disableActions) return;
     setIsToggling(true);
@@ -90,25 +110,27 @@ export function UserCard({
                 {role}
               </p>
             </div>
-            <Dropdown
-              menuOptions={menuOptions}
-              onAction={handleMenuAction}
-              trigger={
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  className='h-8 w-8 p-0 flex-shrink-0'
-                  disabled={disableActions}
-                >
-                  <IconDotsVertical
-                    className='!w-6 !h-6'
-                    strokeWidth={2}
-                    color='var(--text)'
-                  />
-                </Button>
-              }
-              align='end'
-            />
+            {showMenu && (
+              <Dropdown
+                menuOptions={filteredMenuOptions}
+                onAction={handleMenuAction}
+                trigger={
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    className='h-8 w-8 p-0 flex-shrink-0'
+                    disabled={disableActions}
+                  >
+                    <IconDotsVertical
+                      className='!w-6 !h-6'
+                      strokeWidth={2}
+                      color='var(--text)'
+                    />
+                  </Button>
+                }
+                align='end'
+              />
+            )}
           </div>
 
           {/* Contact Info */}

@@ -11,14 +11,33 @@ export function Sidebar() {
 
   // Get user permissions
   const userPermissions = getUserPermissionsFromStorage();
-  const canViewCategories = userPermissions?.categories?.view;
 
   // Filter sidebar items based on permissions
   const filteredSidebarItems = sidebarItems.filter(item => {
-    if (item.title === 'Category Management') {
-      return canViewCategories;
+    switch (item.title) {
+      case 'Category Management':
+        return userPermissions?.categories?.view;
+      case 'Role Management':
+        return userPermissions?.roles?.view;
+      case 'User Management':
+        return userPermissions?.users?.view;
+      case 'Company Management':
+        return userPermissions?.companies?.view;
+      case 'Trade Management':
+        return userPermissions?.trades?.view;
+      case 'Service Management':
+        return userPermissions?.services?.view;
+      case 'Material Management':
+        return userPermissions?.materials?.view;
+      case 'Tools Management':
+        return userPermissions?.tools?.view;
+      case 'Jobs':
+        return userPermissions?.jobs?.view;
+      case 'Home':
+        return true; // Always show home
+      default:
+        return true; // Show other items by default
     }
-    return true; // Show other items by default
   });
 
   return (
