@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { ACTIONS } from '@/constants/common';
 import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Call, Icon, Sms } from 'iconsax-react';
@@ -58,10 +59,10 @@ export function UserCard({
 
   // Filter menu options based on permissions
   const filteredMenuOptions = menuOptions.filter(option => {
-    if (option.action === 'edit') {
+    if (option.action === ACTIONS.EDIT) {
       return canEdit;
     }
-    if (option.action === 'delete' || option.action === 'archive') {
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
       return canArchive;
     }
     return true; // Show other actions by default
@@ -71,19 +72,20 @@ export function UserCard({
   const showMenu = filteredMenuOptions.length > 0;
 
   const handleToggle = async () => {
-    if (disableActions) return;
     setIsToggling(true);
-    await onToggle();
-    setTimeout(() => setIsToggling(false), 300);
+    try {
+      await onToggle();
+    } finally {
+      setIsToggling(false);
+    }
   };
 
   const handleMenuAction = (action: string) => {
-    if (action === 'delete') {
-      setShowDelete(true);
-    } else if (action === 'edit') {
+    if (action === ACTIONS.EDIT) {
       router.push(`/user-management/edit-user/${userUuid}`);
+    } else if (action === ACTIONS.DELETE) {
+      setShowDelete(true);
     }
-    return action;
   };
 
   return (
@@ -91,7 +93,6 @@ export function UserCard({
       {/* Header with Avatar, User Info and Menu */}
       <div className='flex items-start gap-4 mb-2'>
         <Avatar
-          name={name}
           image={image}
           avatarColor={avatarColor}
           height={80}

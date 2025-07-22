@@ -5,7 +5,7 @@ import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import NoDataFound from '@/components/shared/common/NoDataFound';
 import SelectField from '@/components/shared/common/SelectField';
 import { useToast } from '@/components/ui/use-toast';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { apiService, FetchUsersResponse, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -190,10 +190,10 @@ export default function UserManagement() {
   }, [router]);
 
   const menuOptions: MenuOption[] = [
-    { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' },
+    { label: 'Edit', action: ACTIONS.EDIT, icon: Edit2, variant: 'default' },
     {
       label: 'Archive',
-      action: 'delete',
+      action: ACTIONS.DELETE,
       icon: Trash,
       variant: 'destructive',
     },

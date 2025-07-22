@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ACTIONS } from '@/constants/common';
 import { cn, getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React, { useState } from 'react';
@@ -57,10 +58,10 @@ export function CategoryCard({
 
   // Filter menu options based on permissions
   const filteredMenuOptions = menuOptions.filter(option => {
-    if (option.action === 'edit') {
+    if (option.action === ACTIONS.EDIT) {
       return canEdit;
     }
-    if (option.action === 'delete' || option.action === 'archive') {
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
       return canArchive;
     }
     return true; // Show other actions by default
@@ -71,12 +72,12 @@ export function CategoryCard({
 
   const handleMenuAction = (action: string) => {
     switch (action) {
-      case 'edit':
+      case ACTIONS.EDIT:
         if (onEdit) {
           onEdit();
         }
         break;
-      case 'delete':
+      case ACTIONS.DELETE:
         setShowDeleteModal(true);
         break;
       default:

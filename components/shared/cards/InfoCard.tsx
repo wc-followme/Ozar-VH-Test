@@ -1,3 +1,4 @@
+import { ACTIONS } from '@/constants/common';
 import { Button } from '@/components/ui/button';
 import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
@@ -20,16 +21,7 @@ interface InfoCardProps {
   image?: string;
   menuOptions?: MenuOption[];
   onMenuAction?: (action: string) => void;
-  module?:
-    | 'categories'
-    | 'roles'
-    | 'users'
-    | 'companies'
-    | 'trades'
-    | 'services'
-    | 'materials'
-    | 'tools'
-    | 'jobs';
+  module?: 'categories' | 'roles' | 'users' | 'companies' | 'trades' | 'services' | 'materials' | 'tools' | 'jobs';
 }
 
 export const InfoCard: React.FC<InfoCardProps> = ({
@@ -43,63 +35,62 @@ export const InfoCard: React.FC<InfoCardProps> = ({
   const userPermissions = getUserPermissionsFromStorage();
   const canEdit = module ? userPermissions?.[module]?.edit : true;
   const canArchive = module ? userPermissions?.[module]?.archive : true;
-
+  
   // Filter menu options based on permissions
   const filteredMenuOptions = menuOptions.filter(option => {
-    if (option.action === 'edit') {
+    if (option.action === ACTIONS.EDIT) {
       return canEdit;
     }
-    if (option.action === 'delete' || option.action === 'archive') {
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
       return canArchive;
     }
     return true; // Show other actions by default
   });
-
+  
   // Only show menu if there are any visible options
   const showMenu = filteredMenuOptions.length > 0;
 
   return (
     <div className='bg-[var(--card-background)] rounded-[12px] border border-[var(--border-dark)] w-full p-[10px] flex items-center gap-4 min-h-[64px] hover:shadow-md transition-shadow duration-200'>
-      {/* Avatar with image, fallback to placeholder or initials */}
+      {/* Avatar */}
       <Avatar
-        name={tradeName}
-        height={60}
-        width={60}
-        className='rounded-[10px]'
+        image=''
+        height={48}
+        width={48}
+        className='rounded-[12px] flex-shrink-0'
       />
-      {/* Info */}
-      <div className='flex flex-col flex-1 min-w-0'>
-        <div className='flex items-start'>
-          <span className='font-semibold text-[var(--text-dark)] text-base leading-tight truncate flex-1'>
-            {tradeName}
-          </span>
-          {/* Menu Button */}
-          {showMenu && (
-            <Dropdown
-              menuOptions={
-                filteredMenuOptions.filter(
-                  (opt): opt is Required<MenuOption> => !!opt.icon
-                ) as import('../common/Dropdown').DropdownOption[]
-              }
-              onAction={onMenuAction ?? (() => {})}
-              trigger={
-                <Button variant='ghost' size='icon' className='h-8 w-8 p-0'>
-                  <IconDotsVertical
-                    className='!w-6 !h-6'
-                    strokeWidth={2}
-                    color='var(--text)'
-                  />
-                </Button>
-              }
-              align='end'
-            />
-          )}
-        </div>
 
-        <span className='text-xs text-[var(--text-dark)] bg-[var(--border-light)] rounded-full px-2 py-[2px] w-fit font-medium'>
+      {/* Info */}
+      <div className='flex-1 min-w-0'>
+        <h3 className='font-bold text-[var(--text)] truncate text-base'>
+          {tradeName}
+        </h3>
+        <p className='text-sm text-[var(--text-secondary)] truncate'>
           {category}
-        </span>
+        </p>
       </div>
+
+      {/* Menu Button */}
+      {showMenu && (
+        <Dropdown
+          menuOptions={
+            filteredMenuOptions.filter(
+              (opt): opt is Required<MenuOption> => !!opt.icon
+            ) as import('../common/Dropdown').DropdownOption[]
+          }
+          onAction={onMenuAction ?? (() => {})}
+          trigger={
+            <Button variant='ghost' size='icon' className='h-8 w-8 p-0'>
+              <IconDotsVertical
+                className='!w-6 !h-6'
+                strokeWidth={2}
+                color='var(--text)'
+              />
+            </Button>
+          }
+          align='end'
+        />
+      )}
     </div>
   );
 };

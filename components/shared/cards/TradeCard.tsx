@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { cn, getUserPermissionsFromStorage } from '@/lib/utils';
+import { ACTIONS } from '@/constants/common';
+import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React from 'react';
 import Dropdown from '../common/Dropdown';
@@ -35,10 +36,10 @@ export const TradeCard: React.FC<TradeCardProps> = ({
 
   // Filter menu options based on permissions
   const filteredMenuOptions = menuOptions.filter(option => {
-    if (option.action === 'edit') {
+    if (option.action === ACTIONS.EDIT) {
       return canEdit;
     }
-    if (option.action === 'delete' || option.action === 'archive') {
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
       return canArchive;
     }
     return true; // Show other actions by default
@@ -51,22 +52,22 @@ export const TradeCard: React.FC<TradeCardProps> = ({
     <div className='bg-white rounded-[12px] border border-[var(--border-dark)] w-full p-[10px] flex items-center gap-4 min-h-[64px] hover:shadow-md transition-shadow duration-200'>
       {/* Initials */}
       <div
-        className={cn(
-          'w-[60px] h-[60px] flex items-center justify-center rounded-[10px] text-base font-bold',
-          initialsBg
-        )}
+        className='w-[48px] h-[48px] rounded-[12px] flex items-center justify-center text-white font-bold text-lg flex-shrink-0'
+        style={{ backgroundColor: initialsBg }}
       >
         {initials}
       </div>
+
       {/* Trade Info */}
-      <div className='flex flex-col flex-1 min-w-0'>
-        <span className='font-semibold text-[var(--text-dark)] text-base leading-tight truncate'>
+      <div className='flex-1 min-w-0'>
+        <h3 className='font-bold text-[var(--text)] truncate text-base'>
           {tradeName}
-        </span>
-        <span className='text-xs text-[var(--text-dark)] bg-[#F4F5F6] rounded-full px-3 py-[2px] mt-2 w-fit font-medium'>
+        </h3>
+        <p className='text-sm text-[var(--text-secondary)] truncate'>
           {category}
-        </span>
+        </p>
       </div>
+
       {/* Menu Button */}
       {showMenu && (
         <Dropdown

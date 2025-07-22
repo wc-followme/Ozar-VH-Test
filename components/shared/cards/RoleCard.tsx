@@ -3,6 +3,7 @@
 import { ROLE_MESSAGES } from '@/app/(DashboardLayout)/role-management/role-messages';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { ACTIONS } from '@/constants/common';
 import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React, { useState } from 'react';
@@ -52,10 +53,10 @@ export const RoleCard: React.FC<RoleCardProps> = ({
 
   // Filter menu options based on permissions
   const filteredMenuOptions = menuOptions.filter(option => {
-    if (option.action === 'edit') {
+    if (option.action === ACTIONS.EDIT) {
       return canEdit;
     }
-    if (option.action === 'delete' || option.action === 'archive') {
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
       return canArchive;
     }
     return true; // Show other actions by default
@@ -65,8 +66,8 @@ export const RoleCard: React.FC<RoleCardProps> = ({
   const showMenu = filteredMenuOptions.length > 0;
 
   const handleMenuAction = (action: string) => {
-    if (action === 'edit' && onEdit) onEdit();
-    if (action === 'delete') setShowDelete(true);
+    if (action === ACTIONS.EDIT && onEdit) onEdit();
+    if (action === ACTIONS.DELETE) setShowDelete(true);
   };
 
   const handleConfirmDelete = () => {

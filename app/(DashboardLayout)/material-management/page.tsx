@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { ACTIONS } from '@/constants/common';
 import {
   extractApiErrorMessage,
   getUserPermissionsFromStorage,
@@ -27,13 +28,13 @@ const menuOptions: {
 }[] = [
   {
     label: MATERIAL_MESSAGES.EDIT_MENU,
-    action: 'edit',
+    action: ACTIONS.EDIT,
     icon: Edit2,
     variant: 'default',
   },
   {
     label: MATERIAL_MESSAGES.DELETE_MENU,
-    action: 'delete',
+    action: ACTIONS.DELETE,
     icon: Trash,
     variant: 'destructive',
   },
@@ -157,11 +158,11 @@ export default function MaterialManagementPage() {
     const material = materials[idx];
     if (!material) return;
 
-    if (action === 'edit') {
+    if (action === ACTIONS.EDIT) {
       setEditingMaterialUuid(material.uuid);
       setSideSheetOpen(true);
     }
-    if (action === 'delete') {
+    if (action === ACTIONS.DELETE) {
       setDeleteIdx(idx);
       setDeleteMaterialName(material.name || '');
       setModalOpen(true);

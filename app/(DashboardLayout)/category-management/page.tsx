@@ -7,6 +7,7 @@ import SideSheet from '@/components/shared/common/SideSheet';
 import CategoryForm from '@/components/shared/forms/CategoryForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ACTIONS } from '@/constants/common';
 import { PAGINATION } from '@/constants/common';
 import { STATUS_CODES } from '@/constants/status-codes';
 import {
@@ -52,13 +53,13 @@ const CategoryManagement = () => {
     () => [
       {
         label: CATEGORY_MESSAGES.EDIT_MENU,
-        action: 'edit',
+        action: ACTIONS.EDIT,
         icon: Edit2,
         variant: 'default' as const,
       },
       {
         label: CATEGORY_MESSAGES.DELETE_MENU,
-        action: 'delete',
+        action: ACTIONS.DELETE,
         icon: Trash,
         variant: 'destructive' as const,
       },

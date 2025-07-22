@@ -27,13 +27,13 @@ const menuOptions: {
 }[] = [
   {
     label: SERVICE_MESSAGES.EDIT_MENU,
-    action: 'edit',
+    action: ACTIONS.EDIT,
     icon: Edit2,
     variant: 'default',
   },
   {
     label: SERVICE_MESSAGES.DELETE_MENU,
-    action: 'delete',
+    action: ACTIONS.DELETE,
     icon: Trash,
     variant: 'destructive',
   },

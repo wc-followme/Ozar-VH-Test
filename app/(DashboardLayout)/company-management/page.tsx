@@ -4,6 +4,7 @@ import { CompanyCard } from '@/components/shared/cards/CompanyCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import NoDataFound from '@/components/shared/common/NoDataFound';
 import { useToast } from '@/components/ui/use-toast';
+import { ACTIONS } from '@/constants/common';
 import { PAGINATION } from '@/constants/common';
 import { apiService, Company, FetchCompaniesResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -13,24 +14,20 @@ import {
   formatDate,
   getUserPermissionsFromStorage,
 } from '@/lib/utils';
+import { MenuOption } from '@/types/menu';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import CompanyCardSkeleton from '../../../components/shared/skeleton/CompanyCardSkeleton';
 import { COMPANY_MESSAGES } from './company-messages';
 
-const menuOptions = [
+const menuOptions: MenuOption[] = [
+  { label: 'Edit', action: ACTIONS.EDIT, icon: Edit2, variant: 'default' },
   {
-    label: COMPANY_MESSAGES.EDIT_MENU,
-    action: 'edit',
-    icon: Edit2,
-    variant: 'default' as const,
-  },
-  {
-    label: COMPANY_MESSAGES.DELETE_MENU,
-    action: 'delete',
+    label: 'Archive',
+    action: ACTIONS.DELETE,
     icon: Trash,
-    variant: 'destructive' as const,
+    variant: 'destructive',
   },
 ];
 

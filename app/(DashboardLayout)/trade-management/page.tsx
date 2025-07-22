@@ -8,6 +8,7 @@ import TradeForm from '@/components/shared/forms/TradeForm';
 import TradeCardSkeleton from '@/components/shared/skeleton/TradeCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ACTIONS } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -27,13 +28,13 @@ const menuOptions: {
 }[] = [
   {
     label: TRADE_MESSAGES.EDIT_MENU,
-    action: 'edit',
+    action: ACTIONS.EDIT,
     icon: Edit2,
     variant: 'default',
   },
   {
     label: TRADE_MESSAGES.DELETE_MENU,
-    action: 'delete',
+    action: ACTIONS.DELETE,
     icon: Trash,
     variant: 'destructive',
   },
@@ -154,11 +155,11 @@ export default function TradeManagementPage() {
     const trade = trades[idx];
     if (!trade) return;
 
-    if (action === 'edit') {
+    if (action === ACTIONS.EDIT) {
       setEditingTradeUuid(trade.uuid);
       setSideSheetOpen(true);
     }
-    if (action === 'delete') {
+    if (action === ACTIONS.DELETE) {
       setDeleteIdx(idx);
       setDeleteTradeName(trade.name || '');
       setModalOpen(true);

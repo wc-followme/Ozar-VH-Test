@@ -5,7 +5,7 @@ import { RoleCard } from '@/components/shared/cards/RoleCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import NoDataFound from '@/components/shared/common/NoDataFound';
 import { useToast } from '@/components/ui/use-toast';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { roleIconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -32,8 +32,18 @@ interface MenuOption {
 }
 
 const menuOptions: MenuOption[] = [
-  { label: ROLE_MESSAGES.EDIT_MENU, action: 'edit', icon: Edit2 },
-  { label: ROLE_MESSAGES.DELETE_MENU, action: 'delete', icon: Trash },
+  {
+    label: ROLE_MESSAGES.EDIT_MENU,
+    action: ACTIONS.EDIT,
+    icon: Edit2,
+    variant: 'default',
+  },
+  {
+    label: ROLE_MESSAGES.DELETE_MENU,
+    action: ACTIONS.DELETE,
+    icon: Trash,
+    variant: 'destructive',
+  },
 ];
 
 // Adapter for icons that expect className instead of size/color

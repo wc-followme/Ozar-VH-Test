@@ -1,12 +1,13 @@
 'use client';
 
+import { ACTIONS } from '@/constants/common';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 import Dropdown from '../common/Dropdown';
 
@@ -55,30 +56,33 @@ export function CompanyCard({
   const userPermissions = getUserPermissionsFromStorage();
   const canEdit = userPermissions?.companies?.edit;
   const canArchive = userPermissions?.companies?.archive;
-
+  
   // Filter menu options based on permissions and isDefault
   const permissionFilteredOptions = menuOptions.filter(option => {
-    if (option.action === 'edit') {
+    if (option.action === ACTIONS.EDIT) {
       return canEdit;
     }
-    if (option.action === 'delete' || option.action === 'archive') {
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
       return canArchive;
     }
     return true; // Show other actions by default
   });
-
+  
   // Apply isDefault filter on top of permission filter
   const filteredMenuOptions = isDefault
-    ? permissionFilteredOptions.filter(option => option.action !== 'delete')
+    ? permissionFilteredOptions.filter(option => option.action !== ACTIONS.DELETE)
     : permissionFilteredOptions;
-
+  
   // Only show menu if there are any visible options
   const showMenu = filteredMenuOptions.length > 0;
 
   const handleToggle = async () => {
     setIsToggling(true);
-    onToggle();
-    setTimeout(() => setIsToggling(false), 300);
+    try {
+      await onToggle();
+    } finally {
+      setIsToggling(false);
+    }
   };
 
   const handleCardClick = () => {
@@ -86,12 +90,11 @@ export function CompanyCard({
   };
 
   const handleMenuAction = (action: string) => {
-    if (action === 'edit') {
+    if (action === ACTIONS.EDIT) {
       router.push(`/company-management/edit-company/${companyUuid}`);
-    } else if (action === 'delete') {
+    } else if (action === ACTIONS.DELETE) {
       setShowDelete(true);
     }
-    // Other actions (like delete) can be handled by parent component
   };
 
   return (
@@ -101,22 +104,19 @@ export function CompanyCard({
     >
       {/* Header with Avatar, User Info and Menu */}
       <div className=''>
-        <div className='relative w-full aspect-[1.87/1] h-[188px]'>
+        <div className='w-[60px] h-[60px] rounded-[12px] overflow-hidden bg-[var(--border-light)] flex items-center justify-center'>
           <Image
-            src={image || '/images/img-placeholder-md.png'}
+            src={
+              isPlaceholder
+                ? '/images/company-management/company-img-1.png'
+                : (process.env['NEXT_PUBLIC_CDN_URL'] || '') + image
+            }
             alt={name}
-            fill
-            className={`${isPlaceholder ? 'object-cover rounded-xl' : 'object-contain'}`}
-            onError={e => {
-              const target = e.target as HTMLImageElement;
-              if (target.src !== '/images/img-placeholder-md.png') {
-                target.src = '/images/img-placeholder-md.png';
-                setIsPlaceholder(true);
-              }
-            }}
-            onLoad={e => {
-              const target = e.target as HTMLImageElement;
-              if (target.src.includes('img-placeholder-md.png')) {
+            width={60}
+            height={60}
+            className='w-full h-full object-cover'
+            onError={() => {
+              if (!isPlaceholder) {
                 setIsPlaceholder(true);
               } else {
                 setIsPlaceholder(false);
