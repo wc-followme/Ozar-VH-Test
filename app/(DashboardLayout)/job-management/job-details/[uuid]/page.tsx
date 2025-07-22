@@ -2,6 +2,7 @@
 
 import { MoveBoxIcon } from '@/components/icons/MoveBoxIcon';
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
+import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModal';
 import Dropdown from '@/components/shared/common/Dropdown';
 import JobDetailsSkeleton from '@/components/shared/skeleton/JobDetailsSkeleton';
 import { Button } from '@/components/ui/button';
@@ -14,43 +15,16 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Job } from '../../types';
 
-const dropdownMenuItems = [
-  {
-    label: 'Close job',
-    icon: ClipboardClose,
-    action: () => {},
-    className:
-      'text-sm px-3 py-2 rounded-md var(--text-dark) cursor-pointer transition-colors flex items-center gap-2',
-  },
-  {
-    label: 'Add Employee',
-    icon: UserAdd,
-    action: () => {},
-    className:
-      'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100',
-  },
-  {
-    label: 'Move to Archive',
-    icon: MoveBoxIcon,
-    action: () => {},
-    className:
-      'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100',
-  },
-  {
-    label: 'Settings',
-    icon: Setting2,
-    action: () => {},
-    className:
-      'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100',
-  },
-];
-
 export default function JobDetailsPage() {
   const params = useParams();
   const uuid = params['uuid'] as string;
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
-  const { showErrorToast } = useToast();
+  const [archiving, setArchiving] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const { showErrorToast, showSuccessToast } = useToast();
 
   useEffect(() => {
     const fetchJobData = async () => {
@@ -68,6 +42,81 @@ export default function JobDetailsPage() {
     };
     if (uuid) fetchJobData();
   }, [uuid, showErrorToast]);
+
+  const handleArchiveClick = () => {
+    setShowArchiveConfirm(true);
+  };
+
+  const handleCloseClick = () => {
+    setShowCloseConfirm(true);
+  };
+
+  const moveToArchive = async () => {
+    if (!job) return;
+
+    try {
+      setArchiving(true);
+      await apiService.updateJob(uuid, { status: 'INACTIVE' });
+      showSuccessToast('Job moved to archive successfully');
+      // Update the local job state to reflect the change
+      setJob(prev => (prev ? { ...prev, status: 'INACTIVE' } : null));
+      setShowArchiveConfirm(false);
+    } catch (error: any) {
+      showErrorToast(error?.message || 'Failed to move job to archive');
+    } finally {
+      setArchiving(false);
+    }
+  };
+
+  const closeJob = async () => {
+    if (!job) return;
+
+    try {
+      setClosing(true);
+      await apiService.updateJob(uuid, { job_status: 'DONE' });
+      showSuccessToast('Job closed successfully');
+      // Update the local job state to reflect the change
+      setJob(prev => (prev ? { ...prev, job_status: 'DONE' } : null));
+      setShowCloseConfirm(false);
+    } catch (error: any) {
+      showErrorToast(error?.message || 'Failed to close job');
+    } finally {
+      setClosing(false);
+    }
+  };
+
+  const dropdownMenuItems = [
+    {
+      label: 'Close job',
+      icon: ClipboardClose,
+      action: handleCloseClick,
+      className:
+        'text-sm px-3 py-2 rounded-md var(--text-dark) cursor-pointer transition-colors flex items-center gap-2',
+      disabled: closing || job?.job_status === 'DONE',
+    },
+    {
+      label: 'Add Employee',
+      icon: UserAdd,
+      action: () => {},
+      className:
+        'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100',
+    },
+    {
+      label: 'Move to Archive',
+      icon: MoveBoxIcon,
+      action: handleArchiveClick,
+      className:
+        'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100',
+      disabled: archiving || job?.status === 'INACTIVE',
+    },
+    {
+      label: 'Settings',
+      icon: Setting2,
+      action: () => {},
+      className:
+        'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100',
+    },
+  ];
 
   const breadcrumbData: BreadcrumbItem[] = [
     { name: 'Job Management', href: '/job-management' },
@@ -111,20 +160,28 @@ export default function JobDetailsPage() {
         {/* 3-dots menu */}
         <div className='ml-auto mt-2 md:mt-0'>
           <Dropdown
-            menuOptions={dropdownMenuItems.map(({ icon, label }) => ({
-              icon,
-              label,
-              action: label,
-            }))}
+            menuOptions={dropdownMenuItems
+              .filter(item => !item.disabled)
+              .map(({ icon, label }) => ({
+                icon,
+                label:
+                  label === 'Move to Archive' && archiving
+                    ? 'Moving to Archive...'
+                    : label === 'Close job' && closing
+                      ? 'Closing Job...'
+                      : label,
+                action: label,
+              }))}
             onAction={action => {
               const item = dropdownMenuItems.find(i => i.label === action);
-              if (item && item.action) item.action();
+              if (item && item.action && !item.disabled) item.action();
             }}
             trigger={
               <Button
                 variant='ghost'
                 size='icon'
                 className='h-8 w-8 p-0 rotate-90'
+                disabled={archiving || closing}
               >
                 <IconDotsVertical
                   className='!w-6 !h-6'
@@ -138,7 +195,17 @@ export default function JobDetailsPage() {
         </div>
       </div>
       {/* Card */}
-      <div className='bg-[var(--card-background)] rounded-[20px] p-4 md:p-6 flex flex-col md:flex-row md:justify-between border border-[var(--border-dark)] max-w-full gap-4 md:gap-0'>
+      <div className='bg-[var(--card-background)] rounded-[20px] p-4 md:p-6 flex flex-col md:flex-row md:justify-between border border-[var(--border-dark)] max-w-full gap-4 md:gap-0 relative'>
+        {job.status === 'INACTIVE' && (
+          <div className='absolute top-4 right-4 bg-gray-500 text-white px-3 py-1 rounded-full text-sm font-medium'>
+            Archived
+          </div>
+        )}
+        {job.job_status === 'DONE' && (
+          <div className='absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium'>
+            Closed
+          </div>
+        )}
         {/* Project Image */}
         <div className='flex-shrink-0 flex justify-center md:block mb-4 md:mb-0'>
           <Image
@@ -244,6 +311,24 @@ export default function JobDetailsPage() {
           />
         </div>
       </div>
+
+      {/* Archive Confirmation Modal */}
+      <ConfirmDeleteModal
+        open={showArchiveConfirm}
+        title='Move to Archive'
+        subtitle='Are you sure you want to move this job to archive? This action can be undone later.'
+        onCancel={() => setShowArchiveConfirm(false)}
+        onDelete={moveToArchive}
+      />
+
+      {/* Close Job Confirmation Modal */}
+      <ConfirmDeleteModal
+        open={showCloseConfirm}
+        title='Close Job'
+        subtitle='Are you sure you want to close this job? This action can be undone later.'
+        onCancel={() => setShowCloseConfirm(false)}
+        onDelete={closeJob}
+      />
     </div>
   );
 }
