@@ -123,7 +123,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
           fileName: generatedFileName,
           fileType: contractorPhotoFile.type,
           fileSize: contractorPhotoFile.size,
-          purpose: 'company', // Try 'company' instead of 'profile-picture'
+          purpose: 'profile-picture', // Try 'company' instead of 'profile-picture'
           customPath: '',
         });
 
@@ -150,16 +150,15 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
 
         // Upload file
         await uploadFileToPresignedUrl(
-          presignedResponse.data.uploadUrl,
+          presignedResponse.data['uploadUrl'],
           contractorPhotoFile
         );
 
-        // Extract file key from fileUrl
-        const fileUrl = presignedResponse.data.publicUrl;
-        const fileKey = fileUrl.split('/').pop() || '';
-
+        // Use fileKey for contractor_profile_url
+        const fileKey = presignedResponse.data['fileKey'];
+        
         setContractorFileKey(fileKey);
-        return fileUrl;
+        return fileKey;
       } catch (error) {
         console.error('Error uploading contractor image:', error);
         throw error;
