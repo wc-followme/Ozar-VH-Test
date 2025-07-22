@@ -156,7 +156,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
 
         // Use fileKey for contractor_profile_url
         const fileKey = presignedResponse.data['fileKey'];
-        
+
         setContractorFileKey(fileKey);
         return fileKey;
       } catch (error) {
