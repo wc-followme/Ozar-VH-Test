@@ -9,7 +9,10 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import NoDataFound from '../../../components/shared/common/NoDataFound';
@@ -52,6 +55,10 @@ export default function MaterialManagementPage() {
   >(undefined);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+
+  // Get user permissions for materials
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.materials?.edit;
 
   const fetchMaterials = useCallback(
     async (targetPage = 1, append = false) => {
@@ -258,9 +265,14 @@ export default function MaterialManagementPage() {
         <h2 className='page-title'>
           {MATERIAL_MESSAGES.MATERIAL_MANAGEMENT_TITLE}
         </h2>
-        <Button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
-          {MATERIAL_MESSAGES.ADD_MATERIAL_BUTTON}
-        </Button>
+        {canEdit && (
+          <Button
+            className='btn-primary'
+            onClick={() => setSideSheetOpen(true)}
+          >
+            {MATERIAL_MESSAGES.ADD_MATERIAL_BUTTON}
+          </Button>
+        )}
       </div>
       {/* Material Grid */}
       <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 xl:gap-6'>
@@ -275,6 +287,7 @@ export default function MaterialManagementPage() {
               buttonText={MATERIAL_MESSAGES.ADD_MATERIAL_BUTTON}
               onButtonClick={() => setSideSheetOpen(true)}
               description={MATERIAL_MESSAGES.NO_MATERIALS_FOUND_DESCRIPTION}
+              showButton={canEdit}
             />
           </div>
         ) : (
@@ -285,7 +298,7 @@ export default function MaterialManagementPage() {
               category={`${material.services?.length || 0} Service${(material.services?.length || 0) !== 1 ? 's' : ''}`}
               menuOptions={menuOptions}
               onMenuAction={action => handleMenuAction(action, idx)}
-              module="materials"
+              module='materials'
             />
           ))
         )}

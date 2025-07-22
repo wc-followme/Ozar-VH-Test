@@ -10,7 +10,10 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { TRADE_MESSAGES } from './trade-messages';
@@ -52,6 +55,10 @@ export default function TradeManagementPage() {
   );
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+
+  // Get user permissions for trades
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.trades?.edit;
 
   const fetchTrades = useCallback(
     async (targetPage = 1, append = false) => {
@@ -251,9 +258,14 @@ export default function TradeManagementPage() {
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
         <h2 className='page-title'>{TRADE_MESSAGES.TRADE_MANAGEMENT_TITLE}</h2>
-        <Button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
-          {TRADE_MESSAGES.ADD_TRADE_BUTTON}
-        </Button>
+        {canEdit && (
+          <Button
+            className='btn-primary'
+            onClick={() => setSideSheetOpen(true)}
+          >
+            {TRADE_MESSAGES.ADD_TRADE_BUTTON}
+          </Button>
+        )}
       </div>
       {/* Trade Grid */}
       <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 xl:gap-6'>
@@ -268,6 +280,7 @@ export default function TradeManagementPage() {
               buttonText={TRADE_MESSAGES.ADD_TRADE_BUTTON}
               onButtonClick={() => setSideSheetOpen(true)}
               description={TRADE_MESSAGES.NO_TRADES_FOUND_DESCRIPTION}
+              showButton={canEdit}
             />
           </div>
         ) : (

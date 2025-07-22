@@ -174,7 +174,7 @@ export function CompanyCard({
           </div>
         </div>
         {/* Status Toggle */}
-        {!isDefault && (
+        {!isDefault && canEdit && (
           <div
             className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3 mt-4'
             onClick={e => {

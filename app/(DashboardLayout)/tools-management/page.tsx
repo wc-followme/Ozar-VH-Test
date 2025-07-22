@@ -4,160 +4,103 @@ import ToolCard from '@/components/shared/cards/ToolCard';
 import SideSheet from '@/components/shared/common/SideSheet';
 import ToolForm from '@/components/shared/forms/ToolForm';
 import ToolCardSkeleton from '@/components/shared/skeleton/ToolCardSkeleton';
-import { useEffect, useState } from 'react';
+import { getUserPermissionsFromStorage } from '@/lib/utils';
+import { useState } from 'react';
 
 const dummyTools = [
   {
     id: 1,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
+    name: 'Hammer',
+    brand: 'DeWalt',
+    quantity: 5,
     videoCount: 2,
   },
   {
     id: 2,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
+    name: 'Drill',
+    brand: 'Makita',
+    quantity: 3,
+    videoCount: 1,
   },
   {
     id: 3,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
+    name: 'Saw',
+    brand: 'Bosch',
+    quantity: 2,
+    videoCount: 3,
   },
   {
     id: 4,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
+    name: 'Wrench',
+    brand: 'Snap-on',
+    quantity: 8,
+    videoCount: 0,
   },
   {
     id: 5,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
+    name: 'Screwdriver',
+    brand: 'Stanley',
+    quantity: 12,
+    videoCount: 1,
   },
   {
     id: 6,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 7,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 8,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 9,
-    image: '',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 10,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 11,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 12,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
+    name: 'Pliers',
+    brand: 'Klein Tools',
+    quantity: 6,
     videoCount: 2,
   },
 ];
 
-const ToolsManagement = () => {
+export default function ToolsManagement() {
   const [tools, setTools] = useState(dummyTools);
+  const [loading, setLoading] = useState(false);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Form state
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [service, setService] = useState('');
   const [toolName, setToolName] = useState('');
   const [companyName, setCompanyName] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [errors, setErrors] = useState<{
-    toolName?: string;
-    companyName?: string;
-    quantity?: string;
-    service?: string;
-  }>({});
-  const [service, setService] = useState('');
+  const [quantity, setQuantity] = useState(1);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Refs - commented out as currently unused
-  // const _photoInputRef = useRef<HTMLInputElement>(null);
+  // Get user permissions for tools
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.tools?.edit;
 
   const handleDelete = (id: number) => {
-    setTools(currentTools => currentTools.filter(tool => tool.id !== id));
+    setTools(tools.filter(tool => tool.id !== id));
   };
 
   const handleDeletePhoto = () => {
     setPhoto(null);
   };
 
-  function onClose() {
+  const onClose = () => {
     setSideSheetOpen(false);
-    // Optionally reset form fields here
+    setPhoto(null);
+    setService('');
     setToolName('');
     setCompanyName('');
-    setQuantity('');
-    setPhoto(null);
+    setQuantity(1);
     setErrors({});
-  }
-
-  // Show skeletons for 3 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  };
 
   return (
     <div className='w-full'>
       {/* Header */}
       <div className='flex items-center justify-between mb-8'>
         <h2 className='page-title'>Tools Management</h2>
-        <button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
-          <span>Create Tool</span>
-        </button>
+        {canEdit && (
+          <button className='btn-primary' onClick={() => setSideSheetOpen(true)}>
+            <span>Create Tool</span>
+          </button>
+        )}
       </div>
       <SideSheet
         title='Add Tool'
@@ -201,6 +144,4 @@ const ToolsManagement = () => {
       </div>
     </div>
   );
-};
-
-export default ToolsManagement;
+}

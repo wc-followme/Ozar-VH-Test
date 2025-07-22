@@ -157,27 +157,29 @@ export function UserCard({
       </div>
 
       {/* Status Toggle */}
-      <div className='flex items-center mt-auto justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
-        <span className='text-xs font-medium text-[var(--text-dark)]'>
-          Enable
-        </span>
-        <Switch
-          checked={status}
-          onCheckedChange={handleToggle}
-          disabled={isToggling || disableActions}
-          className='
-              h-4 w-9 
-              data-[state=checked]:bg-[var(--secondary)] 
-              data-[state=unchecked]:bg-gray-300
-              [&>span]:h-3 
-              [&>span]:w-3 
-              [&>span]:bg-white 
-              data-[state=checked]:[&>span]:border-green-400
-              [&>span]:transition-all
-              [&>span]:duration-200
-            '
-        />
-      </div>
+      {canEdit && (
+        <div className='flex items-center mt-auto justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
+          <span className='text-xs font-medium text-[var(--text-dark)]'>
+            Enable
+          </span>
+          <Switch
+            checked={status}
+            onCheckedChange={handleToggle}
+            disabled={isToggling || disableActions}
+            className='
+                h-4 w-9 
+                data-[state=checked]:bg-[var(--secondary)] 
+                data-[state=unchecked]:bg-gray-300
+                [&>span]:h-3 
+                [&>span]:w-3 
+                [&>span]:bg-white 
+                data-[state=checked]:[&>span]:border-green-400
+                [&>span]:transition-all
+                [&>span]:duration-200
+              '
+          />
+        </div>
+      )}
       <ConfirmDeleteModal
         open={showDelete}
         title={`Are you sure you want to archive?`}

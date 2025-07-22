@@ -11,6 +11,7 @@ import {
   extractApiErrorMessage,
   extractApiSuccessMessage,
   formatDate,
+  getUserPermissionsFromStorage,
 } from '@/lib/utils';
 import { Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
@@ -42,6 +43,10 @@ export default function CompanyManagement() {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
   const router = useRouter();
+
+  // Get user permissions for companies
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.companies?.edit;
 
   // Fetch companies
   useEffect(() => {
@@ -198,12 +203,14 @@ export default function CompanyManagement() {
           {COMPANY_MESSAGES.COMPANY_MANAGEMENT_TITLE}
         </h1>
         <div className='flex items-center gap-4'>
-          <button
-            onClick={handleCreateCompany}
-            className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-2'
-          >
-            <span>{COMPANY_MESSAGES.ADD_COMPANY_BUTTON}</span>
-          </button>
+          {canEdit && (
+            <button
+              onClick={handleCreateCompany}
+              className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-2'
+            >
+              <span>{COMPANY_MESSAGES.ADD_COMPANY_BUTTON}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -222,6 +229,7 @@ export default function CompanyManagement() {
               description={COMPANY_MESSAGES.NO_COMPANIES_FOUND_DESCRIPTION}
               buttonText={COMPANY_MESSAGES.ADD_COMPANY_BUTTON}
               onButtonClick={handleCreateCompany}
+              showButton={canEdit}
             />
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
