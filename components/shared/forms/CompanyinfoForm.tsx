@@ -641,99 +641,124 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               />
             </div>
             <div className='col-span-2 pt-6'>
-              <h2 className='text-lg font-bold mb-4'>
-                Contractor Information{' '}
-                <span className='font-medium text-[var(--text-secondary)]'>
-                  (Optional)
-                </span>
-              </h2>
-              <div className='flex items-center gap-6'>
-                <div className='h-[180px] w-[180px]'>
-                  <PhotoUploadField
-                    photo={contractorPhotoFile}
-                    onPhotoChange={handleContractorPhotoChange}
-                    onDeletePhoto={handleDeleteContractorPhoto}
-                    label={COMPANY_MESSAGES.ENTER_CONTRACTOR_PHOTO}
-                    uploading={contractorUploading}
-                    existingImageUrl={
-                      contractorFileKey && !contractorPhotoFile
-                        ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
-                          contractorFileKey
-                        : ''
-                    }
-                    cardHeight='h-[180px]'
-                  />
-                  {contractorUploading && (
-                    <div className='text-xs mt-2'>
-                      {COMPANY_MESSAGES.UPLOADING}
-                    </div>
-                  )}
-                </div>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4 flex-1'>
-                  {/* Contractor Name */}
-                  <div className='col-span-2 space-y-2'>
-                    <Label htmlFor='contractor-name' className='field-label'>
-                      {COMPANY_MESSAGES.CONTRACTOR_NAME_LABEL}
-                    </Label>
-                    <Input
-                      id='contractor-name'
-                      value={contractorName}
-                      onChange={e => setContractorName(e.target.value)}
-                      placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_NAME}
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    />
-                    <FormErrorMessage message={errors.contractor_name || ''} />
-                  </div>
-
-                  {/* Contractor Email */}
-                  <div className='space-y-2'>
-                    <Label htmlFor='contractor-email' className='field-label'>
-                      {COMPANY_MESSAGES.CONTRACTOR_EMAIL_LABEL}
-                    </Label>
-                    <Input
-                      id='contractor-email'
-                      type='email'
-                      value={contractorEmail}
-                      onChange={e => setContractorEmail(e.target.value)}
-                      placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_EMAIL}
-                      className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
-                    />
-                    <FormErrorMessage message={errors.contractor_email || ''} />
-                  </div>
-
-                  {/* Contractor Phone */}
-                  <div className='space-y-2'>
-                    <Label htmlFor='contractor-phone' className='field-label'>
-                      {COMPANY_MESSAGES.CONTRACTOR_PHONE_LABEL}
-                    </Label>
-                    <div className='flex gap-2'>
-                      <Select
-                        value={contractorCountryCode}
-                        onValueChange={setContractorCountryCode}
-                      >
-                        <SelectTrigger className='w-[120px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {countryCodes.map(country => (
-                            <SelectItem key={country.code} value={country.code}>
-                              {country.flag} {country.code}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        id='contractor-phone'
-                        value={contractorPhone}
-                        onChange={e => setContractorPhone(e.target.value)}
-                        placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_PHONE}
-                        className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+              {/* Only show Contractor Information in create mode, not edit mode */}
+              {!isEditMode && (
+                <>
+                  <h2 className='text-lg font-bold mb-4'>
+                    Contractor Information{' '}
+                    <span className='font-medium text-[var(--text-secondary)]'>
+                      (Optional)
+                    </span>
+                  </h2>
+                  <div className='flex items-center gap-6'>
+                    <div className='h-[180px] w-[180px]'>
+                      <PhotoUploadField
+                        photo={contractorPhotoFile}
+                        onPhotoChange={handleContractorPhotoChange}
+                        onDeletePhoto={handleDeleteContractorPhoto}
+                        label={COMPANY_MESSAGES.ENTER_CONTRACTOR_PHOTO}
+                        uploading={contractorUploading}
+                        existingImageUrl={
+                          contractorFileKey && !contractorPhotoFile
+                            ? (process.env['NEXT_PUBLIC_CDN_URL'] || '') +
+                              contractorFileKey
+                            : ''
+                        }
+                        cardHeight='h-[180px]'
                       />
+                      {contractorUploading && (
+                        <div className='text-xs mt-2'>
+                          {COMPANY_MESSAGES.UPLOADING}
+                        </div>
+                      )}
                     </div>
-                    <FormErrorMessage message={errors.contractor_phone || ''} />
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4 flex-1'>
+                      {/* Contractor Name */}
+                      <div className='col-span-2 space-y-2'>
+                        <Label
+                          htmlFor='contractor-name'
+                          className='field-label'
+                        >
+                          {COMPANY_MESSAGES.CONTRACTOR_NAME_LABEL}
+                        </Label>
+                        <Input
+                          id='contractor-name'
+                          value={contractorName}
+                          onChange={e => setContractorName(e.target.value)}
+                          placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_NAME}
+                          className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                        />
+                        <FormErrorMessage
+                          message={errors.contractor_name || ''}
+                        />
+                      </div>
+
+                      {/* Contractor Email */}
+                      <div className='space-y-2'>
+                        <Label
+                          htmlFor='contractor-email'
+                          className='field-label'
+                        >
+                          {COMPANY_MESSAGES.CONTRACTOR_EMAIL_LABEL}
+                        </Label>
+                        <Input
+                          id='contractor-email'
+                          type='email'
+                          value={contractorEmail}
+                          onChange={e => setContractorEmail(e.target.value)}
+                          placeholder={COMPANY_MESSAGES.ENTER_CONTRACTOR_EMAIL}
+                          className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                        />
+                        <FormErrorMessage
+                          message={errors.contractor_email || ''}
+                        />
+                      </div>
+
+                      {/* Contractor Phone */}
+                      <div className='space-y-2'>
+                        <Label
+                          htmlFor='contractor-phone'
+                          className='field-label'
+                        >
+                          {COMPANY_MESSAGES.CONTRACTOR_PHONE_LABEL}
+                        </Label>
+                        <div className='flex gap-2'>
+                          <Select
+                            value={contractorCountryCode}
+                            onValueChange={setContractorCountryCode}
+                          >
+                            <SelectTrigger className='w-[100px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className='bg-[var(--white-background)] border border-[var(--border-light)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
+                              {countryCodes.map(country => (
+                                <SelectItem
+                                  key={country.code}
+                                  value={country.code}
+                                >
+                                  {country.flag} {country.code}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            id='contractor-phone'
+                            value={contractorPhone}
+                            onChange={e => setContractorPhone(e.target.value)}
+                            placeholder={
+                              COMPANY_MESSAGES.ENTER_CONTRACTOR_PHONE
+                            }
+                            className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                          />
+                        </div>
+                        <FormErrorMessage
+                          message={errors.contractor_phone || ''}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
 
