@@ -3,6 +3,7 @@
 import { MoveBoxIcon } from '@/components/icons/MoveBoxIcon';
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import Dropdown from '@/components/shared/common/Dropdown';
+import JobDetailsSkeleton from '@/components/shared/skeleton/JobDetailsSkeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { apiService } from '@/lib/api';
@@ -12,7 +13,6 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Job } from '../../types';
-import JobDetailsSkeleton from '@/components/shared/skeleton/JobDetailsSkeleton';
 
 const dropdownMenuItems = [
   {
@@ -95,7 +95,10 @@ export default function JobDetailsPage() {
   const mapImage = '/images/map-placeholder.png';
   const projectId = job.project_id || 'Job#456';
   const projectName = job.project_name || 'Downtown Project';
-  const category = job.category || 'Interior';
+  const category =
+    typeof job.category === 'string'
+      ? job.category
+      : (job.category as any)?.name || 'Interior';
   const budget =
     job.budget !== null && job.budget !== undefined ? job.budget : 57000;
   const spent = 17200; // Static fallback

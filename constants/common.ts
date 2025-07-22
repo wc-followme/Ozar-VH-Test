@@ -168,6 +168,7 @@ export type JobType = (typeof JOB_TYPE)[keyof typeof JOB_TYPE];
 
 export const ROLE_ID = {
   JOB_USER: 6,
+  CONTRACTOR: 3,
 } as const;
 
 export enum CommonStatus {

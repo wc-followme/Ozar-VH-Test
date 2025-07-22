@@ -4,12 +4,14 @@ import { HomeOwnerHeader } from '@/components/layout/HomeOwnerHeader';
 import { StepGeneralInfo } from '@/components/shared/forms/StepGeneralInfo';
 import { StepOptionalDetails } from '@/components/shared/forms/StepOptionalDetails';
 import { StepProjectType } from '@/components/shared/forms/StepProjectType';
+import { showErrorToast, showSuccessToast } from '@/components/ui/use-toast';
 import { apiService } from '@/lib/api';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function HomeOwnerWizardPage() {
   const params = useParams();
+  const router = useRouter();
   const uuid = params['uuid'] as string;
 
   // Job data state
@@ -22,33 +24,10 @@ export default function HomeOwnerWizardPage() {
     'general'
   );
 
-  // Step 1: General Info state
-  const [projectStart, setProjectStart] = useState<Date | undefined>();
-  const [projectFinish, setProjectFinish] = useState<Date | undefined>();
-  const [emails, setEmails] = useState(['']);
-  const [phones, setPhones] = useState(['']);
-  const [contractor, setContractor] = useState('any');
-  const handleAddEmail = () => setEmails([...emails, '']);
-  const handleEmailChange = (idx: number, value: string) =>
-    setEmails(emails.map((e, i) => (i === idx ? value : e)));
-  const handleAddPhone = () => setPhones([...phones, '']);
-  const handlePhoneChange = (idx: number, value: string) =>
-    setPhones(phones.map((p, i) => (i === idx ? value : p)));
-
-  // Step 2: Optional Details state
-  const [typeOfProperty, setTypeOfProperty] = useState('Residential');
-  const [ageOfProperty, setAgeOfProperty] = useState('20 years');
-  const [approxSqft, setApproxSqft] = useState('2500 Sq / Ft');
-  const [notificationStyle, setNotificationStyle] = useState('Email');
-  const [dailyWorkStart, setDailyWorkStart] = useState('');
-  const [dailyWorkEnd, setDailyWorkEnd] = useState('');
-  const [ownerPresent, setOwnerPresent] = useState('No');
-  const [weekendWork, setWeekendWork] = useState('Yes');
-  const [animals, setAnimals] = useState('Yes');
-  const [petType, setPetType] = useState('Dog');
-
-  // Step 3: Project Type state
-  const [selectedType, setSelectedType] = useState('full_home');
+  // Form data state
+  const [generalInfoData, setGeneralInfoData] = useState<any>(null);
+  const [optionalDetailsData, setOptionalDetailsData] = useState<any>(null);
+  const [projectTypeData, setProjectTypeData] = useState<any>(null);
 
   // Fetch job data on component mount
   useEffect(() => {
@@ -63,7 +42,46 @@ export default function HomeOwnerWizardPage() {
         setIsLoading(true);
         setError(null);
         const response = await apiService.fetchJobById(uuid);
-        setJobData(response.data || response);
+        const job = response.data || response;
+        setJobData(job);
+
+        // Reset form data based on existing job data
+        if (job) {
+          // Reset general info data
+          setGeneralInfoData({
+            fullName: job.client_name || '',
+            email: job.client_email || '',
+            phone: job.client_phone_number || '',
+            address: job.client_address || '',
+            budget: job.budget ? `$${job.budget}` : '',
+            contractor: job.preferred_contractor
+              ? job.preferred_contractor.toString()
+              : '',
+            projectStartDate: job.project_start_date || '',
+            projectFinishDate: job.project_finish_date || '',
+          });
+
+          // Reset optional details data
+          setOptionalDetailsData({
+            typeOfProperty: job.property_type
+              ? job.property_type.toLowerCase()
+              : '',
+            ageOfProperty: job.age_of_property || '',
+            approxSqft: job.approx_sq_ft ? job.approx_sq_ft.toString() : '',
+            notificationStyle: job.notification_style || 'Email',
+            dailyWorkStart: job.daily_work_start_time || '',
+            dailyWorkEnd: job.daily_work_end_time || '',
+            ownerPresent: job.owner_present_need ? 'Yes' : 'No',
+            weekendWork: job.weekend_work ? 'Yes' : 'No',
+            animals: job.has_animals ? 'Yes' : 'No',
+            petType: job.pet_type || '',
+          });
+
+          // Reset project type data
+          setProjectTypeData({
+            selectedType: job.category_id ? job.category_id.toString() : '',
+          });
+        }
       } catch (err) {
         console.error('Error fetching job data:', err);
         setError('Failed to load job data');
@@ -79,6 +97,147 @@ export default function HomeOwnerWizardPage() {
   const goToGeneral = () => setStep('general');
   const goToOptional = () => setStep('optional');
   const goToProjectType = () => setStep('projectType');
+
+  // Form submission handlers
+  const handleGeneralInfoSubmit = (data: any) => {
+    setGeneralInfoData(data);
+    if (jobBoxesStep === 'FIRST') {
+      // Submit only general info
+      handleFinalSubmit({ generalInfo: data });
+    } else {
+      goToOptional();
+    }
+  };
+
+  const handleOptionalDetailsSubmit = (data: any) => {
+    setOptionalDetailsData(data);
+    if (jobBoxesStep === 'SECOND') {
+      // Submit general + optional info
+      handleFinalSubmit({
+        generalInfo: generalInfoData,
+        optionalDetails: data,
+      });
+    } else {
+      goToProjectType();
+    }
+  };
+
+  const handleOptionalDetailsSkip = () => {
+    if (jobBoxesStep === 'SECOND') {
+      // Submit only general info (skip optional)
+      handleFinalSubmit({ generalInfo: generalInfoData });
+    } else {
+      goToProjectType();
+    }
+  };
+
+  const handleProjectTypeSubmit = (data: any) => {
+    setProjectTypeData(data);
+    // Submit all data
+    handleFinalSubmit({
+      generalInfo: generalInfoData,
+      optionalDetails: optionalDetailsData,
+      projectType: data,
+    });
+  };
+
+  const handleFinalSubmit = async (allData: any) => {
+    try {
+      console.log('Submitting all form data:', allData);
+
+      // Prepare API payload
+      const payload: any = {};
+
+      // Map general info data
+      if (allData.generalInfo) {
+        const general = allData.generalInfo;
+        payload.client_name = general.fullName || '';
+        payload.client_email = general.email || '';
+        payload.client_phone_number = general.phone || '';
+        payload.client_address = general.address || '';
+        payload.budget =
+          parseFloat(general.budget?.replace(/[^0-9.]/g, '')) || 0;
+        payload.preferred_contractor = Number(general.contractor) || null;
+
+        // Handle dates
+        if (general.projectStartDate) {
+          payload.project_start_date = new Date(general.projectStartDate)
+            .toISOString()
+            .split('T')[0];
+        }
+        if (general.projectFinishDate) {
+          payload.project_finish_date = new Date(general.projectFinishDate)
+            .toISOString()
+            .split('T')[0];
+        }
+      }
+
+      // Map optional details data
+      if (allData.optionalDetails) {
+        const optional = allData.optionalDetails;
+        payload.property_type =
+          optional.typeOfProperty?.toUpperCase() || 'RESIDENTIAL';
+        payload.age_of_property = optional.ageOfProperty || '';
+        payload.approx_sq_ft =
+          parseInt(optional.approxSqft?.replace(/[^0-9]/g, '')) || 0;
+        payload.notification_style = optional.notificationStyle || 'Email';
+        payload.daily_work_start_time = optional.dailyWorkStart || '';
+        payload.daily_work_end_time = optional.dailyWorkEnd || '';
+        payload.owner_present_need = optional.ownerPresent === 'Yes';
+        payload.weekend_work = optional.weekendWork === 'Yes';
+        payload.has_animals = optional.animals === 'Yes';
+        payload.pet_type = optional.petType || '';
+      }
+
+      // Map project type data
+      if (allData.projectType) {
+        const project = allData.projectType;
+        payload.category_id = Number(project.selectedType) || null;
+      }
+
+      // Add existing job data if available
+      if (jobData) {
+        payload.company_id = Number(jobData.company_id) || null;
+        payload.client_id = jobData.client_id || null;
+        payload.job_image = jobData.job_image || '';
+        payload.project_name = jobData.project_name || '';
+        payload.latitude = jobData.latitude || '';
+        payload.longitude = jobData.longitude || '';
+        payload.job_status = jobData.job_status || 'PENDING';
+        payload.job_privacy = jobData.job_privacy || 'PUBLIC';
+        payload.status = jobData.status || 'ACTIVE';
+      }
+
+      payload.job_boxes_step = jobBoxesStep;
+
+      console.log('API Payload:', payload);
+
+      // Call the API using apiService
+      const response = await apiService.updateJob(uuid, payload);
+
+      console.log('API Response:', response);
+
+      // Show success toast with API response message
+      if (response && response.message) {
+        showSuccessToast(response.message);
+        router.push('/job-management');
+      } else {
+        showSuccessToast('Form submitted successfully!');
+      }
+
+      // Redirect to job management page after a short delay
+    } catch (error: any) {
+      console.error('Error submitting form:', error);
+
+      // Show error toast with API response message
+      if (error && error.message) {
+        showErrorToast(error.message);
+      } else {
+        showErrorToast('Failed to submit form. Please try again.');
+      }
+    } finally {
+    }
+  };
 
   // Get job boxes step from job data
   const jobBoxesStep = jobData?.job_boxes_step || 'THIRD';
@@ -179,60 +338,30 @@ export default function HomeOwnerWizardPage() {
             {/* Wizard Steps */}
             {step === 'general' && (
               <StepGeneralInfo
-                projectStart={projectStart}
-                setProjectStart={setProjectStart}
-                projectFinish={projectFinish}
-                setProjectFinish={setProjectFinish}
-                emails={emails}
-                setEmails={setEmails}
-                handleAddEmail={handleAddEmail}
-                handleEmailChange={handleEmailChange}
-                phones={phones}
-                setPhones={setPhones}
-                handleAddPhone={handleAddPhone}
-                handlePhoneChange={handlePhoneChange}
-                contractor={contractor}
-                setContractor={setContractor}
-                onNext={goToOptional}
+                onNext={handleGeneralInfoSubmit}
+                defaultValues={generalInfoData}
+                isLastStep={jobBoxesStep === 'FIRST'}
               />
             )}
             {step === 'optional' && (
               <StepOptionalDetails
-                typeOfProperty={typeOfProperty}
-                setTypeOfProperty={setTypeOfProperty}
-                ageOfProperty={ageOfProperty}
-                setAgeOfProperty={setAgeOfProperty}
-                approxSqft={approxSqft}
-                setApproxSqft={setApproxSqft}
-                notificationStyle={notificationStyle}
-                setNotificationStyle={setNotificationStyle}
-                dailyWorkStart={dailyWorkStart}
-                setDailyWorkStart={setDailyWorkStart}
-                dailyWorkEnd={dailyWorkEnd}
-                setDailyWorkEnd={setDailyWorkEnd}
-                ownerPresent={ownerPresent}
-                setOwnerPresent={setOwnerPresent}
-                weekendWork={weekendWork}
-                setWeekendWork={setWeekendWork}
-                animals={animals}
-                setAnimals={setAnimals}
-                petType={petType}
-                setPetType={setPetType}
                 onPrev={goToGeneral}
                 {...(jobBoxesStep === 'THIRD' && {
-                  onSkip: goToProjectType,
-                  onNext: goToProjectType,
+                  onSkip: handleOptionalDetailsSkip,
                 })}
+                onNext={handleOptionalDetailsSubmit}
                 cancelButtonClass={cancelButtonClass}
+                defaultValues={optionalDetailsData}
+                isLastStep={jobBoxesStep === 'SECOND'}
               />
             )}
             {step === 'projectType' && jobBoxesStep === 'THIRD' && (
               <StepProjectType
-                selectedType={selectedType}
-                setSelectedType={setSelectedType}
                 onPrev={goToOptional}
-                onSubmit={() => {}}
+                onSubmit={handleProjectTypeSubmit}
                 cancelButtonClass={cancelButtonClass}
+                defaultValues={projectTypeData}
+                isLastStep={true}
               />
             )}
           </div>

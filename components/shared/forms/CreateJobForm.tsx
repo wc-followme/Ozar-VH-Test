@@ -20,41 +20,41 @@ import { SelectBoxCard } from '../common/SelectBoxCard';
 
 const selectBoxOptions = [
   {
-    id: 'homeowner-info',
+    id: 'general-info',
     value: 'FIRST',
-    title: 'Homeowner Info',
+    title: 'General Information',
     description:
       'Includes name, email, phone number, and basic contact details.',
     disabled: false,
   },
   {
-    id: 'property-details',
+    id: 'property-info',
     value: 'SECOND',
-    title: 'Property Details',
+    title: 'Property Information',
     description:
       'Covers home size, number of BHKs, and type of work (interior, exterior, etc.).',
     disabled: false,
   },
   {
-    id: 'project-estimate',
+    id: 'project-category',
     value: 'THIRD',
-    title: 'Project Estimate',
+    title: 'Project Category',
     description:
       'Provides a detailed cost estimate based on selected services and property info.',
     disabled: false,
   },
   {
-    id: 'adding-more',
+    id: 'project-info',
     value: 'FOURTH',
-    title: 'Adding more project details',
+    title: 'Project Information',
     description:
       'Includes name, email, phone number, and basic contact details.',
     disabled: true,
   },
   {
-    id: 'complete-estimate',
+    id: 'project-estimates',
     value: 'FIFTH',
-    title: 'Complete line items in estimates to create new estimates.',
+    title: 'Project Estimates',
     description: 'Covers home size, number of BHKs, and type of work.',
     disabled: true,
   },

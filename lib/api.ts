@@ -1227,6 +1227,48 @@ class ApiService {
     });
   }
 
+  // Update job
+  async updateJob(
+    uuid: string,
+    payload: {
+      client_id?: number;
+      client_name?: string;
+      client_email?: string;
+      client_phone_number?: string;
+      job_boxes_step?: string;
+      job_privacy?: string;
+      project_name?: string;
+      budget?: number;
+      category_id?: number;
+      client_address?: string;
+      latitude?: number;
+      longitude?: number;
+      property_type?: string;
+      project_start_date?: string;
+      project_finish_date?: string;
+      preferred_contractor?: string;
+      notification_style?: string;
+      approx_sq_ft?: number;
+      age_of_property?: string;
+      daily_work_start_time?: string;
+      daily_work_end_time?: string;
+      owner_present_need?: boolean;
+      weekend_work?: boolean;
+      has_animals?: boolean;
+      pet_type?: string;
+      company_id?: number;
+      job_image?: string;
+      job_status?: string;
+      status?: string;
+    }
+  ): Promise<any> {
+    return this.makeRequest(`/jobs/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Removed testConnection and all debug code
 }
 
