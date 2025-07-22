@@ -52,6 +52,25 @@ export function CompanyCard({
   const router = useRouter();
   const [isPlaceholder, setIsPlaceholder] = useState(!image);
 
+  // Generate a consistent placeholder image based on company name
+  const getPlaceholderImage = () => {
+    const placeholderImages = [
+      '/images/company-management/company-img-1.png',
+      '/images/company-management/company-img-2.png',
+      '/images/company-management/company-img-3.png',
+      '/images/company-management/company-img-4.png',
+    ];
+
+    // Use company name to consistently pick same placeholder for same company
+    const hash = name.split('').reduce((a, b) => {
+      a = (a << 5) - a + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+
+    const index = Math.abs(hash) % placeholderImages.length;
+    return placeholderImages[index];
+  };
+
   // Get user permissions for companies
   const userPermissions = getUserPermissionsFromStorage();
   const canEdit = userPermissions?.companies?.assign_user;
@@ -109,9 +128,9 @@ export function CompanyCard({
         <div className='w-[60px] h-[60px] rounded-[12px] overflow-hidden bg-[var(--border-light)] flex items-center justify-center'>
           <Image
             src={
-              isPlaceholder
-                ? '/images/company-management/company-img-1.png'
-                : (process.env['NEXT_PUBLIC_CDN_URL'] || '') + image
+              !image || image.trim() === '' || isPlaceholder
+                ? getPlaceholderImage()
+                : image || '/images/company-management/company-img-1.png'
             }
             alt={name}
             width={60}
