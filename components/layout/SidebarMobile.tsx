@@ -1,5 +1,5 @@
 import { sidebarItems } from '@/constants/sidebar-items';
-import { cn } from '@/lib/utils';
+import { cn, getUserPermissionsFromStorage } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Sheet, SheetContent, SheetTitle } from '../ui/sheet';
@@ -12,6 +12,18 @@ interface SidebarMobileProps {
 export function SidebarMobile({ open, onOpenChange }: SidebarMobileProps) {
   const pathname = usePathname();
 
+  // Get user permissions
+  const userPermissions = getUserPermissionsFromStorage();
+  const canViewCategories = userPermissions?.categories?.view;
+
+  // Filter sidebar items based on permissions
+  const filteredSidebarItems = sidebarItems.filter(item => {
+    if (item.title === 'Category Management') {
+      return canViewCategories;
+    }
+    return true; // Show other items by default
+  });
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -21,7 +33,7 @@ export function SidebarMobile({ open, onOpenChange }: SidebarMobileProps) {
         <SheetTitle className='hidden'></SheetTitle>
         <nav className='py-3'>
           <ul className='py-2 [&>li+li]:mt-0.5'>
-            {sidebarItems.map(({ title, href, icon: Icon }, index) => (
+            {filteredSidebarItems.map(({ title, href, icon: Icon }, index) => (
               <li key={index}>
                 <Link
                   href={href}
