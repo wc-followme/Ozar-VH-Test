@@ -714,6 +714,37 @@ class ApiService {
     });
   }
 
+  /**
+   * Get users dropdown for autocomplete
+   */
+  async getUsersDropdown({
+    name = '',
+    phone_number = '',
+    email = '',
+    role_id = '',
+    page = 1,
+    limit = 10,
+  }: {
+    name?: string;
+    phone_number?: string;
+    email?: string;
+    role_id?: string | number;
+    page?: number;
+    limit?: number;
+  }): Promise<any> {
+    const params = new URLSearchParams();
+    if (name) params.append('name', name);
+    if (phone_number) params.append('phone_number', phone_number);
+    if (email) params.append('email', email);
+    if (role_id) params.append('role_id', String(role_id));
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    return this.makeRequest(`/users/dropdown?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   // Fetch companies with pagination, status, and sortOrder
   async fetchCompanies({
     page = 1,
@@ -1141,6 +1172,57 @@ class ApiService {
   async deleteMaterial(uuid: string): Promise<any> {
     return this.makeRequest(`/materials/${uuid}`, {
       method: 'DELETE',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Job management API
+  async createJob(payload: {
+    client_id?: string | number;
+    client_name: string;
+    client_email: string;
+    client_phone_number: string;
+    job_boxes_step: string;
+    job_privacy: string;
+  }): Promise<any> {
+    return this.makeRequest('/jobs', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Fetch jobs
+  async fetchJobs(params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    type?: string;
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.type) queryParams.append('type', params.type);
+
+    const url = `/jobs${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+
+    return this.makeRequest(url, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  async fetchJobStatistics(): Promise<any> {
+    return this.makeRequest('/jobs/statistics', {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  async fetchJobById(uuid: string): Promise<any> {
+    return this.makeRequest(`/jobs/${uuid}`, {
+      method: 'GET',
       headers: this.getRoleHeaders(),
     });
   }

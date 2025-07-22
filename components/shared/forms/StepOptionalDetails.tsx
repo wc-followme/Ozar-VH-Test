@@ -30,8 +30,8 @@ interface StepOptionalDetailsProps {
   petType: string;
   setPetType: (val: string) => void;
   onPrev: () => void;
-  onSkip: () => void;
-  onNext: () => void;
+  onSkip?: () => void;
+  onNext?: () => void;
   cancelButtonClass?: string;
 }
 
@@ -61,8 +61,14 @@ export function StepOptionalDetails({
   onNext,
   cancelButtonClass,
 }: StepOptionalDetailsProps) {
+  const handleSkip = () => {
+    if (onSkip) {
+      onSkip();
+    }
+  };
+
   return (
-    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-10 flex flex-col items-center'>
+    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
       <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
         Optional Details
       </h2>
@@ -71,13 +77,15 @@ export function StepOptionalDetails({
         them for later.
       </p>
       <form
-        className='w-full flex flex-col gap-6'
+        className='w-full flex flex-col gap-4'
         onSubmit={e => {
           e.preventDefault();
-          onNext();
+          if (onNext) {
+            onNext();
+          }
         }}
       >
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 h-[calc(100vh_-_550px)] overflow-y-auto'>
           {/* Type of Property */}
           <div className='flex flex-col gap-2'>
             <label className='field-label'>Type of Property</label>
@@ -207,7 +215,7 @@ export function StepOptionalDetails({
             />
           </div>
         </div>
-        <div className='flex w-full justify-between mt-6'>
+        <div className='flex w-full justify-between'>
           <button
             type='button'
             className={cancelButtonClass || 'btn-secondary !h-12 !px-8'}
@@ -216,13 +224,15 @@ export function StepOptionalDetails({
             Previous
           </button>
           <div className='flex gap-2'>
-            <button
-              type='button'
-              className='text-[var(--text-dark)] font-semibold bg-transparent'
-              onClick={onSkip}
-            >
-              Skip
-            </button>
+            {onSkip && (
+              <button
+                type='button'
+                className='btn-secondary !h-12 !px-8'
+                onClick={handleSkip}
+              >
+                Skip
+              </button>
+            )}
             <button className='btn-primary !h-12 !px-12' type='submit'>
               Next Step
             </button>

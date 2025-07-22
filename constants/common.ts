@@ -159,6 +159,31 @@ export const COUNTRY_CODES = {
   },
 } as const;
 
+export const JOB_TYPE = {
+  PUBLIC: 'PUBLIC',
+  PRIVATE: 'PRIVATE',
+} as const;
+
+export type JobType = (typeof JOB_TYPE)[keyof typeof JOB_TYPE];
+
+export const ROLE_ID = {
+  JOB_USER: 6,
+} as const;
+
+export enum CommonStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DELETED = 'DELETED',
+}
+
+export enum JobFilterType {
+  ALL = 'ALL',
+  NEED_ATTENTION = 'NEED_ATTENTION',
+  NEW_LEADS = 'NEW_LEADS',
+  WAITING_ON_CLIENT = 'WAITING_ON_CLIENT',
+  ONGOING = 'ONGOING',
+}
+
 // Future constants can be added here
 // export const OTHER_CONSTANTS = {
 //   // Add new constants as needed

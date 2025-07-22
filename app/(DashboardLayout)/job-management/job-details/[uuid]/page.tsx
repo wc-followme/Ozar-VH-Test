@@ -1,29 +1,18 @@
 'use client';
 
+import { MoveBoxIcon } from '@/components/icons/MoveBoxIcon';
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import Dropdown from '@/components/shared/common/Dropdown';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
+import { apiService } from '@/lib/api';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { ClipboardClose, Setting2, UserAdd } from 'iconsax-react';
 import Image from 'next/image';
-import { MoveBoxIcon } from '../../../../components/icons/MoveBoxIcon';
-
-const job = {
-  id: 'Job#456',
-  name: 'Downtown Project',
-  category: 'Interior',
-  budget: 57000,
-  spent: 17200,
-  client: {
-    name: 'Client Name',
-    email: 'tanya.hill@example.com',
-    phone: '(239) 555-0108',
-    address: '3517 W. Gray St. Utica, Pennsylvania 57867',
-    image: '/public/profile.jpg',
-  },
-  projectImage: '/public/images/auth/login-slider-01.webp',
-  mapImage: '/public/images/map-placeholder.png',
-};
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Job } from '../../types';
+import JobDetailsSkeleton from '@/components/shared/skeleton/JobDetailsSkeleton';
 
 const dropdownMenuItems = [
   {
@@ -57,10 +46,60 @@ const dropdownMenuItems = [
 ];
 
 export default function JobDetailsPage() {
+  const params = useParams();
+  const uuid = params['uuid'] as string;
+  const [job, setJob] = useState<Job | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { showErrorToast } = useToast();
+
+  useEffect(() => {
+    const fetchJobData = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.fetchJobById(uuid);
+        if (response.data) {
+          setJob(response.data);
+        }
+      } catch (error: any) {
+        showErrorToast(error?.message || 'Failed to fetch job details');
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (uuid) fetchJobData();
+  }, [uuid, showErrorToast]);
+
   const breadcrumbData: BreadcrumbItem[] = [
-    { name: 'Home', href: '/' },
-    { name: job.id },
+    { name: 'Job Management', href: '/job-management' },
+    { name: job?.project_id || job?.['uuid'] || 'Job Details' },
   ];
+
+  if (loading) {
+    return <JobDetailsSkeleton />;
+  }
+  if (!job) {
+    return (
+      <div className='flex items-center justify-center h-64'>
+        <div className='text-lg text-red-500'>Job not found</div>
+      </div>
+    );
+  }
+
+  // Fallbacks for client info
+  const clientName = job.client_name || 'Client Name';
+  const clientEmail = job.client_email || 'tanya.hill@example.com';
+  const clientPhone = job.client_phone_number || '(239) 555-0108';
+  const clientAddress =
+    job.client_address || '3517 W. Gray St. Utica, Pennsylvania 57867';
+  const projectImage = job.job_image || '/images/auth/login-slider-01.webp';
+  const mapImage = '/images/map-placeholder.png';
+  const projectId = job.project_id || 'Job#456';
+  const projectName = job.project_name || 'Downtown Project';
+  const category = job.category || 'Interior';
+  const budget =
+    job.budget !== null && job.budget !== undefined ? job.budget : 57000;
+  const spent = 17200; // Static fallback
+
   return (
     <div className=''>
       {/* Breadcrumb */}
@@ -100,7 +139,7 @@ export default function JobDetailsPage() {
         {/* Project Image */}
         <div className='flex-shrink-0 flex justify-center md:block mb-4 md:mb-0'>
           <Image
-            src='/images/auth/login-slider-01.webp'
+            src={projectImage}
             alt='Project'
             width={120}
             height={120}
@@ -115,7 +154,7 @@ export default function JobDetailsPage() {
                 Project ID
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.id}
+                {projectId}
               </div>
             </div>
             <div className='min-w-0 break-words'>
@@ -123,7 +162,7 @@ export default function JobDetailsPage() {
                 Project Name
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.name}
+                {projectName}
               </div>
             </div>
             <div className='min-w-0 break-words'>
@@ -131,7 +170,7 @@ export default function JobDetailsPage() {
                 Job category
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.category}
+                {category}
               </div>
             </div>
             <div className='md:col-span-2 flex flex-col md:flex-row md:items-center gap-2 min-w-0 break-words'>
@@ -141,16 +180,16 @@ export default function JobDetailsPage() {
                 </div>
                 <div className='flex items-center gap-2'>
                   <span className='font-semibold text-base text-[var(--text-dark)]'>
-                    ${job.spent.toLocaleString()}
+                    ${spent.toLocaleString()}
                   </span>
                   <div className='w-32 h-2 bg-gray-200 rounded-full overflow-hidden'>
                     <div
                       className='h-2 bg-[var(--secondary)]'
-                      style={{ width: `${(job.spent / job.budget) * 100}%` }}
+                      style={{ width: `${(spent / budget) * 100}%` }}
                     />
                   </div>
                   <span className='text-[var(--text-secondary)] font-medium'>
-                    ${job.budget.toLocaleString()}
+                    ${budget.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -162,7 +201,7 @@ export default function JobDetailsPage() {
                 Client Name
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.client.name}
+                {clientName}
               </div>
             </div>
             <div className='min-w-0 break-words'>
@@ -170,7 +209,7 @@ export default function JobDetailsPage() {
                 Email
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.client.email}
+                {clientEmail}
               </div>
             </div>
             <div className='min-w-0 break-words'>
@@ -178,7 +217,7 @@ export default function JobDetailsPage() {
                 Phone Number
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.client.phone}
+                {clientPhone}
               </div>
             </div>
             <div className='md:col-span-2 min-w-0 break-words'>
@@ -186,7 +225,7 @@ export default function JobDetailsPage() {
                 Address
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.client.address}
+                {clientAddress}
               </div>
             </div>
           </div>
@@ -194,7 +233,7 @@ export default function JobDetailsPage() {
         {/* Map Image */}
         <div className='flex flex-row md:flex-col items-center md:items-end gap-2 mt-4 md:mt-0'>
           <Image
-            src='/images/map-placeholder.png'
+            src={mapImage}
             alt='Map'
             width={100}
             height={100}
