@@ -21,7 +21,7 @@ import {
   formatDate,
 } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
-import { Edit2, Trash } from 'iconsax-react';
+import { Edit2, Trash, UserAdd } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -364,15 +364,15 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
   }
 
   return (
-    <div>
+    <div className='w-full h-full overflow-auto'>
       {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbData} className='mb-5' />
-      <div className='p-6 bg-[var(--white-background)] rounded-[24px]'>
+      <Breadcrumb items={breadcrumbData} className='mb-6' />
+      <div className='p-4 md:p-6 bg-[var(--white-background)] rounded-[16px] md:rounded-[24px]'>
         {/* Header */}
-        <div className='flex gap-6 items-center'>
-          <div className='flex-0 w-[120px]'>
+        <div className='flex flex-col sm:flex-row gap-4 md:gap-6 items-start sm:items-center'>
+          <div className='flex-shrink-0 w-[100px] sm:w-[120px]'>
             {company.image ? (
-              <div className='w-[120px] h-[120px] p-3 rounded-[16px] border border-[var(--border-dark)] flex items-center justify-center'>
+              <div className='w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] p-3 rounded-[12px] md:rounded-[16px] border border-[var(--border-dark)] flex items-center justify-center'>
                 <Image
                   src={
                     (process.env['NEXT_PUBLIC_CDN_URL'] || '') + company.image
@@ -384,29 +384,29 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                 />
               </div>
             ) : (
-              <div className='w-[120px] h-[120px] rounded-[16px] border border-[var(--border-dark)] flex items-center justify-center bg-gray-50'>
+              <div className='w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] rounded-[12px] md:rounded-[16px] border border-[var(--border-dark)] flex items-center justify-center bg-gray-50'>
                 <span className='text-gray-400 text-sm text-center'>
                   No Image
                 </span>
               </div>
             )}
           </div>
-          <div className='flex-1 -mt-[5px]'>
-            <div className='flex items-center gap-4 border-b border-[var(--border-dark)] pb-4 mb-4'>
+          <div className='flex-1 -mt-[5px] w-full'>
+            <div className='flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 border-b border-[var(--border-dark)] pb-3 md:pb-4 mb-3 md:mb-4'>
               <div className='flex-1'>
-                <h1 className='text-[24px] font-bold text-[var(--text-dark)] leading-[1] mb-2'>
+                <h1 className='text-lg sm:text-xl md:text-[24px] font-bold text-[var(--text-dark)] leading-[1] mb-2'>
                   {company.name}
                 </h1>
-                <p className='text-[16px] text-[var(--text-secondary)] leading-[1]'>
+                <p className='text-sm md:text-[16px] text-[var(--text-secondary)] leading-[1]'>
                   Construction Company
                 </p>
               </div>
 
-              <div className='flex items-center gap-4'>
+              <div className='flex flex-row items-center gap-2 sm:gap-4'>
                 <Link href={`/company-management/edit-company/${company.uuid}`}>
                   <Button
                     variant='outline'
-                    className='btn-secondary !h-9 text-sm'
+                    className='btn-secondary !h-9 text-sm w-auto'
                   >
                     <Edit2
                       size='28'
@@ -419,49 +419,45 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                   </Button>
                 </Link>
                 <Link
-                  className='!h-9 btn-primary !px-6'
+                  className='!h-9 btn-primary flex items-center justify-center !px-0 sm:!px-6 text-center !w-9 sm:!w-auto rounded-full'
                   href={`/company-management/add-user?company_id=${company.uuid}`}
                 >
-                  {/* <Add
-                    size='28'
-                    color='#fff'
-                    className='text-[var(--text-dark)]'
-                  /> */}
-                  <span>Add User</span>
+                  <UserAdd size='20' color='#fff' className='sm:hidden' />
+                  <span className='hidden sm:inline'>Add User</span>
                 </Link>
               </div>
             </div>
             {/* Info Row */}
-            <div className='flex gap-4'>
-              <div className='flex gap-14 text-[16px] flex-1 leading-tight'>
+            <div className='flex flex-col sm:flex-row gap-3 md:gap-4'>
+              <div className='flex flex-col sm:flex-row gap-6 md:gap-14 text-sm md:text-[16px] flex-1 leading-tight'>
                 <div>
-                  <div className='text-[var(--text-secondary)] text-sm'>
+                  <div className='text-[var(--text-secondary)] text-xs md:text-sm'>
                     Industry
                   </div>
-                  <div className='font-medium text-[var(--text-dark)] text-sm'>
+                  <div className='font-medium text-[var(--text-dark)] text-xs md:text-sm'>
                     Construction
                   </div>
                 </div>
                 <div>
-                  <div className='text-[var(--text-secondary)] text-sm'>
+                  <div className='text-[var(--text-secondary)] text-xs md:text-sm'>
                     Created on
                   </div>
-                  <div className='font-medium text-[var(--text-dark)] text-sm'>
+                  <div className='font-medium text-[var(--text-dark)] text-xs md:text-sm'>
                     {formatDate(company.created_at)}
                   </div>
                 </div>
                 <div>
-                  <div className='text-[var(--text-secondary)] text-sm'>
+                  <div className='text-[var(--text-secondary)] text-xs md:text-sm'>
                     Subscription Ends
                   </div>
-                  <div className='font-medium text-[var(--text-dark)] text-sm'>
+                  <div className='font-medium text-[var(--text-dark)] text-xs md:text-sm'>
                     {formatDate(company.expiry_date)}
                   </div>
                 </div>
               </div>
               {/* Status Toggle */}
               {!company.is_default && (
-                <div className='flex gap-3 items-center justify-between bg-[var(--border-light)] rounded-[30px] py-1 px-3'>
+                <div className='flex gap-3 items-center justify-between bg-[var(--border-light)] rounded-[30px] py-1 px-3 self-start'>
                   <span className='text-[12px] font-medium text-[var(--text-dark)] w-[100px]'>
                     {enabled ? 'Enable' : 'Disable'}
                   </span>
@@ -480,80 +476,80 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
         {/* Tabs */}
       </div>
       {/* Main Content */}
-      <div className='bg-[var(--white-background)] rounded-[20px] p-[28px] mt-4 min-h-[calc(100vh-370px)]'>
+      <div className='bg-[var(--white-background)] rounded-[16px] md:rounded-[20px] p-4 md:p-[28px] mt-4 min-h-[calc(100vh-370px)]'>
         <Tabs
           value={selectedTab}
           onValueChange={setSelectedTab}
           className='w-full'
         >
-          <div className='flex'>
-            <TabsList className='grid grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal'>
+          <div className='flex justify-center sm:justify-start'>
+            <TabsList className='grid grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal w-full sm:w-auto'>
               <TabsTrigger
                 value='about'
-                className='px-4 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='px-3 md:px-4 py-2 text-sm md:text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
                 About
               </TabsTrigger>
               <TabsTrigger
                 value='usermanagement'
-                className='px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='px-4 md:px-8 py-2 text-sm md:text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
                 User Management
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value='about' className='py-6'>
+          <TabsContent value='about' className='py-4 md:py-6'>
             {/* About Section */}
-            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-5 mb-6'>
-              <div className='text-sm text-[var(--text-secondary)] font-normal mb-2'>
+            <div className='bg-[var(--white-background)] rounded-[12px] md:rounded-[16px] border border-[#EAECF0] p-3 md:p-5 mb-4 md:mb-6'>
+              <div className='text-xs md:text-sm text-[var(--text-secondary)] font-normal mb-2'>
                 About
               </div>
-              <div className='text-sm text-[var(--text-dark)] font-medium leading-tight'>
+              <div className='text-xs md:text-sm text-[var(--text-dark)] font-medium leading-tight'>
                 {company.about || 'No description available.'}
               </div>
             </div>
             {/* Contact Info Row */}
-            <div className='bg-[var(--white-background)] rounded-[16px] border border-[#EAECF0] p-5 flex gap-8 text-sm flex-wrap'>
+            <div className='bg-[var(--white-background)] rounded-[12px] md:rounded-[16px] border border-[#EAECF0] p-3 md:p-5 flex flex-col sm:flex-row gap-4 md:gap-8 text-xs md:text-sm flex-wrap'>
               <div className='flex-1'>
-                <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
+                <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
                   Email
                 </div>
-                <div className='text-[var(--text-dark)] text-sm font-medium'>
+                <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium'>
                   {company.email || 'N/A'}
                 </div>
               </div>
               <div className='flex-1'>
-                <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
+                <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
                   Phone Number
                 </div>
-                <div className='text-[var(--text-dark)] text-sm font-medium'>
+                <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium'>
                   {company.phone_number || 'N/A'}
                 </div>
               </div>
               <div className='flex-1'>
-                <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
+                <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
                   Address
                 </div>
-                <div className='text-[var(--text-dark)] text-sm font-medium'>
+                <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium'>
                   {company.city && company.pincode
                     ? `${company.city}, ${company.pincode}`
                     : 'N/A'}
                 </div>
               </div>
               <div className='flex-1'>
-                <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
+                <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
                   Communication
                 </div>
-                <div className='text-[var(--text-dark)] text-sm font-medium'>
+                <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium'>
                   {company.preferred_communication_method || 'N/A'}
                 </div>
               </div>
               <div className='flex-1'>
-                <div className='font-normal text-[var(--text-secondary)] mb-1 text-sm'>
+                <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
                   Website
                 </div>
-                <div className='flex items-center gap-1 text-[var(--text-dark)] text-sm font-medium'>
+                <div className='flex items-center gap-1 text-[var(--text-dark)] text-xs md:text-sm font-medium'>
                   {company.website ? (
                     <>
                       <span>{company.website}</span>
@@ -577,9 +573,9 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
             </div>
           </TabsContent>
 
-          <TabsContent value='usermanagement' className='py-6'>
-            <div className='flex justify-between gap-4'>
-              <div className='relative max-w-[360px] w-full'>
+          <TabsContent value='usermanagement' className='py-4 md:py-6'>
+            <div className='flex flex-col sm:flex-row justify-between gap-3 md:gap-4'>
+              <div className='relative w-full sm:max-w-[360px]'>
                 <Input
                   id='search'
                   placeholder='Search here...'
@@ -600,12 +596,12 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                   })),
                 ]}
                 placeholder={USER_MESSAGES.ALL_USERS}
-                className='w-40 rounded-full'
+                className='w-full sm:w-40 rounded-full'
                 optionClassName={''}
                 triggerClassName='rounded-full h-[42px] border-2 border-[var(--border-dark)]'
               />
             </div>
-            <div className='mt-6'>
+            <div className='mt-4 md:mt-6'>
               {/* User Grid */}
               {usersLoading && users.length === 0 ? (
                 <LoadingComponent variant='inline' />
@@ -614,7 +610,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
                   {USER_MESSAGES.NO_USERS_FOUND}
                 </div>
               ) : (
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4'>
                   {filteredUsers.map(
                     ({
                       uuid,

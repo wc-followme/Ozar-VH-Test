@@ -7,10 +7,14 @@ import SideSheet from '@/components/shared/common/SideSheet';
 import ServiceForm from '@/components/shared/forms/ServiceForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ACTIONS } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage } from '@/lib/utils';
-import { Edit2, Trash } from 'iconsax-react';
+import {
+  extractApiErrorMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
+import { Add, Edit2, Trash } from 'iconsax-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import TradeCardSkeleton from '../../../components/shared/skeleton/TradeCardSkeleton';
 import { SERVICE_MESSAGES } from './service-messages';
@@ -24,13 +28,13 @@ const menuOptions: {
 }[] = [
   {
     label: SERVICE_MESSAGES.EDIT_MENU,
-    action: 'edit',
+    action: ACTIONS.EDIT,
     icon: Edit2,
     variant: 'default',
   },
   {
     label: SERVICE_MESSAGES.DELETE_MENU,
-    action: 'delete',
+    action: ACTIONS.DELETE,
     icon: Trash,
     variant: 'destructive',
   },
@@ -52,6 +56,10 @@ export default function ServiceManagementPage() {
   >(undefined);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+
+  // Get user permissions for services
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.services?.edit;
 
   const fetchServices = useCallback(
     async (targetPage = 1, append = false) => {
@@ -253,16 +261,23 @@ export default function ServiceManagementPage() {
     <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
-        <h2 className='page-title'>
-          {SERVICE_MESSAGES.SERVICE_MANAGEMENT_TITLE}
-        </h2>
-        <div className='flex justify-end'>
-          <Button
-            className='btn-primary'
-            onClick={() => setSideSheetOpen(true)}
-          >
-            {SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
-          </Button>
+        <div className='flex items-center justify-between w-full'>
+          <h2 className='page-title'>
+            {SERVICE_MESSAGES.SERVICE_MANAGEMENT_TITLE}
+          </h2>
+          {canEdit && (
+            <div className='flex justify-end'>
+              <Button
+                className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
+                onClick={() => setSideSheetOpen(true)}
+              >
+                <Add size='20' color='#fff' className='sm:hidden' />
+                <span className='hidden sm:inline'>
+                  {SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
+                </span>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       {/* Service Grid */}
@@ -278,6 +293,7 @@ export default function ServiceManagementPage() {
               buttonText={SERVICE_MESSAGES.ADD_SERVICE_BUTTON}
               onButtonClick={() => setSideSheetOpen(true)}
               description={SERVICE_MESSAGES.NO_SERVICES_FOUND_DESCRIPTION}
+              showButton={canEdit ?? false}
             />
           </div>
         ) : (
@@ -288,6 +304,7 @@ export default function ServiceManagementPage() {
               category={`${service.trades?.length || 0} Trade${(service.trades?.length || 0) !== 1 ? 's' : ''}`}
               menuOptions={menuOptions}
               onMenuAction={action => handleMenuAction(action, idx)}
+              module='services'
             />
           ))
         )}

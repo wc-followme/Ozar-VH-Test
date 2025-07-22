@@ -3,165 +3,118 @@
 import ToolCard from '@/components/shared/cards/ToolCard';
 import SideSheet from '@/components/shared/common/SideSheet';
 import ToolForm from '@/components/shared/forms/ToolForm';
-import ToolCardSkeleton from '@/components/shared/skeleton/ToolCardSkeleton';
+import { getUserPermissionsFromStorage } from '@/lib/utils';
+import { Add } from 'iconsax-react';
 import { useEffect, useState } from 'react';
+import ToolCardSkeleton from '../../../components/shared/skeleton/ToolCardSkeleton';
 
 const dummyTools = [
   {
     id: 1,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
+    name: 'Hammer',
+    brand: 'DeWalt',
+    quantity: 5,
     videoCount: 2,
   },
   {
     id: 2,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
+    name: 'Drill',
+    brand: 'Makita',
+    quantity: 3,
+    videoCount: 1,
   },
   {
     id: 3,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
+    name: 'Saw',
+    brand: 'Bosch',
+    quantity: 2,
+    videoCount: 3,
   },
   {
     id: 4,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
+    name: 'Wrench',
+    brand: 'Snap-on',
+    quantity: 8,
+    videoCount: 0,
   },
   {
     id: 5,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
+    name: 'Screwdriver',
+    brand: 'Stanley',
+    quantity: 12,
+    videoCount: 1,
   },
   {
     id: 6,
     image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 7,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 8,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 9,
-    image: '',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 10,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 11,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
-    videoCount: 2,
-  },
-  {
-    id: 12,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Tool Name',
-    brand: 'Brand name',
-    quantity: 100,
+    name: 'Pliers',
+    brand: 'Klein Tools',
+    quantity: 6,
     videoCount: 2,
   },
 ];
 
-const ToolsManagement = () => {
+export default function ToolsManagement() {
   const [tools, setTools] = useState(dummyTools);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Form state
+  const [isLoading, setIsLoading] = useState(true);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [service, setService] = useState('');
   const [toolName, setToolName] = useState('');
   const [companyName, setCompanyName] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [errors, setErrors] = useState<{
-    toolName?: string;
-    companyName?: string;
-    quantity?: string;
-    service?: string;
-  }>({});
-  const [service, setService] = useState('');
+  const [quantity, setQuantity] = useState(1);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Refs - commented out as currently unused
-  // const _photoInputRef = useRef<HTMLInputElement>(null);
+  // Get user permissions for tools
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.tools?.edit;
+
+  useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => setIsLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleDelete = (id: number) => {
-    setTools(currentTools => currentTools.filter(tool => tool.id !== id));
+    setTools(tools.filter(tool => tool.id !== id));
   };
 
   const handleDeletePhoto = () => {
     setPhoto(null);
   };
 
-  function onClose() {
+  const onClose = () => {
     setSideSheetOpen(false);
-    // Optionally reset form fields here
+    setPhoto(null);
+    setService('');
     setToolName('');
     setCompanyName('');
-    setQuantity('');
-    setPhoto(null);
+    setQuantity(1);
     setErrors({});
-  }
-
-  // Show skeletons for 3 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  };
 
   return (
     <div className='w-full'>
       {/* Header */}
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8'>
-        <h2 className='page-title'>Tools Management</h2>
-        <div className='flex justify-end'>
-          <button
-            className='btn-primary'
-            onClick={() => setSideSheetOpen(true)}
-          >
-            <span>Create Tool</span>
-          </button>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
+        <div className='flex items-center justify-between w-full'>
+          <h2 className='page-title'>Tools Management</h2>
+          {canEdit && (
+            <div className='flex justify-end'>
+              <button
+                className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
+                onClick={() => setSideSheetOpen(true)}
+              >
+                <Add size='20' color='#fff' className='sm:hidden' />
+                <span className='hidden sm:inline'>Create Tool</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <SideSheet
@@ -180,17 +133,17 @@ const ToolsManagement = () => {
           setToolName={setToolName}
           companyName={companyName}
           setCompanyName={setCompanyName}
-          quantity={quantity}
-          setQuantity={setQuantity}
+          quantity={quantity.toString()}
+          setQuantity={(qty: string) => setQuantity(parseInt(qty) || 1)}
           errors={errors}
           onClose={onClose}
           onSubmit={e => e.preventDefault()}
         />
       </SideSheet>
       <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
-        {loading
-          ? Array.from({ length: 12 }).map((_, idx) => (
-              <ToolCardSkeleton key={idx} />
+        {isLoading
+          ? Array.from({ length: 12 }).map((_, item) => (
+              <ToolCardSkeleton key={`skeleton-${item}`} />
             ))
           : tools.map(({ id, image, name, brand, quantity, videoCount }) => (
               <ToolCard
@@ -206,6 +159,4 @@ const ToolsManagement = () => {
       </div>
     </div>
   );
-};
-
-export default ToolsManagement;
+}

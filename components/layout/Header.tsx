@@ -76,7 +76,7 @@ export function Header() {
           <SidebarMobile open={sideSheetOpen} onOpenChange={setSideSheetOpen} />
         </div>
         <div className='flex items-center space-x-4 mr-auto'>
-          <Link href='/' className='text-lg md:text-2xl font-bold'>
+          <Link href='/' className='text-base md:text-2xl font-bold'>
             Virtual Homes
           </Link>
         </div>

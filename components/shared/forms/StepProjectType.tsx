@@ -60,10 +60,10 @@ export function StepProjectType({
 }: StepProjectTypeProps) {
   return (
     <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
-      <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
+      <h2 className='text-xl md:text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
         Which type of project do you need for your home?
       </h2>
-      <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
+      <p className='text-[var(--text-secondary)] text-sm md:text-[18px] font-normal text-center mb-8 max-w-lg'>
         Choose the project category to help us provide accurate planning and
         estimates.
       </p>

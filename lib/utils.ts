@@ -1,6 +1,26 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+// --- Encryption Utilities ---
+import CryptoJS from 'crypto-js';
+
+// Encrypts a string using AES and a secret key from env
+export function encryptData(data: string): string {
+  const key =
+    process.env['NEXT_PUBLIC_PERMISSIONS_ENCRYPTION_KEY'] ||
+    'fallback-key-for-development-32-chars';
+  return CryptoJS.AES.encrypt(data, key).toString();
+}
+
+// Decrypts a string using AES and a secret key from env
+export function decryptData(ciphertext: string): string {
+  const key =
+    process.env['NEXT_PUBLIC_PERMISSIONS_ENCRYPTION_KEY'] ||
+    'fallback-key-for-development-32-chars';
+  const bytes = CryptoJS.AES.decrypt(ciphertext, key);
+  return bytes.toString(CryptoJS.enc.Utf8);
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -68,5 +88,27 @@ export function formatDateTime(dateString: string): string {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   } catch (error) {
     return dateString; // Return original string if parsing fails
+  }
+}
+
+// Get user permissions from localStorage or cookies (decrypted)
+export function getUserPermissionsFromStorage():
+  | import('@/lib/api').UserPermissions
+  | null {
+  let encrypted = '';
+  if (typeof window !== 'undefined') {
+    encrypted = localStorage.getItem('user_permissions') || '';
+    if (!encrypted) {
+      // Try cookies
+      const match = document.cookie.match(/(?:^|; )user_permissions=([^;]*)/);
+      if (match && match[1]) encrypted = decodeURIComponent(match[1]);
+    }
+  }
+  if (!encrypted) return null;
+  try {
+    const decrypted = decryptData(encrypted);
+    return JSON.parse(decrypted);
+  } catch {
+    return null;
   }
 }

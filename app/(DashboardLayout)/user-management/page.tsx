@@ -5,11 +5,15 @@ import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import NoDataFound from '@/components/shared/common/NoDataFound';
 import SelectField from '@/components/shared/common/SelectField';
 import { useToast } from '@/components/ui/use-toast';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { apiService, FetchUsersResponse, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
-import { Edit2, Trash } from 'iconsax-react';
+import {
+  extractApiErrorMessage,
+  extractApiSuccessMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
+import { Add, Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import UserCardSkeleton from '../../../components/shared/skeleton/UserCardSkeleton';
@@ -19,14 +23,18 @@ import { USER_MESSAGES } from './user-messages';
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [filter, setFilter] = useState<string>('all');
-  const [loading, setLoading] = useState<boolean>(true);
+  const [filter, setFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
   const [_page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [isNavigating, setIsNavigating] = useState(false);
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
   const router = useRouter();
+
+  // Get user permissions for users
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.users?.create;
 
   const isRoleApiResponse = (obj: unknown): obj is RoleApiResponse => {
     return (
@@ -182,10 +190,10 @@ export default function UserManagement() {
   }, [router]);
 
   const menuOptions: MenuOption[] = [
-    { label: 'Edit', action: 'edit', icon: Edit2, variant: 'default' },
+    { label: 'Edit', action: ACTIONS.EDIT, icon: Edit2, variant: 'default' },
     {
       label: 'Archive',
-      action: 'delete',
+      action: ACTIONS.DELETE,
       icon: Trash,
       variant: 'destructive',
     },
@@ -200,30 +208,37 @@ export default function UserManagement() {
     <div className='w-full overflow-y-auto'>
       {/* Header */}
       <div className='flex flex-col sm:flex-row gap-4 md:items-center justify-between mb-4 xl:mb-8'>
-        <h2 className='page-title'>{USER_MESSAGES.USER_MANAGEMENT_TITLE}</h2>
-        <div className='flex items-center gap-2 lg:gap-4 justify-end'>
-          <SelectField
-            value={filter}
-            onValueChange={setFilter}
-            options={[
-              { value: 'all', label: USER_MESSAGES.ALL_USERS },
-              ...roles.map(({ id, name }) => ({
-                value: String(id),
-                label: name,
-              })),
-            ]}
-            placeholder={USER_MESSAGES.ALL_USERS}
-            className='w-40'
-            triggerClassName='bg-[var(--white-background)] rounded-[30px] border-2 border-[var(--border-dark)] h-[42px]'
-            optionClassName='text-[var(--text-dark)] hover:bg-[var(--select-option)] focus:bg-[var(--select-option)] cursor-pointer rounded-[5px]'
-          />
-          <button
-            onClick={handleCreateUser}
-            className='btn-primary'
-            disabled={loading}
-          >
-            {USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
-          </button>
+        <div className='flex flex-col md:flex-row gap-4 md:items-center justify-between w-full'>
+          <h2 className='page-title'>{USER_MESSAGES.USER_MANAGEMENT_TITLE}</h2>
+          <div className='flex items-center gap-2 lg:gap-4 justify-end'>
+            <SelectField
+              value={filter}
+              onValueChange={setFilter}
+              options={[
+                { value: 'all', label: USER_MESSAGES.ALL_USERS },
+                ...roles.map(({ id, name }) => ({
+                  value: String(id),
+                  label: name,
+                })),
+              ]}
+              placeholder={USER_MESSAGES.ALL_USERS}
+              className='w-40'
+              triggerClassName='bg-[var(--white-background)] rounded-[30px] border-2 border-[var(--border-dark)] h-[42px]'
+              optionClassName='text-[var(--text-dark)] hover:bg-[var(--select-option)] focus:bg-[var(--select-option)] cursor-pointer rounded-[5px]'
+            />
+            {canEdit && (
+              <button
+                onClick={handleCreateUser}
+                className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
+                disabled={loading}
+              >
+                <Add size='20' color='#fff' className='sm:hidden' />
+                <span className='hidden sm:inline'>
+                  {USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
+                </span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
       {/* Initial Loading State */}
@@ -242,6 +257,7 @@ export default function UserManagement() {
                 description={USER_MESSAGES.NO_USERS_FOUND_DESCRIPTION}
                 buttonText={USER_MESSAGES.ADD_ADMIN_USER_BUTTON}
                 onButtonClick={handleCreateUser}
+                showButton={canEdit ?? false}
               />
             </div>
           ) : (

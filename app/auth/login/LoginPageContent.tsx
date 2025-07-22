@@ -62,7 +62,7 @@ export default function LoginPageContent() {
                 <h1 className='text-lg xl:text-3xl lg:text-xl font-bold text-[#2D2D2D] mb-4 xl:mb-6 leading-tight'>
                   Join us to start turning your vision into reality!
                 </h1>
-                <p className='text-[var(--text-secondary)] text-sm xl:text-[18px]'>
+                <p className='text-[var(--text-secondary)] text-sm xl:text-[18px] lg:text-base'>
                   Login now to get started!
                 </p>
                 {redirectTo && (

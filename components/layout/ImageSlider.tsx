@@ -41,10 +41,10 @@ export function ImageSlider() {
               {/* Content */}
               <div className='absolute flex items-start gap-4 bottom-4 w-[calc(100%_-_32px)] mx-auto left-0 right-0 rounded-[20px] p-8 lg:p-6 text-white backdrop-blur-md bg-[#0000000D]'>
                 <div className='max-w-2xl flex-1'>
-                  <h2 className='text-3xl lg:text-[30px] font-bold mb-4 leading-white'>
+                  <h2 className='text-xl lg:text-[30px] font-bold mb-4 leading-white'>
                     {slide.title}
                   </h2>
-                  <p className='text-lg lg:text-[16px] text-white leading-relaxed font-thin'>
+                  <p className='text-sm lg:text-[16px] text-white leading-relaxed font-thin'>
                     {slide.subtitle}
                   </p>
                 </div>

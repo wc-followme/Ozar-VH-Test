@@ -153,10 +153,10 @@ export default function MaterialForm({
   return (
     <form
       onSubmit={handleSubmit(onFormSubmit)}
-      className='space-y-6 w-full max-w-xl'
+      className='space-y-4 sm:space-y-6 w-full max-w-xl'
     >
       <div className='space-y-2'>
-        <Label htmlFor='services' className='field-label'>
+        <Label htmlFor='services' className='field-label text-sm sm:text-base'>
           {MATERIAL_MESSAGES.SERVICE_LABEL}
         </Label>
         <Controller
@@ -185,13 +185,18 @@ export default function MaterialForm({
                 placeholder={MATERIAL_MESSAGES.SELECT_SERVICE}
                 error={errors.services?.message as string}
                 name='services'
+                maxHeight={200}
+                maxSelectedItems={1}
               />
             );
           }}
         />
       </div>
       <div className='space-y-2'>
-        <Label htmlFor='materialName' className='field-label'>
+        <Label
+          htmlFor='materialName'
+          className='field-label text-sm sm:text-base'
+        >
           {MATERIAL_MESSAGES.MATERIAL_NAME_LABEL}
         </Label>
         <Controller
@@ -203,7 +208,7 @@ export default function MaterialForm({
               {...field}
               placeholder={MATERIAL_MESSAGES.ENTER_MATERIAL_NAME}
               className={cn(
-                'input-field',
+                'input-field !h-12',
                 errors.materialName
                   ? '!border-[var(--warning)]'
                   : '!border-[var(--border-dark)]'
@@ -213,11 +218,11 @@ export default function MaterialForm({
         />
         <FormErrorMessage message={errors.materialName?.message as string} />
       </div>
-      <div className='pt-2 flex items-center gap-4'>
+      <div className='pt-2 flex sm:items-center gap-3 sm:gap-4'>
         <Button
           type='button'
           variant='outline'
-          className='btn-secondary !px-8 !h-12'
+          className='btn-secondary !px-6 sm:!px-8 !h-12'
           onClick={onCancel}
           disabled={loading}
         >
@@ -225,7 +230,7 @@ export default function MaterialForm({
         </Button>
         <Button
           type='submit'
-          className='btn-primary !h-12 !px-12'
+          className='btn-primary !h-12 !px-6 sm:!px-12'
           disabled={loading}
         >
           {loading

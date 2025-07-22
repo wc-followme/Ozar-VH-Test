@@ -5,12 +5,16 @@ import { RoleCard } from '@/components/shared/cards/RoleCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
 import NoDataFound from '@/components/shared/common/NoDataFound';
 import { useToast } from '@/components/ui/use-toast';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { roleIconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
-import { Edit2, Trash } from 'iconsax-react';
+import {
+  extractApiErrorMessage,
+  extractApiSuccessMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
+import { Add, Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import RoleCardSkeleton from '../../../components/shared/skeleton/RoleCardSkeleton';
@@ -28,8 +32,16 @@ interface MenuOption {
 }
 
 const menuOptions: MenuOption[] = [
-  { label: ROLE_MESSAGES.EDIT_MENU, action: 'edit', icon: Edit2 },
-  { label: ROLE_MESSAGES.DELETE_MENU, action: 'delete', icon: Trash },
+  {
+    label: ROLE_MESSAGES.EDIT_MENU,
+    action: ACTIONS.EDIT,
+    icon: Edit2,
+  },
+  {
+    label: ROLE_MESSAGES.DELETE_MENU,
+    action: ACTIONS.DELETE,
+    icon: Trash,
+  },
 ];
 
 // Adapter for icons that expect className instead of size/color
@@ -53,6 +65,10 @@ const RoleManagement = () => {
   const router = useRouter();
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+
+  // Get user permissions for roles
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.roles?.edit;
 
   const fetchRoles = useCallback(
     async (targetPage = 1, append = false) => {
@@ -163,15 +179,21 @@ const RoleManagement = () => {
   const safeIconOptions = Array.isArray(roleIconOptions) ? roleIconOptions : [];
 
   return (
-    <section className='flex flex-col w-full items-start gap-4 xl:gap-8 overflow-y-auto'>
-      <header className='flex items-center justify-between w-full'>
-        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full'>
+    <section className=''>
+      <header className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
+        <div className='flex items-center justify-between w-full'>
           <h2 className='page-title'>{ROLE_MESSAGES.PAGE_TITLE}</h2>
-          <div className='flex justify-end'>
-            <button onClick={handleCreateRole} className='btn-primary'>
-              {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
+          {canEdit && (
+            <button
+              onClick={handleCreateRole}
+              className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
+            >
+              <Add size='20' color='#fff' className='sm:hidden' />
+              <span className='hidden sm:inline'>
+                {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
+              </span>
             </button>
-          </div>
+          )}
         </div>
       </header>
 
@@ -192,6 +214,7 @@ const RoleManagement = () => {
                   buttonText={ROLE_MESSAGES.CREATE_ROLE_BUTTON}
                   onButtonClick={handleCreateRole}
                   description={ROLE_MESSAGES.NO_ROLES_FOUND_DESCRIPTION}
+                  showButton={canEdit ?? false}
                 />
               </div>
             ) : (

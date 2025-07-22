@@ -388,7 +388,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
           <div className='space-y-2'>
             <Label
               htmlFor='phone'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
+              className='text-xs md:text-[14px] font-semibold text-[var(--text-dark)]'
             >
               {USER_MESSAGES.PHONE_LABEL}
             </Label>

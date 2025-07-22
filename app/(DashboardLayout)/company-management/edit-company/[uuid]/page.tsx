@@ -244,7 +244,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
       <div className=''>
         <div className='flex flex-col xl:flex-row items-start gap-4 md:gap-6'>
           {/* Left Column - Upload Photo */}
-          <div className='w-[412px] flex-shrink-0 bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[1rem] relative'>
+          <div className='w-full md:w-[412px] flex-shrink-0 bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[1rem] relative'>
             <h2 className='text-lg font-bold mb-4'>Upload Logo</h2>
             <PhotoUploadField
               photo={photoFile}

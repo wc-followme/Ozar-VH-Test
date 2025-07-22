@@ -7,7 +7,7 @@ import SideSheet from '@/components/shared/common/SideSheet';
 import CategoryForm from '@/components/shared/forms/CategoryForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { STATUS_CODES } from '@/constants/status-codes';
 import {
   apiService,
@@ -17,13 +17,17 @@ import {
   UpdateCategoryRequest,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  extractApiSuccessMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
 import {
   CreateCategoryFormData,
   createCategorySchema,
 } from '@/lib/validations/category';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Edit2, Trash } from 'iconsax-react';
+import { Add, Edit2, Trash } from 'iconsax-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import CategoryCardSkeleton from '../../../components/shared/skeleton/CategoryCardSkeleton';
@@ -39,18 +43,22 @@ const CategoryManagement = () => {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
+  // Get user permissions for categories
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.categories?.edit;
+
   // Memoize menu options to prevent unnecessary re-renders
   const menuOptions = useMemo(
     () => [
       {
         label: CATEGORY_MESSAGES.EDIT_MENU,
-        action: 'edit',
+        action: ACTIONS.EDIT,
         icon: Edit2,
         variant: 'default' as const,
       },
       {
         label: CATEGORY_MESSAGES.DELETE_MENU,
-        action: 'delete',
+        action: ACTIONS.DELETE,
         icon: Trash,
         variant: 'destructive' as const,
       },
@@ -308,16 +316,24 @@ const CategoryManagement = () => {
 
   return (
     <section className='w-full overflow-y-auto pb-4'>
-      <header className='flex items-center justify-between mb-4 xl:mb-8'>
-        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full'>
+      <header className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
+        <div className='flex items-center justify-between w-full'>
           <h2 className='page-title'>
             {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
           </h2>
-          <div className='flex justify-end'>
-            <Button onClick={() => setOpen(true)} className='btn-primary'>
-              {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
-            </Button>
-          </div>
+          {canEdit && (
+            <div className='flex justify-end'>
+              <Button
+                onClick={() => setOpen(true)}
+                className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
+              >
+                <Add size='20' color='#fff' className='sm:hidden' />
+                <span className='hidden sm:inline'>
+                  {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
+                </span>
+              </Button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -336,6 +352,7 @@ const CategoryManagement = () => {
                 description={CATEGORY_MESSAGES.NO_CATEGORIES_FOUND_DESCRIPTION}
                 buttonText={CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
                 onButtonClick={() => setOpen(true)}
+                showButton={canEdit ?? false}
               />
             </div>
           ) : (
