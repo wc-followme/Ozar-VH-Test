@@ -6,69 +6,18 @@ import SideSheet from '@/components/shared/common/SideSheet';
 import { ToolForm } from '@/components/shared/forms/ToolForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { apiService, CreateToolRequest } from '@/lib/api';
+import { apiService, CreateToolRequest, Tool } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
   extractApiErrorMessage,
-  extractApiSuccessMessage,
   getUserPermissionsFromStorage,
 } from '@/lib/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TOOL_MESSAGES } from './tool-messages';
 
-const dummyTools = [
-  {
-    id: 1,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Hammer',
-    brand: 'DeWalt',
-    quantity: 5,
-    videoCount: 2,
-  },
-  {
-    id: 2,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Drill',
-    brand: 'Makita',
-    quantity: 3,
-    videoCount: 1,
-  },
-  {
-    id: 3,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Saw',
-    brand: 'Bosch',
-    quantity: 2,
-    videoCount: 3,
-  },
-  {
-    id: 4,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Wrench',
-    brand: 'Snap-on',
-    quantity: 8,
-    videoCount: 0,
-  },
-  {
-    id: 5,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Screwdriver',
-    brand: 'Stanley',
-    quantity: 12,
-    videoCount: 1,
-  },
-  {
-    id: 6,
-    image: '/images/tools-management/tools-img-1.png',
-    name: 'Pliers',
-    brand: 'Klein Tools',
-    quantity: 6,
-    videoCount: 2,
-  },
-];
-
 export default function ToolsManagement() {
-  const [tools, setTools] = useState(dummyTools);
+  const [tools, setTools] = useState<Tool[]>([]);
+  const [loading, setLoading] = useState(true);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
   const [fileKey, setFileKey] = useState<string>('');
@@ -76,11 +25,57 @@ export default function ToolsManagement() {
   const [formLoading, setFormLoading] = useState(false);
 
   const { showSuccessToast, showErrorToast } = useToast();
-  const { handleAuthError } = useAuth();
+  const { handleAuthError, user } = useAuth();
 
   // Get user permissions for tools
   const userPermissions = getUserPermissionsFromStorage();
   const canEdit = userPermissions?.tools?.edit;
+
+  const cdnPrefix = process.env['NEXT_PUBLIC_CDN_URL'] || '';
+
+  // Load tools from API
+  useEffect(() => {
+    const loadTools = async () => {
+      console.log('loadTools called, user:', user);
+      console.log('user?.company_id:', user?.company_id);
+
+      if (!user) {
+        console.log('User not available yet, waiting...');
+        return; // Don't set loading to false, wait for user to load
+      }
+
+      setLoading(true);
+      try {
+        console.log('Making API call WITHOUT company_id');
+        const response = await apiService.fetchTools({
+          page: 1,
+          limit: 50,
+        });
+
+        console.log('API response:', response);
+        if (response.statusCode === 200) {
+          setTools(response.data?.data || []);
+        } else {
+          showErrorToast(
+            extractApiErrorMessage(response.message) || 'Failed to load tools'
+          );
+        }
+      } catch (error: any) {
+        console.error('Error loading tools:', error);
+        if (error.status === 401) {
+          handleAuthError(error);
+        } else {
+          showErrorToast(
+            extractApiErrorMessage(error.message) || 'Failed to load tools'
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTools();
+  }, [user, showErrorToast, handleAuthError]);
 
   const handleDelete = (id: number) => {
     setTools(tools.filter(tool => tool.id !== id));
@@ -115,7 +110,17 @@ export default function ToolsManagement() {
         setSideSheetOpen(false);
         setPhoto(null);
         setFileKey('');
-        // Refresh tools list or add new tool to state
+        // Refresh tools list
+        if (user?.company_id) {
+          const refreshResponse = await apiService.fetchTools({
+            page: 1,
+            limit: 50,
+            company_id: user.company_id,
+          });
+          if (refreshResponse.statusCode === 200) {
+            setTools(refreshResponse.data || []);
+          }
+        }
       } else {
         showErrorToast(
           extractApiErrorMessage(response.message) || TOOL_MESSAGES.CREATE_ERROR
@@ -133,6 +138,36 @@ export default function ToolsManagement() {
       setFormLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className='w-full'>
+        <div className='flex items-center justify-between mb-8'>
+          <h2 className='page-title'>Tools Management</h2>
+        </div>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+          {[...Array(8)].map((_, index) => (
+            <div
+              key={index}
+              className='bg-[var(--card-background)] rounded-2xl p-2.5 flex flex-col border border-[var(--border-dark)] min-h-[6.25rem] animate-pulse'
+            >
+              <div className='flex gap-3'>
+                <div className='w-[60px] h-[60px] rounded-[12px] bg-gray-300'></div>
+                <div className='flex-1'>
+                  <div className='h-4 bg-gray-300 rounded mb-2'></div>
+                  <div className='h-3 bg-gray-300 rounded mb-2'></div>
+                  <div className='flex gap-2'>
+                    <div className='h-6 bg-gray-300 rounded w-16'></div>
+                    <div className='h-6 bg-gray-300 rounded w-20'></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='w-full'>
@@ -152,17 +187,23 @@ export default function ToolsManagement() {
       {/* Tools Grid */}
       {tools.length > 0 ? (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-          {tools.map(tool => (
-            <ToolCard
-              key={tool.id}
-              image={tool.image}
-              name={tool.name}
-              brand={tool.brand}
-              quantity={tool.quantity}
-              videoCount={tool.videoCount}
-              onDelete={() => handleDelete(tool.id)}
-            />
-          ))}
+          {tools.map(tool => {
+            const imageUrl =
+              tool.assets && tool.assets[0]?.media_url
+                ? cdnPrefix + tool.assets[0].media_url
+                : '/images/tools-management/tools-img-1.png';
+            return (
+              <ToolCard
+                key={tool.id}
+                image={imageUrl}
+                name={tool.name}
+                brand={tool.manufacturer}
+                quantity={tool.available_quantity}
+                videoCount={0} // Static 0 for now as requested
+                onDelete={() => handleDelete(tool.id)}
+              />
+            );
+          })}
         </div>
       ) : (
         <NoDataFound

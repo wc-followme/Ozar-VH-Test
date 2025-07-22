@@ -443,6 +443,21 @@ export interface GetCompanyResponse {
 }
 
 // Tool management interfaces
+export interface ToolAsset {
+  uuid: string;
+  media_url: string;
+  available_quantity: number;
+  company_id: string;
+  condition: string;
+  created_at: string;
+  created_by: string;
+  manufacturer: string;
+  name: string;
+  status: string;
+  updated_at: string;
+  updated_by: string;
+}
+
 export interface Tool {
   id: number;
   uuid: string;
@@ -459,6 +474,7 @@ export interface Tool {
     name: string;
     status: string;
   }>;
+  assets?: ToolAsset[];
 }
 
 export interface FetchToolsResponse {
@@ -1372,12 +1388,14 @@ class ApiService {
     name = '',
     service_id = '',
     status = 'ACTIVE',
+    company_id = '',
   }: {
     page?: number;
     limit?: number;
     name?: string;
     service_id?: string | number;
     status?: 'ACTIVE' | 'INACTIVE' | '';
+    company_id?: string | number;
   }): Promise<FetchToolsResponse> {
     const params = new URLSearchParams();
     params.append('page', String(page));
@@ -1385,6 +1403,7 @@ class ApiService {
     if (name) params.append('name', name);
     if (service_id) params.append('service_id', String(service_id));
     if (status) params.append('status', status);
+    if (company_id) params.append('company_id', String(company_id));
     return this.makeRequest(`/tools?${params.toString()}`, {
       method: 'GET',
       headers: this.getRoleHeaders(),

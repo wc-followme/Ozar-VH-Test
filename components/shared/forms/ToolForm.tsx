@@ -109,11 +109,9 @@ const ToolForm: React.FC<ToolFormProps> = ({
         });
 
         if (response.statusCode === 200) {
-          // Handle the correct response structure: { statusCode, message, data: { data: Service[], total, page, etc } }
-          const servicesData = response.data?.data || response.data || [];
+          // Handle the correct response structure: { statusCode, message, data: Service[] }
+          const servicesData = response.data || [];
           const finalServices = Array.isArray(servicesData) ? servicesData : [];
-          console.log('Services response:', response);
-          console.log('Services data:', finalServices);
           setServices(finalServices);
         }
       } catch (error) {
@@ -221,7 +219,7 @@ const ToolForm: React.FC<ToolFormProps> = ({
       service_ids: serviceIds.join(','), // Convert array to comma-separated string
     });
   };
-  
+
   // Convert services to dropdown options
   const serviceOptions = Array.isArray(services)
     ? services.map(service => ({

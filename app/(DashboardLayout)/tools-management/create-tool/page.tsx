@@ -64,7 +64,7 @@ export default function CreateToolPage() {
     try {
       const payload: CreateToolRequest = {
         name: data.name,
-        total_quantity: data.total_quantity,
+        available_quantity: data.available_quantity,
         manufacturer: data.manufacturer,
         tool_assets: fileKey,
         service_ids: data.service_ids,
