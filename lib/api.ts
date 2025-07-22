@@ -68,6 +68,7 @@ interface CreateRoleRequest {
   description: string;
   icon: string;
   status?: 'ACTIVE' | 'INACTIVE';
+  permissions?: any;
 }
 
 interface CreateRoleResponse {
