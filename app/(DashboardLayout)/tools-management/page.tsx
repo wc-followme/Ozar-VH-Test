@@ -23,6 +23,9 @@ export default function ToolsManagement() {
   const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
+  const [editToolUuid, setEditToolUuid] = useState<string | null>(null);
+  const [editToolData, setEditToolData] = useState<Tool | null>(null);
+  const [editLoading, setEditLoading] = useState(false);
 
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError, user } = useAuth();
@@ -86,6 +89,34 @@ export default function ToolsManagement() {
     setFileKey('');
   };
 
+  const handleEdit = async (uuid: string) => {
+    setEditToolUuid(uuid);
+    setEditLoading(true);
+    setSideSheetOpen(true);
+    try {
+      const response = await apiService.getToolDetails(uuid);
+      if (response.statusCode === 200 && response.data) {
+        setEditToolData(response.data);
+      } else {
+        showErrorToast(
+          extractApiErrorMessage(response.message) ||
+            TOOL_MESSAGES.FETCH_DETAILS_ERROR
+        );
+        setEditToolData(null);
+        setSideSheetOpen(false);
+      }
+    } catch (error: any) {
+      showErrorToast(
+        extractApiErrorMessage(error.message) ||
+          TOOL_MESSAGES.FETCH_DETAILS_ERROR
+      );
+      setEditToolData(null);
+      setSideSheetOpen(false);
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const handleCreateTool = async (data: {
     name: string;
     available_quantity: number;
@@ -132,6 +163,59 @@ export default function ToolsManagement() {
       } else {
         showErrorToast(
           extractApiErrorMessage(error.message) || TOOL_MESSAGES.CREATE_ERROR
+        );
+      }
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleUpdateTool = async (data: {
+    name: string;
+    available_quantity: number;
+    manufacturer: string;
+    tool_assets: string;
+    service_ids: string;
+  }) => {
+    setFormLoading(true);
+    try {
+      const payload: CreateToolRequest = {
+        name: data.name,
+        available_quantity: data.available_quantity,
+        manufacturer: data.manufacturer,
+        tool_assets: fileKey,
+        service_ids: data.service_ids,
+      };
+
+      const response = await apiService.updateTool(editToolUuid!, payload);
+
+      if (response.statusCode === 200 || response.statusCode === 201) {
+        showSuccessToast(response.message || TOOL_MESSAGES.UPDATE_SUCCESS);
+        setSideSheetOpen(false);
+        setPhoto(null);
+        setFileKey('');
+        setEditToolUuid(null);
+        setEditToolData(null);
+        // Refresh tools list
+        const refreshResponse = await apiService.fetchTools({
+          page: 1,
+          limit: 50,
+        });
+        if (refreshResponse.statusCode === 200) {
+          const responseData = (refreshResponse as any).data;
+          setTools(responseData?.data || []);
+        }
+      } else {
+        showErrorToast(
+          extractApiErrorMessage(response.message) || TOOL_MESSAGES.UPDATE_ERROR
+        );
+      }
+    } catch (error: any) {
+      if (error.status === 401) {
+        handleAuthError(error);
+      } else {
+        showErrorToast(
+          extractApiErrorMessage(error.message) || TOOL_MESSAGES.UPDATE_ERROR
         );
       }
     } finally {
@@ -201,6 +285,7 @@ export default function ToolsManagement() {
                 quantity={tool.available_quantity}
                 videoCount={0} // Static 0 for now as requested
                 onDelete={() => handleDelete(tool.id)}
+                onEdit={() => handleEdit(tool.uuid)}
               />
             );
           })}
@@ -217,26 +302,54 @@ export default function ToolsManagement() {
 
       {/* Side Sheet for Create Tool */}
       <SideSheet
-        title={TOOL_MESSAGES.ADD_TOOL_TITLE}
+        title={
+          editToolUuid
+            ? TOOL_MESSAGES.EDIT_TOOL_TITLE
+            : TOOL_MESSAGES.ADD_TOOL_TITLE
+        }
         open={sideSheetOpen}
         onOpenChange={setSideSheetOpen}
         size='600px'
       >
-        <ToolForm
-          photo={photo}
-          setPhoto={setPhoto}
-          handleDeletePhoto={handleDeletePhoto}
-          uploading={uploading}
-          onSubmit={handleCreateTool}
-          loading={formLoading}
-          onCancel={() => {
-            setSideSheetOpen(false);
-            setPhoto(null);
-            setFileKey('');
-          }}
-          setUploading={setUploading}
-          setFileKey={setFileKey}
-        />
+        {editLoading ? (
+          <div className='p-6 text-center'>Loading...</div>
+        ) : (
+          <ToolForm
+            photo={photo}
+            setPhoto={setPhoto}
+            handleDeletePhoto={handleDeletePhoto}
+            uploading={uploading}
+            onSubmit={editToolUuid ? handleUpdateTool : handleCreateTool}
+            loading={formLoading}
+            onCancel={() => {
+              setSideSheetOpen(false);
+              setPhoto(null);
+              setFileKey('');
+              setEditToolUuid(null);
+              setEditToolData(null);
+            }}
+            setUploading={setUploading}
+            setFileKey={setFileKey}
+            existingImageUrl={
+              editToolData &&
+              editToolData.assets &&
+              editToolData.assets[0]?.media_url
+                ? cdnPrefix + editToolData.assets[0].media_url
+                : undefined
+            }
+            initialValues={
+              editToolData
+                ? {
+                    name: editToolData.name,
+                    available_quantity: editToolData.available_quantity,
+                    manufacturer: editToolData.manufacturer,
+                    services: editToolData.services?.map(s => s.id) || [],
+                  }
+                : undefined
+            }
+            isEdit={!!editToolUuid}
+          />
+        )}
       </SideSheet>
     </div>
   );

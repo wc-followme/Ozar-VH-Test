@@ -29,6 +29,14 @@ interface ToolFormProps {
   onCancel?: () => void;
   setUploading?: (uploading: boolean) => void;
   setFileKey?: (fileKey: string) => void;
+  existingImageUrl?: string;
+  initialValues?: {
+    name?: string;
+    available_quantity?: number;
+    manufacturer?: string;
+    services?: (string | number)[];
+  };
+  isEdit?: boolean;
 }
 
 const ToolForm: React.FC<ToolFormProps> = ({
@@ -41,12 +49,21 @@ const ToolForm: React.FC<ToolFormProps> = ({
   onCancel,
   setUploading,
   setFileKey,
+  existingImageUrl,
+  initialValues,
+  isEdit = false,
 }) => {
   // Form states
-  const [name, setName] = useState('');
-  const [manufacturer, setManufacturer] = useState('');
-  const [totalQuantity, setTotalQuantity] = useState<number>(1);
-  const [serviceIds, setServiceIds] = useState<string[]>([]);
+  const [name, setName] = useState(initialValues?.name || '');
+  const [manufacturer, setManufacturer] = useState(
+    initialValues?.manufacturer || ''
+  );
+  const [totalQuantity, setTotalQuantity] = useState<number>(
+    initialValues?.available_quantity || 1
+  );
+  const [serviceIds, setServiceIds] = useState<string[]>(
+    initialValues?.services?.map(s => s.toString()) || []
+  );
   const [errors, setErrors] = useState<{
     name?: string;
     manufacturer?: string;
@@ -58,6 +75,16 @@ const ToolForm: React.FC<ToolFormProps> = ({
   // Service dropdown states
   const [services, setServices] = useState<Service[]>([]);
   const [loadingServices, setLoadingServices] = useState(false);
+
+  // Update form state if initialValues change (for edit mode)
+  useEffect(() => {
+    if (initialValues) {
+      setName(initialValues.name || '');
+      setManufacturer(initialValues.manufacturer || '');
+      setTotalQuantity(initialValues.available_quantity || 1);
+      setServiceIds(initialValues.services?.map(s => s.toString()) || []);
+    }
+  }, [initialValues]);
 
   // Handle photo change with upload
   const handlePhotoChange = async (file: File | null) => {
@@ -114,16 +141,24 @@ const ToolForm: React.FC<ToolFormProps> = ({
         if (response.statusCode === 200) {
           // Handle the actual API response structure: { statusCode, message, data: Service[], limit, page, total, totalPages }
           let servicesData = response.data || [];
-          
+
           // If data is an object with a 'data' property (nested structure), use that
-          if (response.data && typeof response.data === 'object' && !Array.isArray(response.data) && response.data.data) {
+          if (
+            response.data &&
+            typeof response.data === 'object' &&
+            !Array.isArray(response.data) &&
+            response.data.data
+          ) {
             servicesData = response.data.data;
           }
-          
+
           const finalServices = Array.isArray(servicesData) ? servicesData : [];
           setServices(finalServices);
           console.log('Services loaded:', finalServices); // Debug log
-          console.log('Service options:', finalServices.map(s => ({ value: s.id?.toString(), label: s.name }))); // Debug log
+          console.log(
+            'Service options:',
+            finalServices.map(s => ({ value: s.id?.toString(), label: s.name }))
+          ); // Debug log
         }
       } catch (error) {
         console.error('Error loading services:', error);
@@ -266,6 +301,7 @@ const ToolForm: React.FC<ToolFormProps> = ({
               allowed
             </>
           }
+          existingImageUrl={existingImageUrl}
         />
 
         {/* Services Select */}
@@ -361,8 +397,12 @@ const ToolForm: React.FC<ToolFormProps> = ({
             className='btn-primary'
           >
             {loading
-              ? TOOL_MESSAGES.CREATING_BUTTON
-              : TOOL_MESSAGES.CREATE_BUTTON}
+              ? isEdit
+                ? TOOL_MESSAGES.UPDATING_BUTTON
+                : TOOL_MESSAGES.CREATING_BUTTON
+              : isEdit
+                ? TOOL_MESSAGES.UPDATE_BUTTON
+                : TOOL_MESSAGES.CREATE_BUTTON}
           </Button>
         </div>
       </form>
