@@ -110,16 +110,16 @@ export default function ToolsManagement() {
         setSideSheetOpen(false);
         setPhoto(null);
         setFileKey('');
-        // Refresh tools list
-        if (user?.company_id) {
-          const refreshResponse = await apiService.fetchTools({
-            page: 1,
-            limit: 50,
-            company_id: user.company_id,
-          });
-          if (refreshResponse.statusCode === 200) {
-            setTools(refreshResponse.data || []);
-          }
+        // Refresh tools list - use the same API call as initial load
+        const refreshResponse = await apiService.fetchTools({
+          page: 1,
+          limit: 50,
+        });
+        console.log('Refresh response:', refreshResponse); // Debug log
+        if (refreshResponse.statusCode === 200) {
+          const responseData = (refreshResponse as any).data;
+          console.log('Setting tools to:', responseData?.data || []); // Debug log
+          setTools(responseData?.data || []);
         }
       } else {
         showErrorToast(
