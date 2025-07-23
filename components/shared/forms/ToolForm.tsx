@@ -102,17 +102,28 @@ const ToolForm: React.FC<ToolFormProps> = ({
     const loadServices = async () => {
       setLoadingServices(true);
       try {
-        const response = await apiService.fetchServicesForTools({
+        const response = await apiService.fetchServices({
           page: 1,
           limit: 50,
-          is_active: true,
         });
 
+        console.log('Services API response:', response); // Debug log
+        console.log('Response data type:', typeof response.data); // Debug log
+        console.log('Response data keys:', Object.keys(response.data || {})); // Debug log
+
         if (response.statusCode === 200) {
-          // Handle the correct response structure: { statusCode, message, data: Service[] }
-          const servicesData = response.data || [];
+          // Handle the actual API response structure: { statusCode, message, data: Service[], limit, page, total, totalPages }
+          let servicesData = response.data || [];
+          
+          // If data is an object with a 'data' property (nested structure), use that
+          if (response.data && typeof response.data === 'object' && !Array.isArray(response.data) && response.data.data) {
+            servicesData = response.data.data;
+          }
+          
           const finalServices = Array.isArray(servicesData) ? servicesData : [];
           setServices(finalServices);
+          console.log('Services loaded:', finalServices); // Debug log
+          console.log('Service options:', finalServices.map(s => ({ value: s.id?.toString(), label: s.name }))); // Debug log
         }
       } catch (error) {
         console.error('Error loading services:', error);
@@ -227,6 +238,10 @@ const ToolForm: React.FC<ToolFormProps> = ({
         label: service.name || '',
       }))
     : [];
+
+  console.log('Current services state:', services); // Debug log
+  console.log('Service options for MultiSelect:', serviceOptions); // Debug log
+  console.log('Current serviceIds:', serviceIds); // Debug log
 
   return (
     <div className='p-0 w-full'>
