@@ -436,11 +436,13 @@ export default function ToolsManagement() {
             setUploading={setUploading}
             setFileKey={setFileKey}
             existingImageUrl={
-              editToolData &&
-              editToolData.assets &&
-              editToolData.assets[0]?.media_url
-                ? cdnPrefix + editToolData.assets[0].media_url
-                : undefined
+              imageDeleted
+                ? undefined
+                : editToolData &&
+                    editToolData.assets &&
+                    editToolData.assets[0]?.media_url
+                  ? cdnPrefix + editToolData.assets[0].media_url
+                  : undefined
             }
             existingToolAssets={imageDeleted ? '' : originalToolAssets}
             initialValues={
