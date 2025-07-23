@@ -1,28 +1,68 @@
 'use client';
 import { ModeToggle } from '@/components/mode-toggle';
 import { Button } from '@/components/ui/button';
-import { UserOctagon } from 'iconsax-react';
+import { Key, UserOctagon } from 'iconsax-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../../lib/auth-context';
+import { cn } from '../../lib/utils';
 import { SignoutIcon } from '../icons/SignoutIcon';
 import { SupportIcon } from '../icons/SupportIcon';
 import Dropdown from '../shared/common/Dropdown';
 
 const menuOptions = [
   { label: 'View Profile', action: 'edit', icon: UserOctagon },
+  { label: 'Change Password', action: 'changePassword', icon: Key },
   { label: 'Logout', action: 'delete', icon: SignoutIcon },
 ];
 export function HomeOwnerHeader() {
+  const { logout } = useAuth();
+
+  // Add scroll direction state
+  const [showHeader, setShowHeader] = useState(true);
+  const lastScrollY = useRef(0);
+  // const [sideSheetOpen, setSideSheetOpen] = useState(false);
+  // const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
+        // Scrolling down
+        setShowHeader(false);
+      } else {
+        // Scrolling up
+        setShowHeader(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleMenuAction = (action: string) => {
+    if (action === 'delete') {
+      logout();
+    } else if (action === 'changePassword') {
+      // setChangePasswordOpen(true);
+    }
     return action;
   };
   return (
-    <header className='bg-[var(--white-background)] px-6 py-3 w-full'>
+    <header
+      className={cn(
+        'bg-[var(--white-background)] px-6 py-3 sticky top-0 z-50 transition-transform ease-in-out duration-200 w-full',
+        showHeader ? 'translate-y-0' : '-translate-y-full'
+      )}
+    >
       <div className=' flex h-14 items-center justify-between'>
         <div className='flex items-center space-x-4'>
-          <h1 className='text-2xl font-bold'>Virtual Homes</h1>
+          <Link href='/' className='text-2xl font-bold'>
+            Virtual Homes
+          </Link>
         </div>
-        <div className='flex items-center gap-6'>
+        <div className='hidden flex items-center gap-6'>
           <Link href='/'>
             <SupportIcon className='text-[var(--text-dark)]' />
           </Link>

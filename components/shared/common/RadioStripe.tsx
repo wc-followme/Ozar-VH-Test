@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 
 const options = [
-  { label: 'Public Job', value: 'public' },
-  { label: 'Private Job', value: 'private' },
+  { label: 'Public Job', value: 'PUBLIC' },
+  { label: 'Private Job', value: 'PRIVATE' },
 ];
 
 export function RadioGroupStripe({
