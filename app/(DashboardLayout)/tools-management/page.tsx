@@ -80,8 +80,27 @@ export default function ToolsManagement() {
     loadTools();
   }, [user, showErrorToast, handleAuthError]);
 
-  const handleDelete = (id: number) => {
-    setTools(tools.filter(tool => tool.id !== id));
+  const handleDelete = async (uuid: string) => {
+    try {
+      const response = await apiService.deleteTool(uuid);
+      if (response.statusCode === 200) {
+        showSuccessToast(response.message || TOOL_MESSAGES.DELETE_SUCCESS);
+        setTools(tools.filter(tool => tool.uuid !== uuid));
+      } else {
+        showErrorToast(
+          extractApiErrorMessage(response.message) || TOOL_MESSAGES.DELETE_ERROR
+        );
+      }
+    } catch (error: any) {
+      console.error('Delete tool error:', error);
+      if (error.status === 401) {
+        handleAuthError(error);
+      } else {
+        showErrorToast(
+          extractApiErrorMessage(error.message) || TOOL_MESSAGES.DELETE_ERROR
+        );
+      }
+    }
   };
 
   const handleDeletePhoto = () => {
@@ -293,7 +312,7 @@ export default function ToolsManagement() {
                 brand={tool.manufacturer}
                 quantity={tool.available_quantity}
                 videoCount={0} // Static 0 for now as requested
-                onDelete={() => handleDelete(tool.id)}
+                onDelete={() => handleDelete(tool.uuid)}
                 onEdit={() => handleEdit(tool.uuid)}
               />
             );
