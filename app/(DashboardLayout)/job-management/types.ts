@@ -360,6 +360,7 @@ export interface Category {
   name: string;
   description?: string;
   is_default?: boolean;
+  icon?: string;
 }
 
 export interface CategoryApiResponse {

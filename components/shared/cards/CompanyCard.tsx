@@ -54,12 +54,7 @@ export function CompanyCard({
 
   // Generate a consistent placeholder image based on company name
   const getPlaceholderImage = () => {
-    const placeholderImages = [
-      '/images/company-management/company-img-1.png',
-      '/images/company-management/company-img-2.png',
-      '/images/company-management/company-img-3.png',
-      '/images/company-management/company-img-4.png',
-    ];
+    const placeholderImages = ['/images/img-placeholder-md.png'];
 
     // Use company name to consistently pick same placeholder for same company
     const hash = name.split('').reduce((a, b) => {
@@ -125,7 +120,13 @@ export function CompanyCard({
     >
       {/* Header with Avatar, User Info and Menu */}
       <div className=''>
-        <div className='w-[60px] h-[60px] rounded-[12px] overflow-hidden bg-[var(--border-light)] flex items-center justify-center'>
+        <div
+          className={`${
+            !image || image.trim() === '' || isPlaceholder
+              ? 'w-full h-[200px] rounded-[12px] overflow-hidden flex items-center justify-center'
+              : 'w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-40 xl:h-40 min-h-[200px] min-w-[240px] max-w-[240px] max-h-[240px] rounded-[12px] overflow-hidden flex items-center justify-center aspect-square mx-auto'
+          }`}
+        >
           <Image
             src={
               (!image || image.trim() === '' || isPlaceholder
@@ -133,9 +134,13 @@ export function CompanyCard({
                 : image || getPlaceholderImage()) as string
             }
             alt={name}
-            width={60}
-            height={60}
-            className='w-full h-full object-cover'
+            width={240}
+            height={240}
+            className={
+              !image || image.trim() === '' || isPlaceholder
+                ? 'w-full h-full object-cover'
+                : 'w-auto h-auto max-h-full object-contain'
+            }
             onError={() => {
               if (!isPlaceholder) {
                 setIsPlaceholder(true);
@@ -148,7 +153,7 @@ export function CompanyCard({
         <div className='flex-1 min-w-0 pt-[18px]'>
           {/* User Info */}
           <div className='flex items-center justify-between mb-3'>
-            <h3 className='font-bold text-[var(--text)] truncate text-base'>
+            <h3 className='font-bold text-[var(--text)] truncate text-sm md:text-base'>
               {name}
             </h3>
             {showMenu && (
@@ -178,16 +183,16 @@ export function CompanyCard({
 
           {/* Contact Info */}
           <div className='space-y-1'>
-            <div className='flex items-center justify-between gap-2 text-[12px] font-medium text-[var(--text-secondary)]'>
-              <p className='text-[14px] font-medium text-[var(--text-dark)] flex flex-col'>
+            <div className='flex items-center justify-between gap-2 text-[10px] md:text-[12px] font-medium text-[var(--text-secondary)]'>
+              <p className='text-[12px] md:text-[14px] font-medium text-[var(--text-dark)] flex flex-col'>
                 <span className='text-[var(--text-secondary)] '>
                   Created On
                 </span>
                 <span className='text-[var(--text)] '>{createdOn}</span>
               </p>
-              <p className='text-[14px] font-medium text-[var(--text-dark)] flex flex-col'>
+              <p className='text-[12px] md:text-[14px] font-medium text-[var(--text-dark)] flex flex-col'>
                 <span className='text-[var(--text-secondary)]'>
-                  Subscription Ends
+                  Subscription End
                 </span>
                 <span className='text-[var(--text)]'>{subsEnd}</span>
               </p>

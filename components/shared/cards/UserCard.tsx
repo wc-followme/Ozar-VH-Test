@@ -104,7 +104,7 @@ export function UserCard({
         <div className='flex-1 min-w-0'>
           {/* User Info */}
           <div className='flex items-start'>
-            <div className='mb-1.5 flex-1'>
+            <div className='mb-1.5 flex-1 truncate'>
               <h3 className='font-bold text-[var(--text)] truncate text-base'>
                 {name}
               </h3>

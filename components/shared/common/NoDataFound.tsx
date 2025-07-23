@@ -18,19 +18,19 @@ const NoDataFound: React.FC<NoDataFoundProps> = ({
 }) => {
   return (
     <div className='flex flex-col items-center justify-center min-h-[60vh] h-full text-center'>
-      <div className='mb-8'>
+      <div className='mb-4 md:mb-8'>
         <Image
           src='/images/no-data-found.svg'
           height={250}
           width={250}
           alt=''
-          className='object-fit'
+          className='object-fit max-h-32 md:max-h-fit'
         />
       </div>
-      <h2 className='text-2xl font-bold text-[var(--text-dark)] mb-2'>
+      <h2 className='text-xl md:text-2xl font-bold text-[var(--text-dark)] mb-2'>
         {title}
       </h2>
-      <p className='text-2xl font-medium text-[var(--text-dark)] mb-6 max-w-[738px]'>
+      <p className='text-base md:text-2xl font-medium text-[var(--text-dark)] mb-6 max-w-[738px]'>
         {description}
       </p>
       {showButton && onButtonClick && (

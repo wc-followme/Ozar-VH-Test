@@ -1,5 +1,6 @@
 import { STEP_MESSAGES } from '@/app/(DashboardLayout)/job-management/step-messages';
 import { Contractor } from '@/app/(DashboardLayout)/job-management/types';
+import SelectField from '@/components/shared/common/SelectField';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -16,13 +17,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { apiService } from '@/lib/api';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { format } from 'date-fns';
@@ -144,21 +138,21 @@ export function StepGeneralInfo({
 
   return (
     <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-4 flex flex-col items-center'>
-      <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
+      <h2 className='text-xl md:text-2xl xl:text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
         {STEP_MESSAGES.GENERAL_INFO_TITLE}
       </h2>
-      <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
+      <p className='text-[var(--text-secondary)] text-sm md:text-[18px] font-normal text-center mb-6 sm:mb-8 max-w-lg px-2 sm:px-0'>
         {STEP_MESSAGES.GENERAL_INFO_DESCRIPTION}
       </p>
       <Form {...form}>
         <form
-          className='w-full flex flex-col gap-6'
+          className='w-full flex flex-col gap-4 sm:gap-6'
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <div className='h-[calc(100vh_-_550px)] overflow-y-auto'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div className='h-auto md:h-[calc(100vh_-_550px)] md:-mx-4 md:px-4 overflow-y-auto'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4'>
               {/* Your Name (full width) */}
-              <div className='flex flex-col gap-2 col-span-1 md:col-span-2'>
+              <div className='flex flex-col gap-1.5 sm:gap-2 col-span-1 md:col-span-2'>
                 <FormField
                   control={form.control}
                   name='fullName'
@@ -180,7 +174,7 @@ export function StepGeneralInfo({
                 />
               </div>
               {/* Project Start Date */}
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1.5 sm:gap-2'>
                 <FormField
                   control={form.control}
                   name='projectStartDate'
@@ -231,7 +225,7 @@ export function StepGeneralInfo({
                 />
               </div>
               {/* Project Finish Date */}
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1.5 sm:gap-2'>
                 <FormField
                   control={form.control}
                   name='projectFinishDate'
@@ -282,7 +276,7 @@ export function StepGeneralInfo({
                 />
               </div>
               {/* Email */}
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1.5 sm:gap-2'>
                 <FormField
                   control={form.control}
                   name='email'
@@ -305,7 +299,7 @@ export function StepGeneralInfo({
                 />
               </div>
               {/* Phone */}
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1.5 sm:gap-2'>
                 <FormField
                   control={form.control}
                   name='phone'
@@ -327,7 +321,7 @@ export function StepGeneralInfo({
                 />
               </div>
               {/* Your Budget */}
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1.5 sm:gap-2'>
                 <FormField
                   control={form.control}
                   name='budget'
@@ -349,7 +343,7 @@ export function StepGeneralInfo({
                 />
               </div>
               {/* Preferred Contractor */}
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1.5 sm:gap-2'>
                 <FormField
                   control={form.control}
                   name='contractor'
@@ -358,34 +352,22 @@ export function StepGeneralInfo({
                       <FormLabel className='field-label'>
                         {STEP_MESSAGES.PREFERRED_CONTRACTOR_LABEL}
                       </FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={isLoadingContractors}
-                      >
-                        <FormControl>
-                          <SelectTrigger className='input-field'>
-                            <SelectValue
-                              placeholder={
-                                isLoadingContractors
-                                  ? STEP_MESSAGES.LOADING_CONTRACTORS
-                                  : STEP_MESSAGES.SELECT_CONTRACTOR
-                              }
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                          {/* <SelectItem value='any'>Any</SelectItem> */}
-                          {contractors.map((contractor: any) => {
-                            const { id, name } = contractor;
-                            return (
-                              <SelectItem key={id} value={id.toString()}>
-                                {name}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <SelectField
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          options={contractors.map((contractor: any) => ({
+                            value: contractor.id.toString(),
+                            label: contractor.name,
+                          }))}
+                          placeholder={
+                            isLoadingContractors
+                              ? STEP_MESSAGES.LOADING_CONTRACTORS
+                              : STEP_MESSAGES.SELECT_CONTRACTOR
+                          }
+                          className=''
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -393,7 +375,7 @@ export function StepGeneralInfo({
               </div>
             </div>
             {/* Address */}
-            <div className='flex flex-col gap-2 mt-4'>
+            <div className='flex flex-col gap-1.5 sm:gap-2 mt-3 sm:mt-4'>
               <FormField
                 control={form.control}
                 name='address'
@@ -417,7 +399,10 @@ export function StepGeneralInfo({
           </div>
           {/* Submit/Next Step Button */}
           <div className='flex justify-end'>
-            <Button type='submit' className='btn-primary !h-12 !px-12'>
+            <Button
+              type='submit'
+              className='btn-primary !px-4 md:!px-8 text-sm sm:text-base'
+            >
               {isLastStep ? STEP_MESSAGES.SUBMIT : STEP_MESSAGES.NEXT_STEP}
             </Button>
           </div>

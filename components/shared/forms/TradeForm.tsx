@@ -152,10 +152,10 @@ export default function TradeForm({
   return (
     <form
       onSubmit={handleSubmit(onFormSubmit)}
-      className='space-y-6 w-full max-w-xl'
+      className='space-y-4 sm:space-y-6 w-full max-w-xl'
     >
       <div className='space-y-2'>
-        <Label htmlFor='category' className='field-label'>
+        <Label htmlFor='category' className='field-label text-sm sm:text-base'>
           {TRADE_MESSAGES.CATEGORY_LABEL}
         </Label>
         <Controller
@@ -184,13 +184,15 @@ export default function TradeForm({
                 placeholder={TRADE_MESSAGES.SELECT_CATEGORY}
                 error={errors.categories?.message as string}
                 name='category'
+                maxHeight={200}
+                maxSelectedItems={1}
               />
             );
           }}
         />
       </div>
       <div className='space-y-2'>
-        <Label htmlFor='tradeName' className='field-label'>
+        <Label htmlFor='tradeName' className='field-label text-sm sm:text-base'>
           {TRADE_MESSAGES.TRADE_NAME_LABEL}
         </Label>
         <Controller
@@ -202,7 +204,7 @@ export default function TradeForm({
               {...field}
               placeholder={TRADE_MESSAGES.ENTER_TRADE_NAME}
               className={cn(
-                'input-field',
+                'input-field !h-12',
                 errors.tradeName
                   ? 'border-[var(--warning)]'
                   : 'border-[var(--border-dark)]'
@@ -212,11 +214,11 @@ export default function TradeForm({
         />
         <FormErrorMessage message={errors.tradeName?.message as string} />
       </div>
-      <div className='pt-2 flex items-center gap-4'>
+      <div className='pt-2 flex flex-row items-center gap-2 sm:gap-4'>
         <Button
           type='button'
           variant='outline'
-          className='btn-secondary !px-8 !h-12'
+          className='btn-secondary !px-4 md:!px-8'
           onClick={onCancel}
           disabled={loading}
         >
@@ -224,7 +226,7 @@ export default function TradeForm({
         </Button>
         <Button
           type='submit'
-          className='btn-primary !h-12 !px-12'
+          className='btn-primary !px-4 md:!px-8'
           disabled={loading}
         >
           {loading

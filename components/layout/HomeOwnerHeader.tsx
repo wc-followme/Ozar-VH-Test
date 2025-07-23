@@ -52,17 +52,17 @@ export function HomeOwnerHeader() {
   return (
     <header
       className={cn(
-        'bg-[var(--white-background)] px-6 py-3 sticky top-0 z-50 transition-transform ease-in-out duration-200 w-full',
+        'bg-[var(--white-background)] px-4 md:px-6 py-3 sticky top-0 z-50 transition-transform ease-in-out duration-200 w-full',
         showHeader ? 'translate-y-0' : '-translate-y-full'
       )}
     >
       <div className=' flex h-14 items-center justify-between'>
         <div className='flex items-center space-x-4'>
-          <Link href='/' className='text-2xl font-bold'>
+          <Link href='/' className='text-xl md:text-2xl font-bold'>
             Virtual Homes
           </Link>
         </div>
-        <div className='hidden flex items-center gap-6'>
+        <div className='items-center gap-2 md:gap-6 hidden'>
           <Link href='/'>
             <SupportIcon className='text-[var(--text-dark)]' />
           </Link>

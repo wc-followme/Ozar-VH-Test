@@ -3,6 +3,9 @@
 @tailwind utilities;
 body {
   font-family: Arial, Helvetica, sans-serif;
+  min-height: -moz-available; /* WebKit-based browsers will ignore this. */
+  min-height: -webkit-fill-available; /* Mozilla-based browsers will ignore this. */
+  min-height: fill-available;
 }
 
 @layer base {
@@ -72,7 +75,7 @@ body {
     text-wrap: balance;
   }
   .btn-primary {
-    @apply h-[42px] px-6 bg-[var(--secondary)] hover:!bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2;
+    @apply h-[42px] px-6 bg-[var(--secondary)] hover:!bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2 whitespace-nowrap;
   }
   .btn-secondary {
     @apply h-[42px] px-[18px] border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center;
@@ -268,5 +271,94 @@ input:-webkit-autofill:active {
     background: #f0fdf4 !important;
     border-color: #86efac !important;
     color: #166534 !important;
+  }
+}
+
+/* Mobile-specific styles */
+@media (max-width: 639px) {
+  .btn-primary {
+    @apply w-auto justify-center px-4 text-sm;
+  }
+
+  .btn-secondary {
+    @apply w-auto justify-center px-4 text-sm;
+  }
+
+  .page-title {
+    @apply text-lg leading-snug font-semibold;
+  }
+
+  .field-label {
+    @apply text-xs;
+  }
+
+  .input-field {
+    @apply text-sm;
+  }
+
+  /* Job details specific mobile styles */
+  .job-details-card {
+    @apply p-3 gap-3;
+  }
+
+  .job-details-grid {
+    @apply grid-cols-1 gap-3;
+  }
+
+  .job-details-image {
+    @apply w-full max-w-[100px] mx-auto;
+  }
+
+  .job-details-text {
+    @apply text-sm;
+  }
+
+  .job-details-label {
+    @apply text-xs;
+  }
+
+  /* Mobile text responsiveness */
+  .mobile-text-xs {
+    @apply text-xs;
+  }
+
+  .mobile-text-sm {
+    @apply text-sm;
+  }
+
+  .mobile-text-base {
+    @apply text-base;
+  }
+
+  .mobile-text-lg {
+    @apply text-lg;
+  }
+
+  .mobile-text-xl {
+    @apply text-xl;
+  }
+
+  .mobile-text-2xl {
+    @apply text-2xl;
+  }
+
+  /* Card title mobile responsiveness */
+  .card-title-mobile {
+    @apply text-lg;
+  }
+
+  /* Form label mobile responsiveness */
+  .form-label-mobile {
+    @apply text-xs;
+  }
+
+  /* Paragraph mobile responsiveness */
+  .paragraph-mobile {
+    @apply text-sm;
+  }
+
+  /* Subtitle mobile responsiveness */
+  .subtitle-mobile {
+    @apply text-sm;
   }
 }

@@ -17,6 +17,7 @@ interface CategoryFormProps {
   errors: {
     icon?: string;
     description?: string;
+    name?: string;
   };
   selectedIcon: string;
   setSelectedIcon: (icon: string) => void;
@@ -63,16 +64,17 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
                   <Input
                     {...field}
                     placeholder={CATEGORY_MESSAGES.ENTER_CATEGORY_NAME}
-                    className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                    className={`h-12 ${errors.name ? 'border-2 !border-[var(--warning)]' : 'border-2 !border-[var(--border-dark)]'} focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]`}
                     disabled={isSubmitting}
                   />
                 )}
               />
             </div>
           </div>
-          {errors.icon && (
+          {(errors.icon || errors.name) && (
             <div className='space-y-1'>
               {errors.icon && <FormErrorMessage message={errors.icon} />}
+              {errors.name && <FormErrorMessage message={errors.name} />}
             </div>
           )}
         </div>
@@ -88,7 +90,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               <Textarea
                 {...field}
                 placeholder={CATEGORY_MESSAGES.ENTER_DESCRIPTION}
-                className='min-h-[80px] border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                className={`min-h-[80px] ${errors.description ? 'border-2 !border-[var(--warning)]' : 'border-2 !border-[var(--border-dark)]'} focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]`}
                 disabled={isSubmitting}
               />
             )}
@@ -102,7 +104,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           <Button
             type='button'
             variant='outline'
-            className='btn-secondary !h-12 !px-8'
+            className='btn-secondary !px-4 md:!px-8'
             onClick={handleClose}
             disabled={isSubmitting}
           >
@@ -110,7 +112,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           </Button>
           <Button
             type='submit'
-            className='btn-primary !h-12 !px-12'
+            className='btn-primary !px-4 md:!px-8'
             disabled={isSubmitting}
           >
             {isSubmitting

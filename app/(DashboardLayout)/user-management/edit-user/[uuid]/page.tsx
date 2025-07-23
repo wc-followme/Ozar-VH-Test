@@ -519,7 +519,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
         </div> */}
 
         {/* Main Content */}
-        <div className='bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
+        <div className='bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-4 md:p-6'>
           <Tabs
             value={selectedTab}
             onValueChange={setSelectedTab}
@@ -540,10 +540,10 @@ export default function EditUserPage({ params }: EditUserPageProps) {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value='info' className='pt-8'>
-              <div className='flex items-start gap-6'>
+            <TabsContent value='info' className='pt-4 md:pt-8'>
+              <div className='flex flex-col xl:flex-row items-start gap-3 md:gap-6'>
                 {/* Left Column - Upload Photo */}
-                <div className='w-[250px] flex-shrink-0 relative'>
+                <div className='w-full md:w-[250px] flex-shrink-0 relative'>
                   <PhotoUploadField
                     photo={photoFile}
                     onPhotoChange={handlePhotoChange}
@@ -566,7 +566,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                 </div>
 
                 {/* Right Column - Form Fields */}
-                <div className='flex-1'>
+                <div className='flex-1 w-full'>
                   <UserInfoForm
                     key={user?.uuid || 'loading'}
                     roles={roles}
@@ -582,7 +582,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
               </div>
             </TabsContent>
 
-            <TabsContent value='permissions' className='pt-8'>
+            <TabsContent value='permissions' className='pt-4 md:pt-8'>
               {permissionsLoading ? (
                 <div className='flex items-center justify-center py-8'>
                   <LoadingComponent variant='inline' />
@@ -630,14 +630,14 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                   <div className='flex justify-end gap-6 mt-8'>
                     <Link
                       href={'/user-management'}
-                      className='inline-flex items-center h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] hover:bg-gray-50 transition-colors'
+                      className='btn-secondary !px-4 md:!px-8'
                     >
                       Cancel
                     </Link>
                     <Button
                       onClick={handleUpdatePermissions}
                       disabled={formLoading}
-                      className='h-[48px] px-12 bg-[var(--secondary)] hover:bg-green-600 rounded-full font-semibold text-white'
+                      className='btn-primary !px-4 md:!px-8'
                     >
                       {formLoading ? 'Updating...' : 'Update'}
                     </Button>

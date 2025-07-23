@@ -280,9 +280,9 @@ export default function AddCompanyUserPage() {
             </TabsList>
 
             <TabsContent value='info' className='pt-8'>
-              <div className='flex items-start gap-6'>
+              <div className='flex flex-col xl:flex-row items-start gap-4 xl:gap-6'>
                 {/* Left Column - Upload Photo */}
-                <div className='w-[250px] flex-shrink-0 relative'>
+                <div className='w-full sm:w-[250px] flex-shrink-0 relative'>
                   <PhotoUploadField
                     photo={photoFile}
                     onPhotoChange={handlePhotoChange}

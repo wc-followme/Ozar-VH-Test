@@ -63,42 +63,46 @@ const AccessControlAccordion: React.FC<AccessControlAccordionProps> = ({
     >
       <AccordionItem
         value='roles'
-        className='border border-[var(--border-dark)] !hover:no-underline rounded-[20px] overflow-hidden'
+        className='border border-[var(--border-dark)] !hover:no-underline rounded-[16px] sm:rounded-[20px] overflow-hidden'
       >
-        <AccordionTrigger className='border-0 px-6 py-5 flex items-center justify-normal gap-4 bg-[var(--white-background)] hover:!no-underline [&>svg]:ml-auto'>
-          <span className='text-base font-bold text-[var(--text-dark)] !no-underline'>
-            {title}
-          </span>
-          <Badge
-            className={`${badgeColorClass} text-white px-3 py-1 rounded-full text-sm font-medium leading-tight`}
-          >
-            {badgeLabel}
-          </Badge>
+        <AccordionTrigger className='border-0 px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-2 sm:gap-4 bg-[var(--white-background)] hover:!no-underline [&>svg]:ml-auto'>
+          <div className='flex flex-col text-left sm:flex-row items-start sm:items-center gap-2 sm:gap-4 flex-1'>
+            <span className='text-sm sm:text-base font-bold text-[var(--text-dark)] !no-underline'>
+              {title}
+            </span>
+            <Badge
+              className={`${badgeColorClass} text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium leading-tight`}
+            >
+              {badgeLabel}
+            </Badge>
+          </div>
         </AccordionTrigger>
-        <AccordionContent className='border-0 bg-[var(--background)] px-6 py-4'>
-          <div className='flex flex-col gap-4'>
+        <AccordionContent className='border-0 bg-[var(--background)] px-3 sm:px-6 py-3 sm:py-4'>
+          <div className='flex flex-col gap-3 sm:gap-4'>
             {stripes.map((stripe, idx) => {
               const { title, description, checked, onToggle, disabled } =
                 stripe;
               return (
                 <div
                   key={title + idx}
-                  className='flex items-center gap-4 justify-between rounded-[10px] bg-[var(--white-background)] p-4 shadow-sm'
+                  className='flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 justify-between rounded-[8px] sm:rounded-[10px] bg-[var(--white-background)] p-3 sm:p-4 shadow-sm'
                 >
-                  <div>
-                    <div className='font-medium text-base text-[var(--text-dark)] mb-2'>
+                  <div className='flex-1'>
+                    <div className='font-medium text-sm sm:text-base text-[var(--text-dark)] mb-1 sm:mb-2'>
                       {title}
                     </div>
-                    <div className='text-sm text-[var(--text-secondary)]'>
+                    <div className='text-xs sm:text-sm text-[var(--text-secondary)]'>
                       {description}
                     </div>
                   </div>
-                  <Switch
-                    checked={checked}
-                    onCheckedChange={onToggle}
-                    className={switchStyleMd}
-                    disabled={disabled}
-                  />
+                  <div className='flex sm:justify-end'>
+                    <Switch
+                      checked={checked}
+                      onCheckedChange={onToggle}
+                      className={switchStyleMd}
+                      disabled={disabled}
+                    />
+                  </div>
                 </div>
               );
             })}

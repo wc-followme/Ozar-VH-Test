@@ -15,10 +15,10 @@ import {
 import { CommonStatus } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { FlagHookIcon } from '../../icons/FalgHookIcon';
+import { catIconOptions } from '../../../constants/sidebar-items';
 
 const projectTypeSchema = yup.object({
   selectedType: yup.string().required(STEP_MESSAGES.PROJECT_TYPE_REQUIRED),
@@ -120,11 +120,11 @@ export function StepProjectType({
   // Loading state
   if (isLoading) {
     return (
-      <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
-        <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
+      <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-4 flex flex-col items-center'>
+        <h2 className='text-xl md:text-2xl xl:text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
           {STEP_MESSAGES.PROJECT_TYPE_TITLE}
         </h2>
-        <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
+        <p className='text-[var(--text-secondary)] text-sm md:text-[18px] font-normal text-center mb-6 sm:mb-8 max-w-lg px-2 sm:px-0'>
           {STEP_MESSAGES.PROJECT_TYPE_DESCRIPTION}
         </p>
         <div className='w-full flex items-center justify-center h-64'>
@@ -139,11 +139,11 @@ export function StepProjectType({
   // Error state
   if (error) {
     return (
-      <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
-        <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
+      <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-4 flex flex-col items-center'>
+        <h2 className='text-xl md:text-2xl xl:text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
           {STEP_MESSAGES.PROJECT_TYPE_TITLE}
         </h2>
-        <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
+        <p className='text-[var(--text-secondary)] text-sm md:text-[18px] font-normal text-center mb-6 sm:mb-8 max-w-lg px-2 sm:px-0'>
           {STEP_MESSAGES.PROJECT_TYPE_DESCRIPTION}
         </p>
         <div className='w-full flex items-center justify-center h-64'>
@@ -154,11 +154,11 @@ export function StepProjectType({
   }
 
   return (
-    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
-      <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
+    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-4 flex flex-col items-center'>
+      <h2 className='text-xl md:text-2xl xl:text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
         {STEP_MESSAGES.PROJECT_TYPE_TITLE}
       </h2>
-      <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
+      <p className='text-[var(--text-secondary)] text-sm md:text-[18px] font-normal text-center mb-6 sm:mb-8 max-w-lg px-2 sm:px-0'>
         {STEP_MESSAGES.PROJECT_TYPE_DESCRIPTION}
       </p>
       <Form {...form}>
@@ -169,73 +169,101 @@ export function StepProjectType({
             render={({}) => (
               <FormItem>
                 <FormControl>
-                  <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 h-[calc(100vh_-_550px)] overflow-y-auto'>
-                    {categories.map((category: Category) => {
-                      const { id, name, description, is_default } = category;
-                      return (
-                        <div
-                          key={id}
-                          className={`flex flex-col items-start border border-[var(--border-dark)] rounded-2xl bg-[var(--card-background)] p-6 cursor-pointer transition-all duration-150 hover:shadow-md ${selectedType === id.toString() ? 'bg-[var(--card-hover)] shadow-green-100' : ''}`}
-                          onClick={() =>
-                            setValue('selectedType', id.toString())
-                          }
-                        >
-                          <div
-                            className={`w-10 h-10 rounded-[16px] bg-[#EBB4021A] text-[#EBB402] flex items-center justify-center mb-4`}
-                          >
-                            <FlagHookIcon
-                              className={`w-5 h-5`}
-                              color='currentcolor'
-                            />
-                          </div>
-                          <div className='font-bold text-base mb-2 text-[var(--text-dark)]'>
-                            {name || STEP_MESSAGES.UNNAMED_CATEGORY}
-                          </div>
-                          <div className='text-[var(--text-secondary)] text-base font-normal leading-snug'>
-                            {description || STEP_MESSAGES.NO_DESCRIPTION}
-                          </div>
-                          {is_default && (
-                            <div className='mt-2'>
-                              <span className='text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full'>
-                                {STEP_MESSAGES.DEFAULT}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                  <div className='h-auto md:h-[calc(100vh_-_550px)] md:-mx-4 md:px-4 overflow-y-auto'>
+                    <div className='w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8'>
+                      {categories.map((category: Category) => {
+                        const { id, name, description, is_default, icon } =
+                          category;
 
-                    {/* Load More Button */}
-                    {hasMore && (
-                      <div className='col-span-1 md:col-span-2 flex justify-center mt-4'>
-                        <Button
-                          type='button'
-                          variant='outline'
-                          onClick={loadMore}
-                          disabled={isLoadingMore}
-                          className='px-6'
-                        >
-                          {isLoadingMore
-                            ? STEP_MESSAGES.LOADING
-                            : STEP_MESSAGES.LOAD_MORE}
-                        </Button>
-                      </div>
-                    )}
+                        // Map icon string to icon component and colors
+                        const iconOption = catIconOptions.find(
+                          opt => opt.value === icon
+                        ) || {
+                          icon: () => null,
+                          color: '#EBB402',
+                          bgColor: '#EBB4021A',
+                        };
+
+                        return (
+                          <div
+                            key={id}
+                            className={`flex flex-col items-start border border-[var(--border-dark)] rounded-2xl bg-[var(--card-background)] p-4 sm:p-6 cursor-pointer transition-all duration-150 hover:shadow-md ${selectedType === id.toString() ? 'bg-[var(--card-hover)] shadow-green-100' : ''}`}
+                            onClick={() =>
+                              setValue('selectedType', id.toString())
+                            }
+                          >
+                            <div
+                              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-[16px] flex items-center justify-center mb-3 sm:mb-4`}
+                              style={{
+                                background: iconOption.bgColor,
+                                color: iconOption.color,
+                              }}
+                            >
+                              {(() => {
+                                const IconComponent = iconOption.icon;
+                                if (IconComponent) {
+                                  return React.createElement(IconComponent, {
+                                    className: 'w-4 h-4 sm:w-5 sm:h-5',
+                                  });
+                                }
+                                return null;
+                              })()}
+                            </div>
+                            <div className='font-bold text-sm sm:text-base mb-2 text-[var(--text-dark)]'>
+                              {name || STEP_MESSAGES.UNNAMED_CATEGORY}
+                            </div>
+                            <div className='text-[var(--text-secondary)] text-sm sm:text-base font-normal leading-snug'>
+                              {description || STEP_MESSAGES.NO_DESCRIPTION}
+                            </div>
+                            {is_default && (
+                              <div className='mt-2'>
+                                <span className='text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full'>
+                                  {STEP_MESSAGES.DEFAULT}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+
+                      {/* Load More Button */}
+                      {hasMore && (
+                        <div className='col-span-1 sm:col-span-2 flex justify-center mt-3 sm:mt-4'>
+                          <Button
+                            type='button'
+                            variant='outline'
+                            onClick={loadMore}
+                            disabled={isLoadingMore}
+                            className='text-white border-0 bg-[var(--success)] rounded-full py-3'
+                          >
+                            {isLoadingMore
+                              ? STEP_MESSAGES.LOADING
+                              : STEP_MESSAGES.LOAD_MORE}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <div className='flex w-full justify-between'>
+          <div className='flex w-full justify-between items-center gap-2'>
             <button
               type='button'
-              className={cancelButtonClass || 'btn-secondary !h-12 !px-8'}
+              className={
+                cancelButtonClass ||
+                'btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
+              }
               onClick={onPrev}
             >
               {STEP_MESSAGES.PREVIOUS}
             </button>
-            <Button type='submit' className='btn-primary !h-12 !px-12'>
+            <Button
+              type='submit'
+              className='btn-primary !px-4 md:!px-8 text-sm sm:text-base'
+            >
               {isLastStep ? STEP_MESSAGES.SUBMIT : STEP_MESSAGES.NEXT_STEP}
             </Button>
           </div>

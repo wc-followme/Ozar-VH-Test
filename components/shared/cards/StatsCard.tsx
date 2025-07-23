@@ -19,12 +19,14 @@ export function StatsCard({
   return (
     <Card className='border-[1px] border-[var(--border-dark)] bg-[var(--card-background)] shadow-0 rounded-[20px]'>
       <CardContent className='p-6'>
-        <div className='flex items-center justify-between'>
+        <div className='flex items-center justify-between gap-2'>
           <div>
             <p className='text-[18px] font-bold text-[var(--text-dark)] mb-2'>
               {value}
             </p>
-            <p className='text-base text-[var(--text-secondary)]'>{label}</p>
+            <p className='text-base text-[var(--text-secondary)] truncate'>
+              {label}
+            </p>
           </div>
           <div
             className={`w-10 h-10 rounded-[16px] ${bgColor} ${iconColor} flex items-center justify-center`}

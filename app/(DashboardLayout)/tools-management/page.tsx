@@ -13,12 +13,14 @@ import {
   getUserPermissionsFromStorage,
 } from '@/lib/utils';
 import { useEffect, useState } from 'react';
+import ToolCardSkeleton from '../../../components/shared/skeleton/ToolCardSkeleton';
 import { TOOL_MESSAGES } from './tool-messages';
 
 export default function ToolsManagement() {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [photo, setPhoto] = useState<File | null>(null);
   const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState(false);
@@ -284,24 +286,9 @@ export default function ToolsManagement() {
         <div className='flex items-center justify-between mb-8'>
           <h2 className='page-title'>Tools Management</h2>
         </div>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
           {[...Array(8)].map((_, index) => (
-            <div
-              key={index}
-              className='bg-[var(--card-background)] rounded-2xl p-2.5 flex flex-col border border-[var(--border-dark)] min-h-[6.25rem] animate-pulse'
-            >
-              <div className='flex gap-3'>
-                <div className='w-[60px] h-[60px] rounded-[12px] bg-gray-300'></div>
-                <div className='flex-1'>
-                  <div className='h-4 bg-gray-300 rounded mb-2'></div>
-                  <div className='h-3 bg-gray-300 rounded mb-2'></div>
-                  <div className='flex gap-2'>
-                    <div className='h-6 bg-gray-300 rounded w-16'></div>
-                    <div className='h-6 bg-gray-300 rounded w-20'></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ToolCardSkeleton key={`tool-skeleton-${index}`} />
           ))}
         </div>
       </div>
@@ -325,12 +312,12 @@ export default function ToolsManagement() {
 
       {/* Tools Grid */}
       {tools.length > 0 ? (
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
           {tools.map((tool, index) => {
             const imageUrl =
               tool.assets && tool.assets[0]?.media_url
                 ? cdnPrefix + tool.assets[0].media_url
-                : '/images/tools-management/tools-img-1.png';
+                : '/images/img-placeholder-sm.png';
             return (
               <ToolCard
                 key={tool.id ?? `${tool.name}-${tool.manufacturer}-${index}`}

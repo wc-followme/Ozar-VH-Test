@@ -13,7 +13,7 @@ import {
   formatDate,
   getUserPermissionsFromStorage,
 } from '@/lib/utils';
-import { Edit2, Trash } from 'iconsax-react';
+import { Add, Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import CompanyCardSkeleton from '../../../components/shared/skeleton/CompanyCardSkeleton';
@@ -198,25 +198,30 @@ export default function CompanyManagement() {
   return (
     <div className='w-full overflow-y-auto pb-4'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-8'>
-        <h1 className='page-title'>
-          {COMPANY_MESSAGES.COMPANY_MANAGEMENT_TITLE}
-        </h1>
-        <div className='flex items-center gap-4'>
-          {canEdit && (
-            <button
-              onClick={handleCreateCompany}
-              className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white text-base inline-flex items-center gap-2'
-            >
-              <span>{COMPANY_MESSAGES.ADD_COMPANY_BUTTON}</span>
-            </button>
-          )}
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
+        <div className='flex items-center justify-between w-full'>
+          <h1 className='page-title'>
+            {COMPANY_MESSAGES.COMPANY_MANAGEMENT_TITLE}
+          </h1>
+          <div className='flex items-center gap-4 justify-end'>
+            {canEdit && (
+              <button
+                onClick={handleCreateCompany}
+                className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
+              >
+                <Add size='20' color='#fff' className='sm:hidden' />
+                <span className='hidden sm:inline'>
+                  {COMPANY_MESSAGES.ADD_COMPANY_BUTTON}
+                </span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Initial Loading State */}
       {companies.length === 0 && loading ? (
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
           {[...Array(8)].map((_, i) => (
             <CompanyCardSkeleton key={i} />
           ))}
@@ -225,14 +230,16 @@ export default function CompanyManagement() {
         <>
           {/* Company Grid */}
           {companies.length === 0 && !loading ? (
-            <NoDataFound
-              description={COMPANY_MESSAGES.NO_COMPANIES_FOUND_DESCRIPTION}
-              buttonText={COMPANY_MESSAGES.ADD_COMPANY_BUTTON}
-              onButtonClick={handleCreateCompany}
-              showButton={canEdit ?? false}
-            />
+            <div className='h-full md:h-[calc(100vh_-_220px)] w-full'>
+              <NoDataFound
+                description={COMPANY_MESSAGES.NO_COMPANIES_FOUND_DESCRIPTION}
+                buttonText={COMPANY_MESSAGES.ADD_COMPANY_BUTTON}
+                onButtonClick={handleCreateCompany}
+                showButton={canEdit ?? false}
+              />
+            </div>
           ) : (
-            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4'>
+            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
               {companies.map(
                 ({
                   id,

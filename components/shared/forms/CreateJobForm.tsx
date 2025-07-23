@@ -201,11 +201,17 @@ export function CreateJobForm({
   return (
     <Card className='w-full max-w-4xl mx-auto bg-transparent shadow-none border-0'>
       <CardContent className='p-0'>
-        <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className='space-y-4 sm:space-y-6'
+        >
           {/* Full Name Input with Autocomplete */}
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div className='space-y-2 col-span-2 relative'>
-              <Label htmlFor='client_name' className='fled-label'>
+          <div className='grid grid-cols-1 gap-4'>
+            <div className='space-y-1 md:space-y-2 relative'>
+              <Label
+                htmlFor='client_name'
+                className='fled-label text-sm sm:text-base'
+              >
                 {JOB_MESSAGES.JOB_NAME_LABEL}
               </Label>
               <Controller
@@ -216,10 +222,7 @@ export function CreateJobForm({
                     {...field}
                     id='client_name'
                     placeholder={JOB_MESSAGES.ENTER_JOB_NAME}
-                    className={cn(
-                      'h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]',
-                      userLoading ? 'pr-10' : ''
-                    )}
+                    className={cn('input-field', userLoading ? 'pr-10' : '')}
                     autoComplete='off'
                     ref={nameInputRef}
                     onChange={e => {
@@ -266,8 +269,11 @@ export function CreateJobForm({
                 </div>
               )}
             </div>
-            <div className='space-y-2'>
-              <Label htmlFor='client_email' className='fled-label'>
+            <div className='space-y-1 md:space-y-2'>
+              <Label
+                htmlFor='client_email'
+                className='fled-label text-sm sm:text-base'
+              >
                 {JOB_MESSAGES.EMAIL_LABEL}
               </Label>
               <Controller
@@ -278,7 +284,7 @@ export function CreateJobForm({
                     {...field}
                     id='client_email'
                     placeholder={JOB_MESSAGES.ENTER_EMAIL}
-                    className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                    className='input-field'
                     disabled={userSelected}
                   />
                 )}
@@ -289,8 +295,11 @@ export function CreateJobForm({
                 </span>
               )}
             </div>
-            <div className='space-y-2'>
-              <Label htmlFor='client_phone_number' className='fled-label'>
+            <div className='space-y-1 md:space-y-2'>
+              <Label
+                htmlFor='client_phone_number'
+                className='fled-label text-sm sm:text-base'
+              >
                 {JOB_MESSAGES.PHONE_LABEL}
               </Label>
               <Controller
@@ -301,7 +310,7 @@ export function CreateJobForm({
                     {...field}
                     id='client_phone_number'
                     placeholder={JOB_MESSAGES.ENTER_PHONE}
-                    className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                    className='input-field'
                     disabled={userSelected}
                   />
                 )}
@@ -335,8 +344,10 @@ export function CreateJobForm({
           </div>
 
           {/* Select Boxes Section */}
-          <div className='space-y-4'>
-            <Label className='fled-label'>Select Boxes</Label>
+          <div className='space-y-3 sm:space-y-4'>
+            <Label className='fled-label text-sm sm:text-base'>
+              Select Boxes
+            </Label>
             <Controller
               name='job_boxes_step'
               control={control}
@@ -349,7 +360,7 @@ export function CreateJobForm({
                 // Helper to determine if a value is selected
                 const isSelected = (v: string) => value.includes(v);
                 return (
-                  <div className='grid gap-4 grid-cols-3 md:grid-cols-3'>
+                  <div className='grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'>
                     {selectBoxOptions.map(
                       ({
                         id,
@@ -451,41 +462,44 @@ export function CreateJobForm({
 
           {/* Read-only Link Display (if present) */}
           {defaultValues?.link && (
-            <div className='space-y-2'>
-              <Label htmlFor='link' className='fled-label'>
+            <div className='space-y-1 md:space-y-2'>
+              <Label htmlFor='link' className='fled-label text-sm sm:text-base'>
                 {JOB_MESSAGES.LINK_LABEL}
               </Label>
               <Input
                 id='link'
                 value={defaultValues.link}
                 readOnly
-                className='h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] opacity-60 cursor-not-allowed'
+                className='h-10 sm:h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] opacity-60 cursor-not-allowed text-sm sm:text-base'
               />
             </div>
           )}
 
           {/* Generated Home Owner Link Display */}
           {generatedLink && (
-            <div className='space-y-2'>
-              <Label htmlFor='generatedLink' className='fled-label'>
+            <div className='space-y-1 md:space-y-2'>
+              <Label
+                htmlFor='generatedLink'
+                className='fled-label text-sm sm:text-base'
+              >
                 Link
               </Label>
               <Input
                 id='generatedLink'
                 value={generatedLink}
                 readOnly
-                className='h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] opacity-60 cursor-not-allowed'
+                className='h-10 sm:h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)] opacity-60 cursor-not-allowed text-sm sm:text-base'
               />
             </div>
           )}
 
           {/* Action Buttons */}
-          <div className='pt-4 flex items-center gap-3'>
+          <div className='pt-4 flex items-stretch sm:items-center gap-3'>
             {generatedLink ? (
               <>
                 <Button
                   type='button'
-                  className='btn-secondary !h-12'
+                  className='btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
                   onClick={() => {
                     if (generatedLink) {
                       window.open(generatedLink, '_blank');
@@ -495,7 +509,7 @@ export function CreateJobForm({
                   Continue Estimate
                 </Button>
                 <Button
-                  className='btn-primary !h-12'
+                  className='btn-primary !px-4 md:!px-8 text-sm sm:text-base'
                   type='button'
                   onClick={() => {
                     navigator.clipboard.writeText(generatedLink);
@@ -509,19 +523,22 @@ export function CreateJobForm({
               <>
                 <Button
                   type='button'
-                  className='btn-secondary !h-12'
+                  className='btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
                   onClick={onCancel}
                 >
                   {JOB_MESSAGES.CANCEL_BUTTON}
                 </Button>
                 {defaultValues?.link && (
-                  <Button className='btn-secondary !h-12' type='button'>
+                  <Button
+                    className='btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
+                    type='button'
+                  >
                     Continue Estimate
                   </Button>
                 )}
                 <Button
                   type='submit'
-                  className='btn-primary !h-12'
+                  className='btn-primary !px-4 md:!px-8 text-sm sm:text-base'
                   disabled={isSubmitting}
                 >
                   {isSubmitting

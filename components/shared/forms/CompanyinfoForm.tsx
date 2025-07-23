@@ -396,11 +396,13 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
     }
 
     return (
-      <form onSubmit={handleSubmit} className='space-y-6'>
+      <form onSubmit={handleSubmit} className='space-y-4 sm:space-y-6'>
         {/* Company Information */}
         <div>
-          <h2 className='text-lg font-bold mb-4'>Company Information</h2>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <h2 className='text-base sm:text-lg font-bold mb-3 sm:mb-4'>
+            Company Information
+          </h2>
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4'>
             {/* Company Name */}
             <div className='space-y-2'>
               <Label htmlFor='company-name' className='field-label'>
@@ -411,7 +413,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder={COMPANY_MESSAGES.ENTER_COMPANY_NAME}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                className='input-field'
               />
               <FormErrorMessage message={errors.name || ''} />
             </div>
@@ -426,12 +428,12 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                 value={tagline}
                 onChange={e => setTagline(e.target.value)}
                 placeholder={COMPANY_MESSAGES.ENTER_TAGLINE}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                className='input-field'
               />
               <FormErrorMessage message={errors.tagline || ''} />
             </div>
             {/* About - Full Width */}
-            <div className='space-y-2 col-span-2'>
+            <div className='space-y-2 sm:col-span-2'>
               <Label htmlFor='about' className='field-label'>
                 {COMPANY_MESSAGES.ABOUT_LABEL}
               </Label>
@@ -456,7 +458,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder={COMPANY_MESSAGES.ENTER_EMAIL}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                className='input-field'
               />
               <FormErrorMessage message={errors.email || ''} />
             </div>
@@ -466,20 +468,32 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
               <Label htmlFor='phone' className='field-label'>
                 {COMPANY_MESSAGES.PHONE_LABEL}
               </Label>
-              <div className='flex gap-2'>
+              <div className='flex'>
                 <Select
                   value={phoneCountryCode}
                   onValueChange={value => {
                     setPhoneCountryCode(value);
                   }}
                 >
-                  <SelectTrigger className='w-[120px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
+                  <SelectTrigger
+                    className={cn(
+                      'w-20 sm:w-24 h-12 rounded-l-[10px] rounded-r-none border-2 border-r-0 bg-[var(--white-background)]',
+                      errors.phone_number
+                        ? 'border-[var(--warning)]'
+                        : 'border-[var(--border-dark)]'
+                    )}
+                  >
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
+                  <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px] max-h-60 overflow-y-auto'>
                     {COUNTRY_CODES.LIST.map(country => (
                       <SelectItem key={country.key} value={country.code}>
-                        {country.flag} {country.code}
+                        <div className='flex items-center gap-2'>
+                          <span>{country.flag}</span>
+                          <span className='hidden sm:inline'>
+                            {country.code}
+                          </span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -489,13 +503,18 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                   value={phoneNumber}
                   onChange={e => setPhoneNumber(e.target.value)}
                   placeholder={COMPANY_MESSAGES.ENTER_PHONE}
-                  className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                  className={cn(
+                    'h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 bg-[var(--white-background)] !placeholder-[var(--text-placeholder)]',
+                    errors.phone_number
+                      ? 'border-[var(--warning)]'
+                      : 'border-[var(--border-dark)]'
+                  )}
                 />
               </div>
               <FormErrorMessage message={errors.phone_number || ''} />
             </div>
             {/* Address field - using communication state since it's not used elsewhere */}
-            <div className='space-y-2 col-span-2'>
+            <div className='space-y-2 sm:col-span-2'>
               <Label htmlFor='address' className='field-label'>
                 Address
               </Label>
@@ -505,7 +524,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                 value={communication}
                 onChange={e => setCommunication(e.target.value)}
                 placeholder='Enter company address'
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                className='input-field'
               />
               <FormErrorMessage message={errors.communication || ''} />
             </div>
@@ -520,7 +539,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                 value={city}
                 onChange={e => setCity(e.target.value)}
                 placeholder={COMPANY_MESSAGES.ENTER_CITY}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                className='input-field'
               />
               <FormErrorMessage message={errors.city || ''} />
             </div>
@@ -535,7 +554,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                 value={pincode}
                 onChange={e => setPincode(e.target.value)}
                 placeholder={COMPANY_MESSAGES.ENTER_PINCODE}
-                className='h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                className='input-field'
               />
               <FormErrorMessage message={errors.pincode || ''} />
             </div>
@@ -565,19 +584,22 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                   <Button
                     variant={'outline'}
                     className={cn(
-                      'w-full h-12 justify-start text-left font-normal border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]',
+                      'w-full h-12 justify-between text-left font-normal border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]',
                       !expiryDate && 'text-muted-foreground'
                     )}
                   >
-                    <IconsaxCalendar
-                      className='mr-2 !h-6 !w-6'
-                      color='var(--primary)'
-                    />
+                    {' '}
                     {expiryDate ? (
                       format(expiryDate, 'PPP')
                     ) : (
-                      <span>{COMPANY_MESSAGES.SELECT_EXPIRY_DATE}</span>
+                      <span className='flex-1'>
+                        {COMPANY_MESSAGES.SELECT_EXPIRY_DATE}
+                      </span>
                     )}
+                    <IconsaxCalendar
+                      className='ml-2 !h-6 !w-6'
+                      color='var(--primary)'
+                    />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
@@ -605,7 +627,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                   setPreferredCommunication(value);
                 }}
               >
-                <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
+                <SelectTrigger className='h-12 border-2 border-[var(--border-dark)] text-left bg-[var(--white-background)] rounded-[10px]'>
                   <SelectValue
                     placeholder={
                       COMPANY_MESSAGES.SELECT_PREFERRED_COMMUNICATION
@@ -628,17 +650,17 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                 message={errors.preferred_communication_method || ''}
               />
             </div>
-            <div className='col-span-2 pt-6'>
-              {/* Only show Contractor Information in create mode, not edit mode */}
-              {!isEditMode && (
+            {!isEditMode && (
+              <div className='sm:col-span-2 pt-4 sm:pt-6'>
+                {/* Only show Contractor Information in create mode, not edit mode */}
                 <>
-                  <h2 className='text-lg font-bold mb-4'>
+                  <h2 className='text-base sm:text-lg font-bold mb-3 sm:mb-4'>
                     Contractor Information{' '}
                     <span className='font-medium text-[var(--text-secondary)]'>
                       (Optional)
                     </span>
                   </h2>
-                  <div className='flex items-center gap-6'>
+                  <div className='flex flex-col sm:flex-row items-center gap-4 sm:gap-6'>
                     <div className='h-[180px] w-[180px]'>
                       <PhotoUploadField
                         photo={contractorPhotoFile}
@@ -660,9 +682,9 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                         </div>
                       )}
                     </div>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4 flex-1'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 flex-1 w-full'>
                       {/* Contractor Name */}
-                      <div className='col-span-2 space-y-2'>
+                      <div className='sm:col-span-2 space-y-2'>
                         <Label
                           htmlFor='contractor-name'
                           className='field-label'
@@ -710,21 +732,35 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                         >
                           {COMPANY_MESSAGES.CONTRACTOR_PHONE_LABEL}
                         </Label>
-                        <div className='flex gap-2'>
+                        <div className='flex'>
                           <Select
                             value={contractorCountryCode}
-                            onValueChange={setContractorCountryCode}
+                            onValueChange={value => {
+                              setContractorCountryCode(value);
+                            }}
                           >
-                            <SelectTrigger className='w-[100px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
+                            <SelectTrigger
+                              className={cn(
+                                'w-20 sm:w-24 h-12 rounded-l-[10px] rounded-r-none border-2 border-r-0 bg-[var(--white-background)]',
+                                errors.contractor_phone
+                                  ? 'border-[var(--warning)]'
+                                  : 'border-[var(--border-dark)]'
+                              )}
+                            >
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className='bg-[var(--white-background)] border border-[var(--border-light)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                              {countryCodes.map(country => (
+                            <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px] max-h-60 overflow-y-auto'>
+                              {COUNTRY_CODES.LIST.map(country => (
                                 <SelectItem
-                                  key={country.code}
+                                  key={country.key}
                                   value={country.code}
                                 >
-                                  {country.flag} {country.code}
+                                  <div className='flex items-center gap-2'>
+                                    <span>{country.flag}</span>
+                                    <span className='hidden sm:inline'>
+                                      {country.code}
+                                    </span>
+                                  </div>
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -736,7 +772,12 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                             placeholder={
                               COMPANY_MESSAGES.ENTER_CONTRACTOR_PHONE
                             }
-                            className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                            className={cn(
+                              'h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 bg-[var(--white-background)] !placeholder-[var(--text-placeholder)]',
+                              errors.contractor_phone
+                                ? 'border-[var(--warning)]'
+                                : 'border-[var(--border-dark)]'
+                            )}
                           />
                         </div>
                         <FormErrorMessage
@@ -746,8 +787,8 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                     </div>
                   </div>
                 </>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Communication - Full Width */}
@@ -784,20 +825,20 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
         </div>
 
         {/* Form Actions */}
-        <div className='flex items-center justify-end gap-4 pt-6'>
+        <div className='flex sm:items-center justify-end gap-2 sm:gap-4 pt-4 sm:pt-6'>
           <Button
             type='button'
             variant='outline'
             onClick={handleCancel}
             disabled={loading}
-            className='btn-secondary !px-8 !h-12'
+            className='btn-secondary !px-4 md:!px-8'
           >
             {COMPANY_MESSAGES.CANCEL_BUTTON}
           </Button>
           <Button
             type='submit'
             disabled={loading}
-            className='btn-primary !h-12 !px-12'
+            className='btn-primary !px-4 md:!px-8'
           >
             {loading
               ? 'Creating...'

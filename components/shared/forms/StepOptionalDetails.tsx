@@ -13,17 +13,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Clock } from 'iconsax-react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import SelectField from '../common/SelectField';
 
 const optionalDetailsSchema = yup.object({
   typeOfProperty: yup.string().required(STEP_MESSAGES.PROPERTY_TYPE_REQUIRED),
@@ -75,21 +69,21 @@ export function StepOptionalDetails({
   };
 
   return (
-    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
-      <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
+    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-4 flex flex-col items-center'>
+      <h2 className='text-xl md:text-2xl xl:text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
         {STEP_MESSAGES.OPTIONAL_DETAILS_TITLE}
       </h2>
-      <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
+      <p className='text-[var(--text-secondary)] text-sm md:text-[18px] font-normal text-center mb-6 sm:mb-8 max-w-lg px-2 sm:px-0'>
         {STEP_MESSAGES.OPTIONAL_DETAILS_DESCRIPTION}
       </p>
       <Form {...form}>
         <form
-          className='w-full flex flex-col gap-4'
+          className='w-full flex flex-col gap-4 sm:gap-6'
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6 h-[calc(100vh_-_550px)] overflow-y-auto'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 h-auto md:-mx-4 md:px-4 md:h-[calc(100vh_-_550px)] overflow-y-auto'>
             {/* Type of Property */}
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
               <FormField
                 control={form.control}
                 name='typeOfProperty'
@@ -98,28 +92,28 @@ export function StepOptionalDetails({
                     <FormLabel className='field-label'>
                       {STEP_MESSAGES.TYPE_OF_PROPERTY_LABEL}
                     </FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className='input-field'>
-                          <SelectValue
-                            placeholder={STEP_MESSAGES.RESIDENTIAL}
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='Residential'>
-                          {STEP_MESSAGES.RESIDENTIAL}
-                        </SelectItem>
-                        <SelectItem value='Commercial'>Commercial</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          {
+                            value: 'Residential',
+                            label: STEP_MESSAGES.RESIDENTIAL,
+                          },
+                          { value: 'Commercial', label: 'Commercial' },
+                        ]}
+                        placeholder={STEP_MESSAGES.RESIDENTIAL}
+                        className=''
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
             {/* Age of Property */}
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
               <FormField
                 control={form.control}
                 name='ageOfProperty'
@@ -128,28 +122,29 @@ export function StepOptionalDetails({
                     <FormLabel className='field-label'>
                       {STEP_MESSAGES.AGE_OF_PROPERTY_LABEL}
                     </FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className='input-field'>
-                          <SelectValue placeholder={STEP_MESSAGES.SELECT_AGE} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='0-5 years'>0-5 years</SelectItem>
-                        <SelectItem value='6-10 years'>6-10 years</SelectItem>
-                        <SelectItem value='11-20 years'>11-20 years</SelectItem>
-                        <SelectItem value='21-30 years'>21-30 years</SelectItem>
-                        <SelectItem value='31-50 years'>31-50 years</SelectItem>
-                        <SelectItem value='50+ years'>50+ years</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          { value: '0-5 years', label: '0-5 years' },
+                          { value: '6-10 years', label: '6-10 years' },
+                          { value: '11-20 years', label: '11-20 years' },
+                          { value: '21-30 years', label: '21-30 years' },
+                          { value: '31-50 years', label: '31-50 years' },
+                          { value: '50+ years', label: '50+ years' },
+                        ]}
+                        placeholder={STEP_MESSAGES.SELECT_AGE}
+                        className=''
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
             {/* Approx. sq ft */}
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
               <FormField
                 control={form.control}
                 name='approxSqft'
@@ -171,7 +166,7 @@ export function StepOptionalDetails({
               />
             </div>
             {/* Notification Style */}
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
               <FormField
                 control={form.control}
                 name='notificationStyle'
@@ -180,29 +175,29 @@ export function StepOptionalDetails({
                     <FormLabel className='field-label'>
                       {STEP_MESSAGES.NOTIFICATION_STYLE_LABEL}
                     </FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className='input-field'>
-                          <SelectValue
-                            placeholder={STEP_MESSAGES.EMAIL_NOTIFICATION}
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='Email'>
-                          {STEP_MESSAGES.EMAIL_NOTIFICATION}
-                        </SelectItem>
-                        <SelectItem value='SMS'>SMS</SelectItem>
-                        <SelectItem value='Phone'>Phone</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          {
+                            value: 'Email',
+                            label: STEP_MESSAGES.EMAIL_NOTIFICATION,
+                          },
+                          { value: 'SMS', label: 'SMS' },
+                          { value: 'Phone', label: 'Phone' },
+                        ]}
+                        placeholder={STEP_MESSAGES.EMAIL_NOTIFICATION}
+                        className=''
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
             {/* Daily Work Timing */}
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
               <FormLabel className='field-label'>
                 {STEP_MESSAGES.DAILY_WORK_TIMING_LABEL}
               </FormLabel>
@@ -229,7 +224,7 @@ export function StepOptionalDetails({
                 </span>
               </div>
             </div>
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
               <FormLabel className='field-label'>&nbsp;</FormLabel>
               <div className='relative'>
                 <FormField
@@ -255,7 +250,7 @@ export function StepOptionalDetails({
               </div>
             </div>
             {/* Owner Need to Be Present */}
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
               <FormField
                 control={form.control}
                 name='ownerPresent'
@@ -264,24 +259,25 @@ export function StepOptionalDetails({
                     <FormLabel className='field-label'>
                       {STEP_MESSAGES.OWNER_PRESENT_LABEL}
                     </FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className='input-field'>
-                          <SelectValue placeholder={STEP_MESSAGES.NO} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='Yes'>{STEP_MESSAGES.YES}</SelectItem>
-                        <SelectItem value='No'>{STEP_MESSAGES.NO}</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          { value: 'Yes', label: STEP_MESSAGES.YES },
+                          { value: 'No', label: STEP_MESSAGES.NO },
+                        ]}
+                        placeholder={STEP_MESSAGES.NO}
+                        className=''
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
             {/* Weekend Work Availability */}
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
               <FormField
                 control={form.control}
                 name='weekendWork'
@@ -290,24 +286,25 @@ export function StepOptionalDetails({
                     <FormLabel className='field-label'>
                       {STEP_MESSAGES.WEEKEND_WORK_LABEL}
                     </FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className='input-field'>
-                          <SelectValue placeholder={STEP_MESSAGES.YES} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='Yes'>{STEP_MESSAGES.YES}</SelectItem>
-                        <SelectItem value='No'>{STEP_MESSAGES.NO}</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          { value: 'Yes', label: STEP_MESSAGES.YES },
+                          { value: 'No', label: STEP_MESSAGES.NO },
+                        ]}
+                        placeholder={STEP_MESSAGES.YES}
+                        className=''
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
             {/* Animals in the Home */}
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
               <FormField
                 control={form.control}
                 name='animals'
@@ -316,17 +313,18 @@ export function StepOptionalDetails({
                     <FormLabel className='field-label'>
                       {STEP_MESSAGES.ANIMALS_IN_HOME_LABEL}
                     </FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className='input-field'>
-                          <SelectValue placeholder={STEP_MESSAGES.YES} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='Yes'>{STEP_MESSAGES.YES}</SelectItem>
-                        <SelectItem value='No'>{STEP_MESSAGES.NO}</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          { value: 'Yes', label: STEP_MESSAGES.YES },
+                          { value: 'No', label: STEP_MESSAGES.NO },
+                        ]}
+                        placeholder={STEP_MESSAGES.YES}
+                        className=''
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -334,7 +332,7 @@ export function StepOptionalDetails({
             </div>
             {/* Pet type? */}
             {animals === 'Yes' && (
-              <div className='flex flex-col gap-2'>
+              <div className='flex flex-col gap-1.5 sm:gap-2'>
                 <FormField
                   control={form.control}
                   name='petType'
@@ -343,22 +341,18 @@ export function StepOptionalDetails({
                       <FormLabel className='field-label'>
                         {STEP_MESSAGES.PET_TYPE_LABEL}
                       </FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger className='input-field'>
-                            <SelectValue
-                              placeholder={STEP_MESSAGES.SELECT_PET_TYPE}
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                          <SelectItem value='Dog'>Dog</SelectItem>
-                          <SelectItem value='Cat'>Cat</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <SelectField
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          options={[
+                            { value: 'Dog', label: 'Dog' },
+                            { value: 'Cat', label: 'Cat' },
+                          ]}
+                          placeholder={STEP_MESSAGES.SELECT_PET_TYPE}
+                          className=''
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -366,16 +360,22 @@ export function StepOptionalDetails({
               </div>
             )}
           </div>
-          <div className='flex w-full justify-between'>
+          <div className='flex w-full justify-between items-center gap-2'>
             <button
               type='button'
-              className={cancelButtonClass || 'btn-secondary !h-12 !px-8'}
+              className={
+                cancelButtonClass ||
+                'btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
+              }
               onClick={onPrev}
             >
               {STEP_MESSAGES.PREVIOUS}
             </button>
             <div className='flex gap-2'>
-              <Button className='btn-primary !h-12 !px-12' type='submit'>
+              <Button
+                className='btn-primary !px-4 md:!px-8 text-sm sm:text-base'
+                type='submit'
+              >
                 {isLastStep ? STEP_MESSAGES.SUBMIT : STEP_MESSAGES.NEXT_STEP}
               </Button>
             </div>

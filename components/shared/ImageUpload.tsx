@@ -34,11 +34,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       >
         {icon ?? <GalleryAdd size='32' color='#00A8BF' variant='Outline' />}
 
-        <p className='text-[var(--text-dark)] mt-2 font-semibold text-[0.875rem]'>
+        <p className='text-[var(--text-dark)] mt-2 font-semibold text-xs md:text-[0.875rem]'>
           {label}
         </p>
         {text && (
-          <p className='text-[var(--text-secondary)] mt-2 font-normal text-[0.875rem] leading-tight whitespace-pre-line'>
+          <p className='text-[var(--text-secondary)] mt-2 font-normal text-xs md:text-[0.875rem] leading-tight whitespace-pre-line'>
             {text}
           </p>
         )}

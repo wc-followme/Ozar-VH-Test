@@ -241,7 +241,7 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
     };
 
     return (
-      <Card className='flex flex-col gap-8 p-6 flex-1 w-full border-1 border-[#E8EAED] rounded-[20px] bg-[var(--card-background)]'>
+      <Card className='flex flex-col gap-8 p-4 md:p-6 flex-1 w-full border-1 border-[#E8EAED] rounded-[20px] bg-[var(--card-background)]'>
         <form
           onSubmit={handleSubmit(data => {
             // Attach permissions to form data
@@ -251,7 +251,7 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
           className='flex flex-col gap-8'
         >
           {/* Top row with input fields */}
-          <div className='flex items-start gap-6 w-full'>
+          <div className='flex flex-col md:flex-row items-start gap-4 md:gap-6 w-full'>
             {/* Icon selector */}
             <Controller
               name='icon'
@@ -267,7 +267,7 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
               )}
             />
             {/* Role Name input */}
-            <div className='flex flex-col w-[300px] items-start gap-2'>
+            <div className='flex flex-col w-full md:w-[300px] items-start gap-2'>
               <Label className='field-label'>
                 {ROLE_MESSAGES.ROLE_NAME_LABEL}
               </Label>
@@ -294,7 +294,7 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
               )}
             </div>
             {/* Description input */}
-            <div className='flex flex-col items-start gap-2 flex-1'>
+            <div className='flex flex-col items-start gap-2 flex-1 w-full'>
               <Label className='field-label'>
                 {ROLE_MESSAGES.DESCRIPTION_LABEL}
               </Label>
@@ -322,7 +322,7 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
           </div>
 
           {/* Permissions Accordions */}
-          <div className='flex flex-col gap-4 mt-4'>
+          <div className='flex flex-col gap-4 mt-2 md:mt-4'>
             {accordions.map((accordion, idx) => {
               const { title, stripes } = accordion;
               const accessLevel = calculateAccessLevel(stripes);
@@ -358,14 +358,14 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
           <div className='flex items-start justify-end gap-3'>
             <button
               type='button'
-              className='btn-secondary !px-8'
+              className='btn-secondary !px-4 md:!px-8'
               onClick={handleCancel}
             >
               {ROLE_MESSAGES.CANCEL_BUTTON}
             </button>
             <button
               type='submit'
-              className='btn-primary'
+              className='btn-primary !px-4 md:!px-8'
               disabled={isSubmitting}
             >
               {submitButtonContent}

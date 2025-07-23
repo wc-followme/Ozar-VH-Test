@@ -131,9 +131,9 @@ export default function AddCompanyPage() {
 
         {/* Main Content */}
         <div className=''>
-          <div className='flex items-start gap-6'>
+          <div className='flex items-start flex-col xl:flex-row gap-4 md:gap-6'>
             {/* Left Column - Upload Photo */}
-            <div className='w-[412px] flex-shrink-0 bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-4 relative'>
+            <div className='w-full md:w-[412px] flex-shrink-0 bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-4 relative'>
               <h2 className='text-lg font-bold mb-4'>Upload Logo</h2>
               <PhotoUploadField
                 photo={photoFile}
@@ -148,7 +148,7 @@ export default function AddCompanyPage() {
             </div>
 
             {/* Right Column - Form Fields */}
-            <div className='flex-1 bg-[var(--white-background)] rounded-[20px] border border-[var(--border-dark)] p-6'>
+            <div className='flex-1 w-full bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-4 md:p-6'>
               <CompanyInfoForm
                 imageUrl={fileKey}
                 onSubmit={handleCreateCompany}

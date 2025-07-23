@@ -79,7 +79,7 @@ export const RoleCard: React.FC<RoleCardProps> = ({
     <Card className='flex flex-col items-start gap-4 p-6 bg-[var(--card-background)] h-full rounded-[24px] border border-[var(--border-dark)] hover:shadow-lg transition-shadow duration-200'>
       <div className='flex items-start justify-between w-full'>
         <div
-          className={`flex items-center justify-center w-[60px] h-[60px] rounded-[16px] mb-2`}
+          className={`flex items-center justify-center w-[60px] h-[60px] rounded-[16px]`}
           style={{ color: iconColor, background: iconBgColor }}
         >
           {(() => {
@@ -123,9 +123,11 @@ export const RoleCard: React.FC<RoleCardProps> = ({
 
       <CardContent className='flex flex-col items-start gap-4 p-0 w-full flex-1'>
         <div className='flex flex-col gap-2 w-full'>
-          <h3 className='text-base font-bold text-[var(--text)]'>{title}</h3>
+          <h3 className='text-sm md:text-base font-bold text-[var(--text)]'>
+            {title}
+          </h3>
 
-          <p className='text-base text-[var(--text-secondary)] leading-tight line-clamp-3'>
+          <p className='text-sm md:text-base text-[var(--text-secondary)] leading-tight line-clamp-3'>
             {description}
           </p>
         </div>

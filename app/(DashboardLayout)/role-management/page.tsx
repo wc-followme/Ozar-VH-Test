@@ -14,7 +14,7 @@ import {
   extractApiSuccessMessage,
   getUserPermissionsFromStorage,
 } from '@/lib/utils';
-import { Edit2, Trash } from 'iconsax-react';
+import { Add, Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import RoleCardSkeleton from '../../../components/shared/skeleton/RoleCardSkeleton';
@@ -179,24 +179,27 @@ const RoleManagement = () => {
   const safeIconOptions = Array.isArray(roleIconOptions) ? roleIconOptions : [];
 
   return (
-    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
-      <header className='flex items-center justify-between w-full'>
-        <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
-          {ROLE_MESSAGES.PAGE_TITLE}
-        </h2>
-        {canEdit && (
-          <button
-            onClick={handleCreateRole}
-            className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
-          >
-            {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
-          </button>
-        )}
+    <section className=''>
+      <header className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
+        <div className='flex items-center justify-between w-full'>
+          <h2 className='page-title'>{ROLE_MESSAGES.PAGE_TITLE}</h2>
+          {canEdit && (
+            <button
+              onClick={handleCreateRole}
+              className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
+            >
+              <Add size='20' color='#fff' className='sm:hidden' />
+              <span className='hidden sm:inline'>
+                {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
+              </span>
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Initial Loading State */}
       {roles.length === 0 && loading ? (
-        <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6 w-full'>
           {[...Array(8)].map((_, i) => (
             <RoleCardSkeleton key={i} />
           ))}
@@ -204,9 +207,9 @@ const RoleManagement = () => {
       ) : (
         <>
           {/* Roles Grid */}
-          <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
+          <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl w-full gap-3 xl:gap-6'>
             {roles.length === 0 && !loading ? (
-              <div className='col-span-4'>
+              <div className='w-full col-span-full h-full md:h-[calc(100vh_-_220px)]'>
                 <NoDataFound
                   buttonText={ROLE_MESSAGES.CREATE_ROLE_BUTTON}
                   onButtonClick={handleCreateRole}

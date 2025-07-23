@@ -27,7 +27,7 @@ import {
   createCategorySchema,
 } from '@/lib/validations/category';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Edit2, Trash } from 'iconsax-react';
+import { Add, Edit2, Trash } from 'iconsax-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import CategoryCardSkeleton from '../../../components/shared/skeleton/CategoryCardSkeleton';
@@ -316,20 +316,30 @@ const CategoryManagement = () => {
 
   return (
     <section className='w-full overflow-y-auto pb-4'>
-      <header className='flex items-center justify-between mb-8'>
-        <h2 className='page-title'>
-          {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
-        </h2>
-        {canEdit && (
-          <Button onClick={() => setOpen(true)} className='btn-primary'>
-            {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
-          </Button>
-        )}
+      <header className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
+        <div className='flex items-center justify-between w-full'>
+          <h2 className='page-title'>
+            {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
+          </h2>
+          {canEdit && (
+            <div className='flex justify-end'>
+              <Button
+                onClick={() => setOpen(true)}
+                className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
+              >
+                <Add size='20' color='#fff' className='sm:hidden' />
+                <span className='hidden sm:inline'>
+                  {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
+                </span>
+              </Button>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Categories Grid */}
       {categories.length === 0 && loading ? (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6 w-full'>
           {[...Array(8)].map((_, i) => (
             <CategoryCardSkeleton key={i} />
           ))}
@@ -337,14 +347,16 @@ const CategoryManagement = () => {
       ) : (
         <>
           {categories.length === 0 && !loading ? (
-            <NoDataFound
-              description={CATEGORY_MESSAGES.NO_CATEGORIES_FOUND_DESCRIPTION}
-              buttonText={CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
-              onButtonClick={() => setOpen(true)}
-              showButton={canEdit ?? false}
-            />
+            <div className='h-full md:h-[calc(100vh_-_220px)] w-full'>
+              <NoDataFound
+                description={CATEGORY_MESSAGES.NO_CATEGORIES_FOUND_DESCRIPTION}
+                buttonText={CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
+                onButtonClick={() => setOpen(true)}
+                showButton={canEdit ?? false}
+              />
+            </div>
           ) : (
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
+            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6 w-full'>
               {categories.map((category, index) => {
                 const iconOption = catIconOptions.find(
                   opt => opt.value === category.icon
@@ -406,6 +418,7 @@ const CategoryManagement = () => {
               iconOptions={catIconOptions}
               errors={{
                 icon: errors.icon?.message || '',
+                name: errors.name?.message || '',
                 description: errors.description?.message || '',
               }}
               selectedIcon={watch('icon')}

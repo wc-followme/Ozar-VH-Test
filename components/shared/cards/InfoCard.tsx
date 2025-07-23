@@ -3,6 +3,7 @@ import { ACTIONS } from '@/constants/common';
 import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React from 'react';
+import { Badge } from '../../ui/badge';
 import { Avatar } from '../common/Avatar';
 import Dropdown from '../common/Dropdown';
 
@@ -82,19 +83,19 @@ export const InfoCard: React.FC<InfoCardProps> = ({
       <Avatar
         name={tradeName}
         image=''
-        height={48}
-        width={48}
+        height={60}
+        width={60}
         className='rounded-[12px] flex-shrink-0'
       />
 
       {/* Info */}
-      <div className='flex-1 min-w-0'>
+      <div className='flex-1 min-w-0 flex flex-col gap-2'>
         <h3 className='font-bold text-[var(--text)] truncate text-base'>
           {tradeName}
         </h3>
-        <p className='text-sm text-[var(--text-secondary)] truncate'>
+        <Badge className='bg-[var(--border-light)] text-[var(--text)] w-fit text-xs px-2 py-1'>
           {category}
-        </p>
+        </Badge>
       </div>
 
       {/* Menu Button */}

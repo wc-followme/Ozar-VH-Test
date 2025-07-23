@@ -152,10 +152,10 @@ export default function ServiceForm({
   return (
     <form
       onSubmit={handleSubmit(onFormSubmit)}
-      className='space-y-6 w-full max-w-xl'
+      className='space-y-4 sm:space-y-6 w-full max-w-xl'
     >
       <div className='space-y-2'>
-        <Label htmlFor='trades' className='field-label'>
+        <Label htmlFor='trades' className='field-label text-sm sm:text-base'>
           {SERVICE_MESSAGES.TRADE_LABEL}
         </Label>
         <Controller
@@ -184,13 +184,18 @@ export default function ServiceForm({
                 placeholder={SERVICE_MESSAGES.SELECT_TRADE}
                 error={errors.trades?.message as string}
                 name='trades'
+                maxHeight={200}
+                maxSelectedItems={1}
               />
             );
           }}
         />
       </div>
       <div className='space-y-2'>
-        <Label htmlFor='serviceName' className='field-label'>
+        <Label
+          htmlFor='serviceName'
+          className='field-label text-sm sm:text-base'
+        >
           {SERVICE_MESSAGES.SERVICE_NAME_LABEL}
         </Label>
         <Controller
@@ -202,7 +207,7 @@ export default function ServiceForm({
               {...field}
               placeholder={SERVICE_MESSAGES.ENTER_SERVICE_NAME}
               className={cn(
-                'input-field',
+                'input-field !h-12',
                 errors.serviceName
                   ? 'border-[var(--warning)]'
                   : 'border-[var(--border-dark)]'
@@ -212,11 +217,11 @@ export default function ServiceForm({
         />
         <FormErrorMessage message={errors.serviceName?.message as string} />
       </div>
-      <div className='pt-2 flex items-center gap-4'>
+      <div className='pt-2 flex items-center gap-3 sm:gap-4'>
         <Button
           type='button'
           variant='outline'
-          className='btn-secondary !px-8 !h-12'
+          className='btn-secondary !px-4 md:!px-8'
           onClick={onCancel}
           disabled={loading}
         >
@@ -224,7 +229,7 @@ export default function ServiceForm({
         </Button>
         <Button
           type='submit'
-          className='btn-primary !h-12 !px-12'
+          className='btn-primary !px-4 md:!px-8'
           disabled={loading}
         >
           {loading

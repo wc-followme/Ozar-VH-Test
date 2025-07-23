@@ -58,7 +58,7 @@ export default function ToolCard({
     <div className='bg-[var(--card-background)] hover:shadow-lg rounded-2xl p-2.5 flex flex-col border border-[var(--border-dark)] min-h-[6.25rem] relative transition-all'>
       <div className='flex gap-3'>
         {/* Image */}
-        <div className='w-[60px] h-[60px] rounded-[12px] overflow-hidden bg-[var(--border-light)] flex items-center justify-center flex-shrink-0'>
+        <div className='w-[80px] h-[80px] rounded-[12px] overflow-hidden bg-[var(--border-light)] flex items-center justify-center flex-shrink-0'>
           <Image
             src={
               imgError
@@ -66,8 +66,8 @@ export default function ToolCard({
                 : image || '/images/tools-management/tools-img-1.png'
             }
             alt={name}
-            width={60}
-            height={60}
+            width={80}
+            height={80}
             className='w-full h-full object-cover'
             onError={() => setImgError(true)}
           />
