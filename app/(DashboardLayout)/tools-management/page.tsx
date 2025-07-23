@@ -57,7 +57,18 @@ export default function ToolsManagement() {
 
         console.log('API response:', response);
         if (response.statusCode === 200) {
-          setTools(response.data?.data || []);
+          // Handle both possible response structures
+          let toolsData = response.data;
+          if (
+            response.data &&
+            typeof response.data === 'object' &&
+            !Array.isArray(response.data) &&
+            'data' in response.data
+          ) {
+            toolsData = (response.data as any).data;
+          }
+          console.log('Tools data to set:', toolsData);
+          setTools(Array.isArray(toolsData) ? toolsData : []);
         } else {
           showErrorToast(
             extractApiErrorMessage(response.message) || 'Failed to load tools'
@@ -165,11 +176,18 @@ export default function ToolsManagement() {
           page: 1,
           limit: 50,
         });
-        console.log('Refresh response:', refreshResponse); // Debug log
         if (refreshResponse.statusCode === 200) {
-          const responseData = (refreshResponse as any).data;
-          console.log('Setting tools to:', responseData?.data || []); // Debug log
-          setTools(responseData?.data || []);
+          // Handle both possible response structures
+          let toolsData = refreshResponse.data;
+          if (
+            refreshResponse.data &&
+            typeof refreshResponse.data === 'object' &&
+            !Array.isArray(refreshResponse.data) &&
+            'data' in refreshResponse.data
+          ) {
+            toolsData = (refreshResponse.data as any).data;
+          }
+          setTools(Array.isArray(toolsData) ? toolsData : []);
         }
       } else {
         showErrorToast(
@@ -198,8 +216,8 @@ export default function ToolsManagement() {
   }) => {
     setFormLoading(true);
     try {
-      // Use existing tool_assets if no new image is uploaded, otherwise use the new fileKey
-      const toolAssets = fileKey || editToolData?.tool_assets || '';
+      // Use new fileKey if uploaded, otherwise use the tool_assets from form data (which preserves existing assets)
+      const toolAssets = fileKey || data.tool_assets || '';
 
       const payload: CreateToolRequest = {
         name: data.name,
@@ -229,8 +247,17 @@ export default function ToolsManagement() {
           limit: 50,
         });
         if (refreshResponse.statusCode === 200) {
-          const responseData = (refreshResponse as any).data;
-          setTools(responseData?.data || []);
+          // Handle both possible response structures
+          let toolsData = refreshResponse.data;
+          if (
+            refreshResponse.data &&
+            typeof refreshResponse.data === 'object' &&
+            !Array.isArray(refreshResponse.data) &&
+            'data' in refreshResponse.data
+          ) {
+            toolsData = (refreshResponse.data as any).data;
+          }
+          setTools(Array.isArray(toolsData) ? toolsData : []);
         }
       } else {
         showErrorToast(
@@ -365,6 +392,7 @@ export default function ToolsManagement() {
                 ? cdnPrefix + editToolData.assets[0].media_url
                 : undefined
             }
+            existingToolAssets={editToolData?.tool_assets || ''}
             initialValues={
               editToolData
                 ? {

@@ -10,8 +10,22 @@ import { Label } from '@/components/ui/label';
 import { apiService, Service } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { cn } from '@/lib/utils';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
+import * as yup from 'yup';
+
+// Validation schema
+const toolFormSchema = yup.object({
+  name: yup.string().required(TOOL_MESSAGES.NAME_REQUIRED),
+  manufacturer: yup.string().required(TOOL_MESSAGES.MANUFACTURER_REQUIRED),
+  available_quantity: yup
+    .number()
+    .min(1, TOOL_MESSAGES.QUANTITY_MIN)
+    .required(TOOL_MESSAGES.QUANTITY_REQUIRED),
+  services: yup.array().min(1, TOOL_MESSAGES.SERVICES_REQUIRED),
+});
 
 interface ToolFormProps {
   photo: File | null;
@@ -30,6 +44,7 @@ interface ToolFormProps {
   setUploading?: (uploading: boolean) => void;
   setFileKey?: (fileKey: string) => void;
   existingImageUrl?: string | undefined;
+  existingToolAssets?: string;
   initialValues?: {
     name?: string;
     available_quantity?: number;
@@ -50,41 +65,43 @@ const ToolForm: React.FC<ToolFormProps> = ({
   setUploading,
   setFileKey,
   existingImageUrl,
+  existingToolAssets,
   initialValues,
   isEdit = false,
 }) => {
-  // Form states
-  const [name, setName] = useState(initialValues?.name || '');
-  const [manufacturer, setManufacturer] = useState(
-    initialValues?.manufacturer || ''
-  );
-  const [totalQuantity, setTotalQuantity] = useState<number>(
-    initialValues?.available_quantity || 1
-  );
-  const [serviceIds, setServiceIds] = useState<string[]>(
-    initialValues?.services?.map(s => s.toString()) || []
-  );
-  const [errors, setErrors] = useState<{
-    name?: string;
-    manufacturer?: string;
-    totalQuantity?: string;
-    serviceIds?: string;
-    general?: string;
-  }>({});
-
   // Service dropdown states
   const [services, setServices] = useState<Service[]>([]);
   const [loadingServices, setLoadingServices] = useState(false);
 
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm({
+    resolver: yupResolver(toolFormSchema),
+    defaultValues: {
+      name: initialValues?.name || '',
+      manufacturer: initialValues?.manufacturer || '',
+      available_quantity: initialValues?.available_quantity || 1,
+      services:
+        initialValues?.services?.map(s => s.toString()).filter(Boolean) || [],
+    },
+  });
+
   // Update form state if initialValues change (for edit mode)
   useEffect(() => {
     if (initialValues) {
-      setName(initialValues.name || '');
-      setManufacturer(initialValues.manufacturer || '');
-      setTotalQuantity(initialValues.available_quantity || 1);
-      setServiceIds(initialValues.services?.map(s => s.toString()) || []);
+      reset({
+        name: initialValues.name || '',
+        manufacturer: initialValues.manufacturer || '',
+        available_quantity: initialValues.available_quantity || 1,
+        services:
+          initialValues.services?.map(s => s.toString()).filter(Boolean) || [],
+      });
     }
-  }, [initialValues]);
+  }, [initialValues, reset]);
 
   // Handle photo change with upload
   const handlePhotoChange = async (file: File | null) => {
@@ -115,10 +132,10 @@ const ToolForm: React.FC<ToolFormProps> = ({
       setFileKey?.(presigned.data['fileKey'] || '');
     } catch (error) {
       console.error('Error uploading photo:', error);
-      setErrors(prev => ({
-        ...prev,
-        general: TOOL_MESSAGES.UPLOAD_ERROR,
-      }));
+      // setErrors(prev => ({
+      //   ...prev,
+      //   general: TOOL_MESSAGES.UPLOAD_ERROR,
+      // }));
     } finally {
       setUploading?.(false);
     }
@@ -133,10 +150,6 @@ const ToolForm: React.FC<ToolFormProps> = ({
           page: 1,
           limit: 50,
         });
-
-        console.log('Services API response:', response); // Debug log
-        console.log('Response data type:', typeof response.data); // Debug log
-        console.log('Response data keys:', Object.keys(response.data || {})); // Debug log
 
         if (response.statusCode === 200) {
           // Handle the actual API response structure: { statusCode, message, data: Service[], limit, page, total, totalPages }
@@ -154,18 +167,13 @@ const ToolForm: React.FC<ToolFormProps> = ({
 
           const finalServices = Array.isArray(servicesData) ? servicesData : [];
           setServices(finalServices);
-          console.log('Services loaded:', finalServices); // Debug log
-          console.log(
-            'Service options:',
-            finalServices.map(s => ({ value: s.id?.toString(), label: s.name }))
-          ); // Debug log
         }
       } catch (error) {
         console.error('Error loading services:', error);
-        setErrors(prev => ({
-          ...prev,
-          general: TOOL_MESSAGES.LOADING_SERVICES,
-        }));
+        // setErrors(prev => ({
+        //   ...prev,
+        //   general: TOOL_MESSAGES.LOADING_SERVICES,
+        // }));
       } finally {
         setLoadingServices(false);
       }
@@ -176,117 +184,43 @@ const ToolForm: React.FC<ToolFormProps> = ({
 
   // Clear general error when form fields change
   const clearGeneralError = () => {
-    if (errors.general) {
-      setErrors(prev => {
-        const { general, ...rest } = prev;
-        return rest;
-      });
-    }
+    // React Hook Form handles error clearing automatically
   };
 
-  const handleNameChange = (value: string) => {
-    setName(value);
-    if (errors.name) {
-      setErrors(prev => {
-        const { name, ...rest } = prev;
-        return rest;
-      });
-    }
-    clearGeneralError();
-  };
-
-  const handleManufacturerChange = (value: string) => {
-    setManufacturer(value);
-    if (errors.manufacturer) {
-      setErrors(prev => {
-        const { manufacturer, ...rest } = prev;
-        return rest;
-      });
-    }
-    clearGeneralError();
-  };
-
-  const handleQuantityChange = (value: string) => {
-    const numValue = parseInt(value) || 0;
-    setTotalQuantity(numValue);
-    if (errors.totalQuantity) {
-      setErrors(prev => {
-        const { totalQuantity, ...rest } = prev;
-        return rest;
-      });
-    }
-    clearGeneralError();
-  };
-
-  const handleServiceChange = (value: string[]) => {
-    setServiceIds(value);
-    if (errors.serviceIds) {
-      setErrors(prev => {
-        const { serviceIds, ...rest } = prev;
-        return rest;
-      });
-    }
-    clearGeneralError();
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: typeof errors = {};
-
-    if (!name.trim()) {
-      newErrors.name = TOOL_MESSAGES.NAME_REQUIRED;
-    }
-
-    if (!manufacturer.trim()) {
-      newErrors.manufacturer = TOOL_MESSAGES.MANUFACTURER_REQUIRED;
-    }
-
-    if (totalQuantity <= 0) {
-      newErrors.totalQuantity = TOOL_MESSAGES.QUANTITY_MIN;
-    }
-
-    if (serviceIds.length === 0) {
-      newErrors.serviceIds = TOOL_MESSAGES.SERVICES_REQUIRED;
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) {
-      return;
-    }
+  const handleSubmitForm = (data: {
+    services?: any[] | undefined;
+    name: string;
+    manufacturer: string;
+    available_quantity: number;
+  }) => {
     onSubmit({
-      name: name.trim(),
-      available_quantity: totalQuantity,
-      manufacturer: manufacturer.trim(),
-      tool_assets: '', // This will be set by the parent component
-      service_ids: serviceIds.join(','), // Convert array to comma-separated string
+      name: data.name.trim(),
+      available_quantity: data.available_quantity,
+      manufacturer: data.manufacturer.trim(),
+      tool_assets: existingToolAssets || '', // Preserve existing tool assets if no new file is uploaded
+      service_ids: (data.services || []).join(','), // Convert array to comma-separated string
     });
   };
 
   // Convert services to dropdown options
   const serviceOptions = Array.isArray(services)
-    ? services.map(service => ({
-        value: service.id?.toString() || '',
-        label: service.name || '',
-      }))
+    ? services
+        .filter(service => service.id && service.name) // Filter out invalid services
+        .map(service => ({
+          value: service.id.toString(),
+          label: service.name,
+        }))
     : [];
-
-  console.log('Current services state:', services); // Debug log
-  console.log('Service options for MultiSelect:', serviceOptions); // Debug log
-  console.log('Current serviceIds:', serviceIds); // Debug log
 
   return (
     <div className='p-0 w-full'>
-      <form className='space-y-6' onSubmit={handleSubmit}>
+      <form className='space-y-6' onSubmit={handleSubmit(handleSubmitForm)}>
         {/* General Error */}
-        {errors.general && (
+        {/* {errors.general && (
           <div className='p-3 bg-red-50 border border-red-200 rounded-md'>
             <p className='text-sm text-red-600'>{errors.general}</p>
           </div>
-        )}
+        )} */}
 
         {/* Photo Upload */}
         <PhotoUploadField
@@ -305,17 +239,24 @@ const ToolForm: React.FC<ToolFormProps> = ({
         />
 
         {/* Services Select */}
-        <MultiSelect
-          label={TOOL_MESSAGES.SERVICES_LABEL}
-          value={serviceIds}
-          onChange={handleServiceChange}
-          options={serviceOptions}
-          placeholder={
-            loadingServices
-              ? TOOL_MESSAGES.LOADING_SERVICES
-              : TOOL_MESSAGES.SELECT_SERVICES
-          }
-          error={errors.serviceIds || ''}
+        <Controller
+          name='services'
+          control={control}
+          render={({ field }) => (
+            <MultiSelect
+              key={`services-${isEdit ? 'edit' : 'create'}-${serviceOptions.length}`}
+              label={TOOL_MESSAGES.SERVICES_LABEL}
+              value={Array.isArray(field.value) ? field.value : []}
+              onChange={field.onChange}
+              options={serviceOptions}
+              placeholder={
+                loadingServices
+                  ? TOOL_MESSAGES.LOADING_SERVICES
+                  : TOOL_MESSAGES.SELECT_SERVICES
+              }
+              error={errors.services?.message || ''}
+            />
+          )}
         />
 
         {/* Tool Name */}
@@ -323,19 +264,24 @@ const ToolForm: React.FC<ToolFormProps> = ({
           <Label htmlFor='tool-name' className='field-label'>
             {TOOL_MESSAGES.TOOL_NAME_LABEL}
           </Label>
-          <Input
-            id='tool-name'
-            placeholder={TOOL_MESSAGES.ENTER_TOOL_NAME}
-            value={name}
-            onChange={e => handleNameChange(e.target.value)}
-            className={cn(
-              'input-field',
-              errors.name
-                ? 'border-[var(--warning)]'
-                : 'border-[var(--border-dark)]'
+          <Controller
+            name='name'
+            control={control}
+            render={({ field }) => (
+              <Input
+                id='tool-name'
+                placeholder={TOOL_MESSAGES.ENTER_TOOL_NAME}
+                {...field}
+                className={cn(
+                  'input-field',
+                  errors.name
+                    ? 'border-[var(--warning)]'
+                    : 'border-[var(--border-dark)]'
+                )}
+              />
             )}
           />
-          <FormErrorMessage message={errors.name || ''} />
+          <FormErrorMessage message={errors.name?.message || ''} />
         </div>
 
         {/* Manufacturer */}
@@ -343,41 +289,54 @@ const ToolForm: React.FC<ToolFormProps> = ({
           <Label htmlFor='manufacturer' className='field-label'>
             {TOOL_MESSAGES.MANUFACTURER_LABEL}
           </Label>
-          <Input
-            id='manufacturer'
-            placeholder={TOOL_MESSAGES.ENTER_MANUFACTURER}
-            value={manufacturer}
-            onChange={e => handleManufacturerChange(e.target.value)}
-            className={cn(
-              'input-field',
-              errors.manufacturer
-                ? 'border-[var(--warning)]'
-                : 'border-[var(--border-dark)]'
+          <Controller
+            name='manufacturer'
+            control={control}
+            render={({ field }) => (
+              <Input
+                id='manufacturer'
+                placeholder={TOOL_MESSAGES.ENTER_MANUFACTURER}
+                {...field}
+                className={cn(
+                  'input-field',
+                  errors.manufacturer
+                    ? 'border-[var(--warning)]'
+                    : 'border-[var(--border-dark)]'
+                )}
+              />
             )}
           />
-          <FormErrorMessage message={errors.manufacturer || ''} />
+          <FormErrorMessage message={errors.manufacturer?.message || ''} />
         </div>
 
-        {/* Total Quantity */}
+        {/* Quantity */}
         <div className='space-y-2'>
           <Label htmlFor='quantity' className='field-label'>
             {TOOL_MESSAGES.QUANTITY_LABEL}
           </Label>
-          <Input
-            id='quantity'
-            type='number'
-            min='1'
-            placeholder={TOOL_MESSAGES.ENTER_QUANTITY}
-            value={totalQuantity}
-            onChange={e => handleQuantityChange(e.target.value)}
-            className={cn(
-              'input-field',
-              errors.totalQuantity
-                ? 'border-[var(--warning)]'
-                : 'border-[var(--border-dark)]'
+          <Controller
+            name='available_quantity'
+            control={control}
+            render={({ field }) => (
+              <Input
+                id='quantity'
+                type='number'
+                min='1'
+                placeholder={TOOL_MESSAGES.ENTER_QUANTITY}
+                {...field}
+                onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                className={cn(
+                  'input-field',
+                  errors.available_quantity
+                    ? 'border-[var(--warning)]'
+                    : 'border-[var(--border-dark)]'
+                )}
+              />
             )}
           />
-          <FormErrorMessage message={errors.totalQuantity || ''} />
+          <FormErrorMessage
+            message={errors.available_quantity?.message || ''}
+          />
         </div>
 
         {/* Form Actions */}
