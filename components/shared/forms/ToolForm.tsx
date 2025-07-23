@@ -12,7 +12,7 @@ import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { cn } from '@/lib/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import * as yup from 'yup';
 
@@ -78,7 +78,6 @@ const ToolForm: React.FC<ToolFormProps> = ({
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
   } = useForm({
     resolver: yupResolver(toolFormSchema),
     defaultValues: {
@@ -181,11 +180,6 @@ const ToolForm: React.FC<ToolFormProps> = ({
 
     loadServices();
   }, []);
-
-  // Clear general error when form fields change
-  const clearGeneralError = () => {
-    // React Hook Form handles error clearing automatically
-  };
 
   const handleSubmitForm = (data: {
     services?: any[] | undefined;
@@ -324,7 +318,7 @@ const ToolForm: React.FC<ToolFormProps> = ({
                 min='1'
                 placeholder={TOOL_MESSAGES.ENTER_QUANTITY}
                 {...field}
-                onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                onChange={e => field.onChange(parseInt(e.target.value) || 1)}
                 className={cn(
                   'input-field',
                   errors.available_quantity

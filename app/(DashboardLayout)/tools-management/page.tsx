@@ -401,7 +401,12 @@ export default function ToolsManagement() {
                     manufacturer: editToolData.manufacturer,
                     services: editToolData.services?.map(s => s.id) || [],
                   }
-                : undefined
+                : {
+                    name: '',
+                    available_quantity: 1,
+                    manufacturer: '',
+                    services: [],
+                  }
             }
             isEdit={!!editToolUuid}
           />
