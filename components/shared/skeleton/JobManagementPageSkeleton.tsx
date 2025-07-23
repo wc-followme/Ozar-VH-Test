@@ -79,8 +79,8 @@ const JobManagementPageSkeleton: React.FC = () => (
       ))}
     </div>
     {/* Tabs and Create Job Button Skeleton */}
-    <div className='flex items-center gap-2 w-full mb-4 xl:mb-10'>
-      <Skeleton className='h-[54px] rounded-full bg-[var(--bg-skeleton)] w-1/2' />
+    <div className='flex sm:flex-row flex-col items-start lg:items-center gap-2 w-full mb-4 xl:mb-10'>
+      <Skeleton className='h-[54px] rounded-full bg-[var(--bg-skeleton)] w-full sm:w-1/2' />
       <Skeleton className='h-[48px] w-32 rounded-full bg-[var(--bg-skeleton)] ml-auto' />
     </div>
     {/* Jobs Grid Skeleton */}

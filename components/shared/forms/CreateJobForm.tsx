@@ -499,7 +499,7 @@ export function CreateJobForm({
               <>
                 <Button
                   type='button'
-                  className='btn-secondary !h-10 sm:!h-12 text-sm sm:text-base'
+                  className='btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
                   onClick={() => {
                     if (generatedLink) {
                       window.open(generatedLink, '_blank');
@@ -509,7 +509,7 @@ export function CreateJobForm({
                   Continue Estimate
                 </Button>
                 <Button
-                  className='btn-primary !h-10 sm:!h-12 text-sm sm:text-base'
+                  className='btn-primary !px-4 md:!px-8 text-sm sm:text-base'
                   type='button'
                   onClick={() => {
                     navigator.clipboard.writeText(generatedLink);
@@ -523,14 +523,14 @@ export function CreateJobForm({
               <>
                 <Button
                   type='button'
-                  className='btn-secondary !h-10 sm:!h-12 text-sm sm:text-base !px-6 md:!px-8'
+                  className='btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
                   onClick={onCancel}
                 >
                   {JOB_MESSAGES.CANCEL_BUTTON}
                 </Button>
                 {defaultValues?.link && (
                   <Button
-                    className='btn-secondary !h-10 sm:!h-12 text-sm !px-6 md:!px-12 sm:text-base'
+                    className='btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
                     type='button'
                   >
                     Continue Estimate
@@ -538,7 +538,7 @@ export function CreateJobForm({
                 )}
                 <Button
                   type='submit'
-                  className='btn-primary !h-10 sm:!h-12 text-base !px-6 md:!px-12'
+                  className='btn-primary !px-4 md:!px-8 text-sm sm:text-base'
                   disabled={isSubmitting}
                 >
                   {isSubmitting

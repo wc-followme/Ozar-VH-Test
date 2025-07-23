@@ -732,21 +732,35 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                         >
                           {COMPANY_MESSAGES.CONTRACTOR_PHONE_LABEL}
                         </Label>
-                        <div className='flex gap-2'>
+                        <div className='flex'>
                           <Select
                             value={contractorCountryCode}
-                            onValueChange={setContractorCountryCode}
+                            onValueChange={value => {
+                              setContractorCountryCode(value);
+                            }}
                           >
-                            <SelectTrigger className='w-[80px] sm:w-[100px] h-12 border-2 border-[var(--border-dark)] bg-[var(--white-background)] rounded-[10px]'>
+                            <SelectTrigger
+                              className={cn(
+                                'w-20 sm:w-24 h-12 rounded-l-[10px] rounded-r-none border-2 border-r-0 bg-[var(--white-background)]',
+                                errors.contractor_phone
+                                  ? 'border-[var(--warning)]'
+                                  : 'border-[var(--border-dark)]'
+                              )}
+                            >
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className='bg-[var(--white-background)] border border-[var(--border-light)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                              {countryCodes.map(country => (
+                            <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px] max-h-60 overflow-y-auto'>
+                              {COUNTRY_CODES.LIST.map(country => (
                                 <SelectItem
-                                  key={country.code}
+                                  key={country.key}
                                   value={country.code}
                                 >
-                                  {country.flag} {country.code}
+                                  <div className='flex items-center gap-2'>
+                                    <span>{country.flag}</span>
+                                    <span className='hidden sm:inline'>
+                                      {country.code}
+                                    </span>
+                                  </div>
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -758,7 +772,12 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
                             placeholder={
                               COMPANY_MESSAGES.ENTER_CONTRACTOR_PHONE
                             }
-                            className='flex-1 h-12 border-2 border-[var(--border-dark)] focus:border-green-500 focus:ring-green-500 bg-[var(--white-background)] rounded-[10px] !placeholder-[var(--text-placeholder)]'
+                            className={cn(
+                              'h-12 flex-1 rounded-r-[10px] rounded-l-none border-2 border-l-0 bg-[var(--white-background)] !placeholder-[var(--text-placeholder)]',
+                              errors.contractor_phone
+                                ? 'border-[var(--warning)]'
+                                : 'border-[var(--border-dark)]'
+                            )}
                           />
                         </div>
                         <FormErrorMessage
@@ -812,14 +831,14 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
             variant='outline'
             onClick={handleCancel}
             disabled={loading}
-            className='btn-secondary !px-8 !h-12'
+            className='btn-secondary !px-4 md:!px-8'
           >
             {COMPANY_MESSAGES.CANCEL_BUTTON}
           </Button>
           <Button
             type='submit'
             disabled={loading}
-            className='btn-primary !h-12 !px-8 sm:!px-12'
+            className='btn-primary !px-4 md:!px-8'
           >
             {loading
               ? 'Creating...'

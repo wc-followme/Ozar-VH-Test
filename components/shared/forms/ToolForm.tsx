@@ -143,12 +143,12 @@ const ToolForm: React.FC<ToolFormProps> = ({
         <div className='flex items-center gap-4 mt-0'>
           <Button
             type='button'
-            className='btn-secondary !h-12 !px-8'
+            className='btn-secondary !px-4 md:!px-8'
             onClick={onClose}
           >
             Cancel
           </Button>
-          <Button type='submit' className='btn-primary !h-12 !px-12'>
+          <Button type='submit' className='btn-primary !px-4 md:!px-8'>
             Create
           </Button>
         </div>

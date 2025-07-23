@@ -14,7 +14,7 @@ export const JOB_MESSAGES = {
   JOB_NOT_FOUND_ERROR: 'Job UUID not found',
 
   // Validation Messages
-  NAME_REQUIRED: 'Job name is required.',
+  NAME_REQUIRED: 'Client name is required.',
   EMAIL_REQUIRED: 'Email is required.',
   PHONE_REQUIRED: 'Phone number is required.',
 

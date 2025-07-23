@@ -202,6 +202,7 @@ export interface JobFilterCounts {
   new_leads: number;
   ongoing_jobs: number;
   waiting_on_client: number;
+  closed: number;
   archived: number;
 }
 
@@ -359,6 +360,7 @@ export interface Category {
   name: string;
   description?: string;
   is_default?: boolean;
+  icon?: string;
 }
 
 export interface CategoryApiResponse {

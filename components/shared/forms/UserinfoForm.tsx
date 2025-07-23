@@ -537,14 +537,14 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
         <div className='pt-4 flex items-center justify-end gap-3'>
           <Button
             type='button'
-            className='btn-secondary !h-12 !px-6 md:!px-8'
+            className='btn-secondary !px-4 md:!px-8'
             onClick={handleCancel}
           >
             {USER_MESSAGES.CANCEL_BUTTON}
           </Button>
           <Button
             type='submit'
-            className='btn-primary !h-12 !px-6 md:!px-12'
+            className='btn-primary !px-4 md:!px-8'
             disabled={loading}
           >
             {isEditMode

@@ -104,7 +104,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           <Button
             type='button'
             variant='outline'
-            className='btn-secondary !h-12 !px-8'
+            className='btn-secondary !px-4 md:!px-8'
             onClick={handleClose}
             disabled={isSubmitting}
           >
@@ -112,7 +112,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           </Button>
           <Button
             type='submit'
-            className='btn-primary !h-12 !px-12'
+            className='btn-primary !px-4 md:!px-8'
             disabled={isSubmitting}
           >
             {isSubmitting

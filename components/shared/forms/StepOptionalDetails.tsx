@@ -17,7 +17,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Clock } from 'iconsax-react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import SelectField from '../../../components/shared/common/SelectField';
+import SelectField from '../common/SelectField';
 
 const optionalDetailsSchema = yup.object({
   typeOfProperty: yup.string().required(STEP_MESSAGES.PROPERTY_TYPE_REQUIRED),
@@ -37,7 +37,6 @@ const optionalDetailsSchema = yup.object({
     otherwise: schema => schema.optional(),
   }),
 });
-
 export function StepOptionalDetails({
   onPrev,
   onNext,
@@ -50,14 +49,14 @@ export function StepOptionalDetails({
     defaultValues: {
       typeOfProperty: 'Residential',
       ageOfProperty: '0-5 years',
-      approxSqft: '2500 Sq / Ft',
+      approxSqft: '',
       notificationStyle: 'Email',
       dailyWorkStart: '',
       dailyWorkEnd: '',
       ownerPresent: 'No',
-      weekendWork: 'Yes',
-      animals: 'Yes',
-      petType: 'Dog',
+      weekendWork: 'No',
+      animals: 'No',
+      petType: '',
       ...defaultValues,
     },
   });
@@ -366,7 +365,7 @@ export function StepOptionalDetails({
               type='button'
               className={
                 cancelButtonClass ||
-                'btn-secondary !h-10 md:!h-12 !px-4 md:!px-8 text-sm sm:text-base'
+                'btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
               }
               onClick={onPrev}
             >
@@ -374,7 +373,7 @@ export function StepOptionalDetails({
             </button>
             <div className='flex gap-2'>
               <Button
-                className='btn-primary !h-10 md:!h-12 !px-4 md:!px-12 text-sm sm:text-base'
+                className='btn-primary !px-4 md:!px-8 text-sm sm:text-base'
                 type='submit'
               >
                 {isLastStep ? STEP_MESSAGES.SUBMIT : STEP_MESSAGES.NEXT_STEP}

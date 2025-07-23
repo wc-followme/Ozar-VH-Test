@@ -630,14 +630,14 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                   <div className='flex justify-end gap-6 mt-8'>
                     <Link
                       href={'/user-management'}
-                      className='btn-secondary !h-12 !px-6 md:!px-8'
+                      className='btn-secondary !px-4 md:!px-8'
                     >
                       Cancel
                     </Link>
                     <Button
                       onClick={handleUpdatePermissions}
                       disabled={formLoading}
-                      className='btn-primary !h-12 !px-6 md:!px-12'
+                      className='btn-primary !px-4 md:!px-8'
                     >
                       {formLoading ? 'Updating...' : 'Update'}
                     </Button>

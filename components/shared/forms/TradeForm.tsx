@@ -218,7 +218,7 @@ export default function TradeForm({
         <Button
           type='button'
           variant='outline'
-          className='btn-secondary !px-6 sm:!px-8 !h-12'
+          className='btn-secondary !px-4 md:!px-8'
           onClick={onCancel}
           disabled={loading}
         >
@@ -226,7 +226,7 @@ export default function TradeForm({
         </Button>
         <Button
           type='submit'
-          className='btn-primary !h-12 !px-6 sm:!px-12'
+          className='btn-primary !px-4 md:!px-8'
           disabled={loading}
         >
           {loading

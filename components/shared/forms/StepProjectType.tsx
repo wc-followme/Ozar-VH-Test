@@ -12,12 +12,13 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
+import { CommonStatus } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { FlagHookIcon } from '../../icons/FalgHookIcon';
+import { catIconOptions } from '../../../constants/sidebar-items';
 
 const projectTypeSchema = yup.object({
   selectedType: yup.string().required(STEP_MESSAGES.PROJECT_TYPE_REQUIRED),
@@ -29,7 +30,8 @@ export function StepProjectType({
   cancelButtonClass,
   defaultValues,
   isLastStep = false,
-}: StepProjectTypeProps) {
+  company_id,
+}: StepProjectTypeProps & { company_id: number }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,10 +60,11 @@ export function StepProjectType({
       }
       setError(null);
 
-      const response = await apiService.fetchCategories({
+      const response = await apiService.fetchCategoriesPublic({
         page,
-        limit: 10,
-        status: 'ACTIVE',
+        limit: 50,
+        status: CommonStatus.ACTIVE,
+        company_id, // company_id is required
       });
 
       const { statusCode, data } = response;
@@ -169,7 +172,18 @@ export function StepProjectType({
                   <div className='h-auto md:h-[calc(100vh_-_550px)] md:-mx-4 md:px-4 overflow-y-auto'>
                     <div className='w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8'>
                       {categories.map((category: Category) => {
-                        const { id, name, description, is_default } = category;
+                        const { id, name, description, is_default, icon } =
+                          category;
+
+                        // Map icon string to icon component and colors
+                        const iconOption = catIconOptions.find(
+                          opt => opt.value === icon
+                        ) || {
+                          icon: () => null,
+                          color: '#EBB402',
+                          bgColor: '#EBB4021A',
+                        };
+
                         return (
                           <div
                             key={id}
@@ -179,12 +193,21 @@ export function StepProjectType({
                             }
                           >
                             <div
-                              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-[16px] bg-[#EBB4021A] text-[#EBB402] flex items-center justify-center mb-3 sm:mb-4`}
+                              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-[16px] flex items-center justify-center mb-3 sm:mb-4`}
+                              style={{
+                                background: iconOption.bgColor,
+                                color: iconOption.color,
+                              }}
                             >
-                              <FlagHookIcon
-                                className={`w-4 h-4 sm:w-5 sm:h-5`}
-                                color='currentcolor'
-                              />
+                              {(() => {
+                                const IconComponent = iconOption.icon;
+                                if (IconComponent) {
+                                  return React.createElement(IconComponent, {
+                                    className: 'w-4 h-4 sm:w-5 sm:h-5',
+                                  });
+                                }
+                                return null;
+                              })()}
                             </div>
                             <div className='font-bold text-sm sm:text-base mb-2 text-[var(--text-dark)]'>
                               {name || STEP_MESSAGES.UNNAMED_CATEGORY}
@@ -231,7 +254,7 @@ export function StepProjectType({
               type='button'
               className={
                 cancelButtonClass ||
-                'btn-secondary !h-10 md:!h-12 !px-4 md:!px-8 text-sm sm:text-base'
+                'btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
               }
               onClick={onPrev}
             >
@@ -239,7 +262,7 @@ export function StepProjectType({
             </button>
             <Button
               type='submit'
-              className='btn-primary !h-10 md:!h-12 !px-4 md:!px-12 text-sm sm:text-base'
+              className='btn-primary !px-4 md:!px-8 text-sm sm:text-base'
             >
               {isLastStep ? STEP_MESSAGES.SUBMIT : STEP_MESSAGES.NEXT_STEP}
             </Button>

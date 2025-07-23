@@ -14,8 +14,8 @@ export interface GeneralInfoData {
   address: string;
   budget: string;
   contractor: string;
-  projectStartDate: string;
-  projectFinishDate: string;
+  projectStartDate: Date | string | undefined;
+  projectFinishDate: Date | string | undefined;
 }
 
 export interface OptionalDetailsData {

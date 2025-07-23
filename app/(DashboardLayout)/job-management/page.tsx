@@ -5,6 +5,7 @@ import {
   APP_CONFIG,
   CommonStatus,
   JobFilterType,
+  JobStatus,
   ROUTES,
 } from '@/constants/common';
 import { apiService } from '@/lib/api';
@@ -30,12 +31,7 @@ import {
 } from '../../../components/ui/tabs';
 import { getUserPermissionsFromStorage } from '../../../lib/utils';
 import { JOB_MESSAGES } from './job-messages';
-import {
-  CreateJobFormData,
-  CreateJobRequest,
-  Job,
-  JobFilterCounts,
-} from './types';
+import { CreateJobFormData, Job, JobFilterCounts } from './types';
 
 export default function JobManagement() {
   const [selectedTab, setSelectedTab] = useState('newLeads');
@@ -57,6 +53,7 @@ export default function JobManagement() {
     new_leads: 0,
     ongoing_jobs: 0,
     waiting_on_client: 0,
+    closed: 0,
     archived: 0,
   });
 
@@ -109,11 +106,17 @@ export default function JobManagement() {
           params.status = CommonStatus.INACTIVE;
           params.type = JobFilterType.ALL;
           break;
+        case 'closed':
+          params.status = CommonStatus.ACTIVE;
+          params.type = JobFilterType.ALL;
+          params.job_status = JobStatus.DONE;
+          break;
         default:
           params.status = CommonStatus.ACTIVE;
           params.type = JobFilterType.ALL;
       }
 
+      console.log('params', params);
       const response = await apiService.fetchJobs(params);
       setJobs(
         Array.isArray(response.data) ? response.data : response.data?.data || []
@@ -167,14 +170,17 @@ export default function JobManagement() {
       }
 
       // Prepare payload for API
-      const payload: CreateJobRequest = {
+      const payload: any = {
         client_name,
         client_email,
         client_phone_number,
-        job_boxes_step: jobBoxesStep,
         job_privacy,
       };
 
+      // Only add job_boxes_step if array length is not 0
+      if (job_boxes_step?.length !== 0) {
+        payload.job_boxes_step = jobBoxesStep;
+      }
       // Only include client_id if it has a value
       if (client_id !== undefined && client_id !== null && client_id !== '') {
         // Convert string to number if needed
@@ -190,18 +196,18 @@ export default function JobManagement() {
         const jobUuid = response.data?.uuid || response.data?.id;
         const homeOwnerLink = jobUuid ? generateHomeOwnerLink(jobUuid) : null;
 
-        showSuccessToast(response.message || JOB_MESSAGES.CREATE_SUCCESS);
+        showSuccessToast(response?.message || JOB_MESSAGES.CREATE_SUCCESS);
 
         // Set the generated link
         if (homeOwnerLink) {
           setGeneratedLink(homeOwnerLink);
         }
-        if (job_boxes_step.length === 0) {
+        if (job_boxes_step?.length === 0) {
           setIsOpen(false);
+          fetchJobsByTab(selectedTab);
+          fetchFilterCounts();
         }
         // Refresh jobs and counts after successful creation
-        fetchJobsByTab(selectedTab);
-        fetchFilterCounts();
       } else {
         showErrorToast(response.message || JOB_MESSAGES.CREATE_ERROR);
       }
@@ -273,7 +279,7 @@ export default function JobManagement() {
           className='w-full'
         >
           <div className='flex sm:flex-row flex-col items-start  lg:items-center gap-2 w-full'>
-            <ScrollArea className='w-[200px] max-w-full flex-1 rounded-full'>
+            <ScrollArea className='w-[285px] max-w-full flex-1 rounded-full'>
               <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start max-w-full lg:max-w-fit'>
                 <TabsTrigger
                   value='newLeads'
@@ -313,22 +319,34 @@ export default function JobManagement() {
                   value='waitingOnClient'
                   className='hidden px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
-                  Waiting on Client
+                  {filterCounts.waiting_on_client}
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'waitingOnClient' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'closed' ? 'bg-greenbrand text-white' : 'bg-transparent text-greenbrand'}`}
                   >
-                    {filterCounts.waiting_on_client}
+                    {filterCounts.waiting_on_client || 0}
                   </Badge>
                 </TabsTrigger>
+
                 <TabsTrigger
                   value='archive'
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
                 >
-                  Archive
+                  Archived
                   <Badge
                     className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
                   >
                     {filterCounts.archived}
+                  </Badge>
+                </TabsTrigger>
+                <TabsTrigger
+                  value='closed'
+                  className=' px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                >
+                  Closed
+                  <Badge
+                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'closed' ? 'bg-greenbrand text-white' : 'bg-transparent text-greenbrand'}`}
+                  >
+                    {filterCounts.closed || 0}
                   </Badge>
                 </TabsTrigger>
               </TabsList>
@@ -369,20 +387,18 @@ export default function JobManagement() {
                       key={job.id}
                       job={{
                         id: uuid,
-                        title: client_name || 'Project Name',
-                        jobId: project_id || 'Job#789',
+                        title: client_name || '-',
+                        jobId: project_id || '-',
                         progress: 50, // Static value since not in API
                         image:
                           job_image ||
                           'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                        email: client_email || 'tanya.hill@example.com',
-                        address:
-                          client_address ||
-                          '2972 Westheimer Rd. Santa Ana, Illinois 85486',
+                        email: client_email || '-',
+                        address: client_address || '-',
                         startDate: project_start_date
                           ? new Date(project_start_date).toLocaleDateString()
-                          : '15 Mar 2025',
-                        daysLeft: 96, // Static value since not in API
+                          : '-',
+                        daysLeft: 0, // Static value since not in API
                       }}
                     />
                   );
@@ -400,6 +416,50 @@ export default function JobManagement() {
           </TabsContent>
           <TabsContent value='waitingOnClient' className='p-8'>
             <NoDataFound buttonText='Create Job' />
+          </TabsContent>
+          <TabsContent value='closed' className='p-8'>
+            {jobs.length === 0 ? (
+              <NoDataFound
+                description={JOB_MESSAGES.NO_JOBS_FOUND_DESCRIPTION}
+                buttonText={JOB_MESSAGES.ADD_JOB_BUTTON}
+                onButtonClick={() => setIsOpen(true)}
+              />
+            ) : (
+              <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
+                {jobs.map((job: Job) => {
+                  const {
+                    uuid,
+                    client_name,
+                    project_id,
+                    job_image,
+                    client_email,
+                    client_address,
+                    project_start_date,
+                  } = job;
+
+                  return (
+                    <JobCard
+                      key={job.id}
+                      job={{
+                        id: uuid,
+                        title: client_name || '-',
+                        jobId: project_id || '-',
+                        progress: 50, // Static value since not in API
+                        image:
+                          job_image ||
+                          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
+                        email: client_email || '-',
+                        address: client_address || '-',
+                        startDate: project_start_date
+                          ? new Date(project_start_date).toLocaleDateString()
+                          : '-',
+                        daysLeft: 0, // Static value since not in API
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            )}
           </TabsContent>
           <TabsContent value='archive' className='pt-8'>
             {jobs.length === 0 ? (
@@ -426,20 +486,18 @@ export default function JobManagement() {
                       key={job.id}
                       job={{
                         id: uuid,
-                        title: client_name || 'Project Name',
-                        jobId: project_id || 'Job#789',
+                        title: client_name || '-',
+                        jobId: project_id || '-',
                         progress: 50, // Static value since not in API
                         image:
                           job_image ||
                           'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                        email: client_email || 'tanya.hill@example.com',
-                        address:
-                          client_address ||
-                          '2972 Westheimer Rd. Santa Ana, Illinois 85486',
+                        email: client_email || '-',
+                        address: client_address || '-',
                         startDate: project_start_date
                           ? new Date(project_start_date).toLocaleDateString()
-                          : '15 Mar 2025',
-                        daysLeft: 96, // Static value since not in API
+                          : '-',
+                        daysLeft: 0, // Static value since not in API
                       }}
                     />
                   );
@@ -456,6 +514,8 @@ export default function JobManagement() {
           setIsOpen(open);
           if (!open) {
             setGeneratedLink(''); // Clear generated link when opening form
+            fetchJobsByTab(selectedTab);
+            fetchFilterCounts();
           }
         }}
         title={JOB_MESSAGES.ADD_JOB_TITLE}
@@ -464,6 +524,9 @@ export default function JobManagement() {
           onSubmit={handleCreateJob}
           isSubmitting={isSubmitting}
           generatedLink={generatedLink}
+          onCancel={() => {
+            setIsOpen(false);
+          }}
         />
       </SideSheet>
     </div>
