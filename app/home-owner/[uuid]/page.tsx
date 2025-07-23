@@ -1,11 +1,15 @@
 'use client';
 
 import { HomeOwnerHeader } from '@/components/layout/HomeOwnerHeader';
+import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import { ThankYouComponent } from '@/components/shared/common/ThankYouComponent';
 import { StepGeneralInfo } from '@/components/shared/forms/StepGeneralInfo';
 import { StepOptionalDetails } from '@/components/shared/forms/StepOptionalDetails';
 import { StepProjectType } from '@/components/shared/forms/StepProjectType';
 import { showErrorToast, showSuccessToast } from '@/components/ui/use-toast';
+import { ROUTES } from '@/constants/common';
 import { apiService } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { HOME_OWNER_MESSAGES } from '../home-owner-messages';
@@ -23,6 +27,7 @@ import {
 export default function HomeOwnerWizardPage() {
   const params = useParams();
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const uuid = params['uuid'] as string;
 
   // Job data state
@@ -40,6 +45,9 @@ export default function HomeOwnerWizardPage() {
     useState<OptionalDetailsData | null>(null);
   const [projectTypeData, setProjectTypeData] =
     useState<ProjectTypeData | null>(null);
+
+  // State for Thank You component
+  const [showThankYou, setShowThankYou] = useState(false);
 
   // Fetch job data on component mount
   useEffect(() => {
@@ -92,14 +100,21 @@ export default function HomeOwnerWizardPage() {
             contractor: preferred_contractor
               ? preferred_contractor.toString()
               : '',
-            projectStartDate: project_start_date || '',
-            projectFinishDate: project_finish_date || '',
+            projectStartDate: project_start_date
+              ? new Date(project_start_date)
+              : '',
+            projectFinishDate: project_finish_date
+              ? new Date(project_finish_date)
+              : '',
           });
 
           // Reset optional details data
           setOptionalDetailsData({
-            typeOfProperty: property_type ? property_type.toLowerCase() : '',
-            ageOfProperty: age_of_property || '',
+            typeOfProperty: property_type
+              ? property_type.toLowerCase().charAt(0).toUpperCase() +
+                property_type.toLowerCase().slice(1)
+              : 'Residential',
+            ageOfProperty: age_of_property || '0-5 years',
             approxSqft: approx_sq_ft ? approx_sq_ft.toString() : '',
             notificationStyle: notification_style || 'Email',
             dailyWorkStart: daily_work_start_time || '',
@@ -231,12 +246,18 @@ export default function HomeOwnerWizardPage() {
         payload.approx_sq_ft =
           parseInt(approxSqft?.replace(/[^0-9]/g, '')) || 0;
         payload.notification_style = notificationStyle || 'Email';
-        payload.daily_work_start_time = dailyWorkStart || '';
-        payload.daily_work_end_time = dailyWorkEnd || '';
+        if (dailyWorkStart) {
+          payload.daily_work_start_time = dailyWorkStart;
+        }
+        if (dailyWorkEnd) {
+          payload.daily_work_end_time = dailyWorkEnd;
+        }
         payload.owner_present_need = ownerPresent === 'Yes';
         payload.weekend_work = weekendWork === 'Yes';
         payload.has_animals = animals === 'Yes';
-        payload.pet_type = petType || '';
+        if (payload.has_animals === true) {
+          payload.pet_type = petType || '';
+        }
       }
 
       // Map project type data
@@ -278,9 +299,22 @@ export default function HomeOwnerWizardPage() {
       // Show success toast with API response message
       if (response && response.message) {
         showSuccessToast(response.message);
-        router.push('/job-management');
+
+        // Check if user is logged in - redirect to job management, otherwise show thank you
+        if (isAuthenticated) {
+          router.push(ROUTES.JOB_MANAGEMENT);
+        } else {
+          setShowThankYou(true); // Show Thank You component for non-logged in users
+        }
       } else {
         showSuccessToast(HOME_OWNER_MESSAGES.FORM_SUBMIT_SUCCESS);
+
+        // Check if user is logged in - redirect to job management, otherwise show thank you
+        if (isAuthenticated) {
+          router.push(ROUTES.JOB_MANAGEMENT);
+        } else {
+          setShowThankYou(true); // Show Thank You component for non-logged in users
+        }
       }
 
       // Redirect to job management page after a short delay
@@ -346,14 +380,8 @@ export default function HomeOwnerWizardPage() {
     return (
       <div className='min-h-screen bg-[var(--white-background)] flex flex-col items-center'>
         <HomeOwnerHeader />
-        <div className='mt-auto'>
-          <div className='w-[90vw] mx-auto flex flex-col items-center bg-[var(--background)] min-h-[calc(100vh-100px)] rounded-tl-[32px] rounded-tr-[32px] px-4 md:px-12 py-8 md:py-16 shadow-none'>
-            <div className='flex items-center justify-center h-64'>
-              <div className='text-lg text-gray-600'>
-                {HOME_OWNER_MESSAGES.LOADING_JOB_DATA}
-              </div>
-            </div>
-          </div>
+        <div className='flex-1 flex items-center justify-center'>
+          <LoadingComponent variant='inline' size='md' text={''} />
         </div>
       </div>
     );
@@ -372,6 +400,16 @@ export default function HomeOwnerWizardPage() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  // Thank You state
+  if (showThankYou) {
+    return (
+      <ThankYouComponent
+        title='Project Submitted Successfully!'
+        message='Thank you for submitting your project details. Our team will review your information and contact you soon with next steps.'
+      />
     );
   }
 
@@ -429,15 +467,24 @@ export default function HomeOwnerWizardPage() {
               />
             )}
             {step === WIZARD_STEPS.PROJECT_TYPE &&
-              jobBoxesStep === JOB_BOXES_STEPS.THIRD && (
+              jobBoxesStep === JOB_BOXES_STEPS.THIRD &&
+              (jobData?.company_id ? (
                 <StepProjectType
                   onPrev={goToOptional}
                   onSubmit={handleProjectTypeSubmit}
                   cancelButtonClass={cancelButtonClass}
                   defaultValues={projectTypeData as any}
                   isLastStep={true}
+                  company_id={Number(jobData.company_id)}
                 />
-              )}
+              ) : (
+                <div className='flex items-center justify-center h-64'>
+                  <div className='text-lg text-red-600'>
+                    Company ID is required to load project types. Please contact
+                    support.
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       </div>

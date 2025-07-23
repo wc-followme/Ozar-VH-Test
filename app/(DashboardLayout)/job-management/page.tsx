@@ -29,12 +29,7 @@ import {
 } from '../../../components/ui/tabs';
 import { getUserPermissionsFromStorage } from '../../../lib/utils';
 import { JOB_MESSAGES } from './job-messages';
-import {
-  CreateJobFormData,
-  CreateJobRequest,
-  Job,
-  JobFilterCounts,
-} from './types';
+import { CreateJobFormData, Job, JobFilterCounts } from './types';
 
 export default function JobManagement() {
   const [selectedTab, setSelectedTab] = useState('newLeads');
@@ -166,14 +161,17 @@ export default function JobManagement() {
       }
 
       // Prepare payload for API
-      const payload: CreateJobRequest = {
+      const payload: any = {
         client_name,
         client_email,
         client_phone_number,
-        job_boxes_step: jobBoxesStep,
         job_privacy,
       };
 
+      // Only add job_boxes_step if array length is not 0
+      if (job_boxes_step?.length !== 0) {
+        payload.job_boxes_step = jobBoxesStep;
+      }
       // Only include client_id if it has a value
       if (client_id !== undefined && client_id !== null && client_id !== '') {
         // Convert string to number if needed
@@ -189,18 +187,18 @@ export default function JobManagement() {
         const jobUuid = response.data?.uuid || response.data?.id;
         const homeOwnerLink = jobUuid ? generateHomeOwnerLink(jobUuid) : null;
 
-        showSuccessToast(response.message || JOB_MESSAGES.CREATE_SUCCESS);
+        showSuccessToast(response?.message || JOB_MESSAGES.CREATE_SUCCESS);
 
         // Set the generated link
         if (homeOwnerLink) {
           setGeneratedLink(homeOwnerLink);
         }
-        if (job_boxes_step.length === 0) {
+        if (job_boxes_step?.length === 0) {
           setIsOpen(false);
+          fetchJobsByTab(selectedTab);
+          fetchFilterCounts();
         }
         // Refresh jobs and counts after successful creation
-        fetchJobsByTab(selectedTab);
-        fetchFilterCounts();
       } else {
         showErrorToast(response.message || JOB_MESSAGES.CREATE_ERROR);
       }
@@ -365,20 +363,18 @@ export default function JobManagement() {
                       key={job.id}
                       job={{
                         id: uuid,
-                        title: client_name || 'Project Name',
-                        jobId: project_id || 'Job#789',
+                        title: client_name || '-',
+                        jobId: project_id || '-',
                         progress: 50, // Static value since not in API
                         image:
                           job_image ||
                           'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                        email: client_email || 'tanya.hill@example.com',
-                        address:
-                          client_address ||
-                          '2972 Westheimer Rd. Santa Ana, Illinois 85486',
+                        email: client_email || '-',
+                        address: client_address || '-',
                         startDate: project_start_date
                           ? new Date(project_start_date).toLocaleDateString()
-                          : '15 Mar 2025',
-                        daysLeft: 96, // Static value since not in API
+                          : '-',
+                        daysLeft: 0, // Static value since not in API
                       }}
                     />
                   );
@@ -422,20 +418,18 @@ export default function JobManagement() {
                       key={job.id}
                       job={{
                         id: uuid,
-                        title: client_name || 'Project Name',
-                        jobId: project_id || 'Job#789',
+                        title: client_name || '-',
+                        jobId: project_id || '-',
                         progress: 50, // Static value since not in API
                         image:
                           job_image ||
                           'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                        email: client_email || 'tanya.hill@example.com',
-                        address:
-                          client_address ||
-                          '2972 Westheimer Rd. Santa Ana, Illinois 85486',
+                        email: client_email || '-',
+                        address: client_address || '-',
                         startDate: project_start_date
                           ? new Date(project_start_date).toLocaleDateString()
-                          : '15 Mar 2025',
-                        daysLeft: 96, // Static value since not in API
+                          : '-',
+                        daysLeft: 0, // Static value since not in API
                       }}
                     />
                   );
@@ -452,6 +446,8 @@ export default function JobManagement() {
           setIsOpen(open);
           if (!open) {
             setGeneratedLink(''); // Clear generated link when opening form
+            fetchJobsByTab(selectedTab);
+            fetchFilterCounts();
           }
         }}
         title={JOB_MESSAGES.ADD_JOB_TITLE}
@@ -460,6 +456,9 @@ export default function JobManagement() {
           onSubmit={handleCreateJob}
           isSubmitting={isSubmitting}
           generatedLink={generatedLink}
+          onCancel={() => {
+            setIsOpen(false);
+          }}
         />
       </SideSheet>
     </div>

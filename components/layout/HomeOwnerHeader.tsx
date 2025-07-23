@@ -62,7 +62,7 @@ export function HomeOwnerHeader() {
             Virtual Homes
           </Link>
         </div>
-        <div className='flex items-center gap-6'>
+        <div className='hidden flex items-center gap-6'>
           <Link href='/'>
             <SupportIcon className='text-[var(--text-dark)]' />
           </Link>
