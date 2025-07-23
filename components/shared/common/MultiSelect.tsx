@@ -42,11 +42,10 @@ const MultiSelect = <OptionType = MultiSelectOption,>({
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const handleToggle = (optionValue: string) => {
-    if (value.includes(optionValue)) {
-      onChange(value.filter(v => v !== optionValue));
-    } else {
-      onChange([...value, optionValue]);
-    }
+    const newValue = value.includes(optionValue)
+      ? value.filter(v => v !== optionValue)
+      : [...value, optionValue];
+    onChange(newValue);
   };
 
   const displayTags = value.slice(0, 3);

@@ -12,7 +12,7 @@ interface PhotoUploadFieldProps {
   text?: JSX.Element | string;
   className?: string;
   uploading?: boolean;
-  existingImageUrl?: string;
+  existingImageUrl?: string | undefined;
   cardHeight?: string;
 }
 
