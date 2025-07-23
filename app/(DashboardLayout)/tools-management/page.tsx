@@ -187,14 +187,14 @@ export default function ToolsManagement() {
       {/* Tools Grid */}
       {tools.length > 0 ? (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-          {tools.map(tool => {
+          {tools.map((tool, index) => {
             const imageUrl =
               tool.assets && tool.assets[0]?.media_url
                 ? cdnPrefix + tool.assets[0].media_url
                 : '/images/tools-management/tools-img-1.png';
             return (
               <ToolCard
-                key={tool.id}
+                key={tool.id ?? `${tool.name}-${tool.manufacturer}-${index}`}
                 image={imageUrl}
                 name={tool.name}
                 brand={tool.manufacturer}
