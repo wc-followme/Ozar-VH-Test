@@ -64,12 +64,6 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = React.memo(
     const [contractorEmail, setContractorEmail] = useState('');
     const [contractorPhone, setContractorPhone] = useState('');
     const [contractorCountryCode, setContractorCountryCode] = useState('+1');
-    const countryCodes = [
-      { code: '+1', flag: '🇺🇸' },
-      { code: '+44', flag: '🇬🇧' },
-      { code: '+91', flag: '🇮🇳' },
-      // Add more as needed
-    ];
 
     const [errors, setErrors] = useState<CompanyFormErrors>({});
 

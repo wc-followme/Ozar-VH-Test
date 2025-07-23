@@ -20,7 +20,6 @@ export default function ToolsManagement() {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
   const [sideSheetOpen, setSideSheetOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [photo, setPhoto] = useState<File | null>(null);
   const [fileKey, setFileKey] = useState<string>('');
   const [uploading, setUploading] = useState(false);
