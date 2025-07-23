@@ -370,7 +370,7 @@ export default function JobManagement() {
                 onButtonClick={() => setIsOpen(true)}
               />
             ) : (
-              <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
+              <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
                 {jobs.map((job: Job) => {
                   const {
                     uuid,
@@ -425,7 +425,7 @@ export default function JobManagement() {
                 onButtonClick={() => setIsOpen(true)}
               />
             ) : (
-              <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
+              <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
                 {jobs.map((job: Job) => {
                   const {
                     uuid,
@@ -469,7 +469,7 @@ export default function JobManagement() {
                 onButtonClick={() => setIsOpen(true)}
               />
             ) : (
-              <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
+              <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
                 {jobs.map((job: Job) => {
                   const {
                     uuid,
