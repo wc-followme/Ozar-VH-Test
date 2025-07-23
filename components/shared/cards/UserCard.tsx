@@ -2,6 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { ACTIONS } from '@/constants/common';
+import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { Call, Icon, Sms } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
@@ -50,20 +52,40 @@ export function UserCard({
   const [showDelete, setShowDelete] = useState(false);
   const router = useRouter();
 
+  // Get user permissions for users
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.users?.create;
+  const canArchive = userPermissions?.users?.archive;
+
+  // Filter menu options based on permissions
+  const filteredMenuOptions = menuOptions.filter(option => {
+    if (option.action === ACTIONS.EDIT) {
+      return canEdit;
+    }
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
+      return canArchive;
+    }
+    return true; // Show other actions by default
+  });
+
+  // Only show menu if there are any visible options
+  const showMenu = filteredMenuOptions.length > 0;
+
   const handleToggle = async () => {
-    if (disableActions) return;
     setIsToggling(true);
-    await onToggle();
-    setTimeout(() => setIsToggling(false), 300);
+    try {
+      await onToggle();
+    } finally {
+      setIsToggling(false);
+    }
   };
 
   const handleMenuAction = (action: string) => {
-    if (action === 'delete') {
-      setShowDelete(true);
-    } else if (action === 'edit') {
+    if (action === ACTIONS.EDIT) {
       router.push(`/user-management/edit-user/${userUuid}`);
+    } else if (action === ACTIONS.DELETE) {
+      setShowDelete(true);
     }
-    return action;
   };
 
   return (
@@ -82,7 +104,7 @@ export function UserCard({
         <div className='flex-1 min-w-0'>
           {/* User Info */}
           <div className='flex items-start'>
-            <div className='mb-1.5 flex-1'>
+            <div className='mb-1.5 flex-1 truncate'>
               <h3 className='font-bold text-[var(--text)] truncate text-base'>
                 {name}
               </h3>
@@ -90,25 +112,27 @@ export function UserCard({
                 {role}
               </p>
             </div>
-            <Dropdown
-              menuOptions={menuOptions}
-              onAction={handleMenuAction}
-              trigger={
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  className='h-8 w-8 p-0 flex-shrink-0'
-                  disabled={disableActions}
-                >
-                  <IconDotsVertical
-                    className='!w-6 !h-6'
-                    strokeWidth={2}
-                    color='var(--text)'
-                  />
-                </Button>
-              }
-              align='end'
-            />
+            {showMenu && (
+              <Dropdown
+                menuOptions={filteredMenuOptions}
+                onAction={handleMenuAction}
+                trigger={
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    className='h-8 w-8 p-0 flex-shrink-0'
+                    disabled={disableActions}
+                  >
+                    <IconDotsVertical
+                      className='!w-6 !h-6'
+                      strokeWidth={2}
+                      color='var(--text)'
+                    />
+                  </Button>
+                }
+                align='end'
+              />
+            )}
           </div>
 
           {/* Contact Info */}
@@ -135,27 +159,29 @@ export function UserCard({
       </div>
 
       {/* Status Toggle */}
-      <div className='flex items-center mt-auto justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
-        <span className='text-xs font-medium text-[var(--text-dark)]'>
-          Enable
-        </span>
-        <Switch
-          checked={status}
-          onCheckedChange={handleToggle}
-          disabled={isToggling || disableActions}
-          className='
-              h-4 w-9 
-              data-[state=checked]:bg-[var(--secondary)] 
-              data-[state=unchecked]:bg-gray-300
-              [&>span]:h-3 
-              [&>span]:w-3 
-              [&>span]:bg-white 
-              data-[state=checked]:[&>span]:border-green-400
-              [&>span]:transition-all
-              [&>span]:duration-200
-            '
-        />
-      </div>
+      {canEdit && (
+        <div className='flex items-center mt-auto justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3'>
+          <span className='text-xs font-medium text-[var(--text-dark)]'>
+            Enable
+          </span>
+          <Switch
+            checked={status}
+            onCheckedChange={handleToggle}
+            disabled={isToggling || disableActions}
+            className='
+                h-4 w-9 
+                data-[state=checked]:bg-[var(--secondary)] 
+                data-[state=unchecked]:bg-gray-300
+                [&>span]:h-3 
+                [&>span]:w-3 
+                [&>span]:bg-white 
+                data-[state=checked]:[&>span]:border-green-400
+                [&>span]:transition-all
+                [&>span]:duration-200
+              '
+          />
+        </div>
+      )}
       <ConfirmDeleteModal
         open={showDelete}
         title={`Are you sure you want to archive?`}

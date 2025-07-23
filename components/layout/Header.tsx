@@ -21,7 +21,7 @@ const menuOptions = [
   { label: 'Logout', action: 'delete', icon: SignoutIcon },
 ];
 export function Header() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   // Add scroll direction state
   const [showHeader, setShowHeader] = useState(true);
@@ -56,7 +56,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        'bg-[var(--white-background)] px-6 py-3 sticky top-0 z-50 transition-transform ease-in-out duration-200',
+        'bg-[var(--white-background)] px-4 md:px-6 py-3 sticky top-0 z-50 transition-transform ease-in-out duration-200',
         showHeader ? 'translate-y-0' : '-translate-y-full'
       )}
     >
@@ -76,12 +76,12 @@ export function Header() {
           <SidebarMobile open={sideSheetOpen} onOpenChange={setSideSheetOpen} />
         </div>
         <div className='flex items-center space-x-4 mr-auto'>
-          <Link href='/' className='text-2xl font-bold'>
+          <Link href='/' className='text-base md:text-2xl font-bold'>
             Virtual Homes
           </Link>
         </div>
-        <div className='flex items-center gap-6'>
-          <div className='flex items-center border-2 border-[var(--border-dark)] rounded-[20px] overflow-hidden w-[280px] xl:w-[443px] focus-within:border-green-500'>
+        <div className='flex items-center gap-4 md:gap-6'>
+          <div className='items-center border-2 border-[var(--border-dark)] rounded-[20px] overflow-hidden w-[280px] xl:w-[443px] focus-within:border-green-500 hidden md:flex'>
             {/* Search Input */}
             <Input
               id='Search'
@@ -115,7 +115,7 @@ export function Header() {
                 className='h-8 w-8 p-0 flex-shrink-0 self-center'
               >
                 <Image
-                  src={'/images/profile.jpg'}
+                  src={user?.profile_picture_url || '/images/profile.jpg'}
                   alt='profile'
                   width={40}
                   height={40}

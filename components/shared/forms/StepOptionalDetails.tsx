@@ -1,234 +1,387 @@
-import { Input } from '@/components/ui/input';
+import { STEP_MESSAGES } from '@/app/(DashboardLayout)/job-management/step-messages';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  StepOptionalDetailsData,
+  StepOptionalDetailsProps,
+} from '@/app/(DashboardLayout)/job-management/types';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Clock } from 'iconsax-react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import SelectField from '../common/SelectField';
 
-interface StepOptionalDetailsProps {
-  typeOfProperty: string;
-  setTypeOfProperty: (val: string) => void;
-  ageOfProperty: string;
-  setAgeOfProperty: (val: string) => void;
-  approxSqft: string;
-  setApproxSqft: (val: string) => void;
-  notificationStyle: string;
-  setNotificationStyle: (val: string) => void;
-  dailyWorkStart: string;
-  setDailyWorkStart: (val: string) => void;
-  dailyWorkEnd: string;
-  setDailyWorkEnd: (val: string) => void;
-  ownerPresent: string;
-  setOwnerPresent: (val: string) => void;
-  weekendWork: string;
-  setWeekendWork: (val: string) => void;
-  animals: string;
-  setAnimals: (val: string) => void;
-  petType: string;
-  setPetType: (val: string) => void;
-  onPrev: () => void;
-  onSkip: () => void;
-  onNext: () => void;
-  cancelButtonClass?: string;
-}
-
+const optionalDetailsSchema = yup.object({
+  typeOfProperty: yup.string().required(STEP_MESSAGES.PROPERTY_TYPE_REQUIRED),
+  ageOfProperty: yup.string().required(STEP_MESSAGES.PROPERTY_AGE_REQUIRED),
+  approxSqft: yup.string().required(STEP_MESSAGES.SQUARE_FOOTAGE_REQUIRED),
+  notificationStyle: yup
+    .string()
+    .required(STEP_MESSAGES.NOTIFICATION_STYLE_REQUIRED),
+  dailyWorkStart: yup.string().optional(),
+  dailyWorkEnd: yup.string().optional(),
+  ownerPresent: yup.string().required(STEP_MESSAGES.OWNER_PRESENCE_REQUIRED),
+  weekendWork: yup.string().required(STEP_MESSAGES.WEEKEND_WORK_REQUIRED),
+  animals: yup.string().required(STEP_MESSAGES.ANIMALS_REQUIRED),
+  petType: yup.string().when('animals', {
+    is: 'Yes',
+    then: schema => schema.required(STEP_MESSAGES.PET_TYPE_REQUIRED),
+    otherwise: schema => schema.optional(),
+  }),
+});
 export function StepOptionalDetails({
-  typeOfProperty,
-  setTypeOfProperty,
-  ageOfProperty,
-  setAgeOfProperty,
-  approxSqft,
-  setApproxSqft,
-  notificationStyle,
-  setNotificationStyle,
-  dailyWorkStart,
-  setDailyWorkStart,
-  dailyWorkEnd,
-  setDailyWorkEnd,
-  ownerPresent,
-  setOwnerPresent,
-  weekendWork,
-  setWeekendWork,
-  animals,
-  setAnimals,
-  petType,
-  setPetType,
   onPrev,
-  onSkip,
   onNext,
   cancelButtonClass,
+  defaultValues,
+  isLastStep = false,
 }: StepOptionalDetailsProps) {
+  const form = useForm({
+    resolver: yupResolver(optionalDetailsSchema),
+    defaultValues: {
+      typeOfProperty: 'Residential',
+      ageOfProperty: '0-5 years',
+      approxSqft: '',
+      notificationStyle: 'Email',
+      dailyWorkStart: '',
+      dailyWorkEnd: '',
+      ownerPresent: 'No',
+      weekendWork: 'No',
+      animals: 'No',
+      petType: '',
+      ...defaultValues,
+    },
+  });
+
+  const { watch } = form;
+  const animals = watch('animals');
+
+  const onSubmit = (data: any) => {
+    onNext(data as StepOptionalDetailsData);
+  };
+
   return (
-    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-10 flex flex-col items-center'>
-      <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
-        Optional Details
+    <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-4 flex flex-col items-center'>
+      <h2 className='text-xl md:text-2xl xl:text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
+        {STEP_MESSAGES.OPTIONAL_DETAILS_TITLE}
       </h2>
-      <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
-        Help us understand your needs better. Answer these questions or leave
-        them for later.
+      <p className='text-[var(--text-secondary)] text-sm md:text-[18px] font-normal text-center mb-6 sm:mb-8 max-w-lg px-2 sm:px-0'>
+        {STEP_MESSAGES.OPTIONAL_DETAILS_DESCRIPTION}
       </p>
-      <form
-        className='w-full flex flex-col gap-6'
-        onSubmit={e => {
-          e.preventDefault();
-          onNext();
-        }}
-      >
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          {/* Type of Property */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Type of Property</label>
-            <Select value={typeOfProperty} onValueChange={setTypeOfProperty}>
-              <SelectTrigger className='input-field'>
-                <SelectValue placeholder='Residential' />
-              </SelectTrigger>
-              <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                <SelectItem value='Residential'>Residential</SelectItem>
-                <SelectItem value='Commercial'>Commercial</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {/* Age of Property */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Age of Property</label>
-            <Input
-              value={ageOfProperty}
-              onChange={e => setAgeOfProperty(e.target.value)}
-              placeholder='20 years'
-              className='input-field'
-            />
-          </div>
-          {/* Approx. sq ft */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Approx. sq ft</label>
-            <Input
-              value={approxSqft}
-              onChange={e => setApproxSqft(e.target.value)}
-              placeholder='2500 Sq / Ft'
-              className='input-field'
-            />
-          </div>
-          {/* Notification Style */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Notification Style</label>
-            <Select
-              value={notificationStyle}
-              onValueChange={setNotificationStyle}
-            >
-              <SelectTrigger className='input-field'>
-                <SelectValue placeholder='Email' />
-              </SelectTrigger>
-              <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                <SelectItem value='Email'>Email</SelectItem>
-                <SelectItem value='SMS'>SMS</SelectItem>
-                <SelectItem value='Phone'>Phone</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {/* Daily Work Timing */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Daily Work Timing</label>
-            <div className='relative'>
-              <Input
-                value={dailyWorkStart}
-                onChange={e => setDailyWorkStart(e.target.value)}
-                placeholder='Start Time'
-                className='input-field pr-12'
+      <Form {...form}>
+        <form
+          className='w-full flex flex-col gap-4 sm:gap-6'
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 h-auto md:-mx-4 md:px-4 md:h-[calc(100vh_-_550px)] overflow-y-auto'>
+            {/* Type of Property */}
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
+              <FormField
+                control={form.control}
+                name='typeOfProperty'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='field-label'>
+                      {STEP_MESSAGES.TYPE_OF_PROPERTY_LABEL}
+                    </FormLabel>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          {
+                            value: 'Residential',
+                            label: STEP_MESSAGES.RESIDENTIAL,
+                          },
+                          { value: 'Commercial', label: 'Commercial' },
+                        ]}
+                        placeholder={STEP_MESSAGES.RESIDENTIAL}
+                        className=''
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <span className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none'>
-                <Clock size='24' color='#24338C' />
-              </span>
             </div>
-          </div>
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>&nbsp;</label>
-            <div className='relative'>
-              <Input
-                value={dailyWorkEnd}
-                onChange={e => setDailyWorkEnd(e.target.value)}
-                placeholder='End Time'
-                className='input-field pr-12'
+            {/* Age of Property */}
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
+              <FormField
+                control={form.control}
+                name='ageOfProperty'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='field-label'>
+                      {STEP_MESSAGES.AGE_OF_PROPERTY_LABEL}
+                    </FormLabel>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          { value: '0-5 years', label: '0-5 years' },
+                          { value: '6-10 years', label: '6-10 years' },
+                          { value: '11-20 years', label: '11-20 years' },
+                          { value: '21-30 years', label: '21-30 years' },
+                          { value: '31-50 years', label: '31-50 years' },
+                          { value: '50+ years', label: '50+ years' },
+                        ]}
+                        placeholder={STEP_MESSAGES.SELECT_AGE}
+                        className=''
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <span className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none'>
-                <Clock size='24' color='#24338C' />
-              </span>
             </div>
+            {/* Approx. sq ft */}
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
+              <FormField
+                control={form.control}
+                name='approxSqft'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='field-label'>
+                      {STEP_MESSAGES.APPROX_SQ_FT_LABEL}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={STEP_MESSAGES.APPROX_SQ_FT_PLACEHOLDER}
+                        className='input-field'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            {/* Notification Style */}
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
+              <FormField
+                control={form.control}
+                name='notificationStyle'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='field-label'>
+                      {STEP_MESSAGES.NOTIFICATION_STYLE_LABEL}
+                    </FormLabel>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          {
+                            value: 'Email',
+                            label: STEP_MESSAGES.EMAIL_NOTIFICATION,
+                          },
+                          { value: 'SMS', label: 'SMS' },
+                          { value: 'Phone', label: 'Phone' },
+                        ]}
+                        placeholder={STEP_MESSAGES.EMAIL_NOTIFICATION}
+                        className=''
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            {/* Daily Work Timing */}
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
+              <FormLabel className='field-label'>
+                {STEP_MESSAGES.DAILY_WORK_TIMING_LABEL}
+              </FormLabel>
+              <div className='relative'>
+                <FormField
+                  control={form.control}
+                  name='dailyWorkStart'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          type='time'
+                          placeholder={STEP_MESSAGES.START_TIME}
+                          className='input-field pr-12 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <span className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none'>
+                  <Clock size='24' color='#24338C' />
+                </span>
+              </div>
+            </div>
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
+              <FormLabel className='field-label'>&nbsp;</FormLabel>
+              <div className='relative'>
+                <FormField
+                  control={form.control}
+                  name='dailyWorkEnd'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          type='time'
+                          placeholder={STEP_MESSAGES.END_TIME}
+                          className='input-field pr-12 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <span className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none'>
+                  <Clock size='24' color='#24338C' />
+                </span>
+              </div>
+            </div>
+            {/* Owner Need to Be Present */}
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
+              <FormField
+                control={form.control}
+                name='ownerPresent'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='field-label'>
+                      {STEP_MESSAGES.OWNER_PRESENT_LABEL}
+                    </FormLabel>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          { value: 'Yes', label: STEP_MESSAGES.YES },
+                          { value: 'No', label: STEP_MESSAGES.NO },
+                        ]}
+                        placeholder={STEP_MESSAGES.NO}
+                        className=''
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            {/* Weekend Work Availability */}
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
+              <FormField
+                control={form.control}
+                name='weekendWork'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='field-label'>
+                      {STEP_MESSAGES.WEEKEND_WORK_LABEL}
+                    </FormLabel>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          { value: 'Yes', label: STEP_MESSAGES.YES },
+                          { value: 'No', label: STEP_MESSAGES.NO },
+                        ]}
+                        placeholder={STEP_MESSAGES.YES}
+                        className=''
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            {/* Animals in the Home */}
+            <div className='flex flex-col gap-1.5 sm:gap-2'>
+              <FormField
+                control={form.control}
+                name='animals'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='field-label'>
+                      {STEP_MESSAGES.ANIMALS_IN_HOME_LABEL}
+                    </FormLabel>
+                    <FormControl>
+                      <SelectField
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        options={[
+                          { value: 'Yes', label: STEP_MESSAGES.YES },
+                          { value: 'No', label: STEP_MESSAGES.NO },
+                        ]}
+                        placeholder={STEP_MESSAGES.YES}
+                        className=''
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            {/* Pet type? */}
+            {animals === 'Yes' && (
+              <div className='flex flex-col gap-1.5 sm:gap-2'>
+                <FormField
+                  control={form.control}
+                  name='petType'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='field-label'>
+                        {STEP_MESSAGES.PET_TYPE_LABEL}
+                      </FormLabel>
+                      <FormControl>
+                        <SelectField
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          options={[
+                            { value: 'Dog', label: 'Dog' },
+                            { value: 'Cat', label: 'Cat' },
+                          ]}
+                          placeholder={STEP_MESSAGES.SELECT_PET_TYPE}
+                          className=''
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
           </div>
-          {/* Owner Need to Be Present */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Owner Need to Be Present</label>
-            <Select value={ownerPresent} onValueChange={setOwnerPresent}>
-              <SelectTrigger className='input-field'>
-                <SelectValue placeholder='No' />
-              </SelectTrigger>
-              <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                <SelectItem value='Yes'>Yes</SelectItem>
-                <SelectItem value='No'>No</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {/* Weekend Work Availability */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Weekend Work Availability</label>
-            <Select value={weekendWork} onValueChange={setWeekendWork}>
-              <SelectTrigger className='input-field'>
-                <SelectValue placeholder='Yes' />
-              </SelectTrigger>
-              <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                <SelectItem value='Yes'>Yes</SelectItem>
-                <SelectItem value='No'>No</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {/* Animals in the Home */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Animals in the Home</label>
-            <Select value={animals} onValueChange={setAnimals}>
-              <SelectTrigger className='input-field'>
-                <SelectValue placeholder='Yes' />
-              </SelectTrigger>
-              <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                <SelectItem value='Yes'>Yes</SelectItem>
-                <SelectItem value='No'>No</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {/* Pet type? */}
-          <div className='flex flex-col gap-2'>
-            <label className='field-label'>Pet type?</label>
-            <Input
-              value={petType}
-              onChange={e => setPetType(e.target.value)}
-              placeholder='Dog'
-              className='input-field'
-            />
-          </div>
-        </div>
-        <div className='flex w-full justify-between mt-6'>
-          <button
-            type='button'
-            className={cancelButtonClass || 'btn-secondary !h-12 !px-8'}
-            onClick={onPrev}
-          >
-            Previous
-          </button>
-          <div className='flex gap-2'>
+          <div className='flex w-full justify-between items-center gap-2'>
             <button
               type='button'
-              className='text-[var(--text-dark)] font-semibold bg-transparent'
-              onClick={onSkip}
+              className={
+                cancelButtonClass ||
+                'btn-secondary !px-4 md:!px-8 text-sm sm:text-base'
+              }
+              onClick={onPrev}
             >
-              Skip
+              {STEP_MESSAGES.PREVIOUS}
             </button>
-            <button className='btn-primary !h-12 !px-12' type='submit'>
-              Next Step
-            </button>
+            <div className='flex gap-2'>
+              <Button
+                className='btn-primary !px-4 md:!px-8 text-sm sm:text-base'
+                type='submit'
+              >
+                {isLastStep ? STEP_MESSAGES.SUBMIT : STEP_MESSAGES.NEXT_STEP}
+              </Button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </Form>
     </div>
   );
 }

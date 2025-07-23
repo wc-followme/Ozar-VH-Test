@@ -1,13 +1,13 @@
-import { Header } from "@/components/layout/Header"
-import { Sidebar } from "@/components/layout/Sidebar"
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
-import type React from "react"
+import { Header } from '@/components/layout/Header';
+import { Sidebar } from '@/components/layout/Sidebar';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import type React from 'react';
 
 export default async function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   // Server-side authentication check
   const cookieStore = await cookies();
@@ -20,12 +20,14 @@ export default async function DashboardLayout({
   }
 
   return (
-     <div className="flex min-h-screen bg-[var(--white-background)]">
+    <div className='flex bg-[var(--white-background)] min-h-screen'>
       <Sidebar />
-      <div className="flex flex-col flex-1">
+      <div className='flex flex-col flex-1'>
         <Header />
-        <main className="rounded-t-[30px] p-6 bg-[var(--background)] h-full">{children}</main>
+        <main className='rounded-t-[30px] p-4 md:p-6 bg-[var(--background)] flex-1'>
+          {children}
+        </main>
       </div>
     </div>
-  )
+  );
 }

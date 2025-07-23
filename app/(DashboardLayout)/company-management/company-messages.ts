@@ -42,6 +42,9 @@ export const COMPANY_MESSAGES = {
 
   // Status Messages
   NO_COMPANIES_FOUND: 'No companies found.',
+  NO_COMPANIES_FOUND_DESCRIPTION:
+    "You haven't created any companies yet. Start by adding your first one to organize your companies.",
+  NO_MORE_COMPANIES: 'No more companies to load.',
 
   // Button Labels
   ADD_COMPANY_BUTTON: 'Add Company',
@@ -88,6 +91,7 @@ export const COMPANY_MESSAGES = {
 
   // Photo Upload
   UPLOAD_PHOTO_LABEL: 'Upload Company Logo',
+  ENTER_CONTRACTOR_PHOTO: 'Upload Contractor Photo',
   UPLOAD_PHOTO_TEXT:
     '1600 x 1200 (4:3) recommended. PNG and JPG files are allowed.',
 

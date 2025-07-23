@@ -11,6 +11,28 @@ export const PAGINATION = {
 export const APP_CONFIG = {
   SEARCH_DEBOUNCE_MS: 300,
   TOAST_AUTO_HIDE_MS: 3000,
+  // Frontend base URL for generating links (e.g., home-owner links)
+  // Set NEXT_PUBLIC_BASE_URL in your .env.local file
+  BASE_URL: process.env['NEXT_PUBLIC_BASE_URL'] || 'http://localhost:3000',
+} as const;
+
+// Application Routes
+export const ROUTES = {
+  HOME_OWNER: '/home-owner',
+  JOB_MANAGEMENT: '/job-management',
+  DASHBOARD: '/',
+} as const;
+
+// Action constants for menu options and permissions
+export const ACTIONS = {
+  EDIT: 'edit',
+  DELETE: 'delete',
+  ARCHIVE: 'archive',
+  VIEW: 'view',
+  CREATE: 'create',
+  CUSTOMIZE: 'customize',
+  ASSIGN_USER: 'assign_user',
+  HISTORY: 'history',
 } as const;
 
 // Country codes and phone number related constants
@@ -158,6 +180,40 @@ export const COUNTRY_CODES = {
     );
   },
 } as const;
+
+export const JOB_TYPE = {
+  PUBLIC: 'PUBLIC',
+  PRIVATE: 'PRIVATE',
+} as const;
+
+export type JobType = (typeof JOB_TYPE)[keyof typeof JOB_TYPE];
+
+// ROLE_ID is the ID of the role in the database
+export const ROLE_ID = {
+  JOB_USER: 5,
+  CONTRACTOR: 3,
+} as const;
+
+export enum CommonStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DELETED = 'DELETED',
+}
+
+export enum JobStatus {
+  DONE = 'DONE',
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum JobFilterType {
+  ALL = 'ALL',
+  NEED_ATTENTION = 'NEED_ATTENTION',
+  NEW_LEADS = 'NEW_LEADS',
+  WAITING_ON_CLIENT = 'WAITING_ON_CLIENT',
+  ONGOING = 'ONGOING',
+}
 
 // Future constants can be added here
 // export const OTHER_CONSTANTS = {

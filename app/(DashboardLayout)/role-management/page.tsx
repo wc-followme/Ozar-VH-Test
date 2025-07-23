@@ -3,15 +3,21 @@
 import { HelmetIcon } from '@/components/icons/HelmetIcon';
 import { RoleCard } from '@/components/shared/cards/RoleCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import NoDataFound from '@/components/shared/common/NoDataFound';
 import { useToast } from '@/components/ui/use-toast';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { roleIconOptions } from '@/constants/sidebar-items';
 import { apiService } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
-import { Edit2, Trash } from 'iconsax-react';
+import {
+  extractApiErrorMessage,
+  extractApiSuccessMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
+import { Add, Edit2, Trash } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import RoleCardSkeleton from '../../../components/shared/skeleton/RoleCardSkeleton';
 import { ROLE_MESSAGES } from './role-messages';
 import type { FetchRolesParams, Role, RoleApiResponse } from './types';
 
@@ -26,8 +32,16 @@ interface MenuOption {
 }
 
 const menuOptions: MenuOption[] = [
-  { label: ROLE_MESSAGES.EDIT_MENU, action: 'edit', icon: Edit2 },
-  { label: ROLE_MESSAGES.DELETE_MENU, action: 'delete', icon: Trash },
+  {
+    label: ROLE_MESSAGES.EDIT_MENU,
+    action: ACTIONS.EDIT,
+    icon: Edit2,
+  },
+  {
+    label: ROLE_MESSAGES.DELETE_MENU,
+    action: ACTIONS.DELETE,
+    icon: Trash,
+  },
 ];
 
 // Adapter for icons that expect className instead of size/color
@@ -51,6 +65,10 @@ const RoleManagement = () => {
   const router = useRouter();
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
+
+  // Get user permissions for roles
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.roles?.edit;
 
   const fetchRoles = useCallback(
     async (targetPage = 1, append = false) => {
@@ -161,29 +179,43 @@ const RoleManagement = () => {
   const safeIconOptions = Array.isArray(roleIconOptions) ? roleIconOptions : [];
 
   return (
-    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto'>
-      <header className='flex items-center justify-between w-full'>
-        <h2 className='text-2xl font-medium text-[var(--text-dark)]'>
-          {ROLE_MESSAGES.PAGE_TITLE}
-        </h2>
-        <button
-          onClick={handleCreateRole}
-          className='h-[42px] px-6 bg-[var(--secondary)] hover:bg-[var(--hover-bg)] rounded-full font-semibold text-white flex items-center gap-2'
-        >
-          {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
-        </button>
+    <section className=''>
+      <header className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
+        <div className='flex items-center justify-between w-full'>
+          <h2 className='page-title'>{ROLE_MESSAGES.PAGE_TITLE}</h2>
+          {canEdit && (
+            <button
+              onClick={handleCreateRole}
+              className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
+            >
+              <Add size='20' color='#fff' className='sm:hidden' />
+              <span className='hidden sm:inline'>
+                {ROLE_MESSAGES.CREATE_ROLE_BUTTON}
+              </span>
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Initial Loading State */}
       {roles.length === 0 && loading ? (
-        <LoadingComponent variant='fullscreen' />
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6 w-full'>
+          {[...Array(8)].map((_, i) => (
+            <RoleCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           {/* Roles Grid */}
-          <div className='grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
+          <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl w-full gap-3 xl:gap-6'>
             {roles.length === 0 && !loading ? (
-              <div className='col-span-4 text-center py-8'>
-                {ROLE_MESSAGES.NO_ROLES_FOUND}
+              <div className='w-full col-span-full h-full md:h-[calc(100vh_-_220px)]'>
+                <NoDataFound
+                  buttonText={ROLE_MESSAGES.CREATE_ROLE_BUTTON}
+                  onButtonClick={handleCreateRole}
+                  description={ROLE_MESSAGES.NO_ROLES_FOUND_DESCRIPTION}
+                  showButton={canEdit ?? false}
+                />
               </div>
             ) : (
               roles.map(

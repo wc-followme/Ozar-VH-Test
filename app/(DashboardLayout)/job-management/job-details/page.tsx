@@ -2,10 +2,12 @@
 
 import { Breadcrumb, BreadcrumbItem } from '@/components/shared/Breadcrumb';
 import Dropdown from '@/components/shared/common/Dropdown';
+import JobDetailsSkeleton from '@/components/shared/skeleton/JobDetailsSkeleton';
 import { Button } from '@/components/ui/button';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { ClipboardClose, Setting2, UserAdd } from 'iconsax-react';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { MoveBoxIcon } from '../../../../components/icons/MoveBoxIcon';
 
 const job = {
@@ -57,17 +59,34 @@ const dropdownMenuItems = [
 ];
 
 export default function JobDetailsPage() {
+  const [loading, setLoading] = useState(true);
+  const [jobData, setJobData] = useState(job);
+
+  useEffect(() => {
+    // Simulate loading time
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const breadcrumbData: BreadcrumbItem[] = [
     { name: 'Home', href: '/' },
-    { name: job.id },
+    { name: jobData.id },
   ];
+
+  if (loading) {
+    return <JobDetailsSkeleton />;
+  }
+
   return (
-    <div className=''>
+    <div className='w-full h-full overflow-auto'>
       {/* Breadcrumb */}
-      <div className='flex flex-wrap items-start text-sm font-normal mb-1 w-full md:text-base md:mb-3'>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4'>
         <Breadcrumb items={breadcrumbData} className='flex-1' />
         {/* 3-dots menu */}
-        <div className='ml-auto mt-2 md:mt-0'>
+        <div className='flex justify-end sm:ml-auto'>
           <Dropdown
             menuOptions={dropdownMenuItems.map(({ icon, label }) => ({
               icon,
@@ -96,109 +115,109 @@ export default function JobDetailsPage() {
         </div>
       </div>
       {/* Card */}
-      <div className='bg-[var(--card-background)] rounded-[20px] p-4 md:p-6 flex flex-col md:flex-row md:justify-between border border-[var(--border-dark)] max-w-full gap-4 md:gap-0'>
+      <div className='bg-[var(--card-background)] rounded-[20px] p-4 md:p-6 flex flex-col lg:flex-row lg:justify-between border border-[var(--border-dark)] max-w-full gap-6 job-details-card'>
         {/* Project Image */}
-        <div className='flex-shrink-0 flex justify-center md:block mb-4 md:mb-0'>
+        <div className='flex-shrink-0 flex justify-center lg:justify-start'>
           <Image
             src='/images/auth/login-slider-01.webp'
             alt='Project'
             width={120}
             height={120}
-            className='rounded-[8px] object-cover w-[100px] h-[100px] md:w-[120px] md:h-[120px]'
+            className='rounded-[8px] object-cover w-[100px] h-[100px] md:w-[120px] md:h-[120px] job-details-image'
           />
         </div>
         {/* Details */}
-        <div className='flex-1 px-0 md:px-6 w-full'>
-          <div className='grid grid-cols-3 xl:grid-cols-5 gap-y-4 md:gap-4 border-b border-[var(--border-dark)] pb-2 mb-3'>
+        <div className='flex-1 px-0 lg:px-6 w-full'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 border-b border-[var(--border-dark)] pb-4 mb-4 job-details-grid'>
             <div className='min-w-0 break-words'>
-              <div className='text-sm text-[var(--text-secondary)] font-normal mb-1'>
+              <div className='text-xs sm:text-sm text-[var(--text-secondary)] font-normal mb-1 job-details-label'>
                 Project ID
               </div>
-              <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.id}
+              <div className='font-semibold text-sm sm:text-base text-[var(--text-dark)] job-details-text'>
+                {jobData.id}
               </div>
             </div>
             <div className='min-w-0 break-words'>
-              <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
+              <div className='text-xs sm:text-sm text-[var(--text-secondary)] font-normal mb-1 job-details-label'>
                 Project Name
               </div>
-              <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.name}
+              <div className='font-semibold text-sm sm:text-base text-[var(--text-dark)] job-details-text'>
+                {jobData.name}
               </div>
             </div>
             <div className='min-w-0 break-words'>
-              <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
+              <div className='text-xs sm:text-sm text-[var(--text-secondary)] font-normal mb-1 job-details-label'>
                 Job category
               </div>
-              <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.category}
+              <div className='font-semibold text-sm sm:text-base text-[var(--text-dark)] job-details-text'>
+                {jobData.category}
               </div>
             </div>
-            <div className='md:col-span-2 flex flex-col md:flex-row md:items-center gap-2 min-w-0 break-words'>
-              <div>
-                <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
-                  Budget
+            <div className='sm:col-span-2 lg:col-span-2 min-w-0 break-words'>
+              <div className='text-xs sm:text-sm text-[var(--text-secondary)] font-normal mb-2 job-details-label'>
+                Budget
+              </div>
+              <div className='flex flex-col sm:flex-row sm:items-center gap-2'>
+                <span className='font-semibold text-sm sm:text-base text-[var(--text-dark)] job-details-text'>
+                  ${jobData.spent.toLocaleString()}
+                </span>
+                <div className='w-full sm:w-32 h-2 bg-gray-200 rounded-full overflow-hidden'>
+                  <div
+                    className='h-2 bg-[var(--secondary)]'
+                    style={{
+                      width: `${(jobData.spent / jobData.budget) * 100}%`,
+                    }}
+                  />
                 </div>
-                <div className='flex items-center gap-2'>
-                  <span className='font-semibold text-base text-[var(--text-dark)]'>
-                    ${job.spent.toLocaleString()}
-                  </span>
-                  <div className='w-32 h-2 bg-gray-200 rounded-full overflow-hidden'>
-                    <div
-                      className='h-2 bg-[var(--secondary)]'
-                      style={{ width: `${(job.spent / job.budget) * 100}%` }}
-                    />
-                  </div>
-                  <span className='text-[var(--text-secondary)] font-medium'>
-                    ${job.budget.toLocaleString()}
-                  </span>
-                </div>
+                <span className='text-xs sm:text-sm text-[var(--text-secondary)] font-medium job-details-text'>
+                  ${jobData.budget.toLocaleString()}
+                </span>
               </div>
             </div>
           </div>
-          <div className='grid grid-cols-3 xl:grid-cols-5 gap-y-4 md:gap-4 items-start md:items-center mt-2'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-start job-details-grid'>
             <div className='min-w-0 break-words'>
-              <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
+              <div className='text-xs sm:text-sm text-[var(--text-secondary)] font-normal mb-1 job-details-label'>
                 Client Name
               </div>
-              <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.client.name}
+              <div className='font-semibold text-sm sm:text-base text-[var(--text-dark)] job-details-text'>
+                {jobData.client.name}
               </div>
             </div>
             <div className='min-w-0 break-words'>
-              <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
+              <div className='text-xs sm:text-sm text-[var(--text-secondary)] font-normal mb-1 job-details-label'>
                 Email
               </div>
-              <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.client.email}
+              <div className='font-semibold text-sm sm:text-base text-[var(--text-dark)] break-all job-details-text'>
+                {jobData.client.email}
               </div>
             </div>
             <div className='min-w-0 break-words'>
-              <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
+              <div className='text-xs sm:text-sm text-[var(--text-secondary)] font-normal mb-1 job-details-label'>
                 Phone Number
               </div>
-              <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.client.phone}
+              <div className='font-semibold text-sm sm:text-base text-[var(--text-dark)] job-details-text'>
+                {jobData.client.phone}
               </div>
             </div>
-            <div className='md:col-span-2 min-w-0 break-words'>
-              <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
+            <div className='sm:col-span-2 lg:col-span-2 min-w-0 break-words'>
+              <div className='text-xs sm:text-sm text-[var(--text-secondary)] font-normal mb-1 job-details-label'>
                 Address
               </div>
-              <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {job.client.address}
+              <div className='font-semibold text-sm sm:text-base text-[var(--text-dark)] job-details-text'>
+                {jobData.client.address}
               </div>
             </div>
           </div>
         </div>
         {/* Map Image */}
-        <div className='flex flex-row md:flex-col items-center md:items-end gap-2 mt-4 md:mt-0'>
+        <div className='flex justify-center lg:justify-end lg:self-start lg:flex-col lg:items-end gap-2'>
           <Image
             src='/images/map-placeholder.png'
             alt='Map'
             width={100}
             height={100}
-            className='rounded-[8px] object-cover w-[100px] h-[100px] md:w-[120px] md:h-[120px]'
+            className='rounded-[8px] object-cover w-[100px] h-[100px] md:w-[120px] md:h-[120px] job-details-image'
           />
         </div>
       </div>

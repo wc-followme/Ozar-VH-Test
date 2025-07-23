@@ -31,7 +31,7 @@ const CustomSheetContent = React.forwardRef<
     <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
-      className={`fixed z-50 gap-4 bg-[var(--card-background)] p-6 !border-0 transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500 inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm ${className || ''}`}
+      className={`fixed z-50 gap-4 bg-[var(--card-background)] p-3 md:p-6 !border-0 transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500 inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm ${className || ''}`}
       {...props}
     >
       {children}
@@ -54,7 +54,7 @@ export default function SideSheet({
         className={`w-full bg-[var(--card-background)] border-0 overflow-auto`}
         style={{ maxWidth: size }}
       >
-        <SheetHeader className='flex items-center flex-row pb-8'>
+        <SheetHeader className='flex items-center flex-row pb-4 md:pb-8'>
           <SheetTitle className='text-[var(--text-dark)] text-[24px] font-medium '>
             {title}
           </SheetTitle>
