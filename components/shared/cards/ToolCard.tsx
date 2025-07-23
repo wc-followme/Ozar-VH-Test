@@ -15,6 +15,7 @@ interface ToolCardProps {
   quantity: number;
   videoCount: number;
   onDelete: () => void;
+  onEdit?: () => void;
 }
 
 export default function ToolCard({
@@ -24,6 +25,7 @@ export default function ToolCard({
   quantity,
   videoCount,
   onDelete,
+  onEdit,
 }: ToolCardProps) {
   const [showDelete, setShowDelete] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -93,7 +95,9 @@ export default function ToolCard({
             <Dropdown
               menuOptions={filteredMenuOptions}
               onAction={action => {
-                if (action === ACTIONS.EDIT) alert('Edit clicked');
+                if (action === ACTIONS.EDIT) {
+                  if (onEdit) onEdit();
+                }
                 if (action === ACTIONS.ARCHIVE) setShowDelete(true);
               }}
               trigger={

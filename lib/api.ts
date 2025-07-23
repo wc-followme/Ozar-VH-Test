@@ -442,6 +442,116 @@ export interface GetCompanyResponse {
   };
 }
 
+// Tool management interfaces
+export interface ToolAsset {
+  uuid: string;
+  media_url: string;
+  available_quantity: number;
+  company_id: string;
+  condition: string;
+  created_at: string;
+  created_by: string;
+  manufacturer: string;
+  name: string;
+  status: string;
+  updated_at: string;
+  updated_by: string;
+}
+
+export interface Tool {
+  id: number;
+  uuid: string;
+  name: string;
+  available_quantity: number;
+  manufacturer: string;
+  tool_assets: string;
+  service_ids: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  created_at: string;
+  updated_at: string;
+  services: Array<{
+    id: number | string;
+    name: string;
+    status: string;
+  }>;
+  assets?: ToolAsset[];
+}
+
+export interface FetchToolsResponse {
+  statusCode: number;
+  message: string;
+  data: Tool[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CreateToolRequest {
+  name: string;
+  available_quantity: number;
+  manufacturer: string;
+  tool_assets: string;
+  service_ids: string;
+}
+
+export interface CreateToolResponse {
+  statusCode: number;
+  message: string;
+  data?: Tool;
+}
+
+export interface UpdateToolRequest {
+  name?: string;
+  available_quantity?: number;
+  manufacturer?: string;
+  tool_assets?: string;
+  service_ids?: string;
+  status?: 'ACTIVE' | 'INACTIVE';
+}
+
+export interface UpdateToolResponse {
+  statusCode: number;
+  message: string;
+  data?: Tool;
+}
+
+export interface DeleteToolResponse {
+  statusCode: number;
+  message: string;
+}
+
+export interface GetToolResponse {
+  statusCode: number;
+  message: string;
+  data: Tool;
+}
+
+// Service interface for dropdown
+export interface Service {
+  id: number;
+  uuid: string;
+  name: string;
+  description: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FetchServicesResponse {
+  statusCode: number;
+  message: string;
+  data: Service[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 // Get device information for login
 const getDeviceInfo = (): DeviceInfo => {
   const navigator = typeof window !== 'undefined' ? window.navigator : null;
@@ -1227,6 +1337,26 @@ class ApiService {
     });
   }
 
+  // Get services for tool form (with pagination and filters)
+  async fetchServicesForTools({
+    page = 1,
+    limit = 50,
+    is_active = true,
+  }: {
+    page?: number;
+    limit?: number;
+    is_active?: boolean;
+  }): Promise<FetchServicesResponse> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    params.append('is_active', String(is_active));
+    return this.makeRequest(`/services?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   // Material management APIs
   async fetchMaterials({
     page = 1,
@@ -1310,6 +1440,35 @@ class ApiService {
     });
   }
 
+  // Tool management APIs
+  async fetchTools({
+    page = 1,
+    limit = 10,
+    name = '',
+    service_id = '',
+    status = 'ACTIVE',
+    company_id = '',
+  }: {
+    page?: number;
+    limit?: number;
+    name?: string;
+    service_id?: string | number;
+    status?: 'ACTIVE' | 'INACTIVE' | '';
+    company_id?: string | number;
+  }): Promise<FetchToolsResponse> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (name) params.append('name', name);
+    if (service_id) params.append('service_id', String(service_id));
+    if (status) params.append('status', status);
+    if (company_id) params.append('company_id', String(company_id));
+    return this.makeRequest(`/tools?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   // Job management API
   async createJob(payload: {
     client_id?: string | number;
@@ -1348,6 +1507,20 @@ class ApiService {
     });
   }
 
+  async createTool(payload: CreateToolRequest): Promise<CreateToolResponse> {
+    return this.makeRequest('/tools', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getToolDetails(uuid: string): Promise<GetToolResponse> {
+    return this.makeRequest(`/tools/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
   async fetchJobStatistics(): Promise<any> {
     return this.makeRequest('/jobs/statistics', {
       method: 'GET',
@@ -1362,6 +1535,16 @@ class ApiService {
     });
   }
 
+  async updateTool(
+    uuid: string,
+    payload: UpdateToolRequest
+  ): Promise<UpdateToolResponse> {
+    return this.makeRequest(`/tools/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
   // Update job
   async updateJob(
     uuid: string,
@@ -1401,6 +1584,13 @@ class ApiService {
       method: 'PATCH',
       headers: this.getRoleHeaders(),
       body: JSON.stringify(payload),
+    });
+  }
+
+  async deleteTool(uuid: string): Promise<DeleteToolResponse> {
+    return this.makeRequest(`/tools/${uuid}`, {
+      method: 'DELETE',
+      headers: this.getRoleHeaders(),
     });
   }
 

@@ -48,11 +48,10 @@ const MultiSelect = <OptionType = MultiSelectOption,>({
   const isMobile = useIsMobile();
 
   const handleToggle = (optionValue: string) => {
-    if (value.includes(optionValue)) {
-      onChange(value.filter(v => v !== optionValue));
-    } else {
-      onChange([...value, optionValue]);
-    }
+    const newValue = value.includes(optionValue)
+      ? value.filter(v => v !== optionValue)
+      : [...value, optionValue];
+    onChange(newValue);
   };
 
   // Show different number of tags based on screen size
