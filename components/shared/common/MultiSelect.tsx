@@ -41,8 +41,6 @@ const MultiSelect = <OptionType = MultiSelectOption,>({
   name,
   getOptionLabel = (option: any) => option.label,
   getOptionValue = (option: any) => option.value,
-  maxHeight = 200,
-  maxSelectedItems = 3,
 }: MultiSelectProps<OptionType>) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const isMobile = useIsMobile();
