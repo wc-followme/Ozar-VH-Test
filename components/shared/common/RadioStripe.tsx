@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 
 const options = [
-  { label: 'Public Job', value: 'public' },
-  { label: 'Private Job', value: 'private' },
+  { label: 'Public Job', value: 'PUBLIC' },
+  { label: 'Private Job', value: 'PRIVATE' },
 ];
 
 export function RadioGroupStripe({
@@ -20,14 +20,14 @@ export function RadioGroupStripe({
     <RadioGroup
       value={value}
       onValueChange={onChange}
-      className='flex items-center gap-4 w-full'
+      className='flex items-center gap-2 sm:gap-4 w-full'
     >
       {options.map(({ value: optionValue, label: optionLabel }) => (
         <label
           key={optionValue}
           htmlFor={optionValue}
           className={cn(
-            'flex items-center gap-2 px-[12px] py-[10px] w-full max-w-[250px] rounded-full border-2 text-base text-[var(--text-dark)] font-medium cursor-pointer transition-all',
+            'flex items-center gap-2 px-[12px] py-[10px] text-sm sm:text-base w-full max-w-[250px] rounded-full border-2 text-[var(--text-dark)] font-medium cursor-pointer transition-all',
             value === optionValue
               ? 'border-[var(--primary)]'
               : 'border-[var(--border-dark)] bg-transparent'

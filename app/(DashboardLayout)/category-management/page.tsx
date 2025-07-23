@@ -2,11 +2,12 @@
 
 import { CategoryCard } from '@/components/shared/cards/CategoryCard';
 import LoadingComponent from '@/components/shared/common/LoadingComponent';
+import NoDataFound from '@/components/shared/common/NoDataFound';
 import SideSheet from '@/components/shared/common/SideSheet';
 import CategoryForm from '@/components/shared/forms/CategoryForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { PAGINATION } from '@/constants/common';
+import { ACTIONS, PAGINATION } from '@/constants/common';
 import { STATUS_CODES } from '@/constants/status-codes';
 import {
   apiService,
@@ -16,15 +17,20 @@ import {
   UpdateCategoryRequest,
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
+import {
+  extractApiErrorMessage,
+  extractApiSuccessMessage,
+  getUserPermissionsFromStorage,
+} from '@/lib/utils';
 import {
   CreateCategoryFormData,
   createCategorySchema,
 } from '@/lib/validations/category';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Edit2, Trash } from 'iconsax-react';
+import { Add, Edit2, Trash } from 'iconsax-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import CategoryCardSkeleton from '../../../components/shared/skeleton/CategoryCardSkeleton';
 import { catIconOptions } from '../../../constants/sidebar-items';
 import { CATEGORY_MESSAGES } from './category-messages';
 
@@ -37,18 +43,22 @@ const CategoryManagement = () => {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
 
+  // Get user permissions for categories
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.categories?.edit;
+
   // Memoize menu options to prevent unnecessary re-renders
   const menuOptions = useMemo(
     () => [
       {
         label: CATEGORY_MESSAGES.EDIT_MENU,
-        action: 'edit',
+        action: ACTIONS.EDIT,
         icon: Edit2,
         variant: 'default' as const,
       },
       {
         label: CATEGORY_MESSAGES.DELETE_MENU,
-        action: 'delete',
+        action: ACTIONS.DELETE,
         icon: Trash,
         variant: 'destructive' as const,
       },
@@ -305,27 +315,48 @@ const CategoryManagement = () => {
   };
 
   return (
-    <section className='flex flex-col w-full items-start gap-8 overflow-y-auto pb-8'>
-      <header className='flex items-center justify-between w-full'>
-        <h2 className='page-title'>
-          {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
-        </h2>
-        <Button onClick={() => setOpen(true)} className='btn-primary'>
-          {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
-        </Button>
+    <section className='w-full overflow-y-auto pb-4'>
+      <header className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
+        <div className='flex items-center justify-between w-full'>
+          <h2 className='page-title'>
+            {CATEGORY_MESSAGES.CATEGORY_MANAGEMENT_TITLE}
+          </h2>
+          {canEdit && (
+            <div className='flex justify-end'>
+              <Button
+                onClick={() => setOpen(true)}
+                className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
+              >
+                <Add size='20' color='#fff' className='sm:hidden' />
+                <span className='hidden sm:inline'>
+                  {CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
+                </span>
+              </Button>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Categories Grid */}
       {categories.length === 0 && loading ? (
-        <LoadingComponent variant='fullscreen' />
+        <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6 w-full'>
+          {[...Array(8)].map((_, i) => (
+            <CategoryCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           {categories.length === 0 && !loading ? (
-            <div className='text-center py-10 text-gray-500'>
-              {CATEGORY_MESSAGES.NO_CATEGORIES_FOUND}
+            <div className='h-full md:h-[calc(100vh_-_220px)] w-full'>
+              <NoDataFound
+                description={CATEGORY_MESSAGES.NO_CATEGORIES_FOUND_DESCRIPTION}
+                buttonText={CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
+                onButtonClick={() => setOpen(true)}
+                showButton={canEdit ?? false}
+              />
             </div>
           ) : (
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full'>
+            <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6 w-full'>
               {categories.map((category, index) => {
                 const iconOption = catIconOptions.find(
                   opt => opt.value === category.icon
@@ -387,6 +418,7 @@ const CategoryManagement = () => {
               iconOptions={catIconOptions}
               errors={{
                 icon: errors.icon?.message || '',
+                name: errors.name?.message || '',
                 description: errors.description?.message || '',
               }}
               selectedIcon={watch('icon')}

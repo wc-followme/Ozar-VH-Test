@@ -254,7 +254,11 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
     }
 
     return (
-      <form className='space-y-6' onSubmit={handleSubmit} noValidate>
+      <form
+        className='space-y-2 md:space-y-6'
+        onSubmit={handleSubmit}
+        noValidate
+      >
         {/* Role Dropdown */}
         <div className='space-y-2'>
           <SelectField
@@ -276,7 +280,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
           />
         </div>
         {/* First Row - Full Name, Designation, Date of Joining */}
-        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'>
           <div className='space-y-2'>
             <Label htmlFor='full-name' className='field-label'>
               {USER_MESSAGES.FULL_NAME_LABEL}
@@ -358,10 +362,8 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
         {/* Second Row - Email, Phone, Communication, Password (edit mode only) */}
         <div
           className={cn(
-            'grid grid-cols-1 gap-4',
-            isEditMode
-              ? 'md:grid-cols-2 xl:grid-cols-4'
-              : 'md:grid-cols-2 xl:grid-cols-3'
+            'grid grid-cols-1 sm:grid-cols-2 gap-4',
+            isEditMode ? 'xl:grid-cols-4' : 'xl:grid-cols-3'
           )}
         >
           <div className='space-y-2'>
@@ -386,7 +388,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
           <div className='space-y-2'>
             <Label
               htmlFor='phone'
-              className='text-[14px] font-semibold text-[var(--text-dark)]'
+              className='text-xs md:text-[14px] font-semibold text-[var(--text-dark)]'
             >
               {USER_MESSAGES.PHONE_LABEL}
             </Label>
@@ -494,7 +496,7 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
           <FormErrorMessage message={errors.address || ''} />
         </div>
         {/* Fourth Row - City, Pin Code */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
           <div className='space-y-2'>
             <Label htmlFor='city' className='field-label'>
               {USER_MESSAGES.CITY_LABEL}
@@ -535,14 +537,14 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = React.memo(
         <div className='pt-4 flex items-center justify-end gap-3'>
           <Button
             type='button'
-            className='btn-secondary !h-12 !px-8'
+            className='btn-secondary !px-4 md:!px-8'
             onClick={handleCancel}
           >
             {USER_MESSAGES.CANCEL_BUTTON}
           </Button>
           <Button
             type='submit'
-            className='btn-primary !h-12 !px-12'
+            className='btn-primary !px-4 md:!px-8'
             disabled={loading}
           >
             {isEditMode

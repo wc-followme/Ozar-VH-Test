@@ -1,155 +1,361 @@
+'use client';
+
+import { TOOL_MESSAGES } from '@/app/(DashboardLayout)/tools-management/tool-messages';
 import FormErrorMessage from '@/components/shared/common/FormErrorMessage';
+import MultiSelect from '@/components/shared/common/MultiSelect';
 import PhotoUploadField from '@/components/shared/common/PhotoUploadField';
-import SelectField from '@/components/shared/common/SelectField';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { apiService, Service } from '@/lib/api';
+import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { cn } from '@/lib/utils';
-import React from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
+import * as yup from 'yup';
+
+// Validation schema
+const toolFormSchema = yup.object({
+  name: yup.string().required(TOOL_MESSAGES.NAME_REQUIRED),
+  manufacturer: yup.string().required(TOOL_MESSAGES.MANUFACTURER_REQUIRED),
+  available_quantity: yup
+    .number()
+    .min(1, TOOL_MESSAGES.QUANTITY_MIN)
+    .required(TOOL_MESSAGES.QUANTITY_REQUIRED),
+  services: yup.array().min(1, TOOL_MESSAGES.SERVICES_REQUIRED),
+});
 
 interface ToolFormProps {
   photo: File | null;
   setPhoto: (file: File | null) => void;
   handleDeletePhoto: () => void;
-  service: string;
-  setService: (service: string) => void;
-  toolName: string;
-  setToolName: (name: string) => void;
-  companyName: string;
-  setCompanyName: (name: string) => void;
-  quantity: string;
-  setQuantity: (qty: string) => void;
-  errors: {
-    toolName?: string;
-    companyName?: string;
-    quantity?: string;
-    service?: string;
+  uploading?: boolean;
+  onSubmit: (data: {
+    name: string;
+    available_quantity: number;
+    manufacturer: string;
+    tool_assets: string;
+    service_ids: string;
+  }) => void;
+  loading?: boolean;
+  onCancel?: () => void;
+  setUploading?: (uploading: boolean) => void;
+  setFileKey?: (fileKey: string) => void;
+  existingImageUrl?: string | undefined;
+  existingToolAssets?: string;
+  initialValues?: {
+    name?: string;
+    available_quantity?: number;
+    manufacturer?: string;
+    services?: (string | number)[];
   };
-  onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
+  isEdit?: boolean;
 }
 
 const ToolForm: React.FC<ToolFormProps> = ({
   photo,
   setPhoto,
   handleDeletePhoto,
-  service,
-  setService,
-  toolName,
-  setToolName,
-  companyName,
-  setCompanyName,
-  quantity,
-  setQuantity,
-  errors,
-  onClose,
+  uploading = false,
   onSubmit,
+  loading = false,
+  onCancel,
+  setUploading,
+  setFileKey,
+  existingImageUrl,
+  existingToolAssets,
+  initialValues,
+  isEdit = false,
 }) => {
+  // Service dropdown states
+  const [services, setServices] = useState<Service[]>([]);
+  const [loadingServices, setLoadingServices] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(toolFormSchema),
+    defaultValues: {
+      name: initialValues?.name || '',
+      manufacturer: initialValues?.manufacturer || '',
+      available_quantity: initialValues?.available_quantity || 1,
+      services:
+        initialValues?.services?.map(s => s.toString()).filter(Boolean) || [],
+    },
+  });
+
+  // Update form state if initialValues change (for edit mode)
+  useEffect(() => {
+    if (initialValues) {
+      reset({
+        name: initialValues.name || '',
+        manufacturer: initialValues.manufacturer || '',
+        available_quantity: initialValues.available_quantity || 1,
+        services:
+          initialValues.services?.map(s => s.toString()).filter(Boolean) || [],
+      });
+    }
+  }, [initialValues, reset]);
+
+  // Handle photo change with upload
+  const handlePhotoChange = async (file: File | null) => {
+    if (!file) {
+      setPhoto(null);
+      setFileKey?.('');
+      return;
+    }
+
+    setPhoto(file);
+    setUploading?.(true);
+
+    try {
+      const ext = file.name.split('.').pop() || 'png';
+      const timestamp = Date.now();
+      const toolUuid = uuidv4();
+      const generatedFileName = `tool_${toolUuid}_${timestamp}.${ext}`;
+
+      const presigned = await getPresignedUrl({
+        fileName: generatedFileName,
+        fileType: file.type,
+        fileSize: file.size,
+        purpose: 'tool',
+        customPath: '',
+      });
+
+      await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
+      setFileKey?.(presigned.data['fileKey'] || '');
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      // setErrors(prev => ({
+      //   ...prev,
+      //   general: TOOL_MESSAGES.UPLOAD_ERROR,
+      // }));
+    } finally {
+      setUploading?.(false);
+    }
+  };
+
+  // Load services for dropdown
+  useEffect(() => {
+    const loadServices = async () => {
+      setLoadingServices(true);
+      try {
+        const response = await apiService.fetchServices({
+          page: 1,
+          limit: 50,
+        });
+
+        if (response.statusCode === 200) {
+          // Handle the actual API response structure: { statusCode, message, data: Service[], limit, page, total, totalPages }
+          let servicesData = response.data || [];
+
+          // If data is an object with a 'data' property (nested structure), use that
+          if (
+            response.data &&
+            typeof response.data === 'object' &&
+            !Array.isArray(response.data) &&
+            response.data.data
+          ) {
+            servicesData = response.data.data;
+          }
+
+          const finalServices = Array.isArray(servicesData) ? servicesData : [];
+          setServices(finalServices);
+        }
+      } catch (error) {
+        console.error('Error loading services:', error);
+        // setErrors(prev => ({
+        //   ...prev,
+        //   general: TOOL_MESSAGES.LOADING_SERVICES,
+        // }));
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    loadServices();
+  }, []);
+
+  const handleSubmitForm = (data: {
+    services?: any[] | undefined;
+    name: string;
+    manufacturer: string;
+    available_quantity: number;
+  }) => {
+    onSubmit({
+      name: data.name.trim(),
+      available_quantity: data.available_quantity,
+      manufacturer: data.manufacturer.trim(),
+      tool_assets: existingToolAssets || '', // Preserve existing tool assets if no new file is uploaded
+      service_ids: (data.services || []).join(','), // Convert array to comma-separated string
+    });
+  };
+
+  // Convert services to dropdown options
+  const serviceOptions = Array.isArray(services)
+    ? services
+        .filter(service => service.id && service.name) // Filter out invalid services
+        .map(service => ({
+          value: service.id.toString(),
+          label: service.name,
+        }))
+    : [];
+
   return (
     <div className='p-0 w-full'>
-      <form className='space-y-6' onSubmit={onSubmit}>
+      <form className='space-y-6' onSubmit={handleSubmit(handleSubmitForm)}>
+        {/* General Error */}
+        {/* {errors.general && (
+          <div className='p-3 bg-red-50 border border-red-200 rounded-md'>
+            <p className='text-sm text-red-600'>{errors.general}</p>
+          </div>
+        )} */}
+
         {/* Photo Upload */}
         <PhotoUploadField
           photo={photo}
-          onPhotoChange={setPhoto}
+          onPhotoChange={handlePhotoChange}
           onDeletePhoto={handleDeletePhoto}
-          label='Upload Photo or Drag and Drop'
+          uploading={uploading}
+          label={TOOL_MESSAGES.TOOL_IMAGE_LABEL}
           text={
             <>
               1600 x 1200 (4:3) recommended. <br /> PNG and JPG files are
               allowed
             </>
           }
+          existingImageUrl={existingImageUrl}
         />
-        {/* Service Select */}
-        <SelectField
-          label='Service'
-          value={service}
-          onValueChange={setService}
-          options={[
-            { value: 'wrench', label: 'Wrench' },
-            { value: 'drill', label: 'Drill' },
-            { value: 'hammer', label: 'Hammer' },
-          ]}
-          placeholder='Select Service'
-          error={errors.service || ''}
-          className={cn(
-            '!placeholder-[var(--text-placeholder)]',
-            errors.service
-              ? 'border-[var(--warning)]'
-              : 'border-[var(--border-dark)]'
+
+        {/* Services Select */}
+        <Controller
+          name='services'
+          control={control}
+          render={({ field }) => (
+            <MultiSelect
+              key={`services-${isEdit ? 'edit' : 'create'}-${serviceOptions.length}`}
+              label={TOOL_MESSAGES.SERVICES_LABEL}
+              value={Array.isArray(field.value) ? field.value : []}
+              onChange={field.onChange}
+              options={serviceOptions}
+              placeholder={
+                loadingServices
+                  ? TOOL_MESSAGES.LOADING_SERVICES
+                  : TOOL_MESSAGES.SELECT_SERVICES
+              }
+              error={errors.services?.message || ''}
+            />
           )}
         />
+
         {/* Tool Name */}
         <div className='space-y-2'>
           <Label htmlFor='tool-name' className='field-label'>
-            Tool Name
+            {TOOL_MESSAGES.TOOL_NAME_LABEL}
           </Label>
-          <Input
-            id='tool-name'
-            placeholder='Enter Tool Name'
-            value={toolName}
-            onChange={e => setToolName(e.target.value)}
-            className={cn(
-              'input-field',
-              errors.toolName
-                ? 'border-[var(--warning)]'
-                : 'border-[var(--border-dark)]'
+          <Controller
+            name='name'
+            control={control}
+            render={({ field }) => (
+              <Input
+                id='tool-name'
+                placeholder={TOOL_MESSAGES.ENTER_TOOL_NAME}
+                {...field}
+                className={cn(
+                  'input-field',
+                  errors.name
+                    ? 'border-[var(--warning)]'
+                    : 'border-[var(--border-dark)]'
+                )}
+              />
             )}
           />
-          <FormErrorMessage message={errors.toolName || ''} />
+          <FormErrorMessage message={errors.name?.message || ''} />
         </div>
-        {/* Brand Name */}
+
+        {/* Manufacturer */}
         <div className='space-y-2'>
-          <Label htmlFor='company-name' className='field-label'>
-            Brand Name
+          <Label htmlFor='manufacturer' className='field-label'>
+            {TOOL_MESSAGES.MANUFACTURER_LABEL}
           </Label>
-          <Input
-            id='company-name'
-            placeholder='Enter Company Name'
-            value={companyName}
-            onChange={e => setCompanyName(e.target.value)}
-            className={cn(
-              'input-field',
-              errors.companyName
-                ? 'border-[var(--warning)]'
-                : 'border-[var(--border-dark)]'
+          <Controller
+            name='manufacturer'
+            control={control}
+            render={({ field }) => (
+              <Input
+                id='manufacturer'
+                placeholder={TOOL_MESSAGES.ENTER_MANUFACTURER}
+                {...field}
+                className={cn(
+                  'input-field',
+                  errors.manufacturer
+                    ? 'border-[var(--warning)]'
+                    : 'border-[var(--border-dark)]'
+                )}
+              />
             )}
           />
-          <FormErrorMessage message={errors.companyName || ''} />
+          <FormErrorMessage message={errors.manufacturer?.message || ''} />
         </div>
+
         {/* Quantity */}
         <div className='space-y-2'>
           <Label htmlFor='quantity' className='field-label'>
-            Quantity
+            {TOOL_MESSAGES.QUANTITY_LABEL}
           </Label>
-          <Input
-            id='quantity'
-            placeholder='Eg: 12'
-            type='text'
-            min={1}
-            value={quantity}
-            onChange={e => setQuantity(e.target.value)}
-            className={cn(
-              'input-field',
-              errors.quantity
-                ? 'border-[var(--warning)]'
-                : 'border-[var(--border-dark)]'
+          <Controller
+            name='available_quantity'
+            control={control}
+            render={({ field }) => (
+              <Input
+                id='quantity'
+                type='number'
+                min='1'
+                placeholder={TOOL_MESSAGES.ENTER_QUANTITY}
+                {...field}
+                onChange={e => field.onChange(parseInt(e.target.value) || 1)}
+                className={cn(
+                  'input-field',
+                  errors.available_quantity
+                    ? 'border-[var(--warning)]'
+                    : 'border-[var(--border-dark)]'
+                )}
+              />
             )}
           />
-          <FormErrorMessage message={errors.quantity || ''} />
+          <FormErrorMessage
+            message={errors.available_quantity?.message || ''}
+          />
         </div>
-        {/* Action Buttons */}
-        <div className='flex items-center gap-4 mt-0'>
+
+        {/* Form Actions */}
+        <div className='flex items-center justify-end space-x-3 pt-6'>
           <Button
             type='button'
-            className='btn-secondary !h-12 !px-8'
-            onClick={onClose}
+            variant='outline'
+            onClick={onCancel}
+            disabled={loading}
+            className='btn-secondary'
           >
-            Cancel
+            {TOOL_MESSAGES.CANCEL_BUTTON}
           </Button>
-          <Button type='submit' className='btn-primary !h-12 !px-12'>
-            Create
+          <Button
+            type='submit'
+            disabled={loading || uploading}
+            className='btn-primary'
+          >
+            {loading
+              ? isEdit
+                ? TOOL_MESSAGES.UPDATING_BUTTON
+                : TOOL_MESSAGES.CREATING_BUTTON
+              : isEdit
+                ? TOOL_MESSAGES.UPDATE_BUTTON
+                : TOOL_MESSAGES.CREATE_BUTTON}
           </Button>
         </div>
       </form>
@@ -157,4 +363,4 @@ const ToolForm: React.FC<ToolFormProps> = ({
   );
 };
 
-export default ToolForm;
+export { ToolForm };

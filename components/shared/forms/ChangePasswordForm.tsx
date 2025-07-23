@@ -154,7 +154,7 @@ export default function ChangePasswordForm({
       </div>
       <Button
         type='submit'
-        className='btn-primary !h-12 !px-12 w-full mb-8'
+        className='btn-primary !px-4 md:!px-8 w-full mb-8'
         disabled={loading}
       >
         {CHANGE_PASSWORD_MESSAGES.BUTTON}

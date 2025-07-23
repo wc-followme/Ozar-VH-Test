@@ -2,10 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { ACTIONS } from '@/constants/common';
+import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
 import Dropdown from '../common/Dropdown';
 
@@ -50,10 +52,53 @@ export function CompanyCard({
   const router = useRouter();
   const [isPlaceholder, setIsPlaceholder] = useState(!image);
 
+  // Generate a consistent placeholder image based on company name
+  const getPlaceholderImage = () => {
+    const placeholderImages = ['/images/img-placeholder-md.png'];
+
+    // Use company name to consistently pick same placeholder for same company
+    const hash = name.split('').reduce((a, b) => {
+      a = (a << 5) - a + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+
+    const index = Math.abs(hash) % placeholderImages.length;
+    return placeholderImages[index];
+  };
+
+  // Get user permissions for companies
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.companies?.assign_user;
+  const canArchive = userPermissions?.companies?.archive;
+
+  // Filter menu options based on permissions and isDefault
+  const permissionFilteredOptions = menuOptions.filter(option => {
+    if (option.action === ACTIONS.EDIT) {
+      return canEdit;
+    }
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
+      return canArchive;
+    }
+    return true; // Show other actions by default
+  });
+
+  // Apply isDefault filter on top of permission filter
+  const filteredMenuOptions = isDefault
+    ? permissionFilteredOptions.filter(
+        option => option.action !== ACTIONS.DELETE
+      )
+    : permissionFilteredOptions;
+
+  // Only show menu if there are any visible options
+  const showMenu = filteredMenuOptions.length > 0;
+
   const handleToggle = async () => {
     setIsToggling(true);
-    onToggle();
-    setTimeout(() => setIsToggling(false), 300);
+    try {
+      await onToggle();
+    } finally {
+      setIsToggling(false);
+    }
   };
 
   const handleCardClick = () => {
@@ -61,18 +106,12 @@ export function CompanyCard({
   };
 
   const handleMenuAction = (action: string) => {
-    if (action === 'edit') {
+    if (action === ACTIONS.EDIT) {
       router.push(`/company-management/edit-company/${companyUuid}`);
-    } else if (action === 'delete') {
+    } else if (action === ACTIONS.DELETE) {
       setShowDelete(true);
     }
-    // Other actions (like delete) can be handled by parent component
   };
-
-  // Filter menu options based on isDefault
-  const filteredMenuOptions = isDefault
-    ? menuOptions.filter(option => option.action !== 'delete')
-    : menuOptions;
 
   return (
     <div
@@ -81,22 +120,29 @@ export function CompanyCard({
     >
       {/* Header with Avatar, User Info and Menu */}
       <div className=''>
-        <div className='relative w-full aspect-[1.87/1] h-[188px]'>
+        <div
+          className={`${
+            !image || image.trim() === '' || isPlaceholder
+              ? 'w-full h-[200px] rounded-[12px] overflow-hidden flex items-center justify-center'
+              : 'w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-40 xl:h-40 min-h-[200px] min-w-[240px] max-w-[240px] max-h-[240px] rounded-[12px] overflow-hidden flex items-center justify-center aspect-square mx-auto'
+          }`}
+        >
           <Image
-            src={image || '/images/img-placeholder-md.png'}
+            src={
+              (!image || image.trim() === '' || isPlaceholder
+                ? getPlaceholderImage()
+                : image || getPlaceholderImage()) as string
+            }
             alt={name}
-            fill
-            className={`${isPlaceholder ? 'object-cover rounded-xl' : 'object-contain'}`}
-            onError={e => {
-              const target = e.target as HTMLImageElement;
-              if (target.src !== '/images/img-placeholder-md.png') {
-                target.src = '/images/img-placeholder-md.png';
-                setIsPlaceholder(true);
-              }
-            }}
-            onLoad={e => {
-              const target = e.target as HTMLImageElement;
-              if (target.src.includes('img-placeholder-md.png')) {
+            width={240}
+            height={240}
+            className={
+              !image || image.trim() === '' || isPlaceholder
+                ? 'w-full h-full object-cover'
+                : 'w-auto h-auto max-h-full object-contain'
+            }
+            onError={() => {
+              if (!isPlaceholder) {
                 setIsPlaceholder(true);
               } else {
                 setIsPlaceholder(false);
@@ -107,44 +153,46 @@ export function CompanyCard({
         <div className='flex-1 min-w-0 pt-[18px]'>
           {/* User Info */}
           <div className='flex items-center justify-between mb-3'>
-            <h3 className='font-bold text-[var(--text)] truncate text-base'>
+            <h3 className='font-bold text-[var(--text)] truncate text-sm md:text-base'>
               {name}
             </h3>
-            <Dropdown
-              menuOptions={filteredMenuOptions}
-              onAction={handleMenuAction}
-              trigger={
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  className='h-7 w-6 p-0 flex-shrink-0 -mr-2 mt-0.5'
-                  onClick={e => {
-                    e.stopPropagation(); // Prevent card click when clicking menu
-                  }}
-                >
-                  <IconDotsVertical
-                    className='!w-6 !h-6'
-                    strokeWidth={2}
-                    color='var(--text)'
-                  />
-                </Button>
-              }
-              align='end'
-            />
+            {showMenu && (
+              <Dropdown
+                menuOptions={filteredMenuOptions}
+                onAction={handleMenuAction}
+                trigger={
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    className='h-7 w-6 p-0 flex-shrink-0 -mr-2 mt-0.5'
+                    onClick={e => {
+                      e.stopPropagation(); // Prevent card click when clicking menu
+                    }}
+                  >
+                    <IconDotsVertical
+                      className='!w-6 !h-6'
+                      strokeWidth={2}
+                      color='var(--text)'
+                    />
+                  </Button>
+                }
+                align='end'
+              />
+            )}
           </div>
 
           {/* Contact Info */}
           <div className='space-y-1'>
-            <div className='flex items-center justify-between gap-2 text-[12px] font-medium text-[var(--text-secondary)]'>
-              <p className='text-[14px] font-medium text-[var(--text-dark)] flex flex-col'>
+            <div className='flex items-center justify-between gap-2 text-[10px] md:text-[12px] font-medium text-[var(--text-secondary)]'>
+              <p className='text-[12px] md:text-[14px] font-medium text-[var(--text-dark)] flex flex-col'>
                 <span className='text-[var(--text-secondary)] '>
                   Created On
                 </span>
                 <span className='text-[var(--text)] '>{createdOn}</span>
               </p>
-              <p className='text-[14px] font-medium text-[var(--text-dark)] flex flex-col'>
+              <p className='text-[12px] md:text-[14px] font-medium text-[var(--text-dark)] flex flex-col'>
                 <span className='text-[var(--text-secondary)]'>
-                  Subscription Ends
+                  Subscription End
                 </span>
                 <span className='text-[var(--text)]'>{subsEnd}</span>
               </p>
@@ -152,7 +200,7 @@ export function CompanyCard({
           </div>
         </div>
         {/* Status Toggle */}
-        {!isDefault && (
+        {!isDefault && canEdit && (
           <div
             className='flex items-center justify-between bg-[var(--border-light)] rounded-[30px] py-2 px-3 mt-4'
             onClick={e => {

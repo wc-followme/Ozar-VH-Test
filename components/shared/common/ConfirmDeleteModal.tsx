@@ -43,27 +43,27 @@ export function ConfirmDeleteModal({
 }: ConfirmDeleteModalProps) {
   return (
     <Dialog open={open} onOpenChange={onCancel}>
-      <CustomDialogContent className='max-w-[519px] !rounded-[20px] py-[30px] px-[25px] flex flex-col items-center text-center bg-[var(--card-background)] !gap-0 border-[var(--border-dark)]'>
-        <div className='flex items-center justify-center w-[100px] h-[100px] rounded-full bg-[#D4323226] mb-6 mx-auto'>
+      <CustomDialogContent className='!max-w-[95%] sm:!max-w-[519px] !rounded-[20px] py-[30px] px-[25px] flex flex-col items-center text-center bg-[var(--card-background)] !gap-0 border-[var(--border-dark)]'>
+        <div className='flex items-center justify-center w-16 md:w-[100px] h-16 md:h-[100px] rounded-full bg-[#D4323226] mb-6 mx-auto'>
           <Trash size='40' color='var(--warning)' />
         </div>
-        <DialogTitle className='text-[24px] text-[var(--text-dark)] font-medium mb-2 leading-[1.3] tracking-[-0.025em]'>
+        <DialogTitle className='text-base md:text-2xl text-[var(--text-dark)] font-medium mb-2 leading-[1.3] tracking-[-0.025em]'>
           {title}
         </DialogTitle>
-        <p className='text-[var(--text-secondary)] mb-6 text-[18px] leading-[1.4]'>
+        <p className='text-[var(--text-secondary)] mb-6 text-xs md:text-[18px] leading-[1.4]'>
           {subtitle}
         </p>
-        <div className='flex gap-4 w-full justify-center'>
+        <div className='flex gap-2 md:gap-4 w-full justify-center'>
           <Button
             onClick={onCancel}
-            className='h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
+            className='h-[48px] px-6 md:px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center'
           >
             Cancel
           </Button>
           <Button
             onClick={onDelete}
             type='submit'
-            className='h-[48px] px-12 bg-[var(--warning)] hover:bg-[var(--warning)] rounded-full font-semibold text-white'
+            className='h-[48px] px-6 md:px-12 bg-[var(--warning)] hover:bg-[var(--warning)] rounded-full font-semibold text-white'
           >
             Archive
           </Button>

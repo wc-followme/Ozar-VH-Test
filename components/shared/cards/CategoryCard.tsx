@@ -8,7 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
+import { ACTIONS } from '@/constants/common';
+import { cn, getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import React, { useState } from 'react';
 import { ConfirmDeleteModal } from '../common/ConfirmDeleteModal';
@@ -50,14 +51,33 @@ export function CategoryCard({
 }: CategoryCardProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  // Get user permissions for categories
+  const userPermissions = getUserPermissionsFromStorage();
+  const canEdit = userPermissions?.categories?.edit;
+  const canArchive = userPermissions?.categories?.archive;
+
+  // Filter menu options based on permissions
+  const filteredMenuOptions = menuOptions.filter(option => {
+    if (option.action === ACTIONS.EDIT) {
+      return canEdit;
+    }
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
+      return canArchive;
+    }
+    return true; // Show other actions by default
+  });
+
+  // Only show menu if there are any visible options
+  const showMenu = filteredMenuOptions.length > 0;
+
   const handleMenuAction = (action: string) => {
     switch (action) {
-      case 'edit':
+      case ACTIONS.EDIT:
         if (onEdit) {
           onEdit();
         }
         break;
-      case 'delete':
+      case ACTIONS.DELETE:
         setShowDeleteModal(true);
         break;
       default:
@@ -97,50 +117,52 @@ export function CategoryCard({
             })()}
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant='ghost'
-                size='sm'
-                className='h-8 w-8 p-0 flex-shrink-0'
-              >
-                <IconDotsVertical
-                  className='!w-6 !h-6'
-                  strokeWidth={2}
-                  color='var(--text)'
-                />
-              </Button>
-            </DropdownMenuTrigger>
+          {showMenu && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='h-8 w-8 p-0 flex-shrink-0'
+                >
+                  <IconDotsVertical
+                    className='!w-6 !h-6'
+                    strokeWidth={2}
+                    color='var(--text)'
+                  />
+                </Button>
+              </DropdownMenuTrigger>
 
-            <DropdownMenuContent
-              align='end'
-              className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
-            >
-              {menuOptions.map(
-                ({ icon: IconComponent, action, label }, index) => {
-                  return (
-                    <DropdownMenuItem
-                      key={index}
-                      onClick={() => handleMenuAction(action)}
-                      className={cn(
-                        'text-base p-[10px] rounded-md cursor-pointer transition-colors flex font-medium items-center gap-2 hover:!bg-[var(--select-option)]',
-                        index !== menuOptions.length - 1 &&
-                          'border-b border-[var(--border-dark)]'
-                      )}
-                    >
-                      <IconComponent
-                        size='24'
-                        color='var(--text-dark)'
-                        className='!h-6 !w-6'
-                        variant='Outline'
-                      />
-                      <span>{label}</span>
-                    </DropdownMenuItem>
-                  );
-                }
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <DropdownMenuContent
+                align='end'
+                className='bg-[var(--card-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'
+              >
+                {filteredMenuOptions.map(
+                  ({ icon: IconComponent, action, label }, index) => {
+                    return (
+                      <DropdownMenuItem
+                        key={index}
+                        onClick={() => handleMenuAction(action)}
+                        className={cn(
+                          'text-base p-[10px] rounded-md cursor-pointer transition-colors flex font-medium items-center gap-2 hover:!bg-[var(--select-option)]',
+                          index !== filteredMenuOptions.length - 1 &&
+                            'border-b border-[var(--border-dark)]'
+                        )}
+                      >
+                        <IconComponent
+                          size='24'
+                          color='var(--text-dark)'
+                          className='!h-6 !w-6'
+                          variant='Outline'
+                        />
+                        <span>{label}</span>
+                      </DropdownMenuItem>
+                    );
+                  }
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         <CardContent className='flex flex-col items-start gap-4 p-0 w-full flex-1'>

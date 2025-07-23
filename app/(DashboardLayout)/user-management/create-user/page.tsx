@@ -175,11 +175,11 @@ export default function AddUserPage() {
         <Breadcrumb items={breadcrumbData} className='mb-6 mt-2' />
 
         {/* Main Content */}
-        <div className='bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-[28px]'>
-          <div className='pt-8'>
-            <div className='flex flex-col lg:flex-row items-start gap-6'>
+        <div className='bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-4 md:p-6'>
+          <div className=''>
+            <div className='flex flex-col xl:flex-row items-start gap-3 md:gap-6'>
               {/* Left Column - Upload Photo */}
-              <div className='w-[250px] flex-shrink-0 relative'>
+              <div className='w-full md:w-[250px] flex-shrink-0 relative'>
                 <PhotoUploadField
                   photo={photoFile}
                   onPhotoChange={handlePhotoChange}
@@ -189,9 +189,7 @@ export default function AddUserPage() {
                   className='h-[250px]'
                 />
                 {uploading && (
-                  <div className='text-xs mt-2'>
-                    {USER_MESSAGES.UPLOADING}
-                  </div>
+                  <div className='text-xs mt-2'>{USER_MESSAGES.UPLOADING}</div>
                 )}
               </div>
 

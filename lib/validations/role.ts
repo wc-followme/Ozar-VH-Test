@@ -17,4 +17,6 @@ export const createRoleSchema = yup.object({
   icon: yup.string().required('Icon is required'),
 });
 
-export type CreateRoleFormData = yup.InferType<typeof createRoleSchema>;
+export type CreateRoleFormData = yup.InferType<typeof createRoleSchema> & {
+  permissions?: any;
+};

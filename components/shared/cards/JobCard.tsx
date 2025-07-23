@@ -45,7 +45,7 @@ export function JobCard({ job }: JobCardProps) {
     ) {
       return;
     }
-    router.push('/job-management/job-details');
+    router.push(`/job-management/job-details/${job.id}`);
   };
 
   return (
@@ -60,7 +60,7 @@ export function JobCard({ job }: JobCardProps) {
             alt={job.title}
             width={400}
             height={200}
-            className='w-full h-48 object-cover rounded-t-lg'
+            className='w-full h-32 xl:h-48 object-cover rounded-t-lg'
             onError={() => setImgSrc('/images/img-placeholder-md.png')}
           />
           <Badge
@@ -71,8 +71,8 @@ export function JobCard({ job }: JobCardProps) {
             ></span>
             {job.progress}%
           </Badge>
-          <div className='absolute right-0 bottom-0 h-[2.5rem] w-[6rem] flex justify-center items-center gap-3'>
-            <CurvedBgIcon className='absolute -bottom-[2px] right-0 h-[44px] w-[110px] text-[var(--card-background)]' />
+          <div className='absolute right-0 bottom-0 h-5 xl:h-[2.5rem] w-[4rem] xl:w-[6rem] flex justify-center items-center gap-2 xl:gap-3'>
+            <CurvedBgIcon className='absolute -bottom-[2px] right-0 h-8 xl:h-[44px] w-[80px] xl:w-[110px] text-[var(--card-background)]' />
             <Link
               href={''}
               className='relative jobcard-gallery'
@@ -91,9 +91,9 @@ export function JobCard({ job }: JobCardProps) {
             </Link>
           </div>
         </div>
-        <div className='p-5'>
+        <div className='p-3 xl:p-5'>
           <div className='mb-3'>
-            <h3 className='font-semibold text-base text-[var(--text-dark)] mb-1'>
+            <h3 className='font-semibold text-base text-[var(--text-dark)] mb-1 truncate'>
               {job.title}
             </h3>
             <p className='text-sm text-[var(--text-secondary)] font-normal'>
