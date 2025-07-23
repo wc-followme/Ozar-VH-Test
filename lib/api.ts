@@ -1332,13 +1332,14 @@ class ApiService {
     limit?: number;
     status?: string;
     type?: string;
+    job_status?: string;
   }): Promise<any> {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.status) queryParams.append('status', params.status);
     if (params?.type) queryParams.append('type', params.type);
-
+    if (params?.job_status) queryParams.append('job_status', params.job_status);
     const url = `/jobs${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return this.makeRequest(url, {

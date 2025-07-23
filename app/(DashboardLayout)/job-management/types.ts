@@ -202,6 +202,7 @@ export interface JobFilterCounts {
   new_leads: number;
   ongoing_jobs: number;
   waiting_on_client: number;
+  closed: number;
   archived: number;
 }
 
