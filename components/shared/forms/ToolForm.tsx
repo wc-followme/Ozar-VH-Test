@@ -140,39 +140,18 @@ const ToolForm: React.FC<ToolFormProps> = ({
     }
   };
 
-  // Load services for dropdown
+  // Load services for dropdown - using the same method as MaterialForm
   useEffect(() => {
     const loadServices = async () => {
       setLoadingServices(true);
       try {
-        const response = await apiService.fetchServices({
-          page: 1,
-          limit: 50,
-        });
-
-        if (response.statusCode === 200) {
-          // Handle the actual API response structure: { statusCode, message, data: Service[], limit, page, total, totalPages }
-          let servicesData = response.data || [];
-
-          // If data is an object with a 'data' property (nested structure), use that
-          if (
-            response.data &&
-            typeof response.data === 'object' &&
-            !Array.isArray(response.data) &&
-            response.data.data
-          ) {
-            servicesData = response.data.data;
-          }
-
-          const finalServices = Array.isArray(servicesData) ? servicesData : [];
-          setServices(finalServices);
+        const response = await apiService.getServicesDropdown();
+        if (response.statusCode === 200 && Array.isArray(response.data)) {
+          setServices(response.data);
         }
       } catch (error) {
         console.error('Error loading services:', error);
-        // setErrors(prev => ({
-        //   ...prev,
-        //   general: TOOL_MESSAGES.LOADING_SERVICES,
-        // }));
+        setServices([]);
       } finally {
         setLoadingServices(false);
       }
@@ -187,24 +166,32 @@ const ToolForm: React.FC<ToolFormProps> = ({
     manufacturer: string;
     available_quantity: number;
   }) => {
+    console.log(
+      'ToolForm: Form submitted with preservedToolAssets:',
+      preservedToolAssets
+    );
     onSubmit({
       name: data.name.trim(),
       available_quantity: data.available_quantity,
       manufacturer: data.manufacturer.trim(),
-      tool_assets: existingToolAssets || '', // Preserve existing tool assets if no new file is uploaded
+      tool_assets: preservedToolAssets || '', // Use preserved tool assets to prevent loss during re-renders
       service_ids: (data.services || []).join(','), // Convert array to comma-separated string
     });
   };
 
-  // Convert services to dropdown options
-  const serviceOptions = Array.isArray(services)
-    ? services
-        .filter(service => service.id && service.name) // Filter out invalid services
-        .map(service => ({
-          value: service.id.toString(),
-          label: service.name,
-        }))
-    : [];
+  // Preserve existing tool assets in component state to prevent loss during re-renders
+  const [preservedToolAssets, setPreservedToolAssets] = useState<string>(
+    existingToolAssets || ''
+  );
+
+  // Update preserved tool assets when prop changes
+  useEffect(() => {
+    console.log('ToolForm: existingToolAssets changed to:', existingToolAssets);
+    if (existingToolAssets) {
+      setPreservedToolAssets(existingToolAssets);
+      console.log('ToolForm: preservedToolAssets set to:', existingToolAssets);
+    }
+  }, [existingToolAssets]);
 
   return (
     <div className='p-0 w-full'>
@@ -238,17 +225,25 @@ const ToolForm: React.FC<ToolFormProps> = ({
           control={control}
           render={({ field }) => (
             <MultiSelect
-              key={`services-${isEdit ? 'edit' : 'create'}-${serviceOptions.length}`}
               label={TOOL_MESSAGES.SERVICES_LABEL}
-              value={Array.isArray(field.value) ? field.value : []}
+              options={services}
+              getOptionLabel={(option: Service) => option?.name || ''}
+              getOptionValue={(option: Service) => String(option?.id)}
+              value={
+                Array.isArray(field.value)
+                  ? field.value.filter(
+                      (v): v is string => typeof v === 'string'
+                    )
+                  : []
+              }
               onChange={field.onChange}
-              options={serviceOptions}
               placeholder={
                 loadingServices
                   ? TOOL_MESSAGES.LOADING_SERVICES
                   : TOOL_MESSAGES.SELECT_SERVICES
               }
               error={errors.services?.message || ''}
+              name='services'
             />
           )}
         />

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { GalleryAdd } from 'iconsax-react';
 import Image from 'next/image';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { JSX } from 'react/jsx-runtime';
 
 interface PhotoUploadFieldProps {
@@ -37,7 +37,16 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
     if (e.target.files && e.target.files[0]) {
       onPhotoChange(e.target.files[0]);
     }
+    // Reset the input value to allow selecting the same file again
+    e.target.value = '';
   };
+
+  // Reset file input when photo is cleared
+  useEffect(() => {
+    if (!photo && !existingImageUrl && inputRef.current) {
+      inputRef.current.value = '';
+    }
+  }, [photo, existingImageUrl]);
 
   return (
     <div className={className}>

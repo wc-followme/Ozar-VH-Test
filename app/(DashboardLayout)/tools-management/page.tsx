@@ -115,19 +115,54 @@ export default function ToolsManagement() {
     }
   };
 
+  // Track if the existing image has been deleted
+  const [imageDeleted, setImageDeleted] = useState(false);
+  // Track the original tool assets from the API to preserve them
+  const [originalToolAssets, setOriginalToolAssets] = useState<string>('');
+
   const handleDeletePhoto = () => {
     setPhoto(null);
     setFileKey('');
+    setImageDeleted(true);
   };
 
   const handleEdit = async (uuid: string) => {
     setEditToolUuid(uuid);
     setEditLoading(true);
     setSideSheetOpen(true);
+    setImageDeleted(false);
+    setOriginalToolAssets('');
     try {
       const response = await apiService.getToolDetails(uuid);
       if (response.statusCode === 200 && response.data) {
+        console.log('Tool details loaded:', response.data);
+        console.log('Tool assets from API:', response.data.tool_assets);
+        console.log('Tool assets type:', typeof response.data.tool_assets);
+        console.log('Tool assets length:', response.data.tool_assets?.length);
         setEditToolData(response.data);
+        // Check if tool_assets exists in the response
+        const toolAssetsValue = response.data.tool_assets;
+        console.log('Raw tool_assets value:', toolAssetsValue);
+        console.log('Is tool_assets null:', toolAssetsValue === null);
+        console.log('Is tool_assets undefined:', toolAssetsValue === undefined);
+        console.log('Is tool_assets empty string:', toolAssetsValue === '');
+        console.log('Assets array:', response.data.assets);
+        console.log('Assets array length:', response.data.assets?.length);
+
+        // Check if we need to extract tool_assets from assets array
+        let finalToolAssets = toolAssetsValue;
+        if (
+          !toolAssetsValue &&
+          response.data.assets &&
+          response.data.assets.length > 0
+        ) {
+          // If tool_assets is empty but assets array has items, use the first asset's media_url
+          finalToolAssets = response.data.assets[0].media_url;
+          console.log('Using media_url from assets array:', finalToolAssets);
+        }
+
+        setOriginalToolAssets(finalToolAssets ?? '');
+        console.log('Original tool assets set to:', finalToolAssets ?? '');
       } else {
         showErrorToast(
           extractApiErrorMessage(response.message) ||
@@ -215,10 +250,36 @@ export default function ToolsManagement() {
     tool_assets: string;
     service_ids: string;
   }) => {
+    console.log('=== FORM SUBMISSION START ===');
+    console.log('originalToolAssets at submission:', originalToolAssets);
+    console.log('editToolData at submission:', editToolData);
+
+    // Prevent submission if originalToolAssets is not loaded yet
+    if (!originalToolAssets && editToolData?.assets?.length > 0) {
+      console.log('Original tool assets not loaded yet, preventing submission');
+      return;
+    }
+
     setFormLoading(true);
     try {
-      // Use new fileKey if uploaded, otherwise use the tool_assets from form data (which preserves existing assets)
-      const toolAssets = fileKey || data.tool_assets || '';
+      // Debug logging to understand the issue
+      console.log('handleUpdateTool called with data:', data);
+      console.log('fileKey:', fileKey);
+      console.log('editToolData?.tool_assets:', editToolData?.tool_assets);
+      console.log('imageDeleted:', imageDeleted);
+      console.log('data.tool_assets:', data.tool_assets);
+      console.log('originalToolAssets:', originalToolAssets);
+      console.log('originalToolAssets type:', typeof originalToolAssets);
+      console.log('originalToolAssets length:', originalToolAssets?.length);
+
+      // Send tool_assets as it is if not changed, otherwise use new file or empty if deleted
+      const toolAssets =
+        fileKey || (imageDeleted ? '' : (originalToolAssets ?? ''));
+
+      console.log('Calculated toolAssets:', toolAssets);
+      console.log('Calculated toolAssets type:', typeof toolAssets);
+      console.log('Calculated toolAssets length:', toolAssets?.length);
+      console.log('Final payload tool_assets will be:', toolAssets);
 
       const payload: CreateToolRequest = {
         name: data.name,
@@ -228,6 +289,7 @@ export default function ToolsManagement() {
         service_ids: data.service_ids,
       };
 
+      console.log('Final toolAssets value:', toolAssets);
       console.log('Update tool payload:', payload); // Debug log
       console.log('Update tool UUID:', editToolUuid); // Debug log
 
@@ -368,6 +430,8 @@ export default function ToolsManagement() {
               setFileKey('');
               setEditToolUuid(null);
               setEditToolData(null);
+              setImageDeleted(false);
+              setOriginalToolAssets('');
             }}
             setUploading={setUploading}
             setFileKey={setFileKey}
@@ -378,7 +442,7 @@ export default function ToolsManagement() {
                 ? cdnPrefix + editToolData.assets[0].media_url
                 : undefined
             }
-            existingToolAssets={editToolData?.tool_assets || ''}
+            existingToolAssets={imageDeleted ? '' : originalToolAssets}
             initialValues={
               editToolData
                 ? {
