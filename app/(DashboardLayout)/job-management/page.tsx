@@ -287,7 +287,7 @@ export default function JobManagement() {
                 >
                   New Leads
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-limebrand text-white' : 'bg-transparent text-limebrand'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-[var(--badge-bg)] text-white' : 'bg-transparent text-limebrand'}`}
                   >
                     {filterCounts.new_leads}
                   </Badge>
@@ -298,7 +298,7 @@ export default function JobManagement() {
                 >
                   Need Attention{' '}
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
                   >
                     {filterCounts.need_attention}
                   </Badge>
@@ -310,7 +310,7 @@ export default function JobManagement() {
                 >
                   Ongoing Job
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
                   >
                     {filterCounts.ongoing_jobs}
                   </Badge>
@@ -321,7 +321,7 @@ export default function JobManagement() {
                 >
                   {filterCounts.waiting_on_client}
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'closed' ? 'bg-greenbrand text-white' : 'bg-transparent text-greenbrand'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'closed' ? 'bg-greenbrand text-white' : 'bg-transparent text-greenbrand'}`}
                   >
                     {filterCounts.waiting_on_client || 0}
                   </Badge>
@@ -333,7 +333,7 @@ export default function JobManagement() {
                 >
                   Archived
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
                   >
                     {filterCounts.archived}
                   </Badge>
@@ -344,7 +344,7 @@ export default function JobManagement() {
                 >
                   Closed
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'closed' ? 'bg-greenbrand text-white' : 'bg-transparent text-greenbrand'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'closed' ? 'bg-greenbrand text-white' : 'bg-transparent text-greenbrand'}`}
                   >
                     {filterCounts.closed || 0}
                   </Badge>
