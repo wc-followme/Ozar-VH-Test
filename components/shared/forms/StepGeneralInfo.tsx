@@ -70,7 +70,7 @@ const generalInfoSchema = yup.object({
     .required(STEP_MESSAGES.EMAIL_REQUIRED),
   phone: yup.string().required(STEP_MESSAGES.PHONE_REQUIRED),
   budget: yup.string().required(STEP_MESSAGES.BUDGET_REQUIRED),
-  contractor: yup.string().required(STEP_MESSAGES.CONTRACTOR_REQUIRED),
+  contractor: yup.string(),
   address: yup.string().required(STEP_MESSAGES.ADDRESS_REQUIRED),
 });
 
@@ -87,6 +87,8 @@ export function StepGeneralInfo({
 }: StepGeneralInfoProps) {
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [isLoadingContractors, setIsLoadingContractors] = useState(true);
+  const [isStartDateOpen, setIsStartDateOpen] = useState(false);
+  const [isFinishDateOpen, setIsFinishDateOpen] = useState(false);
   const form = useForm<any>({
     resolver: yupResolver(generalInfoSchema),
     defaultValues: {
@@ -128,7 +130,6 @@ export function StepGeneralInfo({
           setContractors(contractorsData);
         }
       } catch (err) {
-        console.error(STEP_MESSAGES.FETCH_CONTRACTORS_ERROR, err);
       } finally {
         setIsLoadingContractors(false);
       }
@@ -189,7 +190,10 @@ export function StepGeneralInfo({
                         {STEP_MESSAGES.PROJECT_START_DATE_LABEL}
                       </FormLabel>
                       <FormControl>
-                        <Popover>
+                        <Popover
+                          open={isStartDateOpen}
+                          onOpenChange={setIsStartDateOpen}
+                        >
                           <PopoverTrigger asChild>
                             <Button
                               variant='outline'
@@ -212,7 +216,10 @@ export function StepGeneralInfo({
                             <Calendar
                               mode='single'
                               selected={field.value}
-                              onSelect={field.onChange}
+                              onSelect={date => {
+                                field.onChange(date);
+                                setIsStartDateOpen(false); // Close popover when date is selected
+                              }}
                               initialFocus
                             />
                           </PopoverContent>
@@ -234,7 +241,10 @@ export function StepGeneralInfo({
                         {STEP_MESSAGES.PROJECT_FINISH_DATE_LABEL}
                       </FormLabel>
                       <FormControl>
-                        <Popover>
+                        <Popover
+                          open={isFinishDateOpen}
+                          onOpenChange={setIsFinishDateOpen}
+                        >
                           <PopoverTrigger asChild>
                             <Button
                               variant='outline'
@@ -257,7 +267,10 @@ export function StepGeneralInfo({
                             <Calendar
                               mode='single'
                               selected={field.value}
-                              onSelect={field.onChange}
+                              onSelect={date => {
+                                field.onChange(date);
+                                setIsFinishDateOpen(false); // Close popover when date is selected
+                              }}
                               initialFocus
                             />
                           </PopoverContent>

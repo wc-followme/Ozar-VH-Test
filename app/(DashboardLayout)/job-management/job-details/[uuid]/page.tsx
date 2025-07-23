@@ -127,19 +127,16 @@ export default function JobDetailsPage() {
   } = job;
 
   // Fallbacks for client info
-  const clientName = client_name || 'Client Name';
-  const clientEmail = client_email || 'tanya.hill@example.com';
-  const clientPhone = client_phone_number || '(239) 555-0108';
-  const clientAddress =
-    client_address || '3517 W. Gray St. Utica, Pennsylvania 57867';
+  const clientName = client_name || '-';
+  const clientEmail = client_email || '-';
+  const clientPhone = client_phone_number || '-';
+  const clientAddress = client_address || '-';
   const projectImage = job_image || '/images/auth/login-slider-01.webp';
   const mapImage = '/images/map-placeholder.png';
-  const projectId = project_id || 'Job#456';
-  const projectName = project_name || 'Downtown Project';
+  const projectId = project_id || '-';
+  const projectName = project_name || '-';
   const categoryName =
-    typeof category === 'string'
-      ? category
-      : (category as any)?.name || 'Interior';
+    typeof category === 'string' ? category : (category as any)?.name || '-';
   const budgetAmount = budget ?? 57000;
   const spent = 17200; // Static fallback
 

@@ -915,6 +915,34 @@ class ApiService {
     });
   }
 
+  async fetchCategoriesPublic({
+    page = 1,
+    limit = PAGINATION.DEFAULT_LIMIT,
+    search = '',
+    name = '',
+    status = 'ACTIVE',
+    company_id = '',
+  }: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    name?: string;
+    status?: 'ACTIVE' | 'INACTIVE' | '';
+    company_id?: string | number;
+  }): Promise<FetchCategoriesResponse> {
+    const params = new URLSearchParams();
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    if (search) params.append('search', search);
+    if (name) params.append('name', name);
+    if (status) params.append('status', status);
+    if (company_id) params.append('company_id', String(company_id));
+    return this.makeRequest(`/categories/public?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   async createCategory(
     payload: CreateCategoryRequest
   ): Promise<CreateCategoryResponse> {
@@ -1304,13 +1332,14 @@ class ApiService {
     limit?: number;
     status?: string;
     type?: string;
+    job_status?: string;
   }): Promise<any> {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.status) queryParams.append('status', params.status);
     if (params?.type) queryParams.append('type', params.type);
-
+    if (params?.job_status) queryParams.append('job_status', params.job_status);
     const url = `/jobs${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return this.makeRequest(url, {

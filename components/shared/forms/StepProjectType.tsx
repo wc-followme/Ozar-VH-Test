@@ -12,6 +12,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
+import { CommonStatus } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
@@ -29,7 +30,8 @@ export function StepProjectType({
   cancelButtonClass,
   defaultValues,
   isLastStep = false,
-}: StepProjectTypeProps) {
+  company_id,
+}: StepProjectTypeProps & { company_id: number }) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,10 +60,11 @@ export function StepProjectType({
       }
       setError(null);
 
-      const response = await apiService.fetchCategories({
+      const response = await apiService.fetchCategoriesPublic({
         page,
-        limit: 10,
-        status: 'ACTIVE',
+        limit: 50,
+        status: CommonStatus.ACTIVE,
+        company_id, // company_id is required
       });
 
       const { statusCode, data } = response;

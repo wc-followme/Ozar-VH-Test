@@ -43,7 +43,6 @@ const optionalDetailsSchema = yup.object({
     otherwise: schema => schema.optional(),
   }),
 });
-
 export function StepOptionalDetails({
   onPrev,
   onNext,
@@ -56,14 +55,14 @@ export function StepOptionalDetails({
     defaultValues: {
       typeOfProperty: 'Residential',
       ageOfProperty: '0-5 years',
-      approxSqft: '2500 Sq / Ft',
+      approxSqft: '',
       notificationStyle: 'Email',
       dailyWorkStart: '',
       dailyWorkEnd: '',
       ownerPresent: 'No',
-      weekendWork: 'Yes',
-      animals: 'Yes',
-      petType: 'Dog',
+      weekendWork: 'No',
+      animals: 'No',
+      petType: '',
       ...defaultValues,
     },
   });
