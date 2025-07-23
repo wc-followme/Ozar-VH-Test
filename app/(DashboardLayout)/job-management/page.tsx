@@ -19,6 +19,7 @@ import { StatsCard } from '../../../components/shared/cards/StatsCard';
 import ComingSoon from '../../../components/shared/common/ComingSoon';
 import SideSheet from '../../../components/shared/common/SideSheet';
 import { CreateJobForm } from '../../../components/shared/forms/CreateJobForm';
+import { JobCardSkeleton } from '../../../components/shared/skeleton/JobCardSkeleton';
 import JobManagementPageSkeleton from '../../../components/shared/skeleton/JobManagementPageSkeleton';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
@@ -37,6 +38,7 @@ export default function JobManagement() {
   const [selectedTab, setSelectedTab] = useState('newLeads');
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [tabLoading, setTabLoading] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]); // Replace mockJobs
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatedLink, setGeneratedLink] = useState<string>('');
@@ -73,9 +75,13 @@ export default function JobManagement() {
   const userPermissions = getUserPermissionsFromStorage();
   const canEdit = userPermissions?.jobs?.edit;
   // Function to fetch jobs based on selected tab
-  const fetchJobsByTab = async (tab: string) => {
+  const fetchJobsByTab = async (tab: string, isInitialLoad = false) => {
     try {
-      setLoading(true);
+      if (isInitialLoad) {
+        setLoading(true);
+      } else {
+        setTabLoading(true);
+      }
       const params: any = {
         page: 1,
         limit: 10,
@@ -124,7 +130,11 @@ export default function JobManagement() {
     } catch (error: any) {
       showErrorToast(error?.message || JOB_MESSAGES.FETCH_ERROR);
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+      } else {
+        setTabLoading(false);
+      }
     }
   };
 
@@ -135,13 +145,23 @@ export default function JobManagement() {
 
   // Effect to fetch jobs when selected tab changes
   useEffect(() => {
-    fetchJobsByTab(selectedTab);
+    fetchJobsByTab(selectedTab, true); // Initial load
+  }, []); // Only run once on mount
+
+  // Effect to fetch jobs when selected tab changes (for tab switching)
+  useEffect(() => {
+    if (
+      selectedTab !== 'info' &&
+      selectedTab !== 'ongoingJob' &&
+      selectedTab !== 'waitingOnClient'
+    ) {
+      fetchJobsByTab(selectedTab, false); // Tab switching
+    }
   }, [selectedTab]);
 
   // Handle tab change
   const handleTabChange = (value: string) => {
     setSelectedTab(value);
-    fetchJobsByTab(value);
   };
 
   // Handle job creation
@@ -255,6 +275,54 @@ export default function JobManagement() {
   if (loading) {
     return <JobManagementPageSkeleton />;
   }
+
+  // Reusable job grid component
+  const JobGrid = ({ jobs }: { jobs: Job[] }) => (
+    <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
+      {jobs.map((job: Job) => {
+        const {
+          uuid,
+          client_name,
+          project_id,
+          job_image,
+          client_email,
+          client_address,
+          project_start_date,
+        } = job;
+
+        return (
+          <JobCard
+            key={job.id}
+            job={{
+              id: uuid,
+              title: client_name || '-',
+              jobId: project_id || '-',
+              progress: 50, // Static value since not in API
+              image:
+                job_image ||
+                'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
+              email: client_email || '-',
+              address: client_address || '-',
+              startDate: project_start_date
+                ? new Date(project_start_date).toLocaleDateString()
+                : '-',
+              daysLeft: 0, // Static value since not in API
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+
+  // Skeleton grid component for tab loading
+  const JobSkeletonGrid = () => (
+    <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
+      {[...Array(8)].map((_, index) => (
+        <JobCardSkeleton key={`job-skeleton-${index}`} />
+      ))}
+    </div>
+  );
+
   return (
     <div className=''>
       {/* Stats Cards */}
@@ -287,7 +355,7 @@ export default function JobManagement() {
                 >
                   New Leads
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-limebrand text-white' : 'bg-transparent text-limebrand'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'newLeads' ? 'bg-[var(--badge-bg)] text-white' : 'bg-transparent text-limebrand'}`}
                   >
                     {filterCounts.new_leads}
                   </Badge>
@@ -298,7 +366,7 @@ export default function JobManagement() {
                 >
                   Need Attention{' '}
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'info' ? 'bg-sidebarpurple text-white' : 'bg-transparent text-sidebarpurple'}`}
                   >
                     {filterCounts.need_attention}
                   </Badge>
@@ -310,7 +378,7 @@ export default function JobManagement() {
                 >
                   Ongoing Job
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'ongoingJob' ? 'bg-yellowbrand text-white' : 'bg-transparent text-yellowbrand'}`}
                   >
                     {filterCounts.ongoing_jobs}
                   </Badge>
@@ -321,7 +389,7 @@ export default function JobManagement() {
                 >
                   {filterCounts.waiting_on_client}
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'closed' ? 'bg-greenbrand text-white' : 'bg-transparent text-greenbrand'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'closed' ? 'bg-greenbrand text-white' : 'bg-transparent text-greenbrand'}`}
                   >
                     {filterCounts.waiting_on_client || 0}
                   </Badge>
@@ -333,7 +401,7 @@ export default function JobManagement() {
                 >
                   Archived
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'archive' ? 'bg-graybrand text-white' : 'bg-transparent text-graybrand'}`}
                   >
                     {filterCounts.archived}
                   </Badge>
@@ -344,7 +412,7 @@ export default function JobManagement() {
                 >
                   Closed
                   <Badge
-                    className={`py-[4px] px-[8px] text-sm font-medium rounded-lg ${selectedTab === 'closed' ? 'bg-greenbrand text-white' : 'bg-transparent text-greenbrand'}`}
+                    className={`py-[2px] px-[10px] text-sm font-medium rounded-lg ${selectedTab === 'closed' ? 'bg-greenbrand text-white' : 'bg-transparent text-greenbrand'}`}
                   >
                     {filterCounts.closed || 0}
                   </Badge>
@@ -363,47 +431,16 @@ export default function JobManagement() {
             )}
           </div>
           <TabsContent value='newLeads' className='pt-8'>
-            {jobs.length === 0 ? (
+            {tabLoading ? (
+              <JobSkeletonGrid />
+            ) : jobs.length === 0 ? (
               <NoDataFound
                 description={JOB_MESSAGES.NO_JOBS_FOUND_DESCRIPTION}
                 buttonText={JOB_MESSAGES.ADD_JOB_BUTTON}
                 onButtonClick={() => setIsOpen(true)}
               />
             ) : (
-              <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
-                {jobs.map((job: Job) => {
-                  const {
-                    uuid,
-                    client_name,
-                    project_id,
-                    job_image,
-                    client_email,
-                    client_address,
-                    project_start_date,
-                  } = job;
-
-                  return (
-                    <JobCard
-                      key={job.id}
-                      job={{
-                        id: uuid,
-                        title: client_name || '-',
-                        jobId: project_id || '-',
-                        progress: 50, // Static value since not in API
-                        image:
-                          job_image ||
-                          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                        email: client_email || '-',
-                        address: client_address || '-',
-                        startDate: project_start_date
-                          ? new Date(project_start_date).toLocaleDateString()
-                          : '-',
-                        daysLeft: 0, // Static value since not in API
-                      }}
-                    />
-                  );
-                })}
-              </div>
+              <JobGrid jobs={jobs} />
             )}
           </TabsContent>
 
@@ -417,92 +454,30 @@ export default function JobManagement() {
           <TabsContent value='waitingOnClient' className='p-8'>
             <NoDataFound buttonText='Create Job' />
           </TabsContent>
-          <TabsContent value='closed' className='p-8'>
-            {jobs.length === 0 ? (
+          <TabsContent value='closed' className='pt-8'>
+            {tabLoading ? (
+              <JobSkeletonGrid />
+            ) : jobs.length === 0 ? (
               <NoDataFound
                 description={JOB_MESSAGES.NO_JOBS_FOUND_DESCRIPTION}
                 buttonText={JOB_MESSAGES.ADD_JOB_BUTTON}
                 onButtonClick={() => setIsOpen(true)}
               />
             ) : (
-              <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
-                {jobs.map((job: Job) => {
-                  const {
-                    uuid,
-                    client_name,
-                    project_id,
-                    job_image,
-                    client_email,
-                    client_address,
-                    project_start_date,
-                  } = job;
-
-                  return (
-                    <JobCard
-                      key={job.id}
-                      job={{
-                        id: uuid,
-                        title: client_name || '-',
-                        jobId: project_id || '-',
-                        progress: 50, // Static value since not in API
-                        image:
-                          job_image ||
-                          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                        email: client_email || '-',
-                        address: client_address || '-',
-                        startDate: project_start_date
-                          ? new Date(project_start_date).toLocaleDateString()
-                          : '-',
-                        daysLeft: 0, // Static value since not in API
-                      }}
-                    />
-                  );
-                })}
-              </div>
+              <JobGrid jobs={jobs} />
             )}
           </TabsContent>
           <TabsContent value='archive' className='pt-8'>
-            {jobs.length === 0 ? (
+            {tabLoading ? (
+              <JobSkeletonGrid />
+            ) : jobs.length === 0 ? (
               <NoDataFound
                 description={JOB_MESSAGES.NO_JOBS_FOUND_DESCRIPTION}
                 buttonText={JOB_MESSAGES.ADD_JOB_BUTTON}
                 onButtonClick={() => setIsOpen(true)}
               />
             ) : (
-              <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
-                {jobs.map((job: Job) => {
-                  const {
-                    uuid,
-                    client_name,
-                    project_id,
-                    job_image,
-                    client_email,
-                    client_address,
-                    project_start_date,
-                  } = job;
-
-                  return (
-                    <JobCard
-                      key={job.id}
-                      job={{
-                        id: uuid,
-                        title: client_name || '-',
-                        jobId: project_id || '-',
-                        progress: 50, // Static value since not in API
-                        image:
-                          job_image ||
-                          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                        email: client_email || '-',
-                        address: client_address || '-',
-                        startDate: project_start_date
-                          ? new Date(project_start_date).toLocaleDateString()
-                          : '-',
-                        daysLeft: 0, // Static value since not in API
-                      }}
-                    />
-                  );
-                })}
-              </div>
+              <JobGrid jobs={jobs} />
             )}
           </TabsContent>
         </Tabs>
