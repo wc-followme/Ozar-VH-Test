@@ -55,6 +55,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [imageDeleted, setImageDeleted] = useState(false);
 
   const isCompanyApiResponse = (obj: unknown): obj is GetCompanyResponse => {
     return (
@@ -79,6 +80,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
           // Set existing image if available
           if (response.data.image) {
             setFileKey(response.data.image);
+            setImageDeleted(false); // Reset deleted state when loading existing image
           }
         } else {
           throw new Error('Invalid response format');
@@ -126,6 +128,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
       });
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
+      setImageDeleted(false); // Reset deleted state when new image is uploaded
     } catch (err: unknown) {
       showErrorToast(COMPANY_MESSAGES.UPLOAD_ERROR);
       setPhotoFile(null);
@@ -138,6 +141,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
   const handleDeletePhoto = () => {
     setPhotoFile(null);
     setFileKey('');
+    setImageDeleted(true);
   };
 
   const handleUpdateCompany = async (data: CompanyCreateFormData) => {
@@ -163,9 +167,11 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
         updatePayload.expiry_date = data.expiry_date;
       }
 
-      // Add image if file was uploaded
+      // Add image if file was uploaded, or remove if deleted
       if (fileKey) {
         updatePayload.image = fileKey;
+      } else if (imageDeleted) {
+        updatePayload.image = ''; // Explicitly remove the image
       }
 
       const response = await apiService.updateCompany(
