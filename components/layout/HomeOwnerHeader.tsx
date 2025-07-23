@@ -17,13 +17,13 @@ const menuOptions = [
   { label: 'Logout', action: 'delete', icon: SignoutIcon },
 ];
 export function HomeOwnerHeader() {
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
 
   // Add scroll direction state
   const [showHeader, setShowHeader] = useState(true);
   const lastScrollY = useRef(0);
-  const [sideSheetOpen, setSideSheetOpen] = useState(false);
-  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  // const [sideSheetOpen, setSideSheetOpen] = useState(false);
+  // const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,24 +45,24 @@ export function HomeOwnerHeader() {
     if (action === 'delete') {
       logout();
     } else if (action === 'changePassword') {
-      setChangePasswordOpen(true);
+      // setChangePasswordOpen(true);
     }
     return action;
   };
   return (
     <header
       className={cn(
-        'bg-[var(--white-background)] px-6 py-3 sticky top-0 z-50 transition-transform ease-in-out duration-200 w-full',
+        'bg-[var(--white-background)] px-4 md:px-6 py-3 sticky top-0 z-50 transition-transform ease-in-out duration-200 w-full',
         showHeader ? 'translate-y-0' : '-translate-y-full'
       )}
     >
       <div className=' flex h-14 items-center justify-between'>
         <div className='flex items-center space-x-4'>
-          <Link href='/' className='text-2xl font-bold'>
+          <Link href='/' className='text-xl md:text-2xl font-bold'>
             Virtual Homes
           </Link>
         </div>
-        <div className='flex items-center gap-6'>
+        <div className='flex items-center gap-2 md:gap-6'>
           <Link href='/'>
             <SupportIcon className='text-[var(--text-dark)]' />
           </Link>

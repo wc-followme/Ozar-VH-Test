@@ -32,8 +32,7 @@ body {
     --select-option: #e8eaed;
     --bg-limited: #f58b1e;
     --bg-skeleton: oklch(0.922 0 0);
-    --card-hover: #e9eff9;
-    /* Shadcn/ui variables needed for toast components */
+    --card-hover: #e9eff9; /* Shadcn/ui variables needed for toast components */
     --foreground: 0 0% 10%;
     --border: 0 0% 90%;
     --destructive: 0 84% 60%;
@@ -64,8 +63,7 @@ body {
     --select-option: #3bc44e;
     --bg-limited: #f58b1e;
     --bg-skeleton: oklch(0.922 0 0);
-
-    /* Shadcn/ui variables for dark theme */
+    --card-hover: #10121d; /* Shadcn/ui variables for dark theme */
     --foreground: 0 0% 98%;
     --border: 0 0% 20%;
     --destructive: 0 63% 31%;

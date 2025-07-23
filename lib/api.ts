@@ -68,6 +68,7 @@ interface CreateRoleRequest {
   description: string;
   icon: string;
   status?: 'ACTIVE' | 'INACTIVE';
+  permissions?: any;
 }
 
 interface CreateRoleResponse {
@@ -783,6 +784,37 @@ class ApiService {
     });
   }
 
+  /**
+   * Get users dropdown for autocomplete
+   */
+  async getUsersDropdown({
+    name = '',
+    phone_number = '',
+    email = '',
+    role_id = '',
+    page = 1,
+    limit = 10,
+  }: {
+    name?: string;
+    phone_number?: string;
+    email?: string;
+    role_id?: string | number;
+    page?: number;
+    limit?: number;
+  }): Promise<any> {
+    const params = new URLSearchParams();
+    if (name) params.append('name', name);
+    if (phone_number) params.append('phone_number', phone_number);
+    if (email) params.append('email', email);
+    if (role_id) params.append('role_id', String(role_id));
+    params.append('page', String(page));
+    params.append('limit', String(limit));
+    return this.makeRequest(`/users/dropdown?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
   // Fetch companies with pagination, status, and sortOrder
   async fetchCompanies({
     page = 1,
@@ -1247,6 +1279,99 @@ class ApiService {
     return this.makeRequest(`/materials/${uuid}`, {
       method: 'DELETE',
       headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Job management API
+  async createJob(payload: {
+    client_id?: string | number;
+    client_name: string;
+    client_email: string;
+    client_phone_number: string;
+    job_boxes_step: string;
+    job_privacy: string;
+  }): Promise<any> {
+    return this.makeRequest('/jobs', {
+      method: 'POST',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
+    });
+  }
+
+  // Fetch jobs
+  async fetchJobs(params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    type?: string;
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.type) queryParams.append('type', params.type);
+
+    const url = `/jobs${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+
+    return this.makeRequest(url, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  async fetchJobStatistics(): Promise<any> {
+    return this.makeRequest('/jobs/statistics', {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  async fetchJobById(uuid: string): Promise<any> {
+    return this.makeRequest(`/jobs/${uuid}`, {
+      method: 'GET',
+      headers: this.getRoleHeaders(),
+    });
+  }
+
+  // Update job
+  async updateJob(
+    uuid: string,
+    payload: {
+      client_id?: number;
+      client_name?: string;
+      client_email?: string;
+      client_phone_number?: string;
+      job_boxes_step?: string;
+      job_privacy?: string;
+      project_name?: string;
+      budget?: number;
+      category_id?: number;
+      client_address?: string;
+      latitude?: number;
+      longitude?: number;
+      property_type?: string;
+      project_start_date?: string;
+      project_finish_date?: string;
+      preferred_contractor?: string;
+      notification_style?: string;
+      approx_sq_ft?: number;
+      age_of_property?: string;
+      daily_work_start_time?: string;
+      daily_work_end_time?: string;
+      owner_present_need?: boolean;
+      weekend_work?: boolean;
+      has_animals?: boolean;
+      pet_type?: string;
+      company_id?: number;
+      job_image?: string;
+      job_status?: string;
+      status?: string;
+    }
+  ): Promise<any> {
+    return this.makeRequest(`/jobs/${uuid}`, {
+      method: 'PATCH',
+      headers: this.getRoleHeaders(),
+      body: JSON.stringify(payload),
     });
   }
 

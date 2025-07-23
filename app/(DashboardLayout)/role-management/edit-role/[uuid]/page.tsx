@@ -76,6 +76,7 @@ const EditRolePage = () => {
         description: data.description,
         icon: data.icon,
         status: 'ACTIVE',
+        permissions: data.permissions,
       })) as ApiResponse;
       if (
         response.statusCode === STATUS_CODES.OK ||

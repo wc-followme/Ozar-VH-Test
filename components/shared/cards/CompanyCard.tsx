@@ -54,12 +54,7 @@ export function CompanyCard({
 
   // Generate a consistent placeholder image based on company name
   const getPlaceholderImage = () => {
-    const placeholderImages = [
-      '/images/company-management/company-img-1.png',
-      '/images/company-management/company-img-2.png',
-      '/images/company-management/company-img-3.png',
-      '/images/company-management/company-img-4.png',
-    ];
+    const placeholderImages = ['/images/img-placeholder-md.png'];
 
     // Use company name to consistently pick same placeholder for same company
     const hash = name.split('').reduce((a, b) => {
@@ -126,7 +121,11 @@ export function CompanyCard({
       {/* Header with Avatar, User Info and Menu */}
       <div className=''>
         <div
-          className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-40 xl:h-40 min-h-[200px] min-w-[240px] max-w-[240px] max-h-[240px] rounded-[12px] overflow-hidden flex items-center justify-center aspect-square mx-auto`}
+          className={`${
+            !image || image.trim() === '' || isPlaceholder
+              ? 'w-full h-[200px] rounded-[12px] overflow-hidden flex items-center justify-center'
+              : 'w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-40 xl:h-40 min-h-[200px] min-w-[240px] max-w-[240px] max-h-[240px] rounded-[12px] overflow-hidden flex items-center justify-center aspect-square mx-auto'
+          }`}
         >
           <Image
             src={
@@ -137,7 +136,11 @@ export function CompanyCard({
             alt={name}
             width={240}
             height={240}
-            className='w-auto h-auto max-h-full object-contain'
+            className={
+              !image || image.trim() === '' || isPlaceholder
+                ? 'w-full h-full object-cover'
+                : 'w-auto h-auto max-h-full object-contain'
+            }
             onError={() => {
               if (!isPlaceholder) {
                 setIsPlaceholder(true);

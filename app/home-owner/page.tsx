@@ -56,7 +56,7 @@ export default function HomeOwnerWizardPage() {
 
   // Cancel/Previous button class
   const cancelButtonClass =
-    'h-[48px] px-8 border-2 border-[var(--border-dark)] bg-transparent rounded-full font-semibold text-[var(--text-dark)] flex items-center';
+    'btn-secondary !h-10 md:!h-12 !px-4 md:!px-8 text-sm sm:text-base';
 
   return (
     <div className='min-h-screen bg-[var(--white-background)] flex flex-col items-center'>
@@ -64,9 +64,9 @@ export default function HomeOwnerWizardPage() {
       {/* Centered content with background */}
       <div className='mt-auto'>
         <div className=''>
-          <div className='w-[90vw] mx-auto flex flex-col items-center bg-[var(--background)] min-h-[calc(100vh-100px)] rounded-tl-[32px] rounded-tr-[32px] px-4 md:px-12 py-8 shadow-none'>
+          <div className='w-[90vw] mx-auto flex flex-col items-center bg-[var(--background)] min-h-[calc(100vh-100px)] rounded-tl-[32px] rounded-tr-[32px] px-4 md:px-12 py-4 md:py-8 shadow-none'>
             {/* Custom Progress Bar */}
-            <div className='w-full flex justify-center mb-8'>
+            <div className='w-full flex justify-center mb-4 md:mb-8'>
               <div className='flex items-center justify-center w-full max-w-2xl'>
                 {steps.map((s, idx) => (
                   <>
@@ -76,12 +76,12 @@ export default function HomeOwnerWizardPage() {
                     >
                       {/* Circle */}
                       <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center z-10 ${stepIndex >= idx ? 'bg-green-600' : 'bg-gray-300'}`}
+                        className={`w-4 md:w-6 h-4 md:h-6 rounded-full flex items-center justify-center z-10 ${stepIndex >= idx ? 'bg-green-600' : 'bg-gray-300'}`}
                       />
                       {/* Line (except after last circle) */}
                       {idx < totalSteps - 1 && (
                         <div
-                          className={`h-2 w-[120px] -mx-[1px] md:w-[180px] ${stepIndex > idx ? 'bg-green-600' : 'bg-gray-300'}`}
+                          className={`h-1 md:h-2 w-[50px] md:w-[120px] -mx-[1px] xl:w-[180px] ${stepIndex > idx ? 'bg-green-600' : 'bg-gray-300'}`}
                         />
                       )}
                     </div>

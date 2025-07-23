@@ -18,13 +18,13 @@ const NoDataFound: React.FC<NoDataFoundProps> = ({
 }) => {
   return (
     <div className='flex flex-col items-center justify-center min-h-[60vh] h-full text-center'>
-      <div className='mb-8'>
+      <div className='mb-4 md:mb-8'>
         <Image
           src='/images/no-data-found.svg'
           height={250}
           width={250}
           alt=''
-          className='object-fit'
+          className='object-fit max-h-32 md:max-h-fit'
         />
       </div>
       <h2 className='text-xl md:text-2xl font-bold text-[var(--text-dark)] mb-2'>

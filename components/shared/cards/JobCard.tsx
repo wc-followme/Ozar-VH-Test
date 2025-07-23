@@ -45,7 +45,7 @@ export function JobCard({ job }: JobCardProps) {
     ) {
       return;
     }
-    router.push('/job-management/job-details');
+    router.push(`/job-management/job-details/${job.id}`);
   };
 
   return (
