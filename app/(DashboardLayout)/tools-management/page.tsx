@@ -179,15 +179,23 @@ export default function ToolsManagement() {
   }) => {
     setFormLoading(true);
     try {
+      // Use existing tool_assets if no new image is uploaded, otherwise use the new fileKey
+      const toolAssets = fileKey || editToolData?.tool_assets || '';
+
       const payload: CreateToolRequest = {
         name: data.name,
         available_quantity: data.available_quantity,
         manufacturer: data.manufacturer,
-        tool_assets: fileKey,
+        tool_assets: toolAssets,
         service_ids: data.service_ids,
       };
 
+      console.log('Update tool payload:', payload); // Debug log
+      console.log('Update tool UUID:', editToolUuid); // Debug log
+
       const response = await apiService.updateTool(editToolUuid!, payload);
+
+      console.log('Update tool response:', response); // Debug log
 
       if (response.statusCode === 200 || response.statusCode === 201) {
         showSuccessToast(response.message || TOOL_MESSAGES.UPDATE_SUCCESS);
@@ -211,6 +219,7 @@ export default function ToolsManagement() {
         );
       }
     } catch (error: any) {
+      console.error('Update tool error:', error); // Debug log
       if (error.status === 401) {
         handleAuthError(error);
       } else {

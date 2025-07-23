@@ -29,7 +29,7 @@ interface ToolFormProps {
   onCancel?: () => void;
   setUploading?: (uploading: boolean) => void;
   setFileKey?: (fileKey: string) => void;
-  existingImageUrl?: string;
+  existingImageUrl?: string | undefined;
   initialValues?: {
     name?: string;
     available_quantity?: number;
