@@ -11,6 +11,16 @@ export const PAGINATION = {
 export const APP_CONFIG = {
   SEARCH_DEBOUNCE_MS: 300,
   TOAST_AUTO_HIDE_MS: 3000,
+  // Frontend base URL for generating links (e.g., home-owner links)
+  // Set NEXT_PUBLIC_BASE_URL in your .env.local file
+  BASE_URL: process.env['NEXT_PUBLIC_BASE_URL'] || 'http://localhost:3000',
+} as const;
+
+// Application Routes
+export const ROUTES = {
+  HOME_OWNER: '/home-owner',
+  JOB_MANAGEMENT: '/job-management',
+  DASHBOARD: '/',
 } as const;
 
 // Action constants for menu options and permissions
@@ -178,8 +188,9 @@ export const JOB_TYPE = {
 
 export type JobType = (typeof JOB_TYPE)[keyof typeof JOB_TYPE];
 
+// ROLE_ID is the ID of the role in the database
 export const ROLE_ID = {
-  JOB_USER: 6,
+  JOB_USER: 5,
   CONTRACTOR: 3,
 } as const;
 
@@ -187,6 +198,13 @@ export enum CommonStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   DELETED = 'DELETED',
+}
+
+export enum JobStatus {
+  DONE = 'DONE',
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  CANCELLED = 'CANCELLED',
 }
 
 export enum JobFilterType {

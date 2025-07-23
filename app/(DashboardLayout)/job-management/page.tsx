@@ -1,7 +1,12 @@
 'use client';
 import NoDataFound from '@/components/shared/common/NoDataFound';
 import { useToast } from '@/components/ui/use-toast';
-import { CommonStatus, JobFilterType } from '@/constants/common';
+import {
+  APP_CONFIG,
+  CommonStatus,
+  JobFilterType,
+  ROUTES,
+} from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { IconFlag } from '@tabler/icons-react';
 import { Profile2User } from 'iconsax-react';
@@ -40,6 +45,10 @@ export default function JobManagement() {
   const [generatedLink, setGeneratedLink] = useState<string>('');
   const { showSuccessToast, showErrorToast } = useToast();
 
+  // Helper function to generate home-owner link
+  const generateHomeOwnerLink = (jobUuid: string) =>
+    `${APP_CONFIG.BASE_URL}${ROUTES.HOME_OWNER}/${jobUuid}`;
+
   // State for filter counts
   const [filterCounts, setFilterCounts] = useState<JobFilterCounts>({
     all: 0,
@@ -58,7 +67,7 @@ export default function JobManagement() {
         setFilterCounts(response.data);
       }
     } catch (error: any) {
-      console.error('Error fetching filter counts:', error);
+      // Error handled silently - filter counts are not critical
     }
   };
 
@@ -133,43 +142,43 @@ export default function JobManagement() {
 
   // Handle job creation
   const handleCreateJob = async (data: CreateJobFormData) => {
+    const {
+      client_name,
+      client_email,
+      client_phone_number,
+      job_boxes_step,
+      job_privacy,
+      client_id,
+    } = data;
+
     setIsSubmitting(true);
     try {
       // Prepare job_boxes_step with automatic logic
       let jobBoxesStep = '';
-      if (
-        Array.isArray(data.job_boxes_step) &&
-        data.job_boxes_step.length > 0
-      ) {
-        if (data.job_boxes_step.length === 1) {
+      if (Array.isArray(job_boxes_step) && job_boxes_step.length > 0) {
+        if (job_boxes_step.length === 1) {
           jobBoxesStep = 'FIRST';
-        } else if (data.job_boxes_step.length === 2) {
+        } else if (job_boxes_step.length === 2) {
           jobBoxesStep = 'SECOND';
-        } else if (data.job_boxes_step.length === 3) {
+        } else if (job_boxes_step.length === 3) {
           jobBoxesStep = 'THIRD';
         }
       }
 
       // Prepare payload for API
       const payload: CreateJobRequest = {
-        client_name: data.client_name,
-        client_email: data.client_email,
-        client_phone_number: data.client_phone_number,
+        client_name,
+        client_email,
+        client_phone_number,
         job_boxes_step: jobBoxesStep,
-        job_privacy: data.job_privacy,
+        job_privacy,
       };
 
       // Only include client_id if it has a value
-      if (
-        data.client_id !== undefined &&
-        data.client_id !== null &&
-        data.client_id !== ''
-      ) {
+      if (client_id !== undefined && client_id !== null && client_id !== '') {
         // Convert string to number if needed
         payload.client_id =
-          typeof data.client_id === 'string'
-            ? parseInt(data.client_id, 10)
-            : data.client_id;
+          typeof client_id === 'string' ? parseInt(client_id, 10) : client_id;
       }
 
       // Call API using apiService
@@ -178,18 +187,15 @@ export default function JobManagement() {
       if (response.data) {
         // Generate home-owner link with job UUID
         const jobUuid = response.data?.uuid || response.data?.id;
-        const homeOwnerLink = jobUuid
-          ? `http://localhost:3000/home-owner/${jobUuid}`
-          : null;
+        const homeOwnerLink = jobUuid ? generateHomeOwnerLink(jobUuid) : null;
 
         showSuccessToast(response.message || JOB_MESSAGES.CREATE_SUCCESS);
 
         // Set the generated link
         if (homeOwnerLink) {
           setGeneratedLink(homeOwnerLink);
-          console.log('Home Owner Link:', homeOwnerLink);
         }
-        if (data.job_boxes_step.length === 0) {
+        if (job_boxes_step.length === 0) {
           setIsOpen(false);
         }
         // Refresh jobs and counts after successful creation
@@ -342,29 +348,41 @@ export default function JobManagement() {
                 onButtonClick={() => setIsOpen(true)}
               />
             ) : (
-              <div className='grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
-                {jobs.map((job: Job) => (
-                  <JobCard
-                    key={job.id}
-                    job={{
-                      id: job.uuid,
-                      title: job.client_name || 'Project Name',
-                      jobId: job.project_id || 'Job#789',
-                      progress: 50, // Static value since not in API
-                      image:
-                        job.job_image ||
-                        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                      email: job.client_email || 'tanya.hill@example.com',
-                      address:
-                        job.client_address ||
-                        '2972 Westheimer Rd. Santa Ana, Illinois 85486',
-                      startDate: job.project_start_date
-                        ? new Date(job.project_start_date).toLocaleDateString()
-                        : '15 Mar 2025',
-                      daysLeft: 96, // Static value since not in API
-                    }}
-                  />
-                ))}
+              <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
+                {jobs.map((job: Job) => {
+                  const {
+                    uuid,
+                    client_name,
+                    project_id,
+                    job_image,
+                    client_email,
+                    client_address,
+                    project_start_date,
+                  } = job;
+
+                  return (
+                    <JobCard
+                      key={job.id}
+                      job={{
+                        id: uuid,
+                        title: client_name || 'Project Name',
+                        jobId: project_id || 'Job#789',
+                        progress: 50, // Static value since not in API
+                        image:
+                          job_image ||
+                          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
+                        email: client_email || 'tanya.hill@example.com',
+                        address:
+                          client_address ||
+                          '2972 Westheimer Rd. Santa Ana, Illinois 85486',
+                        startDate: project_start_date
+                          ? new Date(project_start_date).toLocaleDateString()
+                          : '15 Mar 2025',
+                        daysLeft: 96, // Static value since not in API
+                      }}
+                    />
+                  );
+                })}
               </div>
             )}
           </TabsContent>
@@ -388,28 +406,40 @@ export default function JobManagement() {
               />
             ) : (
               <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] xl:grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-6'>
-                {jobs.map((job: Job) => (
-                  <JobCard
-                    key={job.id}
-                    job={{
-                      id: job.uuid,
-                      title: job.client_name || 'Project Name',
-                      jobId: job.project_id || 'Job#789',
-                      progress: 50, // Static value since not in API
-                      image:
-                        job.job_image ||
-                        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
-                      email: job.client_email || 'tanya.hill@example.com',
-                      address:
-                        job.client_address ||
-                        '2972 Westheimer Rd. Santa Ana, Illinois 85486',
-                      startDate: job.project_start_date
-                        ? new Date(job.project_start_date).toLocaleDateString()
-                        : '15 Mar 2025',
-                      daysLeft: 96, // Static value since not in API
-                    }}
-                  />
-                ))}
+                {jobs.map((job: Job) => {
+                  const {
+                    uuid,
+                    client_name,
+                    project_id,
+                    job_image,
+                    client_email,
+                    client_address,
+                    project_start_date,
+                  } = job;
+
+                  return (
+                    <JobCard
+                      key={job.id}
+                      job={{
+                        id: uuid,
+                        title: client_name || 'Project Name',
+                        jobId: project_id || 'Job#789',
+                        progress: 50, // Static value since not in API
+                        image:
+                          job_image ||
+                          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
+                        email: client_email || 'tanya.hill@example.com',
+                        address:
+                          client_address ||
+                          '2972 Westheimer Rd. Santa Ana, Illinois 85486',
+                        startDate: project_start_date
+                          ? new Date(project_start_date).toLocaleDateString()
+                          : '15 Mar 2025',
+                        daysLeft: 96, // Static value since not in API
+                      }}
+                    />
+                  );
+                })}
               </div>
             )}
           </TabsContent>
@@ -420,7 +450,7 @@ export default function JobManagement() {
         open={isOpen}
         onOpenChange={open => {
           setIsOpen(open);
-          if (open) {
+          if (!open) {
             setGeneratedLink(''); // Clear generated link when opening form
           }
         }}

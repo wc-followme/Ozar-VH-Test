@@ -1,3 +1,9 @@
+import { STEP_MESSAGES } from '@/app/(DashboardLayout)/job-management/step-messages';
+import {
+  Category,
+  StepProjectTypeData,
+  StepProjectTypeProps,
+} from '@/app/(DashboardLayout)/job-management/types';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -14,16 +20,8 @@ import * as yup from 'yup';
 import { FlagHookIcon } from '../../icons/FalgHookIcon';
 
 const projectTypeSchema = yup.object({
-  selectedType: yup.string().required('Please select a project type'),
+  selectedType: yup.string().required(STEP_MESSAGES.PROJECT_TYPE_REQUIRED),
 });
-
-interface StepProjectTypeProps {
-  onPrev: () => void;
-  onSubmit: (data: any) => void;
-  cancelButtonClass?: string;
-  defaultValues?: any;
-  isLastStep?: boolean;
-}
 
 export function StepProjectType({
   onPrev,
@@ -32,14 +30,14 @@ export function StepProjectType({
   defaultValues,
   isLastStep = false,
 }: StepProjectTypeProps) {
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const form = useForm<any>({
+  const form = useForm({
     resolver: yupResolver(projectTypeSchema),
     defaultValues: {
       selectedType: '',
@@ -66,8 +64,10 @@ export function StepProjectType({
         status: 'ACTIVE',
       });
 
-      if (response.statusCode === 200) {
-        const newCategories = response.data.data;
+      const { statusCode, data } = response;
+
+      if (statusCode === 200) {
+        const { data: newCategories, totalPages } = data;
 
         if (append) {
           setCategories(prev => [...prev, ...newCategories]);
@@ -75,22 +75,22 @@ export function StepProjectType({
           setCategories(newCategories);
         }
 
-        setHasMore(page < response.data.totalPages);
+        setHasMore(page < totalPages);
         setCurrentPage(page);
 
         // Set default category if it's the first page and no category is selected
         if (page === 1 && !selectedType) {
           const defaultCategory = newCategories.find(
-            (cat: any) => cat.is_default
+            (cat: Category) => cat.is_default
           );
           if (defaultCategory) {
-            setValue('selectedType', defaultCategory.id);
+            setValue('selectedType', defaultCategory.id.toString());
           }
         }
       }
     } catch (err) {
-      console.error('Error fetching categories:', err);
-      setError('Failed to load categories');
+      console.error(STEP_MESSAGES.FETCH_CATEGORIES_ERROR, err);
+      setError(STEP_MESSAGES.FAILED_TO_LOAD_CATEGORIES);
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -110,7 +110,8 @@ export function StepProjectType({
   }, []);
 
   const handleSubmit = (data: any) => {
-    onSubmit(data);
+    const { selectedType } = data;
+    onSubmit({ selectedType } as StepProjectTypeData);
   };
 
   // Loading state
@@ -118,14 +119,15 @@ export function StepProjectType({
     return (
       <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
         <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
-          Which type of project do you need for your home?
+          {STEP_MESSAGES.PROJECT_TYPE_TITLE}
         </h2>
         <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
-          Choose the project category to help us provide accurate planning and
-          estimates.
+          {STEP_MESSAGES.PROJECT_TYPE_DESCRIPTION}
         </p>
         <div className='w-full flex items-center justify-center h-64'>
-          <div className='text-lg text-gray-600'>Loading categories...</div>
+          <div className='text-lg text-gray-600'>
+            {STEP_MESSAGES.LOADING_CATEGORIES}
+          </div>
         </div>
       </div>
     );
@@ -136,11 +138,10 @@ export function StepProjectType({
     return (
       <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
         <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
-          Which type of project do you need for your home?
+          {STEP_MESSAGES.PROJECT_TYPE_TITLE}
         </h2>
         <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
-          Choose the project category to help us provide accurate planning and
-          estimates.
+          {STEP_MESSAGES.PROJECT_TYPE_DESCRIPTION}
         </p>
         <div className='w-full flex items-center justify-center h-64'>
           <div className='text-lg text-red-600'>{error}</div>
@@ -152,11 +153,10 @@ export function StepProjectType({
   return (
     <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
       <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
-        Which type of project do you need for your home?
+        {STEP_MESSAGES.PROJECT_TYPE_TITLE}
       </h2>
       <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
-        Choose the project category to help us provide accurate planning and
-        estimates.
+        {STEP_MESSAGES.PROJECT_TYPE_DESCRIPTION}
       </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className='w-full'>
@@ -167,12 +167,15 @@ export function StepProjectType({
               <FormItem>
                 <FormControl>
                   <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 h-[calc(100vh_-_550px)] overflow-y-auto'>
-                    {categories.map((category: any) => {
+                    {categories.map((category: Category) => {
+                      const { id, name, description, is_default } = category;
                       return (
                         <div
-                          key={category.id}
-                          className={`flex flex-col items-start border border-[var(--border-dark)] rounded-2xl bg-[var(--card-background)] p-6 cursor-pointer transition-all duration-150 hover:shadow-md ${selectedType === category.id ? 'bg-[var(--card-hover)] shadow-green-100' : ''}`}
-                          onClick={() => setValue('selectedType', category.id)}
+                          key={id}
+                          className={`flex flex-col items-start border border-[var(--border-dark)] rounded-2xl bg-[var(--card-background)] p-6 cursor-pointer transition-all duration-150 hover:shadow-md ${selectedType === id.toString() ? 'bg-[var(--card-hover)] shadow-green-100' : ''}`}
+                          onClick={() =>
+                            setValue('selectedType', id.toString())
+                          }
                         >
                           <div
                             className={`w-10 h-10 rounded-[16px] bg-[#EBB4021A] text-[#EBB402] flex items-center justify-center mb-4`}
@@ -183,15 +186,15 @@ export function StepProjectType({
                             />
                           </div>
                           <div className='font-bold text-base mb-2 text-[var(--text-dark)]'>
-                            {category.name || 'Unnamed Category'}
+                            {name || STEP_MESSAGES.UNNAMED_CATEGORY}
                           </div>
                           <div className='text-[var(--text-secondary)] text-base font-normal leading-snug'>
-                            {category.description || 'No description available'}
+                            {description || STEP_MESSAGES.NO_DESCRIPTION}
                           </div>
-                          {category.is_default && (
+                          {is_default && (
                             <div className='mt-2'>
                               <span className='text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full'>
-                                Default
+                                {STEP_MESSAGES.DEFAULT}
                               </span>
                             </div>
                           )}
@@ -209,7 +212,9 @@ export function StepProjectType({
                           disabled={isLoadingMore}
                           className='px-6'
                         >
-                          {isLoadingMore ? 'Loading...' : 'Load More'}
+                          {isLoadingMore
+                            ? STEP_MESSAGES.LOADING
+                            : STEP_MESSAGES.LOAD_MORE}
                         </Button>
                       </div>
                     )}
@@ -225,10 +230,10 @@ export function StepProjectType({
               className={cancelButtonClass || 'btn-secondary !h-12 !px-8'}
               onClick={onPrev}
             >
-              Previous
+              {STEP_MESSAGES.PREVIOUS}
             </button>
             <Button type='submit' className='btn-primary !h-12 !px-12'>
-              {isLastStep ? 'Submit' : 'Next Step'}
+              {isLastStep ? STEP_MESSAGES.SUBMIT : STEP_MESSAGES.NEXT_STEP}
             </Button>
           </div>
         </form>

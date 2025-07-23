@@ -7,12 +7,14 @@ import Dropdown from '@/components/shared/common/Dropdown';
 import JobDetailsSkeleton from '@/components/shared/skeleton/JobDetailsSkeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { CommonStatus, JobStatus, ROUTES } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { ClipboardClose, Setting2, UserAdd } from 'iconsax-react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { JOB_MESSAGES } from '../../job-messages';
 import { Job } from '../../types';
 
 export default function JobDetailsPage() {
@@ -24,7 +26,13 @@ export default function JobDetailsPage() {
   const [closing, setClosing] = useState(false);
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const { showErrorToast, showSuccessToast } = useToast();
+
+  // Handle client-side only logic
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const fetchJobData = async () => {
@@ -35,7 +43,7 @@ export default function JobDetailsPage() {
           setJob(response.data);
         }
       } catch (error: any) {
-        showErrorToast(error?.message || 'Failed to fetch job details');
+        showErrorToast(error?.message || JOB_MESSAGES.FETCH_DETAILS_ERROR);
       } finally {
         setLoading(false);
       }
@@ -56,13 +64,15 @@ export default function JobDetailsPage() {
 
     try {
       setArchiving(true);
-      await apiService.updateJob(uuid, { status: 'INACTIVE' });
-      showSuccessToast('Job moved to archive successfully');
+      await apiService.updateJob(uuid, { status: CommonStatus.INACTIVE });
+      showSuccessToast(JOB_MESSAGES.ARCHIVE_SUCCESS);
       // Update the local job state to reflect the change
-      setJob(prev => (prev ? { ...prev, status: 'INACTIVE' } : null));
+      setJob(prev =>
+        prev ? { ...prev, status: CommonStatus.INACTIVE } : null
+      );
       setShowArchiveConfirm(false);
     } catch (error: any) {
-      showErrorToast(error?.message || 'Failed to move job to archive');
+      showErrorToast(error?.message || JOB_MESSAGES.ARCHIVE_ERROR);
     } finally {
       setArchiving(false);
     }
@@ -73,17 +83,65 @@ export default function JobDetailsPage() {
 
     try {
       setClosing(true);
-      await apiService.updateJob(uuid, { job_status: 'DONE' });
-      showSuccessToast('Job closed successfully');
+      await apiService.updateJob(uuid, { job_status: JobStatus.DONE });
+      showSuccessToast(JOB_MESSAGES.CLOSE_SUCCESS);
       // Update the local job state to reflect the change
-      setJob(prev => (prev ? { ...prev, job_status: 'DONE' } : null));
+      setJob(prev => (prev ? { ...prev, job_status: JobStatus.DONE } : null));
       setShowCloseConfirm(false);
     } catch (error: any) {
-      showErrorToast(error?.message || 'Failed to close job');
+      showErrorToast(error?.message || JOB_MESSAGES.CLOSE_ERROR);
     } finally {
       setClosing(false);
     }
   };
+
+  const breadcrumbData: BreadcrumbItem[] = [
+    { name: JOB_MESSAGES.JOB_MANAGEMENT_TITLE, href: ROUTES.JOB_MANAGEMENT },
+    { name: job?.project_id || job?.['uuid'] || 'Job Details' },
+  ];
+
+  if (loading) {
+    return <JobDetailsSkeleton />;
+  }
+  if (!job) {
+    return (
+      <div className='flex items-center justify-center h-64'>
+        <div className='text-lg text-red-500'>{JOB_MESSAGES.JOB_NOT_FOUND}</div>
+      </div>
+    );
+  }
+
+  // Destructure job data with fallbacks
+  const {
+    client_name,
+    client_email,
+    client_phone_number,
+    client_address,
+    job_image,
+    project_id,
+    project_name,
+    category,
+    budget,
+    status,
+    job_status,
+  } = job;
+
+  // Fallbacks for client info
+  const clientName = client_name || 'Client Name';
+  const clientEmail = client_email || 'tanya.hill@example.com';
+  const clientPhone = client_phone_number || '(239) 555-0108';
+  const clientAddress =
+    client_address || '3517 W. Gray St. Utica, Pennsylvania 57867';
+  const projectImage = job_image || '/images/auth/login-slider-01.webp';
+  const mapImage = '/images/map-placeholder.png';
+  const projectId = project_id || 'Job#456';
+  const projectName = project_name || 'Downtown Project';
+  const categoryName =
+    typeof category === 'string'
+      ? category
+      : (category as any)?.name || 'Interior';
+  const budgetAmount = budget ?? 57000;
+  const spent = 17200; // Static fallback
 
   const dropdownMenuItems = [
     {
@@ -92,7 +150,7 @@ export default function JobDetailsPage() {
       action: handleCloseClick,
       className:
         'text-sm px-3 py-2 rounded-md var(--text-dark) cursor-pointer transition-colors flex items-center gap-2',
-      disabled: closing || job?.job_status === 'DONE',
+      disabled: closing || job_status === JobStatus.DONE,
     },
     {
       label: 'Add Employee',
@@ -107,7 +165,7 @@ export default function JobDetailsPage() {
       action: handleArchiveClick,
       className:
         'text-sm px-3 py-2 rounded-md cursor-pointer transition-colors flex items-center gap-2 hover:bg-gray-100',
-      disabled: archiving || job?.status === 'INACTIVE',
+      disabled: archiving || status === CommonStatus.INACTIVE,
     },
     {
       label: 'Settings',
@@ -118,92 +176,60 @@ export default function JobDetailsPage() {
     },
   ];
 
-  const breadcrumbData: BreadcrumbItem[] = [
-    { name: 'Job Management', href: '/job-management' },
-    { name: job?.project_id || job?.['uuid'] || 'Job Details' },
-  ];
-
-  if (loading) {
-    return <JobDetailsSkeleton />;
-  }
-  if (!job) {
-    return (
-      <div className='flex items-center justify-center h-64'>
-        <div className='text-lg text-red-500'>Job not found</div>
-      </div>
-    );
-  }
-
-  // Fallbacks for client info
-  const clientName = job.client_name || 'Client Name';
-  const clientEmail = job.client_email || 'tanya.hill@example.com';
-  const clientPhone = job.client_phone_number || '(239) 555-0108';
-  const clientAddress =
-    job.client_address || '3517 W. Gray St. Utica, Pennsylvania 57867';
-  const projectImage = job.job_image || '/images/auth/login-slider-01.webp';
-  const mapImage = '/images/map-placeholder.png';
-  const projectId = job.project_id || 'Job#456';
-  const projectName = job.project_name || 'Downtown Project';
-  const category =
-    typeof job.category === 'string'
-      ? job.category
-      : (job.category as any)?.name || 'Interior';
-  const budget =
-    job.budget !== null && job.budget !== undefined ? job.budget : 57000;
-  const spent = 17200; // Static fallback
-
   return (
     <div className=''>
       {/* Breadcrumb */}
       <div className='flex flex-wrap items-start text-sm font-normal mb-1 w-full md:text-base md:mb-3'>
         <Breadcrumb items={breadcrumbData} className='flex-1' />
         {/* 3-dots menu */}
-        <div className='ml-auto mt-2 md:mt-0'>
-          <Dropdown
-            menuOptions={dropdownMenuItems
-              .filter(item => !item.disabled)
-              .map(({ icon, label }) => ({
-                icon,
-                label:
-                  label === 'Move to Archive' && archiving
-                    ? 'Moving to Archive...'
-                    : label === 'Close job' && closing
-                      ? 'Closing Job...'
-                      : label,
-                action: label,
-              }))}
-            onAction={action => {
-              const item = dropdownMenuItems.find(i => i.label === action);
-              if (item && item.action && !item.disabled) item.action();
-            }}
-            trigger={
-              <Button
-                variant='ghost'
-                size='icon'
-                className='h-8 w-8 p-0 rotate-90'
-                disabled={archiving || closing}
-              >
-                <IconDotsVertical
-                  className='!w-6 !h-6'
-                  strokeWidth={2}
-                  color='var(--text)'
-                />
-              </Button>
-            }
-            align='end'
-          />
-        </div>
+        {isClient && (
+          <div className='ml-auto mt-2 md:mt-0'>
+            <Dropdown
+              menuOptions={dropdownMenuItems
+                .filter(item => !item.disabled)
+                .map(({ icon, label }) => ({
+                  icon,
+                  label:
+                    label === 'Move to Archive' && archiving
+                      ? 'Moving to Archive...'
+                      : label === 'Close job' && closing
+                        ? 'Closing Job...'
+                        : label,
+                  action: label,
+                }))}
+              onAction={action => {
+                const item = dropdownMenuItems.find(i => i.label === action);
+                if (item && item.action && !item.disabled) item.action();
+              }}
+              trigger={
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  className='h-8 w-8 p-0 rotate-90'
+                  disabled={archiving || closing}
+                >
+                  <IconDotsVertical
+                    className='!w-6 !h-6'
+                    strokeWidth={2}
+                    color='var(--text)'
+                  />
+                </Button>
+              }
+              align='end'
+            />
+          </div>
+        )}
       </div>
       {/* Card */}
       <div className='bg-[var(--card-background)] rounded-[20px] p-4 md:p-6 flex flex-col md:flex-row md:justify-between border border-[var(--border-dark)] max-w-full gap-4 md:gap-0 relative'>
-        {job.status === 'INACTIVE' && (
+        {status === CommonStatus.INACTIVE && (
           <div className='absolute top-4 right-4 bg-gray-500 text-white px-3 py-1 rounded-full text-sm font-medium'>
-            Archived
+            {JOB_MESSAGES.ARCHIVED_STATUS}
           </div>
         )}
-        {job.job_status === 'DONE' && (
+        {job_status === JobStatus.DONE && (
           <div className='absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium'>
-            Closed
+            {JOB_MESSAGES.CLOSED_STATUS}
           </div>
         )}
         {/* Project Image */}
@@ -221,7 +247,7 @@ export default function JobDetailsPage() {
           <div className='grid grid-cols-3 xl:grid-cols-5 gap-y-4 md:gap-4 border-b border-[var(--border-dark)] pb-2 mb-3'>
             <div className='min-w-0 break-words'>
               <div className='text-sm text-[var(--text-secondary)] font-normal mb-1'>
-                Project ID
+                {JOB_MESSAGES.PROJECT_ID_LABEL}
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
                 {projectId}
@@ -229,7 +255,7 @@ export default function JobDetailsPage() {
             </div>
             <div className='min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
-                Project Name
+                {JOB_MESSAGES.PROJECT_NAME_LABEL}
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
                 {projectName}
@@ -237,16 +263,16 @@ export default function JobDetailsPage() {
             </div>
             <div className='min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
-                Job category
+                {JOB_MESSAGES.JOB_CATEGORY_LABEL}
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
-                {category}
+                {categoryName}
               </div>
             </div>
             <div className='md:col-span-2 flex flex-col md:flex-row md:items-center gap-2 min-w-0 break-words'>
               <div>
                 <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
-                  Budget
+                  {JOB_MESSAGES.BUDGET_LABEL}
                 </div>
                 <div className='flex items-center gap-2'>
                   <span className='font-semibold text-base text-[var(--text-dark)]'>
@@ -255,11 +281,11 @@ export default function JobDetailsPage() {
                   <div className='w-32 h-2 bg-gray-200 rounded-full overflow-hidden'>
                     <div
                       className='h-2 bg-[var(--secondary)]'
-                      style={{ width: `${(spent / budget) * 100}%` }}
+                      style={{ width: `${(spent / budgetAmount) * 100}%` }}
                     />
                   </div>
                   <span className='text-[var(--text-secondary)] font-medium'>
-                    ${budget.toLocaleString()}
+                    ${budgetAmount.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -268,7 +294,7 @@ export default function JobDetailsPage() {
           <div className='grid grid-cols-3 xl:grid-cols-5 gap-y-4 md:gap-4 items-start md:items-center mt-2'>
             <div className='min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
-                Client Name
+                {JOB_MESSAGES.CLIENT_NAME_LABEL}
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
                 {clientName}
@@ -276,7 +302,7 @@ export default function JobDetailsPage() {
             </div>
             <div className='min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
-                Email
+                {JOB_MESSAGES.EMAIL_LABEL}
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
                 {clientEmail}
@@ -284,7 +310,7 @@ export default function JobDetailsPage() {
             </div>
             <div className='min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
-                Phone Number
+                {JOB_MESSAGES.PHONE_NUMBER_LABEL}
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
                 {clientPhone}
@@ -292,7 +318,7 @@ export default function JobDetailsPage() {
             </div>
             <div className='md:col-span-2 min-w-0 break-words'>
               <div className='text-xs text-[var(--text-secondary)] font-normal mb-1'>
-                Address
+                {JOB_MESSAGES.ADDRESS_LABEL}
               </div>
               <div className='font-semibold text-base text-[var(--text-dark)]'>
                 {clientAddress}
@@ -315,8 +341,8 @@ export default function JobDetailsPage() {
       {/* Archive Confirmation Modal */}
       <ConfirmDeleteModal
         open={showArchiveConfirm}
-        title='Move to Archive'
-        subtitle='Are you sure you want to move this job to archive? This action can be undone later.'
+        title={JOB_MESSAGES.MOVE_TO_ARCHIVE_TITLE}
+        subtitle={JOB_MESSAGES.MOVE_TO_ARCHIVE_SUBTITLE}
         onCancel={() => setShowArchiveConfirm(false)}
         onDelete={moveToArchive}
       />
@@ -324,8 +350,8 @@ export default function JobDetailsPage() {
       {/* Close Job Confirmation Modal */}
       <ConfirmDeleteModal
         open={showCloseConfirm}
-        title='Close Job'
-        subtitle='Are you sure you want to close this job? This action can be undone later.'
+        title={JOB_MESSAGES.CLOSE_JOB_TITLE}
+        subtitle={JOB_MESSAGES.CLOSE_JOB_SUBTITLE}
         onCancel={() => setShowCloseConfirm(false)}
         onDelete={closeJob}
       />

@@ -1,3 +1,8 @@
+import { STEP_MESSAGES } from '@/app/(DashboardLayout)/job-management/step-messages';
+import {
+  StepOptionalDetailsData,
+  StepOptionalDetailsProps,
+} from '@/app/(DashboardLayout)/job-management/types';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -21,31 +26,23 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 const optionalDetailsSchema = yup.object({
-  typeOfProperty: yup.string().required('Property type is required'),
-  ageOfProperty: yup.string().required('Property age is required'),
-  approxSqft: yup.string().required('Square footage is required'),
-  notificationStyle: yup.string().required('Notification style is required'),
+  typeOfProperty: yup.string().required(STEP_MESSAGES.PROPERTY_TYPE_REQUIRED),
+  ageOfProperty: yup.string().required(STEP_MESSAGES.PROPERTY_AGE_REQUIRED),
+  approxSqft: yup.string().required(STEP_MESSAGES.SQUARE_FOOTAGE_REQUIRED),
+  notificationStyle: yup
+    .string()
+    .required(STEP_MESSAGES.NOTIFICATION_STYLE_REQUIRED),
   dailyWorkStart: yup.string().optional(),
   dailyWorkEnd: yup.string().optional(),
-  ownerPresent: yup.string().required('Owner presence preference is required'),
-  weekendWork: yup.string().required('Weekend work preference is required'),
-  animals: yup.string().required('Animals preference is required'),
+  ownerPresent: yup.string().required(STEP_MESSAGES.OWNER_PRESENCE_REQUIRED),
+  weekendWork: yup.string().required(STEP_MESSAGES.WEEKEND_WORK_REQUIRED),
+  animals: yup.string().required(STEP_MESSAGES.ANIMALS_REQUIRED),
   petType: yup.string().when('animals', {
     is: 'Yes',
-    then: schema =>
-      schema.required('Pet type is required when animals are present'),
+    then: schema => schema.required(STEP_MESSAGES.PET_TYPE_REQUIRED),
     otherwise: schema => schema.optional(),
   }),
 });
-
-interface StepOptionalDetailsProps {
-  onPrev: () => void;
-  onSkip?: () => void;
-  onNext: (data: any) => void;
-  cancelButtonClass?: string;
-  defaultValues?: any;
-  isLastStep?: boolean;
-}
 
 export function StepOptionalDetails({
   onPrev,
@@ -54,7 +51,7 @@ export function StepOptionalDetails({
   defaultValues,
   isLastStep = false,
 }: StepOptionalDetailsProps) {
-  const form = useForm<any>({
+  const form = useForm({
     resolver: yupResolver(optionalDetailsSchema),
     defaultValues: {
       typeOfProperty: 'Residential',
@@ -75,17 +72,16 @@ export function StepOptionalDetails({
   const animals = watch('animals');
 
   const onSubmit = (data: any) => {
-    onNext(data);
+    onNext(data as StepOptionalDetailsData);
   };
 
   return (
     <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-6 flex flex-col items-center'>
       <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
-        Optional Details
+        {STEP_MESSAGES.OPTIONAL_DETAILS_TITLE}
       </h2>
       <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
-        Help us understand your needs better. Answer these questions or leave
-        them for later.
+        {STEP_MESSAGES.OPTIONAL_DETAILS_DESCRIPTION}
       </p>
       <Form {...form}>
         <form
@@ -101,16 +97,20 @@ export function StepOptionalDetails({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='field-label'>
-                      Type of Property
+                      {STEP_MESSAGES.TYPE_OF_PROPERTY_LABEL}
                     </FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className='input-field'>
-                          <SelectValue placeholder='Residential' />
+                          <SelectValue
+                            placeholder={STEP_MESSAGES.RESIDENTIAL}
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='Residential'>Residential</SelectItem>
+                        <SelectItem value='Residential'>
+                          {STEP_MESSAGES.RESIDENTIAL}
+                        </SelectItem>
                         <SelectItem value='Commercial'>Commercial</SelectItem>
                       </SelectContent>
                     </Select>
@@ -127,12 +127,12 @@ export function StepOptionalDetails({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='field-label'>
-                      Age of Property
+                      {STEP_MESSAGES.AGE_OF_PROPERTY_LABEL}
                     </FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className='input-field'>
-                          <SelectValue placeholder='Select age' />
+                          <SelectValue placeholder={STEP_MESSAGES.SELECT_AGE} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
@@ -156,10 +156,12 @@ export function StepOptionalDetails({
                 name='approxSqft'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='field-label'>Approx. sq ft</FormLabel>
+                    <FormLabel className='field-label'>
+                      {STEP_MESSAGES.APPROX_SQ_FT_LABEL}
+                    </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='2500 Sq / Ft'
+                        placeholder={STEP_MESSAGES.APPROX_SQ_FT_PLACEHOLDER}
                         className='input-field'
                         {...field}
                       />
@@ -177,16 +179,20 @@ export function StepOptionalDetails({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='field-label'>
-                      Notification Style
+                      {STEP_MESSAGES.NOTIFICATION_STYLE_LABEL}
                     </FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className='input-field'>
-                          <SelectValue placeholder='Email' />
+                          <SelectValue
+                            placeholder={STEP_MESSAGES.EMAIL_NOTIFICATION}
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='Email'>Email</SelectItem>
+                        <SelectItem value='Email'>
+                          {STEP_MESSAGES.EMAIL_NOTIFICATION}
+                        </SelectItem>
                         <SelectItem value='SMS'>SMS</SelectItem>
                         <SelectItem value='Phone'>Phone</SelectItem>
                       </SelectContent>
@@ -198,7 +204,9 @@ export function StepOptionalDetails({
             </div>
             {/* Daily Work Timing */}
             <div className='flex flex-col gap-2'>
-              <FormLabel className='field-label'>Daily Work Timing</FormLabel>
+              <FormLabel className='field-label'>
+                {STEP_MESSAGES.DAILY_WORK_TIMING_LABEL}
+              </FormLabel>
               <div className='relative'>
                 <FormField
                   control={form.control}
@@ -208,7 +216,7 @@ export function StepOptionalDetails({
                       <FormControl>
                         <Input
                           type='time'
-                          placeholder='Start Time'
+                          placeholder={STEP_MESSAGES.START_TIME}
                           className='input-field pr-12 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
                           {...field}
                         />
@@ -233,7 +241,7 @@ export function StepOptionalDetails({
                       <FormControl>
                         <Input
                           type='time'
-                          placeholder='End Time'
+                          placeholder={STEP_MESSAGES.END_TIME}
                           className='input-field pr-12 bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
                           {...field}
                         />
@@ -255,17 +263,17 @@ export function StepOptionalDetails({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='field-label'>
-                      Owner Need to Be Present
+                      {STEP_MESSAGES.OWNER_PRESENT_LABEL}
                     </FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className='input-field'>
-                          <SelectValue placeholder='No' />
+                          <SelectValue placeholder={STEP_MESSAGES.NO} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='Yes'>Yes</SelectItem>
-                        <SelectItem value='No'>No</SelectItem>
+                        <SelectItem value='Yes'>{STEP_MESSAGES.YES}</SelectItem>
+                        <SelectItem value='No'>{STEP_MESSAGES.NO}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -281,17 +289,17 @@ export function StepOptionalDetails({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='field-label'>
-                      Weekend Work Availability
+                      {STEP_MESSAGES.WEEKEND_WORK_LABEL}
                     </FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className='input-field'>
-                          <SelectValue placeholder='Yes' />
+                          <SelectValue placeholder={STEP_MESSAGES.YES} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='Yes'>Yes</SelectItem>
-                        <SelectItem value='No'>No</SelectItem>
+                        <SelectItem value='Yes'>{STEP_MESSAGES.YES}</SelectItem>
+                        <SelectItem value='No'>{STEP_MESSAGES.NO}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -307,17 +315,17 @@ export function StepOptionalDetails({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='field-label'>
-                      Animals in the Home
+                      {STEP_MESSAGES.ANIMALS_IN_HOME_LABEL}
                     </FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className='input-field'>
-                          <SelectValue placeholder='Yes' />
+                          <SelectValue placeholder={STEP_MESSAGES.YES} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
-                        <SelectItem value='Yes'>Yes</SelectItem>
-                        <SelectItem value='No'>No</SelectItem>
+                        <SelectItem value='Yes'>{STEP_MESSAGES.YES}</SelectItem>
+                        <SelectItem value='No'>{STEP_MESSAGES.NO}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -333,23 +341,23 @@ export function StepOptionalDetails({
                   name='petType'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='field-label'>Pet type?</FormLabel>
+                      <FormLabel className='field-label'>
+                        {STEP_MESSAGES.PET_TYPE_LABEL}
+                      </FormLabel>
                       <Select
                         value={field.value}
                         onValueChange={field.onChange}
                       >
                         <FormControl>
                           <SelectTrigger className='input-field'>
-                            <SelectValue placeholder='Select pet type' />
+                            <SelectValue
+                              placeholder={STEP_MESSAGES.SELECT_PET_TYPE}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
                           <SelectItem value='Dog'>Dog</SelectItem>
                           <SelectItem value='Cat'>Cat</SelectItem>
-                          <SelectItem value='Bird'>Bird</SelectItem>
-                          <SelectItem value='Fish'>Fish</SelectItem>
-                          <SelectItem value='Reptile'>Reptile</SelectItem>
-                          <SelectItem value='Other'>Other</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -365,11 +373,11 @@ export function StepOptionalDetails({
               className={cancelButtonClass || 'btn-secondary !h-12 !px-8'}
               onClick={onPrev}
             >
-              Previous
+              {STEP_MESSAGES.PREVIOUS}
             </button>
             <div className='flex gap-2'>
               <Button className='btn-primary !h-12 !px-12' type='submit'>
-                {isLastStep ? 'Submit' : 'Next Step'}
+                {isLastStep ? STEP_MESSAGES.SUBMIT : STEP_MESSAGES.NEXT_STEP}
               </Button>
             </div>
           </div>

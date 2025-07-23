@@ -1,6 +1,12 @@
 'use client';
 
 import { JOB_MESSAGES } from '@/app/(DashboardLayout)/job-management/job-messages';
+import {
+  CreateJobFormData,
+  CreateJobFormProps,
+  SelectBoxOption,
+  UserOption,
+} from '@/app/(DashboardLayout)/job-management/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,7 +24,7 @@ import { showErrorToast } from '../../ui/use-toast';
 import { RadioGroupStripe } from '../common/RadioStripe';
 import { SelectBoxCard } from '../common/SelectBoxCard';
 
-const selectBoxOptions = [
+const selectBoxOptions: SelectBoxOption[] = [
   {
     id: 'general-info',
     value: 'FIRST',
@@ -60,16 +66,6 @@ const selectBoxOptions = [
   },
 ];
 
-// Types
-export interface CreateJobFormData {
-  client_name: string;
-  client_email: string;
-  client_phone_number: string;
-  job_privacy: JobType;
-  job_boxes_step: string[];
-  client_id?: string;
-}
-
 const createJobSchema = yup.object({
   client_name: yup.string().required(JOB_MESSAGES.NAME_REQUIRED),
   client_email: yup
@@ -90,13 +86,7 @@ export function CreateJobForm({
   defaultValues,
   onCancel,
   generatedLink,
-}: {
-  onSubmit?: (data: CreateJobFormData) => void;
-  isSubmitting?: boolean;
-  defaultValues?: Partial<CreateJobFormData & { link?: string }>;
-  onCancel?: () => void;
-  generatedLink?: string;
-}) {
+}: CreateJobFormProps) {
   const {
     control,
     handleSubmit,
@@ -116,9 +106,16 @@ export function CreateJobForm({
       ...defaultValues,
     },
   });
-  console.log('generatedLink', generatedLink);
+
+  // Handle form submission with proper typing
+  const handleFormSubmit = (data: CreateJobFormData) => {
+    if (onSubmitProp) {
+      onSubmitProp(data);
+    }
+  };
+
   // Autocomplete state
-  const [userOptions, setUserOptions] = useState<any[]>([]);
+  const [userOptions, setUserOptions] = useState<UserOption[]>([]);
   const [userLoading, setUserLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const clientNameValue = watch('client_name');
@@ -145,18 +142,19 @@ export function CreateJobForm({
           name: debouncedName,
           role_id: ROLE_ID.JOB_USER,
           page: 1,
-          limit: 10,
+          limit: 50,
         });
-        let users: any[] = [];
-        if (response && Array.isArray(response.data)) {
-          users = response.data;
-        } else if (
-          response &&
-          response.data &&
-          Array.isArray(response.data.data)
-        ) {
-          users = response.data.data;
+
+        const { data } = response;
+        let users: UserOption[] = [];
+
+        if (data && Array.isArray(data)) {
+          users = data;
+        } else if (data && data.data && Array.isArray(data.data)) {
+          const { data: nestedData } = data;
+          users = nestedData;
         }
+
         setUserOptions(users);
         setShowDropdown(true);
       } catch (err: any) {
@@ -170,11 +168,13 @@ export function CreateJobForm({
   }, [debouncedName]);
 
   // Handle selecting a user from dropdown
-  const handleSelectUser = (user: any) => {
-    setValue('client_name', user.name || '');
-    if (user.email) setValue('client_email', user.email);
-    if (user.phone_number) setValue('client_phone_number', user.phone_number);
-    if (user.id) setValue('client_id', user.id);
+  const handleSelectUser = (user: UserOption) => {
+    const { name, email, phone_number, id } = user;
+
+    setValue('client_name', name || '');
+    if (email) setValue('client_email', email);
+    if (phone_number) setValue('client_phone_number', phone_number);
+    if (id) setValue('client_id', String(id));
     setShowDropdown(false);
     setUserSelected(true);
     suppressNextSearch.current = true;
@@ -201,10 +201,7 @@ export function CreateJobForm({
   return (
     <Card className='w-full max-w-4xl mx-auto bg-transparent shadow-none border-0'>
       <CardContent className='p-0'>
-        <form
-          onSubmit={handleSubmit(onSubmitProp || (() => {}))}
-          className='space-y-6'
-        >
+        <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
           {/* Full Name Input with Autocomplete */}
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div className='space-y-2 col-span-2 relative'>

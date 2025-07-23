@@ -1,5 +1,7 @@
 // Job management type definitions
 
+import { JobType } from '@/constants/common';
+
 export interface Job {
   id: number;
   uuid: string;
@@ -39,6 +41,46 @@ export interface Job {
   weekend_work: boolean | null;
   has_animals: boolean | null;
   pet_type: string | null;
+}
+
+// CreateJobForm related types
+export interface SelectBoxOption {
+  id: string;
+  value: string;
+  title: string;
+  description: string;
+  disabled: boolean;
+}
+
+export interface UserOption {
+  id: string | number;
+  name: string;
+  email?: string;
+  phone_number?: string;
+}
+
+export interface CreateJobFormData {
+  client_name: string;
+  client_email: string;
+  client_phone_number: string;
+  job_privacy: JobType;
+  job_boxes_step: string[];
+  client_id?: string;
+}
+
+export interface CreateJobFormProps {
+  onSubmit?: (data: CreateJobFormData) => void;
+  isSubmitting?: boolean;
+  defaultValues?: Partial<CreateJobFormData & { link?: string }>;
+  onCancel?: () => void;
+  generatedLink?: string;
+}
+
+export interface CreateJobFormState {
+  userOptions: UserOption[];
+  userLoading: boolean;
+  showDropdown: boolean;
+  userSelected: boolean;
 }
 
 export interface JobApiResponse {
@@ -124,34 +166,6 @@ export interface UpdateJobRequest {
   pet_type?: string;
 }
 
-export interface CreateJobFormData {
-  client_id?: string;
-  client_name: string;
-  client_email: string;
-  client_phone_number: string;
-  job_boxes_step: string[];
-  job_privacy: string;
-  project_name?: string;
-  budget?: number;
-  category_id?: number;
-  client_address?: string;
-  latitude?: number;
-  longitude?: number;
-  property_type?: string;
-  project_start_date?: string;
-  project_finish_date?: string;
-  preferred_contractor?: string;
-  notification_style?: string;
-  approx_sq_ft?: number;
-  age_of_property?: string;
-  daily_work_start_time?: string;
-  daily_work_end_time?: string;
-  owner_present_need?: boolean;
-  weekend_work?: boolean;
-  has_animals?: boolean;
-  pet_type?: string;
-}
-
 export interface ApiResponse<T = unknown> {
   statusCode: number;
   message?: string;
@@ -213,4 +227,146 @@ export interface MenuOption {
     color?: string;
     variant?: 'Outline' | 'Linear' | 'Broken' | 'Bold' | 'Bulk' | 'TwoTone';
   }>;
+}
+
+// Form validation types
+export interface FormValidationError {
+  type: string;
+  message: string;
+}
+
+export interface FormFieldError {
+  [key: string]: FormValidationError;
+}
+
+// API response types for user dropdown
+export interface UserDropdownResponse {
+  data: UserOption[];
+  total?: number;
+  page?: number;
+  limit?: number;
+}
+
+export interface UserDropdownParams {
+  name: string;
+  role_id: string;
+  page: number;
+  limit: number;
+}
+
+// Job form step types
+export interface JobFormStep {
+  id: string;
+  value: string;
+  title: string;
+  description: string;
+  disabled: boolean;
+}
+
+export interface JobFormStepValidation {
+  step: string;
+  isValid: boolean;
+  errors: string[];
+}
+
+// Job form submission types
+export interface JobFormSubmissionData extends CreateJobFormData {
+  link?: string;
+  generatedLink?: string;
+}
+
+export interface JobFormSubmissionResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    job_id: string;
+    link?: string;
+    generatedLink?: string;
+  };
+  errors?: Record<string, string[]>;
+}
+
+// Step form types
+export interface StepGeneralInfoData {
+  fullName: string;
+  projectStartDate: Date | null;
+  projectFinishDate: Date | null;
+  email: string;
+  phone: string;
+  budget: string;
+  contractor: string;
+  address: string;
+}
+
+export interface StepGeneralInfoProps {
+  onNext: (data: StepGeneralInfoData) => void;
+  defaultValues?: Partial<StepGeneralInfoData>;
+  isLastStep?: boolean;
+}
+
+export interface StepOptionalDetailsData {
+  typeOfProperty: string;
+  ageOfProperty: string;
+  approxSqft: string;
+  notificationStyle: string;
+  dailyWorkStart: string;
+  dailyWorkEnd: string;
+  ownerPresent: string;
+  weekendWork: string;
+  animals: string;
+  petType?: string;
+}
+
+export interface StepOptionalDetailsProps {
+  onPrev: () => void;
+  onSkip?: () => void;
+  onNext: (data: any) => void;
+  cancelButtonClass?: string;
+  defaultValues?: any;
+  isLastStep?: boolean;
+}
+
+export interface StepProjectTypeData {
+  selectedType: string;
+}
+
+export interface StepProjectTypeProps {
+  onPrev: () => void;
+  onSubmit: (data: StepProjectTypeData) => void;
+  cancelButtonClass?: string;
+  defaultValues?: Partial<StepProjectTypeData>;
+  isLastStep?: boolean;
+}
+
+// Contractor types
+export interface Contractor {
+  id: number;
+  name: string;
+  email?: string;
+  phone_number?: string;
+}
+
+export interface ContractorApiResponse {
+  data: Contractor[];
+  total?: number;
+  page?: number;
+  limit?: number;
+}
+
+// Category types
+export interface Category {
+  id: number;
+  name: string;
+  description?: string;
+  is_default?: boolean;
+}
+
+export interface CategoryApiResponse {
+  data: {
+    data: Category[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }

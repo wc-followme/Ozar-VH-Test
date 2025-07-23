@@ -1,3 +1,5 @@
+import { STEP_MESSAGES } from '@/app/(DashboardLayout)/job-management/step-messages';
+import { Contractor } from '@/app/(DashboardLayout)/job-management/types';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -31,23 +33,27 @@ import * as yup from 'yup';
 import { ROLE_ID } from '../../../constants/common';
 
 const generalInfoSchema = yup.object({
-  fullName: yup.string().required('Full name is required'),
+  fullName: yup.string().required(STEP_MESSAGES.FULL_NAME_REQUIRED),
   projectStartDate: yup
     .mixed()
-    .test('is-valid-start-date', 'Please select start date', function (value) {
-      if (value === '' || value === null || value === undefined) {
-        return false; // Show error for empty values
+    .test(
+      'is-valid-start-date',
+      STEP_MESSAGES.PROJECT_START_DATE_REQUIRED,
+      function (value) {
+        if (value === '' || value === null || value === undefined) {
+          return false; // Show error for empty values
+        }
+        if (value instanceof Date) {
+          return !isNaN(value.getTime());
+        }
+        return false;
       }
-      if (value instanceof Date) {
-        return !isNaN(value.getTime());
-      }
-      return false;
-    }),
+    ),
   projectFinishDate: yup
     .mixed()
     .test(
       'is-valid-finish-date',
-      'Please select finish date',
+      STEP_MESSAGES.PROJECT_FINISH_DATE_REQUIRED,
       function (value) {
         if (value === '' || value === null || value === undefined) {
           return false; // Show error for empty values
@@ -60,12 +66,12 @@ const generalInfoSchema = yup.object({
     ),
   email: yup
     .string()
-    .email('Invalid email format')
-    .required('Email is required'),
-  phone: yup.string().required('Phone number is required'),
-  budget: yup.string().required('Budget is required'),
-  contractor: yup.string().required('Contractor preference is required'),
-  address: yup.string().required('Address is required'),
+    .email(STEP_MESSAGES.EMAIL_INVALID)
+    .required(STEP_MESSAGES.EMAIL_REQUIRED),
+  phone: yup.string().required(STEP_MESSAGES.PHONE_REQUIRED),
+  budget: yup.string().required(STEP_MESSAGES.BUDGET_REQUIRED),
+  contractor: yup.string().required(STEP_MESSAGES.CONTRACTOR_REQUIRED),
+  address: yup.string().required(STEP_MESSAGES.ADDRESS_REQUIRED),
 });
 
 interface StepGeneralInfoProps {
@@ -79,7 +85,7 @@ export function StepGeneralInfo({
   defaultValues,
   isLastStep = false,
 }: StepGeneralInfoProps) {
-  const [contractors, setContractors] = useState<any[]>([]);
+  const [contractors, setContractors] = useState<Contractor[]>([]);
   const [isLoadingContractors, setIsLoadingContractors] = useState(true);
   const form = useForm<any>({
     resolver: yupResolver(generalInfoSchema),
@@ -104,16 +110,17 @@ export function StepGeneralInfo({
         const response = await apiService.getUsersDropdown({
           role_id: ROLE_ID.CONTRACTOR, // Contractor role
           page: 1,
-          limit: 100,
+          limit: 50,
         });
 
         if (response) {
-          let contractorsData: any[] = [];
-          if (response && Array.isArray(response.data)) {
+          let contractorsData: Contractor[] = [];
+
+          if (response.data && Array.isArray(response.data)) {
             contractorsData = response.data;
           } else if (
-            response &&
             response.data &&
+            response.data.data &&
             Array.isArray(response.data.data)
           ) {
             contractorsData = response.data.data;
@@ -121,7 +128,7 @@ export function StepGeneralInfo({
           setContractors(contractorsData);
         }
       } catch (err) {
-        console.error('Error fetching contractors:', err);
+        console.error(STEP_MESSAGES.FETCH_CONTRACTORS_ERROR, err);
       } finally {
         setIsLoadingContractors(false);
       }
@@ -137,11 +144,10 @@ export function StepGeneralInfo({
   return (
     <div className='w-full max-w-[846px] bg-[var(--card-background)] rounded-2xl p-4 flex flex-col items-center'>
       <h2 className='text-[30px] font-bold text-center mb-2 text-[var(--text-dark)]'>
-        General information
+        {STEP_MESSAGES.GENERAL_INFO_TITLE}
       </h2>
       <p className='text-[var(--text-secondary)] text-[18px] font-normal text-center mb-8 max-w-lg'>
-        Please answer the required questions to start your project. This helps
-        us generate a personalized quote for you.
+        {STEP_MESSAGES.GENERAL_INFO_DESCRIPTION}
       </p>
       <Form {...form}>
         <form
@@ -157,10 +163,12 @@ export function StepGeneralInfo({
                   name='fullName'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='field-label'>Your Name</FormLabel>
+                      <FormLabel className='field-label'>
+                        {STEP_MESSAGES.YOUR_NAME_LABEL}
+                      </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder='Enter your full name'
+                          placeholder={STEP_MESSAGES.ENTER_FULL_NAME}
                           className='input-field'
                           {...field}
                         />
@@ -178,7 +186,7 @@ export function StepGeneralInfo({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='field-label'>
-                        Project Start Date
+                        {STEP_MESSAGES.PROJECT_START_DATE_LABEL}
                       </FormLabel>
                       <FormControl>
                         <Popover>
@@ -189,7 +197,7 @@ export function StepGeneralInfo({
                             >
                               {field.value
                                 ? format(field.value, 'PPP')
-                                : 'Select Date'}
+                                : STEP_MESSAGES.SELECT_DATE}
                               <IconsaxCalendar
                                 size='50'
                                 className='!h-6 !w-6'
@@ -223,7 +231,7 @@ export function StepGeneralInfo({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='field-label'>
-                        Project Finish Date
+                        {STEP_MESSAGES.PROJECT_FINISH_DATE_LABEL}
                       </FormLabel>
                       <FormControl>
                         <Popover>
@@ -234,7 +242,7 @@ export function StepGeneralInfo({
                             >
                               {field.value
                                 ? format(field.value, 'PPP')
-                                : 'Select Date'}
+                                : STEP_MESSAGES.SELECT_DATE}
                               <IconsaxCalendar
                                 size='50'
                                 className='!h-6 !w-6'
@@ -267,11 +275,13 @@ export function StepGeneralInfo({
                   name='email'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='field-label'>Email</FormLabel>
+                      <FormLabel className='field-label'>
+                        {STEP_MESSAGES.EMAIL_LABEL}
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type='email'
-                          placeholder='Enter your email'
+                          placeholder={STEP_MESSAGES.ENTER_EMAIL}
                           className='input-field'
                           {...field}
                         />
@@ -289,11 +299,11 @@ export function StepGeneralInfo({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='field-label'>
-                        Phone Number
+                        {STEP_MESSAGES.PHONE_NUMBER_LABEL}
                       </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder='Enter your number'
+                          placeholder={STEP_MESSAGES.ENTER_PHONE_NUMBER}
                           className='input-field'
                           {...field}
                         />
@@ -310,10 +320,12 @@ export function StepGeneralInfo({
                   name='budget'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='field-label'>Your Budget</FormLabel>
+                      <FormLabel className='field-label'>
+                        {STEP_MESSAGES.YOUR_BUDGET_LABEL}
+                      </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder='Enter your Budget'
+                          placeholder={STEP_MESSAGES.ENTER_BUDGET}
                           className='input-field'
                           {...field}
                         />
@@ -331,7 +343,7 @@ export function StepGeneralInfo({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='field-label'>
-                        Preferred Contractor
+                        {STEP_MESSAGES.PREFERRED_CONTRACTOR_LABEL}
                       </FormLabel>
                       <Select
                         value={field.value}
@@ -343,22 +355,22 @@ export function StepGeneralInfo({
                             <SelectValue
                               placeholder={
                                 isLoadingContractors
-                                  ? 'Loading contractors...'
-                                  : 'Select contractor'
+                                  ? STEP_MESSAGES.LOADING_CONTRACTORS
+                                  : STEP_MESSAGES.SELECT_CONTRACTOR
                               }
                             />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className='bg-[var(--white-background)] border border-[var(--border-dark)] shadow-[0px_2px_8px_0px_#0000001A] rounded-[8px]'>
                           {/* <SelectItem value='any'>Any</SelectItem> */}
-                          {contractors.map((contractor: any) => (
-                            <SelectItem
-                              key={contractor.id}
-                              value={contractor.id.toString()}
-                            >
-                              {contractor.name}
-                            </SelectItem>
-                          ))}
+                          {contractors.map((contractor: any) => {
+                            const { id, name } = contractor;
+                            return (
+                              <SelectItem key={id} value={id.toString()}>
+                                {name}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -374,10 +386,12 @@ export function StepGeneralInfo({
                 name='address'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='field-label'>Address</FormLabel>
+                    <FormLabel className='field-label'>
+                      {STEP_MESSAGES.ADDRESS_LABEL}
+                    </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Enter your address'
+                        placeholder={STEP_MESSAGES.ENTER_ADDRESS}
                         className='input-field'
                         {...field}
                       />
@@ -391,7 +405,7 @@ export function StepGeneralInfo({
           {/* Submit/Next Step Button */}
           <div className='flex justify-end'>
             <Button type='submit' className='btn-primary !h-12 !px-12'>
-              {isLastStep ? 'Submit' : 'Next Step'}
+              {isLastStep ? STEP_MESSAGES.SUBMIT : STEP_MESSAGES.NEXT_STEP}
             </Button>
           </div>
         </form>
