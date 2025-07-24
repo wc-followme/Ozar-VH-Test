@@ -6,13 +6,15 @@ import SideSheet from '@/components/shared/common/SideSheet';
 import { ToolForm } from '@/components/shared/forms/ToolForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ACTIONS } from '@/constants/common';
 import { apiService, CreateToolRequest, Tool } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
   extractApiErrorMessage,
   getUserPermissionsFromStorage,
 } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { Edit2, Trash } from 'iconsax-react';
+import { useEffect, useMemo, useState } from 'react';
 import ToolCardSkeleton from '../../../components/shared/skeleton/ToolCardSkeleton';
 import { TOOL_MESSAGES } from './tool-messages';
 
@@ -39,6 +41,25 @@ export default function ToolsManagement() {
   // Get user permissions for tools
   const userPermissions = getUserPermissionsFromStorage();
   const canEdit = userPermissions?.tools?.edit;
+
+  // Memoize menu options to prevent unnecessary re-renders
+  const menuOptions = useMemo(
+    () => [
+      {
+        label: TOOL_MESSAGES.EDIT_MENU,
+        action: ACTIONS.EDIT,
+        icon: Edit2,
+        variant: 'default' as const,
+      },
+      {
+        label: TOOL_MESSAGES.DELETE_MENU,
+        action: ACTIONS.DELETE,
+        icon: Trash,
+        variant: 'destructive' as const,
+      },
+    ],
+    []
+  );
 
   const cdnPrefix = process.env['NEXT_PUBLIC_CDN_URL'] || '';
 
@@ -367,6 +388,7 @@ export default function ToolsManagement() {
                 brand={tool.manufacturer}
                 quantity={tool.available_quantity}
                 videoCount={0} // Static 0 for now as requested
+                menuOptions={menuOptions}
                 onDelete={() => handleDelete(tool.uuid)}
                 onEdit={() => handleEdit(tool.uuid)}
               />
