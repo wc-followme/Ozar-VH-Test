@@ -415,7 +415,7 @@ export default function ToolsManagement() {
                   }
                 : {}
             }
-            isEdit={true}
+            isEdit={!!editToolUuid}
           />
         )}
       </SideSheet>
