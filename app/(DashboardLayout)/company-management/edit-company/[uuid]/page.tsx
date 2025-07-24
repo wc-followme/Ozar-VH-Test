@@ -9,12 +9,14 @@ import {
   GetCompanyResponse,
   UpdateCompanyRequest,
 } from '@/lib/api';
+
 import { useAuth } from '@/lib/auth-context';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
-import { extractApiErrorMessage, extractApiSuccessMessage } from '@/lib/utils';
+import { extractApiErrorMessage } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { COMPANY_MESSAGES } from '../../company-messages';
 import { CompanyCreateFormData, CompanyInitialData } from '../../company-types';
 
@@ -55,6 +57,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError } = useAuth();
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [imageDeleted, setImageDeleted] = useState(false);
 
   const isCompanyApiResponse = (obj: unknown): obj is GetCompanyResponse => {
     return (
@@ -79,6 +82,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
           // Set existing image if available
           if (response.data.image) {
             setFileKey(response.data.image);
+            setImageDeleted(false); // Reset deleted state when loading existing image
           }
         } else {
           throw new Error('Invalid response format');
@@ -108,14 +112,14 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
       return;
     }
 
-    try {
-      setUploading(true);
-      setPhotoFile(file);
+    setPhotoFile(file);
+    setUploading(true);
 
+    try {
       const ext = file.name.split('.').pop() || 'png';
       const timestamp = Date.now();
-      const randomId = Math.random().toString(36).substring(2, 15);
-      const generatedFileName = `company_${randomId}_${timestamp}.${ext}`;
+      const companyUuid = uuidv4();
+      const generatedFileName = `company_${companyUuid}_${timestamp}.${ext}`;
 
       const presigned = await getPresignedUrl({
         fileName: generatedFileName,
@@ -124,12 +128,13 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
         purpose: 'company',
         customPath: '',
       });
+
       await uploadFileToPresignedUrl(presigned.data['uploadUrl'], file);
       setFileKey(presigned.data['fileKey'] || '');
+      setImageDeleted(false); // Reset deleted state when new image is uploaded
     } catch (err: unknown) {
       showErrorToast(COMPANY_MESSAGES.UPLOAD_ERROR);
       setPhotoFile(null);
-      setFileKey('');
     } finally {
       setUploading(false);
     }
@@ -138,34 +143,36 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
   const handleDeletePhoto = () => {
     setPhotoFile(null);
     setFileKey('');
+    setImageDeleted(true);
   };
 
   const handleUpdateCompany = async (data: CompanyCreateFormData) => {
     setFormLoading(true);
     try {
       const updatePayload: UpdateCompanyRequest = {
-        name: data.name,
-        tagline: data.tagline,
-        about: data.about,
-        email: data.email,
+        name: data.name.trim(),
+        tagline: data.tagline.trim(),
+        about: data.about.trim(),
+        email: data.email.trim(),
         country_code: data.country_code,
-        phone_number: data.phone_number,
-        communication: data.communication,
-        website: data.website,
+        phone_number: data.phone_number.trim(),
+        communication: data.communication.trim(),
+        website: data.website?.trim() || '',
         preferred_communication_method: data.preferred_communication_method,
-        city: data.city,
-        pincode: data.pincode,
-        projects: data.projects,
+        city: data.city.trim(),
+        pincode: data.pincode.trim(),
+        projects: data.projects.trim(),
       };
 
-      // Add expiry_date only if it's provided
       if (data.expiry_date) {
         updatePayload.expiry_date = data.expiry_date;
       }
 
-      // Add image if file was uploaded
+      // Add image if file was uploaded, or remove if deleted
       if (fileKey) {
         updatePayload.image = fileKey;
+      } else if (imageDeleted) {
+        updatePayload.image = ''; // Explicitly remove the image
       }
 
       const response = await apiService.updateCompany(
@@ -174,22 +181,21 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
       );
 
       if (response.statusCode === 200) {
-        showSuccessToast(
-          extractApiSuccessMessage(response, COMPANY_MESSAGES.UPDATE_SUCCESS)
-        );
+        showSuccessToast(COMPANY_MESSAGES.UPDATE_SUCCESS);
         router.push('/company-management');
       } else {
-        throw new Error(response.message || COMPANY_MESSAGES.UPDATE_ERROR);
+        showErrorToast(
+          extractApiErrorMessage(response.message) ||
+            COMPANY_MESSAGES.UPDATE_ERROR
+        );
       }
-    } catch (err: unknown) {
-      if (handleAuthError(err)) {
-        return;
+    } catch (error: any) {
+      console.error('Error updating company:', error);
+      if (error.status === 401) {
+        handleAuthError(error);
+      } else {
+        showErrorToast(COMPANY_MESSAGES.UPDATE_ERROR);
       }
-      const errorMessage = extractApiErrorMessage(
-        err,
-        COMPANY_MESSAGES.UPDATE_ERROR
-      );
-      showErrorToast(errorMessage);
     } finally {
       setFormLoading(false);
     }
