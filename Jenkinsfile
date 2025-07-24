@@ -5,7 +5,7 @@ pipeline {
         EC2_USER_HOST = 'ubuntu@13.232.74.144'
     }
 
-    def url = 'https://api.envision.webcluesstaging.com/'
+    def url = 'https://envision.webcluesstaging.com/'
 
     stages {
         stage('Run Deployment Script on Staging EC2') {
@@ -13,7 +13,7 @@ pipeline {
                 sshagent(credentials: ['envision-ssh-key']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no $EC2_USER_HOST << 'EOF'
-                        bash /home/ubuntu/scripts/backend-deploy.sh
+                        bash /home/ubuntu/scripts/frontend-deploy.sh
                     EOF
                     """
                 }
