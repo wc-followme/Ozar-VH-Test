@@ -401,6 +401,7 @@ export interface UserPermissions {
     history: boolean;
   };
   jobs: {
+    view: boolean;
     edit: boolean;
     archive: boolean;
   };

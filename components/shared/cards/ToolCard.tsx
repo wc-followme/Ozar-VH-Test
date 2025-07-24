@@ -2,7 +2,6 @@ import { ConfirmDeleteModal } from '@/components/shared/common/ConfirmDeleteModa
 import { ACTIONS } from '@/constants/common';
 import { getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { Edit2, Trash } from 'iconsax-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { Badge } from '../../ui/badge';
@@ -14,6 +13,17 @@ interface ToolCardProps {
   brand: string;
   quantity: number;
   videoCount: number;
+  menuOptions: {
+    label: string;
+    action: string;
+    variant?: 'default' | 'destructive';
+    icon: React.ComponentType<{
+      size?: string | number;
+      color?: string;
+      variant?: 'Linear' | 'Outline' | 'Broken' | 'Bold' | 'Bulk' | 'TwoTone';
+      className?: string;
+    }>;
+  }[];
   onDelete: () => void;
   onEdit?: () => void;
 }
@@ -24,6 +34,7 @@ export default function ToolCard({
   brand,
   quantity,
   videoCount,
+  menuOptions,
   onDelete,
   onEdit,
 }: ToolCardProps) {
@@ -36,16 +47,11 @@ export default function ToolCard({
   const canArchive = userPermissions?.tools?.archive;
 
   // Filter menu options based on permissions
-  const menuOptions = [
-    { label: 'Edit', action: ACTIONS.EDIT, icon: Edit2 },
-    { label: 'Archive', action: ACTIONS.ARCHIVE, icon: Trash },
-  ];
-
   const filteredMenuOptions = menuOptions.filter(option => {
     if (option.action === ACTIONS.EDIT) {
       return canEdit;
     }
-    if (option.action === ACTIONS.ARCHIVE) {
+    if (option.action === ACTIONS.DELETE || option.action === ACTIONS.ARCHIVE) {
       return canArchive;
     }
     return true; // Show other actions by default
@@ -98,7 +104,8 @@ export default function ToolCard({
                 if (action === ACTIONS.EDIT) {
                   if (onEdit) onEdit();
                 }
-                if (action === ACTIONS.ARCHIVE) setShowDelete(true);
+                if (action === ACTIONS.DELETE || action === ACTIONS.ARCHIVE)
+                  setShowDelete(true);
               }}
               trigger={
                 <button className='h-8 w-8 p-0 flex items-center justify-center rounded-full'>

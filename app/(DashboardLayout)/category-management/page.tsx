@@ -314,6 +314,17 @@ const CategoryManagement = () => {
     });
   };
 
+  const handleOpenCreateForm = () => {
+    // Reset all state for create mode
+    setEditingCategory(null);
+    reset({
+      name: '',
+      description: '',
+      icon: defaultIconOption?.value ?? '',
+    });
+    setOpen(true);
+  };
+
   return (
     <section className='w-full overflow-y-auto pb-4'>
       <header className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 xl:mb-8'>
@@ -324,7 +335,7 @@ const CategoryManagement = () => {
           {canEdit && (
             <div className='flex justify-end'>
               <Button
-                onClick={() => setOpen(true)}
+                onClick={handleOpenCreateForm}
                 className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-6 text-center !w-[42px] sm:!w-auto rounded-full'
               >
                 <Add size='20' color='#fff' className='sm:hidden' />
@@ -351,7 +362,7 @@ const CategoryManagement = () => {
               <NoDataFound
                 description={CATEGORY_MESSAGES.NO_CATEGORIES_FOUND_DESCRIPTION}
                 buttonText={CATEGORY_MESSAGES.ADD_CATEGORY_BUTTON}
-                onButtonClick={() => setOpen(true)}
+                onButtonClick={handleOpenCreateForm}
                 showButton={canEdit ?? false}
               />
             </div>
@@ -402,7 +413,12 @@ const CategoryManagement = () => {
             : CATEGORY_MESSAGES.ADD_CATEGORY_TITLE
         }
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={open => {
+          if (!open) {
+            handleClose(); // Reset state when sheet is closed
+          }
+          setOpen(open);
+        }}
         size='600px'
       >
         <div className='space-y-6'>
@@ -410,6 +426,7 @@ const CategoryManagement = () => {
             <LoadingComponent variant='fullscreen' size='sm' />
           ) : (
             <CategoryForm
+              key={editingCategory?.uuid || 'create'} // Force re-render when switching modes
               control={control}
               isSubmitting={isSubmitting}
               editingCategory={editingCategory}

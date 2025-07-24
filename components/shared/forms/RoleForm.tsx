@@ -112,7 +112,7 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
       ['view', 'edit', 'archive'], // services
       ['view', 'edit', 'archive'], // materials
       ['view', 'edit', 'archive', 'history'], // tools
-      ['edit', 'archive'], // jobs
+      ['view', 'edit', 'archive'], // jobs
     ];
 
     // Helper: Convert permissions object to accordions state
@@ -146,7 +146,7 @@ export const RoleForm: React.FC<RoleFormProps> = React.memo(
         services: { view: false, edit: false, archive: false },
         materials: { view: false, edit: false, archive: false },
         tools: { view: false, edit: false, archive: false, history: false },
-        jobs: { edit: false, archive: false },
+        jobs: { view: false, edit: false, archive: false },
       };
       accordions.forEach((accordion, accordionIdx) => {
         const permissionKey = accordionToPermissionMap[accordionIdx];
