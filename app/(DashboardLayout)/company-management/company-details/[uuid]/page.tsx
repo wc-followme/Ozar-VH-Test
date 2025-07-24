@@ -429,7 +429,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
             </div>
             {/* Info Row */}
             <div className='flex flex-col sm:flex-row gap-3 md:gap-4'>
-              <div className='flex flex-col sm:flex-row gap-6 md:gap-14 text-sm md:text-[16px] flex-1 leading-tight'>
+              <div className='flex flex-col sm:flex-row sm:gap-6 gap-3 md:gap-14 text-sm md:text-[16px] flex-1 leading-tight'>
                 <div>
                   <div className='text-[var(--text-secondary)] text-xs md:text-sm'>
                     Industry
@@ -483,7 +483,7 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
           className='w-full'
         >
           <div className='flex justify-center sm:justify-start'>
-            <TabsList className='grid grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal w-full max-w-md sm:w-auto'>
+            <TabsList className='grid grid-cols-[auto_auto] sm:grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal w-full max-w-md sm:w-auto'>
               <TabsTrigger
                 value='about'
                 className='px-3 md:px-6 lg:px-8 py-2 text-sm md:text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal whitespace-nowrap'

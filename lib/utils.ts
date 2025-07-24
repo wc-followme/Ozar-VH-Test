@@ -1,3 +1,4 @@
+'use client';
 import { clsx, type ClassValue } from 'clsx';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -150,19 +151,29 @@ export const calculateDynamicWidth = (
 
   // Mobile devices (up to maxMobileWidth)
   if (screenWidth <= maxMobileWidth) {
-    return `${screenWidth - mobilePadding - buttonWidth}px`;
+    const availableWidth = screenWidth - mobilePadding - buttonWidth;
+    return `${Math.max(availableWidth, 200)}px`; // Minimum 200px width
   }
   // Small tablets (maxMobileWidth + 1 to maxTabletWidth)
   else if (screenWidth <= maxTabletWidth) {
-    return `${Math.min(screenWidth - tabletPadding - buttonWidth, 400)}px`;
+    const availableWidth = Math.min(
+      screenWidth - tabletPadding - buttonWidth,
+      400
+    );
+    return `${Math.max(availableWidth, 250)}px`; // Minimum 250px width
   }
   // Medium tablets (maxTabletWidth + 1 to maxLargeTabletWidth)
   else if (screenWidth <= maxLargeTabletWidth) {
-    return `${Math.min(screenWidth - desktopPadding - buttonWidthDesktop, 500)}px`;
+    const availableWidth = Math.min(
+      screenWidth - desktopPadding - buttonWidthDesktop,
+      500
+    );
+    return `${Math.max(availableWidth, 300)}px`; // Minimum 300px width
   }
   // Desktop (maxLargeTabletWidth + 1 and above)
   else {
-    return `${defaultDesktopWidth - buttonWidthDesktop}px`;
+    const availableWidth = defaultDesktopWidth - buttonWidthDesktop;
+    return `${Math.max(availableWidth, 200)}px`; // Minimum 200px width
   }
 };
 

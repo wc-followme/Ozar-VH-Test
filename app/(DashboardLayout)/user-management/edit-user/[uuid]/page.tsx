@@ -536,7 +536,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
                 value='permissions'
                 className='px-8 py-2 text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
               >
-                {USER_MESSAGES.PERMISSIONS_TAB}
+                {USER_MESSAGES.SETTINGS_TAB}
               </TabsTrigger>
             </TabsList>
 
