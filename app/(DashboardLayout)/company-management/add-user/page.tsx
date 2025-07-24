@@ -298,7 +298,7 @@ export default function AddCompanyUserPage() {
                 </div>
 
                 {/* Right Column - Form Fields */}
-                <div className='flex-1'>
+                <div className='flex-1 w-full'>
                   {loadingCompany ? (
                     <LoadingComponent variant='inline' />
                   ) : (

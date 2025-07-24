@@ -175,10 +175,10 @@ const config: Config = {
           },
           // Custom grid-cols utilities
           '.grid-cols-autofit': {
-            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(255px, 1fr))',
           },
           '.grid-cols-autofit-xl': {
-            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
           },
         },
         {
