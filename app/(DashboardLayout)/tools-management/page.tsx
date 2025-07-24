@@ -6,13 +6,15 @@ import SideSheet from '@/components/shared/common/SideSheet';
 import { ToolForm } from '@/components/shared/forms/ToolForm';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ACTIONS } from '@/constants/common';
 import { apiService, CreateToolRequest, Tool } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
   extractApiErrorMessage,
   getUserPermissionsFromStorage,
 } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { Edit2, Trash } from 'iconsax-react';
+import { useEffect, useMemo, useState } from 'react';
 import ToolCardSkeleton from '../../../components/shared/skeleton/ToolCardSkeleton';
 import { TOOL_MESSAGES } from './tool-messages';
 
@@ -39,6 +41,25 @@ export default function ToolsManagement() {
   // Get user permissions for tools
   const userPermissions = getUserPermissionsFromStorage();
   const canEdit = userPermissions?.tools?.edit;
+
+  // Memoize menu options to prevent unnecessary re-renders
+  const menuOptions = useMemo(
+    () => [
+      {
+        label: TOOL_MESSAGES.EDIT_MENU,
+        action: ACTIONS.EDIT,
+        icon: Edit2,
+        variant: 'default' as const,
+      },
+      {
+        label: TOOL_MESSAGES.DELETE_MENU,
+        action: ACTIONS.DELETE,
+        icon: Trash,
+        variant: 'destructive' as const,
+      },
+    ],
+    []
+  );
 
   const cdnPrefix = process.env['NEXT_PUBLIC_CDN_URL'] || '';
 
@@ -233,7 +254,11 @@ export default function ToolsManagement() {
     service_ids: string;
   }) => {
     // Prevent submission if originalToolAssets is not loaded yet
-    if (!originalToolAssets && editToolData?.assets && editToolData.assets.length > 0) {
+    if (
+      !originalToolAssets &&
+      editToolData?.assets &&
+      editToolData.assets.length > 0
+    ) {
       return;
     }
 
@@ -309,6 +334,17 @@ export default function ToolsManagement() {
     setOriginalToolAssets('');
   };
 
+  const handleOpenCreateForm = () => {
+    // Reset all state for create mode
+    setPhoto(null);
+    setFileKey('');
+    setEditToolUuid(null);
+    setEditToolData(null);
+    setImageDeleted(false);
+    setOriginalToolAssets('');
+    setSideSheetOpen(true);
+  };
+
   if (loading) {
     return (
       <div className='w-full'>
@@ -330,10 +366,7 @@ export default function ToolsManagement() {
       <div className='flex items-center justify-between mb-8'>
         <h2 className='page-title'>Tools Management</h2>
         {canEdit && (
-          <Button
-            onClick={() => setSideSheetOpen(true)}
-            className='btn-primary'
-          >
+          <Button onClick={handleOpenCreateForm} className='btn-primary'>
             Create Tool
           </Button>
         )}
@@ -355,6 +388,7 @@ export default function ToolsManagement() {
                 brand={tool.manufacturer}
                 quantity={tool.available_quantity}
                 videoCount={0} // Static 0 for now as requested
+                menuOptions={menuOptions}
                 onDelete={() => handleDelete(tool.uuid)}
                 onEdit={() => handleEdit(tool.uuid)}
               />
@@ -366,7 +400,7 @@ export default function ToolsManagement() {
           title='No Tools Found'
           description="You haven't created any tools yet. Start by adding your first one to organize your tools."
           buttonText='Create Tool'
-          onButtonClick={() => setSideSheetOpen(true)}
+          onButtonClick={handleOpenCreateForm}
           showButton={canEdit ?? false}
         />
       )}
@@ -379,13 +413,19 @@ export default function ToolsManagement() {
             : TOOL_MESSAGES.ADD_TOOL_TITLE
         }
         open={sideSheetOpen}
-        onOpenChange={setSideSheetOpen}
+        onOpenChange={open => {
+          if (!open) {
+            handleCancel(); // Reset state when sheet is closed
+          }
+          setSideSheetOpen(open);
+        }}
         size='600px'
       >
         {editLoading ? (
           <div className='p-6 text-center'>Loading...</div>
         ) : (
           <ToolForm
+            key={editToolUuid || 'create'} // Force re-render when switching modes
             photo={photo}
             setPhoto={setPhoto}
             handleDeletePhoto={handleDeletePhoto}
@@ -415,7 +455,7 @@ export default function ToolsManagement() {
                   }
                 : {}
             }
-            isEdit={true}
+            isEdit={!!editToolUuid}
           />
         )}
       </SideSheet>
