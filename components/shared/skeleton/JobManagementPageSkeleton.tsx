@@ -56,7 +56,7 @@ const JobCardSkeleton: React.FC = () => (
 const JobManagementPageSkeleton: React.FC = () => (
   <div className=''>
     {/* Stats Cards Skeleton */}
-    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-4 xl:mb-8'>
+    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-6 mb-8'>
       {[...Array(4)].map((_, i) => (
         <Card
           key={i}
@@ -79,13 +79,13 @@ const JobManagementPageSkeleton: React.FC = () => (
       ))}
     </div>
     {/* Tabs and Create Job Button Skeleton */}
-    <div className='flex sm:flex-row flex-col items-start lg:items-center gap-2 w-full mb-4 xl:mb-10'>
-      <Skeleton className='h-[54px] rounded-full bg-[var(--bg-skeleton)] w-full sm:w-1/2' />
-      <Skeleton className='h-[48px] w-32 rounded-full bg-[var(--bg-skeleton)] ml-auto' />
+    <div className='flex flex-row items-start lg:items-center gap-2 w-full mb-10'>
+      <Skeleton className='h-12 rounded-full bg-[var(--bg-skeleton)] w-full sm:w-1/2' />
+      <Skeleton className='w-12 h-12  sm:w-32 rounded-full shrink-0 bg-[var(--bg-skeleton)] ml-auto' />
     </div>
     {/* Jobs Grid Skeleton */}
-    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
-      {[...Array(8)].map((_, i) => (
+    <div className='grid grid-cols-autofit xl:grid-cols-autofit-xl gap-3 xl:gap-6'>
+      {[...Array(4)].map((_, i) => (
         <JobCardSkeleton key={i} />
       ))}
     </div>

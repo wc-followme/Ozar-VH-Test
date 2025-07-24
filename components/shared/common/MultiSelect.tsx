@@ -113,9 +113,23 @@ const MultiSelect = <OptionType = MultiSelectOption,>({
         </PopoverTrigger>
         <PopoverContent className='w-full bg-[var(--card-background)] min-w-[var(--radix-popover-trigger-width)] p-0 rounded-[12px] border border-[var(--border-dark)]'>
           <div
-            className='h-48 overflow-y-auto'
+            className='max-h-48 overflow-y-auto'
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehavior: 'contain',
+              touchAction: 'pan-y',
+            }}
             onWheel={e => {
+              // Handle mouse wheel scrolling for desktop
               e.currentTarget.scrollTop += e.deltaY;
+            }}
+            onTouchStart={e => {
+              // Allow touch events to propagate
+              e.stopPropagation();
+            }}
+            onTouchMove={e => {
+              // Allow touch scrolling
+              e.stopPropagation();
             }}
           >
             <div className='py-2'>
