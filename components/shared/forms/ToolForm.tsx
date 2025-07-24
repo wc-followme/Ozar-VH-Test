@@ -11,7 +11,7 @@ import { apiService, Service } from '@/lib/api';
 import { getPresignedUrl, uploadFileToPresignedUrl } from '@/lib/upload';
 import { cn } from '@/lib/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import * as yup from 'yup';
@@ -72,7 +72,6 @@ const ToolForm: React.FC<ToolFormProps> = ({
   // Service dropdown states
   const [services, setServices] = useState<Service[]>([]);
   const [loadingServices, setLoadingServices] = useState(false);
-  const formInitializedRef = useRef(false);
 
   const {
     control,
@@ -90,9 +89,10 @@ const ToolForm: React.FC<ToolFormProps> = ({
     },
   });
 
-  // Update form state if initialValues change (for edit mode) - only on initial load
+  // Update form state when initialValues change (for switching between create/edit modes)
   useEffect(() => {
-    if (initialValues && !formInitializedRef.current) {
+    if (initialValues) {
+      // Edit mode - populate with existing data
       reset({
         name: initialValues.name || '',
         manufacturer: initialValues.manufacturer || '',
@@ -100,7 +100,14 @@ const ToolForm: React.FC<ToolFormProps> = ({
         services:
           initialValues.services?.map(s => s.toString()).filter(Boolean) || [],
       });
-      formInitializedRef.current = true;
+    } else {
+      // Create mode - reset to empty form
+      reset({
+        name: '',
+        manufacturer: '',
+        available_quantity: 1,
+        services: [],
+      });
     }
   }, [initialValues, reset]);
 
