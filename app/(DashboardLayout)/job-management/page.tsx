@@ -346,19 +346,19 @@ export default function JobManagement() {
           onValueChange={handleTabChange}
           className='w-full'
         >
-          <div className='flex flex-row items-center gap-2 w-full overflow-hidden'>
+          <div className='flex flex-row items-center gap-2 w-full overflow-hidden max-w-full'>
             <DynamicScrollArea
-              className='flex-1 rounded-full min-w-0'
+              className='flex-1 rounded-full min-w-0 max-w-full'
               widthOptions={{
-                mobilePadding: 32,
-                tabletPadding: 40,
-                desktopPadding: 48,
+                mobilePadding: 40,
+                tabletPadding: 48,
+                desktopPadding: 56,
                 maxMobileWidth: 640,
                 maxTabletWidth: 768,
                 maxLargeTabletWidth: 1024,
-                defaultDesktopWidth: 200,
-                buttonWidth: canEdit ? 60 : 0, // Updated for 40px button + gap
-                buttonWidthDesktop: canEdit ? 150 : 0, // Updated for 90px button + gap
+                defaultDesktopWidth: 180,
+                buttonWidth: canEdit ? 70 : 0, // 48px button + 8px gap + 14px safety margin
+                buttonWidthDesktop: canEdit ? 200 : 0, // Auto width button + gap + safety margin
               }}
             >
               <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start max-w-full overflow-hidden'>
@@ -435,10 +435,10 @@ export default function JobManagement() {
             {canEdit && (
               <button
                 onClick={() => setIsOpen(true)}
-                className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-3 text-center !h-12 sm:!h-12 !w-12 sm:!w-[90px] rounded-full'
+                className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-8 text-base text-center !h-12 sm:!h-12 !w-12 sm:!w-auto rounded-full'
               >
                 <Add size='18' color='#fff' className='sm:hidden' />
-                <span className='hidden sm:inline text-xs'>
+                <span className='hidden sm:inline text-base'>
                   {JOB_MESSAGES.ADD_JOB_BUTTON}
                 </span>
               </button>

@@ -178,7 +178,7 @@ const config: Config = {
             gridTemplateColumns: 'repeat(auto-fill, minmax(255px, 1fr))',
           },
           '.grid-cols-autofit-xl': {
-            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
           },
         },
         {

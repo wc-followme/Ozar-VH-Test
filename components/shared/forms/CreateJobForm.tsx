@@ -206,8 +206,8 @@ export function CreateJobForm({
           className='space-y-4 sm:space-y-6'
         >
           {/* Full Name Input with Autocomplete */}
-          <div className='grid grid-cols-1 gap-4'>
-            <div className='space-y-1 md:space-y-2 relative'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className='space-y-1 md:space-y-2 relative col-span-full'>
               <Label
                 htmlFor='client_name'
                 className='fled-label text-sm sm:text-base'
@@ -360,7 +360,7 @@ export function CreateJobForm({
                 // Helper to determine if a value is selected
                 const isSelected = (v: string) => value.includes(v);
                 return (
-                  <div className='grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'>
+                  <div className='grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3'>
                     {selectBoxOptions.map(
                       ({
                         id,
