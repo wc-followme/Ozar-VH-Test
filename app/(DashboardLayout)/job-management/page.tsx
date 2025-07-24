@@ -1,5 +1,6 @@
 'use client';
 import NoDataFound from '@/components/shared/common/NoDataFound';
+
 import { useToast } from '@/components/ui/use-toast';
 import {
   APP_CONFIG,
@@ -10,20 +11,19 @@ import {
 } from '@/constants/common';
 import { apiService } from '@/lib/api';
 import { IconFlag } from '@tabler/icons-react';
-import { Profile2User } from 'iconsax-react';
+import { Add, Profile2User } from 'iconsax-react';
 import { DollarSign } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { FlagHookIcon } from '../../../components/icons/FalgHookIcon';
 import { JobCard } from '../../../components/shared/cards/JobCard';
 import { StatsCard } from '../../../components/shared/cards/StatsCard';
 import ComingSoon from '../../../components/shared/common/ComingSoon';
+import { DynamicScrollArea } from '../../../components/shared/common/DynamicScrollArea';
 import SideSheet from '../../../components/shared/common/SideSheet';
 import { CreateJobForm } from '../../../components/shared/forms/CreateJobForm';
 import { JobCardSkeleton } from '../../../components/shared/skeleton/JobCardSkeleton';
 import JobManagementPageSkeleton from '../../../components/shared/skeleton/JobManagementPageSkeleton';
 import { Badge } from '../../../components/ui/badge';
-import { Button } from '../../../components/ui/button';
-import { ScrollArea, ScrollBar } from '../../../components/ui/scroll-area';
 import {
   Tabs,
   TabsContent,
@@ -369,9 +369,22 @@ export default function JobManagement() {
           onValueChange={handleTabChange}
           className='w-full'
         >
-          <div className='flex sm:flex-row flex-col items-start  lg:items-center gap-2 w-full'>
-            <ScrollArea className='w-[285px] max-w-full flex-1 rounded-full'>
-              <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start max-w-full lg:max-w-fit'>
+          <div className='flex flex-row items-center gap-2 w-full overflow-hidden max-w-full'>
+            <DynamicScrollArea
+              className='flex-1 rounded-full min-w-0 max-w-full'
+              widthOptions={{
+                mobilePadding: 40,
+                tabletPadding: 48,
+                desktopPadding: 56,
+                maxMobileWidth: 640,
+                maxTabletWidth: 768,
+                maxLargeTabletWidth: 1024,
+                defaultDesktopWidth: 180,
+                buttonWidth: canEdit ? 70 : 0, // 48px button + 8px gap + 14px safety margin
+                buttonWidthDesktop: canEdit ? 200 : 0, // Auto width button + gap + safety margin
+              }}
+            >
+              <TabsList className='flex w-fit bg-[var(--dark-background)] p-1 rounded-[30px] h-auto font-normal justify-start max-w-full overflow-hidden'>
                 <TabsTrigger
                   value='newLeads'
                   className='px-8  py-2 text-sm xl:text-base gap-3 text-[var(--text-dark)] transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
@@ -441,16 +454,17 @@ export default function JobManagement() {
                   </Badge>
                 </TabsTrigger>
               </TabsList>
-              <ScrollBar orientation='horizontal' />
-            </ScrollArea>
+            </DynamicScrollArea>
             {canEdit && (
-              <Button
-                variant='ghost'
-                className='btn-primary !h-[48px] ml-auto hover:text-white'
+              <button
                 onClick={() => setIsOpen(true)}
+                className='btn-primary flex items-center shrink-0 justify-center !px-0 sm:!px-8 text-base text-center !h-12 sm:!h-12 !w-12 sm:!w-auto rounded-full'
               >
-                {JOB_MESSAGES.ADD_JOB_BUTTON}
-              </Button>
+                <Add size='18' color='#fff' className='sm:hidden' />
+                <span className='hidden sm:inline text-base'>
+                  {JOB_MESSAGES.ADD_JOB_BUTTON}
+                </span>
+              </button>
             )}
           </div>
           <TabsContent value='newLeads' className='pt-8'>
