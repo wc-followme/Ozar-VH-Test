@@ -73,7 +73,25 @@ export default function JobManagement() {
 
   // Get user permissions for jobs
   const userPermissions = getUserPermissionsFromStorage();
+  const canView = userPermissions?.jobs?.view;
   const canEdit = userPermissions?.jobs?.edit;
+
+  // Check if user has permission to view jobs
+  if (!canView) {
+    return (
+      <div className='flex items-center justify-center h-full'>
+        <div className='text-center'>
+          <h2 className='text-xl font-semibold text-[var(--text-dark)] mb-2'>
+            Access Denied
+          </h2>
+          <p className='text-[var(--text-secondary)]'>
+            You don't have permission to view jobs.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Function to fetch jobs based on selected tab
   const fetchJobsByTab = async (tab: string, isInitialLoad = false) => {
     try {
