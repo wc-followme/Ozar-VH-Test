@@ -12,7 +12,7 @@ import { apiService } from '@/lib/api';
 import { IconFlag } from '@tabler/icons-react';
 import { Profile2User } from 'iconsax-react';
 import { DollarSign } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FlagHookIcon } from '../../../components/icons/FalgHookIcon';
 import { JobCard } from '../../../components/shared/cards/JobCard';
 import { StatsCard } from '../../../components/shared/cards/StatsCard';
@@ -44,6 +44,11 @@ export default function JobManagement() {
   const [generatedLink, setGeneratedLink] = useState<string>('');
   const { showSuccessToast, showErrorToast } = useToast();
 
+  // Get user permissions for jobs
+  const userPermissions = getUserPermissionsFromStorage();
+  const canView = userPermissions?.jobs?.view;
+  const canEdit = userPermissions?.jobs?.edit;
+
   // Helper function to generate home-owner link
   const generateHomeOwnerLink = (jobUuid: string) =>
     `${APP_CONFIG.BASE_URL}${ROUTES.HOME_OWNER}/${jobUuid}`;
@@ -60,7 +65,7 @@ export default function JobManagement() {
   });
 
   // Function to fetch filter counts
-  const fetchFilterCounts = async () => {
+  const fetchFilterCounts = useCallback(async () => {
     try {
       const response = await apiService.fetchJobStatistics();
       if (response.data) {
@@ -69,102 +74,86 @@ export default function JobManagement() {
     } catch (error: any) {
       // Error handled silently - filter counts are not critical
     }
-  };
-
-  // Get user permissions for jobs
-  const userPermissions = getUserPermissionsFromStorage();
-  const canView = userPermissions?.jobs?.view;
-  const canEdit = userPermissions?.jobs?.edit;
-
-  // Check if user has permission to view jobs
-  if (!canView) {
-    return (
-      <div className='flex items-center justify-center h-full'>
-        <div className='text-center'>
-          <h2 className='text-xl font-semibold text-[var(--text-dark)] mb-2'>
-            Access Denied
-          </h2>
-          <p className='text-[var(--text-secondary)]'>
-            You don't have permission to view jobs.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  }, []);
 
   // Function to fetch jobs based on selected tab
-  const fetchJobsByTab = async (tab: string, isInitialLoad = false) => {
-    try {
-      if (isInitialLoad) {
-        setLoading(true);
-      } else {
-        setTabLoading(true);
-      }
-      const params: any = {
-        page: 1,
-        limit: 10,
-      };
+  const fetchJobsByTab = useCallback(
+    async (tab: string, isInitialLoad = false) => {
+      try {
+        if (isInitialLoad) {
+          setLoading(true);
+        } else {
+          setTabLoading(true);
+        }
+        const params: any = {
+          page: 1,
+          limit: 10,
+        };
 
-      // Set parameters based on selected tab
-      switch (tab) {
-        case 'newLeads':
-          params.status = CommonStatus.ACTIVE;
-          params.type = JobFilterType.NEW_LEADS;
-          break;
-        case 'info':
-          return;
-        // params.status = CommonStatus.ACTIVE;
-        // params.type = JobFilterType.NEED_ATTENTION;
-        // break;
-        case 'ongoingJob':
-          return;
-        // params.status = CommonStatus.ACTIVE;
-        // params.type = JobFilterType.ONGOING;
-        // break;
-        case 'waitingOnClient':
-          return;
-        // params.status = CommonStatus.ACTIVE;
-        // params.type = JobFilterType.WAITING_ON_CLIENT;
-        // break;
-        case 'archive':
-          params.status = CommonStatus.INACTIVE;
-          params.type = JobFilterType.ALL;
-          break;
-        case 'closed':
-          params.status = CommonStatus.ACTIVE;
-          params.type = JobFilterType.ALL;
-          params.job_status = JobStatus.DONE;
-          break;
-        default:
-          params.status = CommonStatus.ACTIVE;
-          params.type = JobFilterType.ALL;
-      }
+        // Set parameters based on selected tab
+        switch (tab) {
+          case 'newLeads':
+            params.status = CommonStatus.ACTIVE;
+            params.type = JobFilterType.NEW_LEADS;
+            break;
+          case 'info':
+            return;
+          // params.status = CommonStatus.ACTIVE;
+          // params.type = JobFilterType.NEED_ATTENTION;
+          // break;
+          case 'ongoingJob':
+            return;
+          // params.status = CommonStatus.ACTIVE;
+          // params.type = JobFilterType.ONGOING;
+          // break;
+          case 'waitingOnClient':
+            return;
+          // params.status = CommonStatus.ACTIVE;
+          // params.type = JobFilterType.WAITING_ON_CLIENT;
+          // break;
+          case 'archive':
+            params.status = CommonStatus.INACTIVE;
+            params.type = JobFilterType.ALL;
+            break;
+          case 'closed':
+            params.status = CommonStatus.ACTIVE;
+            params.type = JobFilterType.ALL;
+            params.job_status = JobStatus.DONE;
+            break;
+          default:
+            params.status = CommonStatus.ACTIVE;
+            params.type = JobFilterType.ALL;
+        }
 
-      console.log('params', params);
-      const response = await apiService.fetchJobs(params);
-      setJobs(
-        Array.isArray(response.data) ? response.data : response.data?.data || []
-      );
-    } catch (error: any) {
-      showErrorToast(error?.message || JOB_MESSAGES.FETCH_ERROR);
-    } finally {
-      if (isInitialLoad) {
-        setLoading(false);
-      } else {
-        setTabLoading(false);
+        console.log('params', params);
+        const response = await apiService.fetchJobs(params);
+        setJobs(
+          Array.isArray(response.data)
+            ? response.data
+            : response.data?.data || []
+        );
+      } catch (error: any) {
+        showErrorToast(error?.message || JOB_MESSAGES.FETCH_ERROR);
+      } finally {
+        if (isInitialLoad) {
+          setLoading(false);
+        } else {
+          setTabLoading(false);
+        }
       }
-    }
-  };
+    },
+    [showErrorToast]
+  );
 
   // Effect to fetch filter counts on mount
   useEffect(() => {
     fetchFilterCounts();
-  }, []);
+  }, [fetchFilterCounts]);
 
   // Effect to fetch jobs when selected tab changes
   useEffect(() => {
     fetchJobsByTab(selectedTab, true); // Initial load
-  }, []); // Only run once on mount
+  }, [fetchJobsByTab, selectedTab]); // Include dependencies
 
   // Effect to fetch jobs when selected tab changes (for tab switching)
   useEffect(() => {
@@ -175,7 +164,23 @@ export default function JobManagement() {
     ) {
       fetchJobsByTab(selectedTab, false); // Tab switching
     }
-  }, [selectedTab]);
+  }, [selectedTab, fetchJobsByTab]);
+
+  // Check if user has permission to view jobs
+  if (!canView) {
+    return (
+      <div className='flex items-center justify-center h-full'>
+        <div className='text-center'>
+          <h2 className='text-xl font-semibold text-[var(--text-dark)] mb-2'>
+            Access Denied
+          </h2>
+          <p className='text-[var(--text-secondary)]'>
+            You don&apos;t have permission to view jobs.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Handle tab change
   const handleTabChange = (value: string) => {
