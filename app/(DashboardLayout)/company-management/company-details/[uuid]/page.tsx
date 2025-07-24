@@ -483,16 +483,16 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
           className='w-full'
         >
           <div className='flex justify-center sm:justify-start'>
-            <TabsList className='grid grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal w-full sm:w-auto'>
+            <TabsList className='grid grid-cols-2 bg-[var(--background)] p-1 rounded-[30px] h-auto font-normal w-full max-w-md sm:w-auto'>
               <TabsTrigger
                 value='about'
-                className='px-3 md:px-4 py-2 text-sm md:text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='px-3 md:px-6 lg:px-8 py-2 text-sm md:text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal whitespace-nowrap'
               >
                 About
               </TabsTrigger>
               <TabsTrigger
                 value='usermanagement'
-                className='px-4 md:px-8 py-2 text-sm md:text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal'
+                className='px-3 md:px-6 lg:px-8 py-2 text-sm md:text-base transition-colors data-[state=active]:bg-[var(--primary)] data-[state=active]:text-white rounded-[30px] font-normal whitespace-nowrap'
               >
                 User Management
               </TabsTrigger>
@@ -510,64 +510,66 @@ const CompanyDetails = ({ params }: CompanyDetailsPageProps) => {
               </div>
             </div>
             {/* Contact Info Row */}
-            <div className='bg-[var(--white-background)] rounded-[12px] md:rounded-[16px] border border-[#EAECF0] p-3 md:p-5 flex flex-col sm:flex-row gap-4 md:gap-8 text-xs md:text-sm flex-wrap'>
-              <div className='flex-1'>
-                <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
-                  Email
+            <div className='bg-[var(--white-background)] rounded-[12px] md:rounded-[16px] border border-[#EAECF0] p-3 md:p-5'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6 text-xs md:text-sm'>
+                <div className='min-w-0'>
+                  <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
+                    Email
+                  </div>
+                  <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium break-words'>
+                    {company.email || 'N/A'}
+                  </div>
                 </div>
-                <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium'>
-                  {company.email || 'N/A'}
+                <div className='min-w-0'>
+                  <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
+                    Phone Number
+                  </div>
+                  <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium break-words'>
+                    {company.phone_number || 'N/A'}
+                  </div>
                 </div>
-              </div>
-              <div className='flex-1'>
-                <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
-                  Phone Number
+                <div className='min-w-0'>
+                  <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
+                    Address
+                  </div>
+                  <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium break-words'>
+                    {company.city && company.pincode
+                      ? `${company.city}, ${company.pincode}`
+                      : 'N/A'}
+                  </div>
                 </div>
-                <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium'>
-                  {company.phone_number || 'N/A'}
+                <div className='min-w-0'>
+                  <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
+                    Communication
+                  </div>
+                  <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium break-words'>
+                    {company.preferred_communication_method || 'N/A'}
+                  </div>
                 </div>
-              </div>
-              <div className='flex-1'>
-                <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
-                  Address
-                </div>
-                <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium'>
-                  {company.city && company.pincode
-                    ? `${company.city}, ${company.pincode}`
-                    : 'N/A'}
-                </div>
-              </div>
-              <div className='flex-1'>
-                <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
-                  Communication
-                </div>
-                <div className='text-[var(--text-dark)] text-xs md:text-sm font-medium'>
-                  {company.preferred_communication_method || 'N/A'}
-                </div>
-              </div>
-              <div className='flex-1'>
-                <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
-                  Website
-                </div>
-                <div className='flex items-center gap-1 text-[var(--text-dark)] text-xs md:text-sm font-medium'>
-                  {company.website ? (
-                    <>
-                      <span>{company.website}</span>
-                      <Link
-                        href={
-                          company.website.startsWith('http')
-                            ? company.website
-                            : `https://${company.website}`
-                        }
-                        target='_blank'
-                        className='underline ml-1'
-                      >
-                        ↗
-                      </Link>
-                    </>
-                  ) : (
-                    'N/A'
-                  )}
+                <div className='min-w-0 sm:col-span-2 lg:col-span-1'>
+                  <div className='font-normal text-[var(--text-secondary)] mb-1 text-xs md:text-sm'>
+                    Website
+                  </div>
+                  <div className='flex items-center gap-1 text-[var(--text-dark)] text-xs md:text-sm font-medium break-words'>
+                    {company.website ? (
+                      <>
+                        <span className='truncate'>{company.website}</span>
+                        <Link
+                          href={
+                            company.website.startsWith('http')
+                              ? company.website
+                              : `https://${company.website}`
+                          }
+                          target='_blank'
+                          className='underline ml-1 flex-shrink-0'
+                        >
+                          ↗
+                        </Link>
+                      </>
+                    ) : (
+                      'N/A'
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

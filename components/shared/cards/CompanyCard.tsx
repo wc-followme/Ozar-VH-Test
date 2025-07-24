@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { ACTIONS } from '@/constants/common';
-import { getUserPermissionsFromStorage } from '@/lib/utils';
+import { cn, getUserPermissionsFromStorage } from '@/lib/utils';
 import { IconDotsVertical } from '@tabler/icons-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -136,11 +136,12 @@ export function CompanyCard({
             alt={name}
             width={240}
             height={240}
-            className={
+            className={cn(
+              'mx-auto',
               !image || image.trim() === '' || isPlaceholder
                 ? 'w-full h-full object-cover'
-                : 'w-auto h-auto max-h-full object-contain'
-            }
+                : 'w-auto h-auto max-h-full max-w-full object-contain'
+            )}
             onError={() => {
               if (!isPlaceholder) {
                 setIsPlaceholder(true);

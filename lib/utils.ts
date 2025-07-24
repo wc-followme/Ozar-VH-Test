@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from 'clsx';
+import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 // --- Encryption Utilities ---
@@ -112,3 +113,83 @@ export function getUserPermissionsFromStorage():
     return null;
   }
 }
+
+/**
+ * Calculates dynamic width for responsive components based on screen size
+ * @param options Configuration options for width calculation
+ * @returns Calculated width in pixels as a string
+ */
+export const calculateDynamicWidth = (
+  options: {
+    mobilePadding?: number;
+    tabletPadding?: number;
+    desktopPadding?: number;
+    maxMobileWidth?: number;
+    maxTabletWidth?: number;
+    maxLargeTabletWidth?: number;
+    defaultDesktopWidth?: number;
+    buttonWidth?: number;
+    buttonWidthDesktop?: number;
+  } = {}
+) => {
+  if (typeof window === 'undefined') return '320px';
+
+  const {
+    mobilePadding = 32,
+    tabletPadding = 48,
+    desktopPadding = 64,
+    maxMobileWidth = 640,
+    maxTabletWidth = 768,
+    maxLargeTabletWidth = 1024,
+    defaultDesktopWidth = 320,
+    buttonWidth = 0,
+    buttonWidthDesktop = 0,
+  } = options;
+
+  const screenWidth = window.innerWidth;
+
+  // Mobile devices (up to maxMobileWidth)
+  if (screenWidth <= maxMobileWidth) {
+    return `${screenWidth - mobilePadding - buttonWidth}px`;
+  }
+  // Small tablets (maxMobileWidth + 1 to maxTabletWidth)
+  else if (screenWidth <= maxTabletWidth) {
+    return `${Math.min(screenWidth - tabletPadding - buttonWidth, 400)}px`;
+  }
+  // Medium tablets (maxTabletWidth + 1 to maxLargeTabletWidth)
+  else if (screenWidth <= maxLargeTabletWidth) {
+    return `${Math.min(screenWidth - desktopPadding - buttonWidthDesktop, 500)}px`;
+  }
+  // Desktop (maxLargeTabletWidth + 1 and above)
+  else {
+    return `${defaultDesktopWidth - buttonWidthDesktop}px`;
+  }
+};
+
+/**
+ * Hook for dynamic width calculation with resize listener
+ * @param options Configuration options for width calculation
+ * @returns Current calculated width
+ */
+export const useDynamicWidth = (
+  options?: Parameters<typeof calculateDynamicWidth>[0]
+) => {
+  const [width, setWidth] = useState('320px');
+
+  useEffect(() => {
+    const updateWidth = () => {
+      setWidth(calculateDynamicWidth(options));
+    };
+
+    // Set initial width
+    updateWidth();
+
+    // Add resize listener
+    window.addEventListener('resize', updateWidth);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', updateWidth);
+  }, [options]);
+
+  return width;
+};

@@ -60,7 +60,7 @@ export function Sidebar() {
         'hidden lg:block transition-all duration-300 ease h-full bg-[var(--white-background)] sticky top-0'
       )}
     >
-      <div className='flex flex-col h-screen'>
+      <div className='flex flex-col h-screen max-h-[100dvh]'>
         {/* Burger Menu */}
         <div className='w-[60px] h-[60px] flex items-center px-[18px] mx-4 mt-2'>
           <div

@@ -266,7 +266,7 @@ export default function EditCompanyPage({ params }: EditCompanyPageProps) {
           </div>
 
           {/* Right Column - Form Fields */}
-          <div className='flex-1 bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-4 md:p-6'>
+          <div className='flex-1 bg-[var(--card-background)] rounded-[20px] border border-[var(--border-dark)] p-4 md:p-6 w-full'>
             {getInitialData() && (
               <CompanyInfoForm
                 key={company?.uuid || 'loading'}
