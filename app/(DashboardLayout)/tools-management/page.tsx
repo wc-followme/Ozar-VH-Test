@@ -28,6 +28,11 @@ export default function ToolsManagement() {
   const [editToolData, setEditToolData] = useState<Tool | null>(null);
   const [editLoading, setEditLoading] = useState(false);
 
+  // Track if the existing image has been deleted
+  const [imageDeleted, setImageDeleted] = useState(false);
+  // Track the original tool assets from the API to preserve them
+  const [originalToolAssets, setOriginalToolAssets] = useState<string>('');
+
   const { showSuccessToast, showErrorToast } = useToast();
   const { handleAuthError, user } = useAuth();
 
@@ -118,31 +123,43 @@ export default function ToolsManagement() {
   const handleDeletePhoto = () => {
     setPhoto(null);
     setFileKey('');
+    setImageDeleted(true);
   };
 
   const handleEdit = async (uuid: string) => {
     setEditToolUuid(uuid);
     setEditLoading(true);
     setSideSheetOpen(true);
+    setImageDeleted(false);
+    setOriginalToolAssets('');
     try {
       const response = await apiService.getToolDetails(uuid);
       if (response.statusCode === 200 && response.data) {
         setEditToolData(response.data);
+        // Check if tool_assets exists in the response
+        const toolAssetsValue = response.data.tool_assets;
+
+        // Check if we need to extract tool_assets from assets array
+        let finalToolAssets = toolAssetsValue;
+        if (
+          !toolAssetsValue &&
+          response.data.assets &&
+          response.data.assets.length > 0 &&
+          response.data.assets[0]?.media_url
+        ) {
+          // If tool_assets is empty but assets array has items, use the first asset's media_url
+          finalToolAssets = response.data.assets[0].media_url;
+        }
+
+        setOriginalToolAssets(finalToolAssets ?? '');
       } else {
         showErrorToast(
-          extractApiErrorMessage(response.message) ||
-            TOOL_MESSAGES.FETCH_DETAILS_ERROR
+          extractApiErrorMessage(response.message) || TOOL_MESSAGES.FETCH_ERROR
         );
-        setEditToolData(null);
-        setSideSheetOpen(false);
       }
-    } catch (error: any) {
-      showErrorToast(
-        extractApiErrorMessage(error.message) ||
-          TOOL_MESSAGES.FETCH_DETAILS_ERROR
-      );
-      setEditToolData(null);
-      setSideSheetOpen(false);
+    } catch (error) {
+      console.error('Error fetching tool details:', error);
+      showErrorToast(TOOL_MESSAGES.FETCH_ERROR);
     } finally {
       setEditLoading(false);
     }
@@ -215,10 +232,16 @@ export default function ToolsManagement() {
     tool_assets: string;
     service_ids: string;
   }) => {
+    // Prevent submission if originalToolAssets is not loaded yet
+    if (!originalToolAssets && editToolData?.assets && editToolData.assets.length > 0) {
+      return;
+    }
+
     setFormLoading(true);
     try {
-      // Use new fileKey if uploaded, otherwise use the tool_assets from form data (which preserves existing assets)
-      const toolAssets = fileKey || data.tool_assets || '';
+      // Send tool_assets as it is if not changed, otherwise use new file or empty if deleted
+      const toolAssets =
+        fileKey || (imageDeleted ? '' : (originalToolAssets ?? ''));
 
       const payload: CreateToolRequest = {
         name: data.name,
@@ -228,20 +251,17 @@ export default function ToolsManagement() {
         service_ids: data.service_ids,
       };
 
-      console.log('Update tool payload:', payload); // Debug log
-      console.log('Update tool UUID:', editToolUuid); // Debug log
-
       const response = await apiService.updateTool(editToolUuid!, payload);
 
-      console.log('Update tool response:', response); // Debug log
-
-      if (response.statusCode === 200 || response.statusCode === 201) {
-        showSuccessToast(response.message || TOOL_MESSAGES.UPDATE_SUCCESS);
+      if (response.statusCode === 200) {
+        showSuccessToast(TOOL_MESSAGES.UPDATE_SUCCESS);
         setSideSheetOpen(false);
         setPhoto(null);
         setFileKey('');
         setEditToolUuid(null);
         setEditToolData(null);
+        setImageDeleted(false);
+        setOriginalToolAssets('');
         // Refresh tools list
         const refreshResponse = await apiService.fetchTools({
           page: 1,
@@ -266,7 +286,7 @@ export default function ToolsManagement() {
         );
       }
     } catch (error: any) {
-      console.error('Update tool error:', error); // Debug log
+      console.error('Error updating tool:', error);
       if (error.status === 401) {
         handleAuthError(error);
       } else {
@@ -277,6 +297,16 @@ export default function ToolsManagement() {
     } finally {
       setFormLoading(false);
     }
+  };
+
+  const handleCancel = () => {
+    setSideSheetOpen(false);
+    setPhoto(null);
+    setFileKey('');
+    setEditToolUuid(null);
+    setEditToolData(null);
+    setImageDeleted(false);
+    setOriginalToolAssets('');
   };
 
   if (loading) {
@@ -362,23 +392,19 @@ export default function ToolsManagement() {
             uploading={uploading}
             onSubmit={editToolUuid ? handleUpdateTool : handleCreateTool}
             loading={formLoading}
-            onCancel={() => {
-              setSideSheetOpen(false);
-              setPhoto(null);
-              setFileKey('');
-              setEditToolUuid(null);
-              setEditToolData(null);
-            }}
+            onCancel={handleCancel}
             setUploading={setUploading}
             setFileKey={setFileKey}
             existingImageUrl={
-              editToolData &&
-              editToolData.assets &&
-              editToolData.assets[0]?.media_url
-                ? cdnPrefix + editToolData.assets[0].media_url
-                : undefined
+              imageDeleted
+                ? undefined
+                : editToolData &&
+                    editToolData.assets &&
+                    editToolData.assets[0]?.media_url
+                  ? cdnPrefix + editToolData.assets[0].media_url
+                  : undefined
             }
-            existingToolAssets={editToolData?.tool_assets || ''}
+            existingToolAssets={imageDeleted ? '' : originalToolAssets}
             initialValues={
               editToolData
                 ? {
@@ -387,14 +413,9 @@ export default function ToolsManagement() {
                     manufacturer: editToolData.manufacturer,
                     services: editToolData.services?.map(s => s.id) || [],
                   }
-                : {
-                    name: '',
-                    available_quantity: 1,
-                    manufacturer: '',
-                    services: [],
-                  }
+                : {}
             }
-            isEdit={!!editToolUuid}
+            isEdit={true}
           />
         )}
       </SideSheet>
